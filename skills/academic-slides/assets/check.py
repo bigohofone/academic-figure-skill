@@ -2,98 +2,178 @@
 
 Runs every check in CHECKS on the deck and reports the problems. Exits with 1 if anything is reported.
 
-- check_fit: measures every text box with Inter's real metrics and reports text that overflows
-  its box or titles longer than two lines.
+- check_fit: measures every text box with Inter's real metrics (measure.py) and reports text that
+  overflows its box, titles longer than two lines (three on the title slide), table cells that wrap,
+  and paragraphs whose last line is a single word that save() couldn't pull back.
+- check_grid: reports shapes whose left edge isn't on a grid column start or whose right edge
+  isn't on a column end (see box() in slides.py). Arrows (connectors) are exempt; figures only have
+  to stay inside the side margins, since they keep their aspect ratio and may be centered.
+- check_bounds: reports content shapes that run into the footnote and page-number line, and anything
+  that runs past the bottom margin.
+- check_density: reports slides with more than MAX_WORDS words of body text (titles and footnotes not
+  counted, nor tables, the References slide or reference entries such as "[1] ..."): too dense to leave whitespace (design-guidelines.md, principle 6).
+- check_shadows: reports shapes with a shadow, or with a style whose effect could add one.
+- check_overlap: reports shapes whose boxes overlap (text running into a figure or table). Full-bleed
+  backgrounds, arrows and the contents of a card (add_statement) are exempt.
 """
+import re
 import sys
-from pathlib import Path
 
-from PIL import ImageFont
 from pptx import Presentation
 from pptx.enum.shapes import PP_PLACEHOLDER
+from pptx.oxml.ns import qn
 
-ASSETS = Path(__file__).parent
-FONT_FILES = {"Inter": ASSETS / "Inter-Regular.ttf", "Inter SemiBold": ASSETS / "Inter-SemiBold.ttf"}
-FONT_FILES["+mn-lt"], FONT_FILES["+mj-lt"] = FONT_FILES["Inter"], FONT_FILES["Inter SemiBold"]  # the theme's body and heading fonts
-LINE_EM = (1984 + 494) / 2048  # Inter's ascent + descent, the line height before line spacing
-A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-EMU_PER_PT = 12700
-fonts = {}
+from measure import EMU_PER_PT, font, measure
+from slides import COLUMN, COLUMNS, GUTTER, LEFT, WIDTH
 
-
-def font(typeface, size):
-    key = (typeface, size)
-    if key not in fonts:
-        fonts[key] = ImageFont.truetype(str(FONT_FILES.get(typeface, FONT_FILES["Inter"])), size * 10)
-    return fonts[key]
+EMU_PER_IN = 914400
+COLUMN_STARTS = [LEFT + c * (COLUMN + GUTTER) for c in range(COLUMNS)]
+COLUMN_ENDS = [start + COLUMN for start in COLUMN_STARTS]
+GRID_TOLERANCE = 0.01  # in
 
 
-def style_chain(shape, slide):
-    """lvl1pPr elements that style this shape's text, nearest first."""
-    chain = [shape.text_frame._txBody.find(f"{A}lstStyle/{A}lvl1pPr")]
-    if shape.is_placeholder:
-        layout_ph = slide.slide_layout.placeholders.get(idx=shape.placeholder_format.idx)
-        if layout_ph is not None:
-            chain.append(layout_ph.text_frame._txBody.find(f"{A}lstStyle/{A}lvl1pPr"))
-        is_title = shape.placeholder_format.type in (PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE)
-        styles = slide.slide_layout.slide_master._element.find(
-            "{http://schemas.openxmlformats.org/presentationml/2006/main}txStyles")
-        chain.append(styles.find(f"*/{A}lvl1pPr") if is_title else styles[1].find(f"{A}lvl1pPr"))
-    return [el for el in chain if el is not None]
-
-
-def lookup(elements, path, attr, default):
-    for el in elements:
-        found = el.find(path) if path else el
-        if found is not None and found.get(attr) is not None:
-            return found.get(attr)
-    return default
-
-
-def measure(shape, slide):
-    chain = style_chain(shape, slide)
-    width_pt = shape.width / EMU_PER_PT
-    height_pt = 0
-    lines_total = 0
-    for i, p in enumerate(shape.text_frame.paragraphs):
-        pPr = p._p.find(f"{A}pPr")
-        pchain = ([pPr] if pPr is not None else []) + chain
-        size = int(lookup(pchain, f"{A}defRPr", "sz", 1800)) / 100
-        face_default = lookup(pchain, f"{A}defRPr/{A}latin", "typeface", "Inter")
-        spacing = int(lookup(pchain, f"{A}lnSpc/{A}spcPct", "val", 100000)) / 100000
-        after = int(lookup(pchain, f"{A}spcAft/{A}spcPts", "val", 0)) / 100
-        indent = int(lookup(pchain, None, "marL", 0)) / EMU_PER_PT
-        words = []
-        for run in p.runs:
-            size = run.font.size.pt if run.font.size else size
-            face = run.font.name or face_default
-            words += [(word, face) for word in run.text.split(" ")]
-        lines, line_width = 1, 0
-        for word, face in words:
-            w = (font(face, size).getlength(word) + font(face, size).getlength(" ")) / 10
-            if line_width and line_width + w > width_pt - indent:
-                lines, line_width = lines + 1, 0
-            line_width += w
-        lines_total += lines
-        height_pt += lines * size * LINE_EM * spacing + (after if i < len(shape.text_frame.paragraphs) - 1 else 0)
-    return height_pt / 72, shape.height / 914400, lines_total
+def check_table_cells(n, shape):
+    problems = []
+    table = shape.table
+    for r, row in enumerate(table.rows):
+        for c, cell in enumerate(row.cells):
+            if cell.is_spanned:
+                continue
+            span = cell.span_width if cell.is_merge_origin else 1
+            width = (sum(table.columns[k].width for k in range(c, c + span)) - cell.margin_left - cell.margin_right) / EMU_PER_PT
+            for p in cell.text_frame.paragraphs:
+                need = sum(font(run.font.size.pt if run.font.size else 18, bool(run.font.italic)).getlength(run.text) / 10
+                           for run in p.runs)
+                if need > width:
+                    problems.append(f"slide {n}, {shape.name}: cell ({r}, {c}) \"{cell.text}\" wraps; widen its column")
+    return problems
 
 
 def check_fit(prs):
     problems = []
     for n, slide in enumerate(prs.slides, 1):
         for shape in slide.shapes:
+            if shape.has_table:
+                problems += check_table_cells(n, shape)
             if not shape.has_text_frame or not shape.text_frame.text.strip():
                 continue
-            need, box, lines = measure(shape, slide)
+            need, box, lines, runts = measure(shape, slide)
+            for i in runts:
+                problems.append(f"slide {n}, {shape.name}: paragraph {i + 1} ends with one word on its last line; "
+                                "reword it (save() already tried tighter spacing)")
             if need > box + 0.01:
                 problems.append(f"slide {n}, {shape.name}: text needs {need:.2f} in, box is {box:.2f} in")
-            if shape.is_placeholder and shape.placeholder_format.type == PP_PLACEHOLDER.TITLE and lines > 2:
-                problems.append(f"slide {n}, {shape.name}: title runs {lines} lines, max 2")
+            max_lines = 3 if slide.slide_layout.name == "Title" else 2  # a paper's full title may need three
+            if shape.is_placeholder and shape.placeholder_format.type == PP_PLACEHOLDER.TITLE and lines > max_lines:
+                problems.append(f"slide {n}, {shape.name}: title runs {lines} lines, max {max_lines}")
     return problems
 
 
-CHECKS = [check_fit]
+def on_any(edge, edges):
+    return any(abs(edge - e) <= GRID_TOLERANCE for e in edges)
+
+
+def on_card(shape, slide):
+    """True for text or an equation placed on a card (add_statement): it follows the card's padding, not the grid."""
+    return any(card.name == "Card" and card is not shape and card.left <= shape.left
+               and shape.left + shape.width <= card.left + card.width and card.top <= shape.top
+               and shape.top + shape.height <= card.top + card.height for card in slide.shapes)
+
+
+def check_grid(prs):
+    problems = []
+    slide_width = prs.slide_width / EMU_PER_IN
+    for n, slide in enumerate(prs.slides, 1):
+        for shape in slide.shapes:
+            if shape.element.tag == qn("p:cxnSp") or shape.name == "Highlight" or on_card(shape, slide):
+                continue  # arrows run through the gutters; highlights sit on a figure; card contents follow its padding
+            left = shape.left / EMU_PER_IN
+            right = left + shape.width / EMU_PER_IN
+            if abs(left) <= GRID_TOLERANCE and abs(right - slide_width) <= GRID_TOLERANCE:
+                continue  # full-bleed
+            if not on_any(left, COLUMN_STARTS) and shape.element.tag != qn("p:pic"):
+                problems.append(f"slide {n}, {shape.name}: left edge {left:.2f} in is not on a column start")
+            if shape.element.tag == qn("p:pic"):
+                # A figure keeps its aspect ratio and may be centered in its box: it only has to stay inside the margins.
+                if left < LEFT - GRID_TOLERANCE or right > LEFT + WIDTH + GRID_TOLERANCE:
+                    problems.append(f"slide {n}, {shape.name}: figure runs outside the side margins")
+                continue
+            if not on_any(right, COLUMN_ENDS):
+                problems.append(f"slide {n}, {shape.name}: right edge {right:.2f} in is not on a column end")
+    return problems
+
+
+BOTTOM_MARGIN = 0.4  # in, the theme's bottom padding
+FOOTER_BAND = 0.375  # in, the footnote and page-number line above the bottom margin
+
+
+def check_bounds(prs):
+    problems = []
+    bottom_margin = prs.slide_height / EMU_PER_IN - BOTTOM_MARGIN
+    footer_top = bottom_margin - FOOTER_BAND
+    for n, slide in enumerate(prs.slides, 1):
+        for shape in slide.shapes:
+            top = shape.top / EMU_PER_IN
+            bottom = (shape.top + shape.height) / EMU_PER_IN
+            if shape.height >= prs.slide_height:
+                continue
+            limit = bottom_margin if top >= footer_top - GRID_TOLERANCE else footer_top
+            if bottom > limit + GRID_TOLERANCE:
+                where = "the bottom margin" if limit == bottom_margin else "the footnote and page-number line"
+                problems.append(f"slide {n}, {shape.name}: bottom edge {bottom:.2f} in runs into {where} ({limit:.2f} in)")
+    return problems
+
+
+def check_overlap(prs):
+    problems = []
+    for n, slide in enumerate(prs.slides, 1):
+        shapes = [s for s in slide.shapes
+                  if s.element.tag != qn("p:cxnSp") and s.name != "Highlight" and s.height < prs.slide_height
+                  and not on_card(s, slide)]
+        for i, a in enumerate(shapes):
+            for b in shapes[i + 1:]:
+                w = min(a.left + a.width, b.left + b.width) - max(a.left, b.left)
+                h = min(a.top + a.height, b.top + b.height) - max(a.top, b.top)
+                if w > EMU_PER_IN * GRID_TOLERANCE and h > EMU_PER_IN * GRID_TOLERANCE:
+                    problems.append(f"slide {n}: {a.name} and {b.name} overlap")
+    return problems
+
+
+MAX_WORDS = 60
+REFERENCE = re.compile(r"\s*(\[\d+\]|[¹²³⁴⁵⁶⁷⁸⁹])")  # a reference-list entry
+
+
+def check_density(prs):
+    problems = []
+    for n, slide in enumerate(prs.slides, 1):
+        if slide.slide_layout.name == "References":
+            continue
+        words = 0
+        for shape in slide.shapes:
+            if not shape.has_text_frame:
+                continue
+            if shape.is_placeholder and (shape.placeholder_format.type in (PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE)
+                                         or shape.placeholder_format.idx == 13):
+                continue
+            words += sum(len(p.text.split()) for p in shape.text_frame.paragraphs if not REFERENCE.match(p.text))
+        if words > MAX_WORDS:
+            problems.append(f"slide {n}: {words} words of body text (at most {MAX_WORDS}); cut words or split the slide")
+    return problems
+
+
+def check_shadows(prs):
+    """No shape may cast a shadow or carry a style that can give it one."""
+    problems = []
+    for n, slide in enumerate(prs.slides, 1):
+        for shape in slide.shapes:
+            el = shape.element
+            effect_ref = el.find(f".//{qn('a:effectRef')}")
+            if el.find(f".//{qn('a:outerShdw')}") is not None or (effect_ref is not None and effect_ref.get("idx") != "0"):
+                problems.append(f"slide {n}, {shape.name}: has a shadow (remove its p:style or effect)")
+    return problems
+
+
+CHECKS = [check_fit, check_grid, check_bounds, check_overlap, check_density, check_shadows]
 
 
 def main(path):

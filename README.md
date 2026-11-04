@@ -24,4 +24,4 @@ Update with `/plugin marketplace update academic-skill`.
 
 MIT, except the bundled Inter fonts (SIL Open Font License, see `skills/academic-figure/assets/Inter-LICENSE.txt` and `skills/academic-slides/assets/Inter-LICENSE.txt`).
 
-`academic-slides` was inspired by [academic-pptx-skill](https://github.com/Gabberflast/academic-pptx-skill).
+`academic-slides` was inspired by [academic-pptx-skill](https://github.com/Gabberflast/academic-pptx-skill). Its argument guidelines draw on David Hirshleifer's "Best Practices for Academic Presentations" (2026), itself prompted by [David Kasten's post](https://x.com/David_Kasten/status/2027063865742442521), and on Naegle (2021), "Ten simple rules for effective presentation slides", *PLOS Computational Biology*.
