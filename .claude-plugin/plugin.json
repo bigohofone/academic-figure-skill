@@ -1,0 +1,10 @@
+{
+  "name": "academic-skill",
+  "version": "0.1.0",
+  "description": "Skills for academic papers: figures and slides.",
+  "author": {
+    "name": "bigohofone"
+  },
+  "repository": "https://github.com/bigohofone/academic-skill",
+  "license": "MIT"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "academic-skill",
+  "owner": {
+    "name": "bigohofone"
+  },
+  "plugins": [
+    {
+      "name": "academic-skill",
+      "source": "./",
+      "description": "Skills for academic papers: figures and slides."
+    }
+  ]
+}

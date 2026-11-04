@@ -1,5 +1,5 @@
 ---
-name: paper-figure
+name: academic-figure
 description: Style rules for academic paper figures made with matplotlib or seaborn (size, fonts, colors, axes, legends, saving), plus a required delivery step - a `figures/` folder in the user's project holds a copy of the style files and `figures.ipynb`, where every figure is one self-contained cell, with a paper-style caption above it, so the user can run, edit, and re-export it (PDF/PNG) themselves. Always use this skill when creating or editing any figure, plot, graph, chart, heatmap, or visualization intended for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned, and even if the user asks only for the plotting code.
 ---
 
