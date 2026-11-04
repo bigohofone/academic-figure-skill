@@ -5,5 +5,3 @@ __pycache__/
 # Third-party talks rebuilt in the theme for testing; their content belongs to the original authors.
 restyled/
 
-# Third-party reading notes the guidelines draw on; kept local, credited in README.
-references/
