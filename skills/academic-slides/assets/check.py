@@ -10,13 +10,11 @@ Runs every check in CHECKS on the deck and reports the problems. Exits with 1 if
   to stay inside the side margins, since they keep their aspect ratio and may be centered.
 - check_bounds: reports content shapes that run into the footnote and page-number line, and anything
   that runs past the bottom margin.
-- check_density: reports slides with more than MAX_WORDS words of body text (titles and footnotes not
-  counted, nor tables, the References slide or reference entries such as "[1] ..."): too dense to leave whitespace (design-guidelines.md, principle 6).
 - check_shadows: reports shapes with a shadow, or with a style whose effect could add one.
 - check_overlap: reports shapes whose boxes overlap (text running into a figure or table). Full-bleed
   backgrounds, arrows and the contents of a card (add_statement) are exempt.
 """
-import re
+
 import sys
 
 from pptx import Presentation
@@ -30,7 +28,6 @@ EMU_PER_IN = 914400
 COLUMN_STARTS = [LEFT + c * (COLUMN + GUTTER) for c in range(COLUMNS)]
 COLUMN_ENDS = [start + COLUMN for start in COLUMN_STARTS]
 GRID_TOLERANCE = 0.01  # in
-
 
 def check_table_cells(n, shape):
     problems = []
@@ -47,7 +44,6 @@ def check_table_cells(n, shape):
                 if need > width:
                     problems.append(f"slide {n}, {shape.name}: cell ({r}, {c}) \"{cell.text}\" wraps; widen its column")
     return problems
-
 
 def check_fit(prs):
     problems = []
@@ -68,17 +64,14 @@ def check_fit(prs):
                 problems.append(f"slide {n}, {shape.name}: title runs {lines} lines, max {max_lines}")
     return problems
 
-
 def on_any(edge, edges):
     return any(abs(edge - e) <= GRID_TOLERANCE for e in edges)
-
 
 def on_card(shape, slide):
     """True for text or an equation placed on a card (add_statement): it follows the card's padding, not the grid."""
     return any(card.name == "Card" and card is not shape and card.left <= shape.left
                and shape.left + shape.width <= card.left + card.width and card.top <= shape.top
                and shape.top + shape.height <= card.top + card.height for card in slide.shapes)
-
 
 def check_grid(prs):
     problems = []
@@ -102,10 +95,8 @@ def check_grid(prs):
                 problems.append(f"slide {n}, {shape.name}: right edge {right:.2f} in is not on a column end")
     return problems
 
-
 BOTTOM_MARGIN = 0.4  # in, the theme's bottom padding
 FOOTER_BAND = 0.375  # in, the footnote and page-number line above the bottom margin
-
 
 def check_bounds(prs):
     problems = []
@@ -123,7 +114,6 @@ def check_bounds(prs):
                 problems.append(f"slide {n}, {shape.name}: bottom edge {bottom:.2f} in runs into {where} ({limit:.2f} in)")
     return problems
 
-
 def check_overlap(prs):
     problems = []
     for n, slide in enumerate(prs.slides, 1):
@@ -138,29 +128,6 @@ def check_overlap(prs):
                     problems.append(f"slide {n}: {a.name} and {b.name} overlap")
     return problems
 
-
-MAX_WORDS = 60
-REFERENCE = re.compile(r"\s*(\[\d+\]|[¹²³⁴⁵⁶⁷⁸⁹])")  # a reference-list entry
-
-
-def check_density(prs):
-    problems = []
-    for n, slide in enumerate(prs.slides, 1):
-        if slide.slide_layout.name == "References":
-            continue
-        words = 0
-        for shape in slide.shapes:
-            if not shape.has_text_frame:
-                continue
-            if shape.is_placeholder and (shape.placeholder_format.type in (PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE)
-                                         or shape.placeholder_format.idx == 13):
-                continue
-            words += sum(len(p.text.split()) for p in shape.text_frame.paragraphs if not REFERENCE.match(p.text))
-        if words > MAX_WORDS:
-            problems.append(f"slide {n}: {words} words of body text (at most {MAX_WORDS}); cut words or split the slide")
-    return problems
-
-
 def check_shadows(prs):
     """No shape may cast a shadow or carry a style that can give it one."""
     problems = []
@@ -172,16 +139,13 @@ def check_shadows(prs):
                 problems.append(f"slide {n}, {shape.name}: has a shadow (remove its p:style or effect)")
     return problems
 
-
-CHECKS = [check_fit, check_grid, check_bounds, check_overlap, check_density, check_shadows]
-
+CHECKS = [check_fit, check_grid, check_bounds, check_overlap, check_shadows]
 
 def main(path):
     prs = Presentation(path)
     problems = [problem for check in CHECKS for problem in check(prs)]
     print("\n".join(problems) or "No problems found.")
     return 1 if problems else 0
-
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1]))

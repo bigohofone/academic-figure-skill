@@ -22,9 +22,8 @@ How specific kinds of content go on a slide: figures, tables, equations, citatio
 
 ## Equations
 
-- Display equations: `add_equation(slide, first_column, span, y, tex, size)` sets LaTeX (matplotlib mathtext) in Inter as an image, so sums with limits, fractions and stacked indices look right. Office equation objects don't survive the import into Google Slides.
-- Inter has no script, blackboard or tall bracket glyphs: write `\mathrm{E}` for `\mathbb{E}`, plain `[ ]` for `\left[ \right]`, and avoid `\mathcal`.
-- Inline math in text: plain Unicode (`R² = 0.91`, `p < 0.001`), italic runs for variables, `"sub"` / `"super"` runs where Unicode has no character.
+- Display equations: `add_equation(slide, first_column, span, y, tex, size)` sets LaTeX (matplotlib mathtext) in Computer Modern, the serif of LaTeX papers, as an image, so equations look as they do in the paper. Office equation objects don't survive the import into Google Slides.
+- Inline math in text: plain Unicode (`R² = 0.91`, `p < 0.001`), italic runs for variables, `"sub"` / `"super"` runs where Unicode has no character. Never combining accents (π̄, x̂): renderers misplace or drop them. Put a symbol with an accent in an `add_equation` line, or name it in words ("π-bar").
 - Explain the key symbols in short term lines below the equation; the equation itself stays dark navy.
 - Theorems, lemmas, propositions, definitions and assumptions: one statement card each (`add_statement`), the label as its heading, the statement's text and equations inside, what it means below the card.
 

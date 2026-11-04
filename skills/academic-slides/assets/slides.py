@@ -298,21 +298,14 @@ def highlight(slide, picture, left, top, right, bottom):
 
 
 def add_equation(slide, first_column, span, y, tex, size=24, align="center"):
-    """A LaTeX equation (matplotlib mathtext, set in Inter, dark navy) as an image at its natural size for `size`
-    pt, from y, centered in its columns by default. For anything Unicode text can't set: stacked sub- and
-    superscripts, sums with limits, fractions. Avoid \\mathcal and \\mathbb: Inter has no script or blackboard
-    letters, so they come from a fallback font; write \\mathrm{E} or \\mathbf{1} instead. Use
-    plain brackets: \\left[ \\right] fails, Inter has no tall brackets."""
+    """A LaTeX equation (matplotlib mathtext in Computer Modern, the serif of LaTeX papers, dark navy) as an image
+    at its natural size for `size` pt, from y, centered in its columns by default. For anything Unicode text can't
+    set: stacked sub- and superscripts, sums with limits, fractions, \\mathbb, \\mathcal, \\left( \\right)."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from matplotlib import font_manager
 
-    for name in ("Inter-Regular.ttf", "Inter-Italic.ttf"):
-        font_manager.fontManager.addfont(str(ASSETS / name))
-    with plt.rc_context({"mathtext.fontset": "custom", "mathtext.rm": "Inter", "mathtext.it": "Inter:italic",
-                         "mathtext.bf": "Inter", "mathtext.sf": "Inter",
-                         "mathtext.cal": "Inter"}):
+    with plt.rc_context({"mathtext.fontset": "cm"}):
         fig = plt.figure(figsize=(0.01, 0.01))
         fig.text(0, 0, f"${tex}$", fontsize=size, color=f"#{STRONG}")
         path = Path(tempfile.mkdtemp()) / "equation.png"

@@ -6,7 +6,7 @@ For converting an existing deck (PDF, PPTX, Keynote export) into this theme. **C
 
 1. **Read the whole source first.** Render every page (PyMuPDF at about 200 dpi) and list what each slide holds.
 
-2. **Layout plan before building** (design-guidelines.md, principle 8). Sort the source slides into kinds of content and give each kind one treatment, so the restyled deck is more consistent than the source, not less. Same-kind slides in one section use the same split, with the same thing on the same side.
+2. **Layout plan before building** (design-guidelines.md, principle 8). Sort the source slides into kinds of content and give each kind one treatment, so the restyled deck is more consistent than the source, not less. Same-kind slides in one section use the same layout, with the same thing in the same place. A description with a figure stacks (description above, figure below) unless the figure is tall; don't turn a source slide's text-above-figure into two columns.
 
 3. **Figures and table crops never shrink.** Crop each figure whole from the source page. On the restyled slide it is at least as large as on the source slide (the same share of the slide's width or height), and its smallest text stays readable. The layout makes room for it, not the other way round:
    - give it the full width or all four rows;
@@ -18,15 +18,15 @@ For converting an existing deck (PDF, PPTX, Keynote export) into this theme. **C
 4. **Tables:** rebuild with `add_table` when the table fits at 13 pt. A table too big for that (many rows or columns, multi-line cells, ± subscripts) stays a crop, under rule 3.
 
 5. **Equations and annotations:**
-   - Re-set equations with `add_equation` when they were screenshots (avoid `\left`, `\mathcal`, `\mathbb`; see its docstring).
+   - Re-set equations with `add_equation` when they were screenshots.
    - Theorems, lemmas, definitions and assumptions go on statement cards (`add_statement`).
    - Boxes, arrows and circled terms that tie a remark to part of a figure or equation are content: redraw them with `highlight()` and `add_arrow`.
-   - Logos, clip art, icons and decorative pictures are not content: drop them, keeping logos only on the title slide.
+   - Logos, clip art, icons and decorative pictures are not content: drop them, keeping logos only on the title slide, in a row along its top margin: `add_image(slide, first_column, span, 0.4, 0.4, logo, align="left")` per logo, left to right.
 
-6. **A slide too dense for whitespace** (design-guidelines.md, principle 6). Try in order:
+6. **A slide too dense for whitespace** (design-guidelines.md, principle 6): it overflows (`check.py`) or is crowded (`aesthetics.py`). Try in order:
    1. Use the space: full width, all four rows.
    2. Set that slide's body at 13 pt, the smallest size in the scale, never smaller.
-   3. Split it into consecutive slides with the same title, the later ones ending in "(cont.)". Split as many times as whitespace needs; dense source decks often double in length, and that is fine. Each part gets the same layout and a balanced share, never a nearly empty slide. Keep every word, figure and item in its original order and grouping.
+   3. Split it into consecutive slides with the same title, the later ones ending in "(cont.)". Split as many times as whitespace needs; dense source decks often double in length, and that is fine. Each part gets the same layout and a balanced share, never a nearly empty slide: a short leftover (a contact line, one bullet) stays with the part before it. An arrow between blocks that end up on different slides is dropped; the order of the slides already says it. Keep every word, figure and item in its original order and grouping.
 
    Tell the user which slides were split. Never cut words, drop items, overflow or cram.
 

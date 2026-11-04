@@ -8,9 +8,22 @@ How every slide looks. These principles hold on every slide; within them, design
 - Every block starts on a column and spans whole columns: `box(first_column, span, y, h)`.
 - Vertically, a block starts on a row (`rows(first_row, span)`), or, in a stack of blocks that size to their content (text, equations, a figure under its text), a gutter below the block above.
 - **One column by default.** Text, equations and a single figure or table run the full 12 columns, stacked top to bottom.
-- **Columns only when the content needs them:** a figure or table with text beside it, or two to four parallel items that must read as separate (two settings, three components, images to compare).
-  - Splits: 6 + 6, 8 + 4, 4 + 4 + 4, 3 × 4.
-  - Two sides are 6 + 6 by default. Use 8 + 4 only for a figure with two or three short remarks.
+- **Text and a figure stack by default:** the description or lead-in above, the figure below it at full width. This is how a slide reads naturally (what to look for, then the thing itself), and a wide figure keeps its size. Don't split a slide into columns just because it holds text and a figure.
+- **Columns only when stacking doesn't work:**
+  - a tall or square figure (about as tall as wide or taller), which would shrink to fit under text: figure on one side, text on the other;
+  - two to four parallel items that must read as separate (two settings, three components, images to compare);
+  - two things the audience compares side by side (before and after, ours and theirs).
+  - Use only simple ratios the eye reads at once:
+
+    | Ratio | Columns | For |
+    |---|---|---|
+    | 1 : 1 | 6 + 6 | Two sides of equal weight; the default for two sides |
+    | 2 : 1 | 8 + 4 | A tall figure with two or three short remarks beside it |
+    | 1 : 2 | 4 + 8 | A short label, list or small figure beside the main block |
+    | 1 : 1 : 1 | 4 + 4 + 4 | Three parallel items |
+    | 1 : 1 : 1 : 1 | 3 + 3 + 3 + 3 | Four parallel items |
+
+    Never other splits (5 + 7, 9 + 3, 3 + 9): ratios the eye can't name look like mistakes.
 - Off the grid: only a `highlight()` outline on a figure, an `add_arrow` across a gutter, and the contents of a card, which follow its padding.
 
 ## 2. Type
@@ -58,14 +71,16 @@ All from one blue, Paul Tol's #4477AA (the academic-figure skill's charts use th
 
 - Decide what the audience must read first on each slide and make it the largest or highest-contrast thing there: usually the exhibit, then the title's claim, then the remarks.
 - One focal point per slide; everything else supports it.
-- Left to right, top to bottom. A figure's remarks sit to its right (or below it), in the order the speaker will point at them.
+- Top to bottom, then left to right. What to look for comes before the figure: a lead-in above it, remarks after it, in the order the speaker will point at them.
 
 ## 6. Whitespace
 
 - Whitespace is signal, not wasted canvas; a dense slide reads as unclear thinking.
 - Nothing runs past the content area, ever. Blocks keep at least a gutter between them and never touch the title, the footnote or each other.
-- Text fills at most about three quarters of the content area's height.
-- About 40 words of body text per slide is the aim; past 60 (`check.py` reports it, not counting titles, footnotes, tables and references) the slide must lose words or become two slides.
+- Measure it: `python assets/aesthetics.py deck.pptx` renders the deck and reports, per slide, after AeSlides (Pan et al., 2026):
+  - **fill**, the share of the content area taken by text and drawn shapes (figures don't count). Over 0.72 the slide is crowded: cut words, give it more space, or split it.
+  - **whitespace**, the share of the content area left as large empty regions. Over 0.5 the slide is mostly empty: enlarge the exhibit or merge the slide with a neighbor.
+  - **balance**, how far the content's visual centroid sits from the middle, sideways counting more. Over 1 the slide leans to one side.
 - When in doubt: more space, fewer things.
 
 ## 7. Alignment and balance
@@ -78,7 +93,7 @@ All from one blue, Paul Tol's #4477AA (the academic-figure skill's charts use th
 
 - The same kind of content looks the same on every slide.
 - **Before building, write a layout plan:** list the kinds of content in the deck (a figure with its equations, a results table, a figure with remarks, a theorem) and give each one treatment: its split, which side holds what, where its lead-in goes.
-- Build every slide of a kind the same way, especially consecutive slides in one section: if one method slide puts the figure left and the equations right on 6 + 6, they all do.
+- Build every slide of a kind the same way, especially consecutive slides in one section: if one method slide puts the description above the figure, they all do; if one puts a tall figure left and its equations right on 6 + 6, they all do.
 - A slide may differ only when its content is a different kind, never because its text is a little longer.
 
 ## 9. Restraint

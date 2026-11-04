@@ -34,14 +34,14 @@ What a research talk says and in what order: the audience, the storyline, titles
 - At most one exhibit per slide (a chart, table, diagram or equation), and it supports the title directly. If it doesn't, change the title or the exhibit.
 - **Self-sufficient slide test:** would someone who can't hear the speaker still get the point? If not, mark the finding on the slide: a dotted `highlight()` on the part of the figure, the focal series in the theme blue, an `add_arrow`, or the finding stated as the first remark beside the exhibit.
 - Prefer a chart to a table for results and trends; a table is right when exact values matter (main results, ablations).
-- A figure with remarks: figure on the left, remarks on the right, in the order the speaker will point at them.
+- A figure with a description: the description above, the figure below at full width. Remarks beside the figure only when it is tall (design-guidelines.md, principle 1).
 - Show only what the talk discusses. An exhibit you'll skip over doesn't belong on a slide.
 - No decorative icons, clip art, stock photos or logos on content slides; logos at most on the title slide.
 
 ## Text on slides
 
 - Full sentences only in titles. Body text is short parallel bullets, one idea each; drop articles and filler ("Intervention cut costs 23% (p < 0.01)").
-- **Aim for about 40 words of body text per slide**; `check.py` reports a slide past 60 (titles, footnotes, tables and references not counted). Detail goes in the speaker notes or a backup slide.
+- Keep body text short enough that the slide breathes; `aesthetics.py` reports crowded slides (design-guidelines.md, principle 6). Detail goes in the speaker notes or a backup slide.
 - If the audience is reading, they aren't listening: the slide supports the talk, it doesn't replace it.
 
 ## Slides every talk needs

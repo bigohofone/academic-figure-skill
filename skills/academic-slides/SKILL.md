@@ -63,7 +63,7 @@ save(prs, "talk.pptx")  # deletes empty placeholders, balances titles, fixes run
 | `add_bullets`, `add_text` | Text in grid columns; `h=None` fits the height to the text. A 17 pt subheading is `add_text(..., [[(text, True, True)]], 17)` |
 | `add_image`, `figure` | A figure, whole and centered, in a grid box or a picture placeholder |
 | `add_table` | A table: 13 pt, horizontal rules, `best=`, `groups=`, `highlight=` |
-| `add_equation` | LaTeX set in Inter, as an image |
+| `add_equation` | LaTeX in Computer Modern, the serif of papers, as an image |
 | `add_statement` | A theorem, lemma or definition on a card, text and equations inside |
 | `add_cards`, `add_card` | 2–4 cards in a row, only when the card gate passes |
 | `add_flow`, `add_arrow` | Steps with arrows; an arrow joining two blocks |
@@ -79,15 +79,16 @@ To change the theme itself, edit `assets/theme.py`, run it, and commit the new `
 
 ## Step 4: Check
 
-1. `python {skill-dir}/assets/check.py deck.pptx`: measures every text box with Inter's real metrics (overflow, titles over two lines, table cells that wrap, single words on a last line), and reports shapes off the grid, past the bottom margin, overlapping or shadowed, and slides with more than 60 words of body text. Fix everything it reports, or (in a restyle) list it for the user.
-2. Render and look at every page: `FONTCONFIG_FILE={skill-dir}/assets/fonts.conf soffice --headless --convert-to pdf deck.pptx` (the config points LibreOffice at the bundled Inter). For each page: is the focal point obvious, does the eye move in reading order, is anything crowded or empty, does it match the deck's other slides of its kind? Fix and render again.
-3. Academic checks:
+1. `python {skill-dir}/assets/check.py deck.pptx`: measures every text box with Inter's real metrics (overflow, titles over two lines, table cells that wrap, single words on a last line), and reports shapes off the grid, past the bottom margin, overlapping or shadowed. Fix everything it reports, or (in a restyle) list it for the user.
+2. `python {skill-dir}/assets/aesthetics.py deck.pptx`: renders the deck and measures each slide after AeSlides: fill (crowding), whitespace (large empty regions) and balance (a lean to one side), and flags slides past the thresholds (design-guidelines.md, principle 6). Fix the flagged slides.
+3. Render and look at every page: `FONTCONFIG_FILE={skill-dir}/assets/fonts.conf soffice --headless --convert-to pdf deck.pptx` (the config points LibreOffice at the bundled Inter). For each page: is the focal point obvious, does the eye move in reading order, is anything crowded or empty, does it match the deck's other slides of its kind? Fix and render again.
+4. Academic checks:
 
 ```
 □ The titles alone tell the argument; each is one sentence of at most two lines
 □ The research question has its own slide, by slide 3
 □ One exhibit per slide, supporting its title, with the finding marked on it
-□ About 40 words of body text per slide at most; detail in the notes or backup
+□ Text above a figure stacks; columns only for tall figures or parallel items
 □ Every borrowed claim, figure or number has a footnote; the References slide lists them all
 □ Conclusions is the last main slide, with contact and a link or QR code; no "Thank you" slide
 □ Backup slides answer the likeliest questions
