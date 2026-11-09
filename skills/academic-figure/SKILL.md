@@ -66,7 +66,7 @@ plt.style.use("paper.mplstyle")
 
 It needs `tol-colors` (Paul Tol's own palette package; Python 3.10+) in the project's Python; if it is missing, tell the user and ask before installing it.
 
-It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 6, legend 7, titles 9 pt), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
+It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 7, legend 7, titles 9 pt), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
 
 - If text renders in DejaVu Sans, `paper` was not imported before plotting; fix that.
 - No figure title. Panel identifiers (dataset, setting) go in the axes title, never as text inside the axes.
@@ -75,7 +75,9 @@ It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lac
 - Noisy per-step training curves (≥ ~100 points: loss, reward, entropy, length): draw the raw curve in the same color at `alpha` 0.25 with no label, then a centered moving average on top with the label, and say so in the caption ("smoothed with a moving average over 5% of the steps; faint lines show raw values"). Window: `half = max(1, len(values) // 40)` points on each side, shrinking at the ends. Don't smooth evaluation curves with few points, or curves whose best step or peak value is marked.
 - Reference lines (max/min, regression, threshold): color of related data, `--`, `alpha` 0.5, behind data, `linewidth=1` (thinner than the 1.5 data lines).
 - Category axes (bar charts, text tick labels): no tick marks, `ax.tick_params(axis="x", length=0)` (or `axis="y"` for horizontal bars); the label under each bar already marks it. With shared axes, apply it to every panel, including those whose labels are hidden.
-- Value labels (numbers on bars or points, e.g. `bar_label`): `fontsize=6`; the proposed method's ("Ours") labels bold.
+- Value labels (numbers on bars or points, e.g. `bar_label`): `fontsize=8`, bold for every series.
+- Text that belongs to one series (value labels, annotations): that series' color darkened to 60% (`[c * 0.6 for c in matplotlib.colors.to_rgb(color)]`), so even yellow, cyan and grey stay readable. Titles, axis labels, ticks and legend text stay black.
+- Peak or best values the reader must compare (best accuracy, best step): mark each with a marker in its series color and write the value just above it as a value label.
 
 ## 3. Plot-type overrides
 
@@ -130,10 +132,10 @@ Paul Tol's color-blind-safe schemes, from `tol_colors` (imported as `tc`). Pick 
 |---|---|
 | Single panel | inside, explicit `loc` (never `"best"`) |
 | Multiple panels, same series | one shared `fig.legend`, `loc="outside upper center"` (above the panels), `ncol` = entries; no per-panel legends |
-| Multiple panels, different series per panel | one legend per panel, above its title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False, fontsize=8)`; never merge them into one legend |
+| Multiple panels, different series per panel | one legend per panel, above its title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)`; never merge them into one legend |
 | Grouped series | rows = groups, columns = variants |
 
-- Inside legends use the style defaults (7 pt). Outside legends add `frameon=False, borderaxespad=0, fontsize=8`.
+- All legends use the style's 7 pt. Outside legends add `frameon=False, borderaxespad=0`.
 
 ## 6. Save
 

@@ -31,7 +31,7 @@ def save(fig, name):
 
 def shared_legend(fig, ax):
     fig.legend(*ax.get_legend_handles_labels(), loc="outside upper center", ncol=2,
-               frameon=False, borderaxespad=0, fontsize=8)
+               frameon=False, borderaxespad=0)
 
 
 def moving_average(values):
@@ -66,18 +66,32 @@ def ablation(name, keys, captions, ylabels, ours, other, smooth):
     save(fig, name)
 
 
+def text_color(color):
+    return [c * 0.6 for c in matplotlib.colors.to_rgb(color)]
+
+
+def label_value(ax, x, y, text, color):
+    ax.annotate(text, (x, y), xytext=(0, 4), textcoords="offset points", ha="center", va="bottom",
+                fontsize=8, fontweight="bold", color=text_color(color),
+                bbox=dict(facecolor="white", edgecolor="none", pad=0.5))
+
+
 def fig1():
     fig, ax = plt.subplots(figsize=(DOUBLE, 2))
     ax.axhline(47, color=cset.grey, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
     ax.axvline(10000, color=cset.grey, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
     ax.plot(10000, 47, "o", color=cset.grey)
     ax.annotate("DeepSeek-R1-Zero-Qwen-32B", (10000, 47), xytext=(-6, -4), textcoords="offset points",
-                ha="right", va="top", fontsize=7, color=tc.colorsets["dark"].dark_grey)
+                ha="right", va="top", fontsize=7, color=text_color(cset.grey))
     for label, color, marker in [("DAPO avg@32", cset.red, "o"), ("DAPO pass@32", cset.blue, "v"),
                                  ("DAPO cons@32", cset.green, "^")]:
         s = data["fig1"][label]
         ax.plot(s["step"], s["value"], color=color, marker=marker,
                 label=label)
+    avg = data["fig1"]["DAPO avg@32"]
+    peak = max(avg["value"])
+    label_value(ax, avg["step"][avg["value"].index(peak)], peak, f"{peak:.1f}", cset.red)
+    label_value(ax, 10000, 47, "47.0", cset.grey)
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME 2024 accuracy (%)")
     ax.legend(loc="lower right", bbox_to_anchor=(9600, 0), bbox_transform=ax.get_xaxis_transform())
@@ -101,9 +115,12 @@ def fig6():
     ax.axhline(0.429, color=cset.grey, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
     for label, color in [("w/o Dynamic Sampling", cset.blue), ("w/ Dynamic Sampling", cset.red)]:
         s = data["fig6"][label]
-        best = s["step"][s["value"].index(max(s["value"]))]
+        peak = max(s["value"])
+        best = s["step"][s["value"].index(peak)]
         ax.axvline(best, color=color, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
         ax.plot(s["step"], s["value"], color=color, label=label)
+        ax.plot(best, peak, "o", color=color)
+        label_value(ax, best, peak, f"{peak:.3f}", color)
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME avg@32")
     ax.legend(loc="lower right")
