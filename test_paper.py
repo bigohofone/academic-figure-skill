@@ -10,7 +10,7 @@ import pytest
 
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
-from paper import fit_height
+from paper import fit_height, mark_value, smooth, darken
 
 STYLE = ASSETS / "paper.mplstyle"
 WIDTH = 3.25
@@ -122,3 +122,24 @@ def test_pdf_embeds_inter_as_text(tmp_path):
     assert b"/Type3" not in pdf
     assert pdf.count(b"/FontFile2") == pdf.count(b"/CIDFontType2") > 0
     assert b"/ToUnicode" in pdf
+
+
+def test_smooth_is_centered():
+    values = [0.0] * 50 + [1.0] * 50
+    smoothed = smooth(values)
+    assert len(smoothed) == len(values)
+    assert smoothed[49] < 0.5 < smoothed[50]
+    assert smoothed[0] == 0.0 and smoothed[-1] == 1.0
+
+
+def test_darken_darkens():
+    assert darken("#FFFFFF") == [0.8, 0.8, 0.8]
+
+
+def test_mark_value_star_is_twice_the_marker():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    mark_value(ax, 1, 1, "1.0", "#4477AA")
+    mark_value(ax, 2, 2, "2.0", "#4477AA", star=True)
+    circle, star = ax.lines
+    assert star.get_markersize() == 2 * circle.get_markersize() == 2 * plt.rcParams["lines.markersize"]
+    assert [t.get_text() for t in ax.texts] == ["1.0", "2.0"]

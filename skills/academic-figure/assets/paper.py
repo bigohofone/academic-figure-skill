@@ -3,8 +3,9 @@ from pathlib import Path
 
 import numpy as np
 import tol_colors  # registers the tol.* colormaps that paper.mplstyle names
-from matplotlib import font_manager
+from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.markers import MarkerStyle
 from matplotlib.ticker import FixedLocator
 
 # Inter ships with the skill because no environment has it installed; paper.mplstyle names it.
@@ -79,3 +80,34 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     return ratios
+
+
+def darken(color):
+    """`color` darkened to 80%: for text or edges that belong to a series, so they read on white."""
+    return [c * 0.8 for c in colors.to_rgb(color)]
+
+
+def smooth(values):
+    """Centered moving average over 5% of the points (2.5% each side), shrinking at the ends.
+    Centered, not EMA, so the smoothed curve does not lag the raw one."""
+    half = max(1, len(values) // 40)
+    return [np.mean(values[max(0, i - half):i + half + 1]) for i in range(len(values))]
+
+
+def mark_value(ax, x, y, text, color, star=False):
+    """Mark (x, y) and write `text` in bold just above it, in `darken(color)`.
+
+    A circle for values the reader compares; `star=True` for one headline value: a star twice the
+    marker size (its thin points vanish at the normal size), filled with `color`, edged in `darken(color)`.
+    The label's white background hides gridlines and reference lines behind the text.
+    """
+    size = rcParams["lines.markersize"] * (2 if star else 1)
+    if star:
+        # matplotlib bevels star corners by default, which blunts the points; miter keeps them sharp
+        ax.plot(x, y, marker=MarkerStyle("*", joinstyle="miter"), markersize=size,
+                markerfacecolor=color, markeredgecolor=darken(color))
+    else:
+        ax.plot(x, y, "o", color=color)
+    ax.annotate(text, (x, y), xytext=(0, size / 2 + 2), textcoords="offset points", ha="center",
+                va="bottom", fontweight="bold", color=darken(color),
+                bbox=dict(boxstyle="square,pad=0", facecolor="white", edgecolor="none"))

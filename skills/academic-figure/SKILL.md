@@ -56,29 +56,43 @@ fig.savefig(...)  # never bbox_inches="tight"
 
 ## 2. Base style
 
-Always start with the bundled style, copied into the project's `figures/` (§9); don't set or override its rcParams by hand. In the notebook, which runs from `figures/`:
+Always start with the bundled style, copied into the project's `figures/` (§9); don't set or override its rcParams (sizes, widths, colors of axes and text) by hand. In the notebook, which runs from `figures/`:
 
 ```python
 import tol_colors as tc
-from paper import fit_height  # importing paper also registers the bundled Inter font
+from paper import fit_height, mark_value, smooth, darken  # importing paper also registers the bundled Inter font
 plt.style.use("paper.mplstyle")
 ```
 
 It needs `tol-colors` (Paul Tol's own palette package; Python 3.10+) in the project's Python; if it is missing, tell the user and ask before installing it.
 
-It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 7, legend 8, titles 9 pt bold), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, 1.5 pt lines, hollow markers (white fill, 1 pt edge in the line color), the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
+| The style sets | |
+|---|---|
+| Text | Inter for all text and math (STIX Sans for math symbols Inter lacks); titles 9 pt bold, ticks 7 pt, everything else 8 pt |
+| Axes | left and bottom spines, black, 0.5 pt; ticks 0.5 pt, 3 pt long (minor 2 pt) |
+| Grid | horizontal, #DDDDDD, 0.5 pt, behind the data |
+| Lines, markers | lines 1.5 pt; hollow markers, size 4 (white fill, 1 pt edge in the line color) |
+| Color | Paul Tol `bright` cycle, `tol.iridescent` colormap (§4) |
+| Layout | constrained layout with fixed gaps: 0.16 in between panels side by side, 0.08 in stacked |
+| Output | 300 dpi; `pdf.fonttype: 42` (PDF text stays text, with Inter embedded) |
 
 - If text renders in DejaVu Sans, `paper` was not imported before plotting; fix that.
 - No figure title. Panel identifiers (dataset, setting) go in the axes title, never as text inside the axes.
-- Subsampled markers: at x major tick positions (mask by x value, not index step).
 - Don't set axis limits exactly at the first or last data point (e.g. `set_xlim(0, 1)` for x in [0, 1]); markers there get cut in half. Keep the default margin.
-- Noisy per-step training curves (≥ ~100 points: loss, reward, entropy, length): draw the raw curve in the same color at `alpha` 0.25 with no label, then a centered moving average on top with the label, and say so in the caption ("smoothed with a moving average over 5% of the steps; faint lines show raw values"). Window: `half = max(1, len(values) // 40)` points on each side, shrinking at the ends. Don't smooth evaluation curves with few points, or curves whose best step or peak value is marked.
-- Reference lines (max/min, regression, threshold): color of related data, `--`, `alpha` 0.5, behind data, `linewidth=1` (thinner than the 1.5 data lines).
-- Category axes (bar charts, text tick labels): no tick marks, `ax.tick_params(axis="x", length=0)` (or `axis="y"` for horizontal bars); the label under each bar already marks it. With shared axes, apply it to every panel, including those whose labels are hidden.
-- Value labels (numbers on bars or points, e.g. `bar_label`): `fontsize=8`, bold for every series.
-- Text inside the axes (annotations such as a baseline's name): `fontsize=8`.
-- Text that belongs to one series (value labels, annotations): that series' color darkened to 80% (`[c * 0.8 for c in matplotlib.colors.to_rgb(color)]`). Titles, axis labels, ticks and legend text stay black.
-- Peak or best values the reader must compare (best accuracy, best step): mark each with a circle in its series color and write the value just above it as a value label. A single headline value to emphasize (e.g. the proposed method's final score against a baseline) gets a star instead (`"*"`, `markersize=8`, twice the style's 4 so its thin points read), filled with the series color and edged in the darkened text color of the series (`markerfacecolor=color, markeredgecolor=text_color(color)`), on top of the series' own marker if it has one.
+- Category axes (bar charts, text tick labels): no tick marks, `ax.tick_params(axis="x", length=0)` (or `axis="y"` for horizontal bars). With shared axes, apply it to every panel, including those whose labels are hidden.
+
+### Lines
+
+- Markers on a dense curve: only at x major tick positions (mask by x value, not index step).
+- Noisy per-step training curves (about 100+ points: loss, reward, entropy, length): the raw curve in the same color at `alpha=0.25` with no label, then `smooth(values)` on top with the label. Caption: "smoothed with a moving average over 5% of the steps; faint lines show raw values". Don't smooth evaluation curves with few points, or a curve whose peak is marked.
+- Reference lines (a baseline's score, a threshold, a best step): `linestyle="--", linewidth=1, alpha=0.5, zorder=1`, in grey or the related series' color.
+
+### Text in the plot
+
+- Text that belongs to one series (value labels, annotations) uses `color=darken(series_color)`, the series color at 80%. Titles, axis labels, ticks and legend text stay black.
+- Values the reader must compare (best accuracy per method, best step): `mark_value(ax, x, y, "0.438", color)` draws a circle and the value in bold just above it.
+- One headline value (e.g. the proposed method's final score against a baseline): `mark_value(..., star=True)` draws a filled star twice the marker size instead.
+- Bar value labels: `ax.bar_label(bars, fontweight="bold")`.
 
 ## 3. Plot-type overrides
 
@@ -111,7 +125,7 @@ Paul Tol's color-blind-safe schemes, from `tol_colors` (imported as `tc`). Pick 
 
 ### Custom palette
 
-When the user gives their own series colors (hex codes, a brand palette, or "match the original figure"), use them instead of a Tol set for the data series only: define them once in the notebook's setup cell as a named dict (e.g. `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`) and pass `color=PALETTE[...]` to each series. Everything else keeps the style: axes, ticks, gridlines, reference lines and neutral series stay grey/black, colormaps stay Tol, and series text uses the darkened series color (§2). If the user's colors include very light ones (e.g. cyan, yellow), say that they read weakly on white.
+When the user gives their own series colors (hex codes, a brand palette, or "match the original figure"), use them instead of a Tol set for the data series only: define them once in the notebook's setup cell as a named dict (e.g. `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`) and pass `color=PALETTE[...]` to each series. Everything else keeps the style: axes, ticks, gridlines, reference lines and neutral series stay grey/black, and colormaps stay Tol. If the user's colors include very light ones (e.g. cyan, yellow), say that they and their `darken` read weakly on white.
 
 ### Rules
 
@@ -125,7 +139,6 @@ When the user gives their own series colors (hex codes, a brand palette, or "mat
 | Signed | `tol.sunset`, centered at 0 (symmetric `vmin/vmax` or `TwoSlopeNorm`); also `tol.BuRd`, `tol.PRGn`, `tol.nightfall` |
 
 - Few levels (e.g. a 5-step heatmap): the `_discrete` version of the map (`tol.sunset_discrete`).
-
 - If series could be confused (grayscale, many series, shades), also vary marker or line style.
 - Emphasis, only when the user names what to emphasize (bars, lines, any chart): that series keeps color (the set's red) and every other series is the same gray (the set's grey, also for bands and markers). If several gray lines must be told apart, vary line style or marker, not shade. Without such a request, use the set colors above.
 - Bar charts: name the bars on the x-axis instead of in a legend; for several groups (benchmarks, datasets), use one panel per group, titled with the group, rather than grouped bars.

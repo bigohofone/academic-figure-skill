@@ -42,7 +42,6 @@ lines.markeredgecolor: auto
 lines.markeredgewidth: 1
 # also sets the legend frame width (no legend.linewidth rcParam)
 patch.linewidth: 0.5
-hatch.linewidth: 0.5
 
 # Paul Tol's bright set; tol.* colormaps are registered when paper.py imports tol_colors
 axes.prop_cycle: cycler('color', ['4477AA', 'EE6677', '228833', 'CCBB44', '66CCEE', 'AA3377', 'BBBBBB'])
