@@ -13,7 +13,7 @@ xtick.labelsize: 7
 ytick.labelsize: 7
 legend.fontsize: 7
 axes.titlesize: 10
-axes.titleweight: bold
+axes.titleweight: normal
 axes.titlepad: 3
 axes.labelpad: 2
 
@@ -54,10 +54,12 @@ legend.borderpad: 0.3
 legend.borderaxespad: 0.5
 
 figure.constrained_layout.use: True
-figure.constrained_layout.w_pad: 0.02
-figure.constrained_layout.h_pad: 0.02
-# gap between stacked rows, as a fraction of panel height
-figure.constrained_layout.hspace: 0.04
+# padding in inches around each panel's labels: panels sit a fixed 2 × 0.08 in apart
+# (no extra gap that scales with panel size), and 0.08 in from the figure edge
+figure.constrained_layout.w_pad: 0.08
+figure.constrained_layout.h_pad: 0.08
+figure.constrained_layout.hspace: 0
+figure.constrained_layout.wspace: 0
 
 savefig.dpi: 300
 # embedded TrueType (never Type 3, which venues reject); PDF text stays selectable text

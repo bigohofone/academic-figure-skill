@@ -34,21 +34,31 @@ def shared_legend(fig, ax):
                frameon=False, borderaxespad=0, fontsize=8)
 
 
-def moving_average(values):
-    half = max(1, len(values) // 40)
-    return [sum(w) / len(w) for w in (values[max(0, i - half):i + half + 1] for i in range(len(values)))]
+def ema(values, weight=0.9):
+    out, last = [], values[0]
+    for v in values:
+        last = weight * last + (1 - weight) * v
+        out.append(last)
+    return out
 
 
 def plot_curve(ax, s, color, label=None, smooth=False):
     if smooth:
         ax.plot(s["step"], s["value"], color=color, alpha=0.25)
-        ax.plot(s["step"], moving_average(s["value"]), color=color, label=label)
+        ax.plot(s["step"], ema(s["value"]), color=color, label=label)
     else:
         ax.plot(s["step"], s["value"], color=color, label=label)
 
 
-def ablation(name, keys, ylabels, ours, other, smooth):
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE, 2), sharex=True)
+def panels(rows, titles, sharex=False):
+    fig, axes = plt.subplots(rows, 2, figsize=(DOUBLE, 2 * rows), sharex=sharex)
+    for ax, title in zip(axes.flat, titles):
+        ax.set_title(title)
+    return fig, list(axes.flat)
+
+
+def ablation(name, keys, captions, ylabels, ours, other, smooth):
+    fig, axes = panels(1, captions, sharex=True)
     for ax, key, ylabel, sm in zip(axes, keys, ylabels, smooth):
         for label, color in [(other, cset.blue), (ours, cset.red)]:
             plot_curve(ax, data[key][label], color, label, sm)
@@ -79,7 +89,7 @@ def fig1():
 
 
 def fig3():
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE, 2))
+    fig, axes = panels(1, ["Mean up-clipped probability", "Samples with an accuracy of 1"])
     for ax, key, ylabel in zip(axes, ["fig3a", "fig3b"],
                                ["Mean up-clipped probability", "Prompts with accuracy = 1"]):
         plot_curve(ax, data[key], cset.blue, smooth=True)
@@ -105,25 +115,28 @@ def fig6():
 
 
 def fig7():
-    fig, axes = plt.subplots(2, 2, figsize=(DOUBLE, 4), sharex=True)
-    for ax, key, ylabel in zip(axes.flat, ["fig7a", "fig7b", "fig7c", "fig7d"],
-                               ["Mean response length", "Reward score", "Generation entropy",
-                                "Mean probability"]):
+    labels = ["Mean response length", "Reward score", "Generation entropy", "Mean probability"]
+    fig, axes = panels(2, labels, sharex=True)
+    for ax, key, ylabel in zip(axes, ["fig7a", "fig7b", "fig7c", "fig7d"], labels):
         ax.plot(data[key]["step"], data[key]["value"], color=cset.blue)
         ax.set_ylabel(ylabel)
-    for ax in axes[1]:
+    for ax in axes[2:]:
         ax.set_xlabel("Training steps")
     fit_height(fig, axes)
     save(fig, "fig7")
 
 
 fig1()
-ablation("fig2", ["fig2a", "fig2b"], ["AIME avg@32", "Generation entropy"],
+ablation("fig2", ["fig2a", "fig2b"], ["Accuracy on AIME", "Entropy of actor model"],
+         ["AIME avg@32", "Generation entropy"],
          "w/ Clip-Higher", "w/o Clip-Higher", smooth=(False, True))
 fig3()
-ablation("fig4", ["fig4a", "fig4b"], ["Generation entropy", "Mean response length"],
+ablation("fig4", ["fig4a", "fig4b"],
+         ["Entropy of generation probabilities", "Average response length"],
+         ["Generation entropy", "Mean response length"],
          "w/ token-level loss", "w/o token-level loss", smooth=(True, True))
-ablation("fig5", ["fig5a", "fig5b"], ["AIME avg@32", "Generation entropy"],
+ablation("fig5", ["fig5a", "fig5b"], ["Performance on AIME", "Entropy of actor model"],
+         ["AIME avg@32", "Generation entropy"],
          "w/ overlong filtering", "w/o overlong filtering", smooth=(False, True))
 fig6()
 fig7()
