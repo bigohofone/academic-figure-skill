@@ -54,10 +54,10 @@ legend.borderpad: 0.3
 legend.borderaxespad: 0.5
 
 figure.constrained_layout.use: True
-# padding in inches around each panel's labels: panels sit a fixed 2 × 0.08 in apart
-# (no extra gap that scales with panel size), and 0.08 in from the figure edge
+# padding in inches around each panel's labels and the outside legend, so gaps are fixed,
+# not a fraction of panel size: side by side 2 × 0.08 in, stacked (and legend to title) 2 × 0.04 in
 figure.constrained_layout.w_pad: 0.08
-figure.constrained_layout.h_pad: 0.08
+figure.constrained_layout.h_pad: 0.04
 figure.constrained_layout.hspace: 0
 figure.constrained_layout.wspace: 0
 
