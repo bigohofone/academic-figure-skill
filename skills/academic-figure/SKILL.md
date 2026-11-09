@@ -24,17 +24,17 @@ Apply every rule unless the user says otherwise. Order: size → style → plot 
 
 ### Grid and panel aspect
 
-Choose the grid (rows × cols) and the panel aspect together, by judgment, for what this data needs to show. Use 4:3 (0.75) unless the content needs another aspect. The aspect (width : height) is per panel, not for the whole figure, and is one of four:
+Choose the grid (rows × cols) and the panel aspect together, by judgment, for what this data needs to show. Use 3:2 unless the content needs another aspect. The aspect (width : height) is per panel, not for the whole figure, and is one of four:
 
 | Aspect | `aspect=` | Typical fit |
 |---|---|---|
-| 8 : 3 | 0.375 | a single panel at double-column width (curves, bars) |
-| 4 : 3 | 0.75 | curves, bars, histograms (default) |
+| 6 : 2 | 1 / 3 | a single panel at 1.5- or double-column width (curves, bars) |
+| 3 : 2 | 2 / 3 | curves, bars, histograms (default) |
 | 1 : 1 | 1.0 | heatmap, confusion matrix, embedding |
-| 3 : 4 | 1.333 | content that is taller than wide (e.g. many horizontal bars) |
+| 2 : 3 | 1.5 | content that is taller than wide (e.g. many horizontal bars) |
 
 - Ask what the reader must see: slopes and gaps between curves need height, many x categories need width, matrices need square cells.
-- Compare a few layouts before choosing. E.g. two line plots in one column: side by side gives ~1.3 in-wide panels that flatten the curves; stacked 2×1 at 0.75 gives each panel the full width and enough height, so it is better.
+- Compare a few layouts before choosing. E.g. two line plots in one column: side by side gives ~1.3 in-wide panels that flatten the curves; stacked 2×1 at 3:2 gives each panel the full width and enough height, so it is better.
 - Spread panels evenly; turn off unused cells.
 - Turn on `sharex` / `sharey` when panels plot the same quantity on that axis (`plt.subplots(..., sharex=True, sharey=True)`); inner tick labels hide automatically, and axis labels go on the outer panels only.
 - After rendering, if curves look flattened or labels crowd, change the grid or aspect and re-render.
@@ -46,7 +46,7 @@ Don't compute it. Create the figure at the target width with any height, draw ev
 ```python
 fig, axes = plt.subplots(1, 2, figsize=(3.25, 2))  # after the §2 setup
 ...  # plot, labels, fig.legend, colorbar
-fit_height(fig, axes, aspect=0.75)
+fit_height(fig, axes, aspect=2 / 3)
 fig.savefig(...)  # never bbox_inches="tight"
 ```
 
@@ -66,14 +66,14 @@ plt.style.use("paper.mplstyle")
 
 It needs `tol-colors` (Paul Tol's own palette package; Python 3.10+) in the project's Python; if it is missing, tell the user and ask before installing it.
 
-It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 9, ticks 8, legend 7, titles 10 pt bold), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
+It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 9, ticks 7, legend 7, titles 10 pt bold), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
 
 - If text renders in DejaVu Sans, `paper` was not imported before plotting; fix that.
 - No figure title. Panel identifiers (dataset, setting) go in the axes title, never as text inside the axes.
 - Subsampled markers: at x major tick positions (mask by x value, not index step).
 - Don't set axis limits exactly at the first or last data point (e.g. `set_xlim(0, 1)` for x in [0, 1]); markers there get cut in half. Keep the default margin.
-- Reference lines (max/min, regression, threshold): color of related data, `--`, `alpha` 0.5, behind data.
-- Text tick labels (model names, keywords, categories): `fontsize=7`, one step below the 8 pt numeric ticks.
+- Noisy per-step training curves (≥ ~100 points: loss, reward, entropy, length): draw the raw curve in the same color at `alpha` 0.25 with no label, then a centered moving average on top with the label, and say so in the caption ("smoothed with a centered moving average over 5% of the steps; faint lines show raw values"). Window: `half = max(1, len(values) // 40)` points on each side, shrinking at the ends. Not EMA: it lags, shifting curves right and flattening peaks. Don't smooth evaluation curves with few points, or curves whose best step or peak value is marked.
+- Reference lines (max/min, regression, threshold): color of related data, `--`, `alpha` 0.5, behind data, `linewidth=1` (thinner than the 1.5 data lines).
 - Category axes (bar charts, text tick labels): no tick marks, `ax.tick_params(axis="x", length=0)` (or `axis="y"` for horizontal bars); the label under each bar already marks it. With shared axes, apply it to every panel, including those whose labels are hidden.
 - Value labels (numbers on bars or points, e.g. `bar_label`): `fontsize=6`; the proposed method's ("Ours") labels bold.
 
