@@ -1,39 +1,23 @@
 # Restyle Guidelines
 
-For converting an existing deck (PDF, PPTX, Keynote export) into this theme. **Change only the style and keep everything else exactly:** the same slides in the same order, titles word for word, the same text, figures, equations and numbers, the same grouping of items on each slide. Don't rewrite titles or text, don't merge, add or remove slides, and split a slide only under rule 6. The design guidelines apply in full; the argument guidelines don't (the content is the author's).
+Restyling converts an existing deck (PDF, PPTX, Keynote export) into this theme. The content is the author's: the slides, their order, every title, word, figure, equation and number, and what is grouped with what. The design is yours, and it should be better than the source, not a copy of it: more consistent, more readable, calmer. The design guidelines apply in full; the argument guidelines don't, because the argument is given.
 
-## Rules
+## Keep the content exact
 
-1. **Read the whole source first.** Render every page (PyMuPDF at about 200 dpi) and list what each slide holds.
+Don't rewrite, shorten, merge, reorder, add or drop anything. Where the author's wording breaks a guideline (a three-line title, a single word left on a line), keep the words and tell the user. Content includes the marks that connect things: an outline around part of a figure, an arrow from a remark to a term. Redraw those in the theme's style (`highlight`, `add_arrow`), and make every one still connect the same two things: an arrow ends on the words or term it points to, not on the empty part of a text box, and bends around other content rather than stopping short. Decoration is not content: logos on every slide, repeated footers, clip art and icons go; the logos may stay on the title slide. To tell the two apart, ask whether the audience would lose anything the author meant them to get. A running section header does carry something, where the talk is; it becomes a section slide at the start of each part rather than a strip on every slide. A PDF of an animated slide often has one page per build step; those pages are one slide shown in stages, so keep its final, complete state once. Don't add anything the source doesn't have, such as a References slide.
 
-2. **Layout plan before building** (design-guidelines.md, principle 8). Sort the source slides into kinds of content and give each kind one treatment, so the restyled deck is more consistent than the source, not less. Same-kind slides in one section use the same layout, with the same thing in the same place. A description with a figure stacks (description above, figure below) unless the figure is tall; don't turn a source slide's text-above-figure into two columns.
+## Redesign the layout
 
-3. **Figures and table crops never shrink.** Crop each figure whole from the source page. On the restyled slide it is at least as large as on the source slide (the same share of the slide's width or height), and its smallest text stays readable. The layout makes room for it, not the other way round:
-   - give it the full width or all four rows;
-   - put a rebuilt table beside it, or lower that table's `row_h`;
-   - set the slide's text at 13 pt before shrinking a figure.
+Read the whole source first and sort its slides into kinds (a description with a figure, a figure with remarks, equations, a theorem, a results table). Give each kind one treatment and keep to it, so the restyled deck is consistent even where the source wasn't. Design from the content, not from the source's layout: a source that crammed text beside a figure can stack them; a source that stacked them shouldn't be split into columns. Keep the order in which things are read: a lead-in before what it introduces, a caption after its figure. When a figure is too tall to stack, put it on one side and its lead-in and text on the other, so the text still comes first in the column the eye starts.
 
-   If a figure is taller than the content area allows at source size, use the whole content area and tell the user.
+## Figures never get worse
 
-4. **Tables:** rebuild with `add_table` when the table fits at 13 pt. A table too big for that (many rows or columns, multi-line cells, ± subscripts) stays a crop, under rule 3.
+A restyle must not make anything harder to read. Crop each figure whole from the source (`crop.py` for a PDF) and give it at least the size it had there; the layout makes room for the figure, not the other way round. Rebuild tables with `add_table` when they fit; a table too large to rebuild stays a crop under the same rule. Re-set screenshot equations with `add_equation`, and put theorems and definitions on their cards. If a figure can't keep its size even with the whole content area, use the whole area and tell the user.
 
-5. **Equations and annotations:**
-   - Re-set equations with `add_equation` when they were screenshots.
-   - Theorems, lemmas, definitions and assumptions go on statement cards (`add_statement`).
-   - Boxes, arrows and circled terms that tie a remark to part of a figure or equation are content: redraw them with `highlight()` and `add_arrow`.
-   - Logos, clip art, icons and decorative pictures are not content: drop them, keeping logos only on the title slide, in a row along its top margin: `add_image(slide, first_column, span, 0.4, 0.4, logo, align="left")` per logo, left to right.
+## Dense slides become more slides
 
-6. **A slide too dense for whitespace** (design-guidelines.md, principle 6): it overflows (`check.py`) or is crowded (`aesthetics.py`). Try in order:
-   1. Use the space: full width, all four rows.
-   2. Set that slide's body at 13 pt, the smallest size in the scale, never smaller.
-   3. Split it into consecutive slides with the same title, the later ones ending in "(cont.)". Split as many times as whitespace needs; dense source decks often double in length, and that is fine. Each part gets the same layout and a balanced share, never a nearly empty slide: a short leftover (a contact line, one bullet) stays with the part before it. An arrow between blocks that end up on different slides is dropped; the order of the slides already says it. Keep every word, figure and item in its original order and grouping.
+Source decks are often far too dense, and a style-only restyle can't cut words. When a slide is crowded or overflows, first use the space fully, then set that slide's body one step smaller (13 pt, never less), then split it into consecutive slides under the same title, the later ones marked "(cont.)", keeping every item in order and in its group. Splitting is normal: dense decks often double in length, and the result is better for it. Split evenly, with the same layout on each part, and repeat the slide's subheading or lead-in on each part so every slide stands on its own. A leftover too small for a slide of its own stays with its neighbor; if that would crowd the neighbor, rebalance the split instead. Connectors between blocks that end up on different slides go; the slide order already carries them.
 
-   Tell the user which slides were split. Never cut words, drop items, overflow or cram.
+## Finish
 
-7. **Original wording stays,** even where `check.py` reports a title over two lines or a single word on a last line that `save()` couldn't pull back. Don't reword and don't force line breaks; list those slides for the user.
-
-## Finishing
-
-- Compare every restyled page with its source page side by side, at the same size: nothing lost, figures no smaller, same-kind slides alike.
-- Keep intermediate files (page renders, trial crops, comparison images) in a temporary folder and delete it. Leave only the deck, its PDF, the build script and the figures it uses.
-- Report: slides split, figures that couldn't keep their size, tables kept as crops, and anything `check.py` still lists.
+Compare every restyled page with its source page at the same size: nothing lost, no figure smaller, every slide of a kind alike. Keep page renders, trial crops and comparison images in a temporary folder and delete it, leaving the deck, its PDF, the build script and the figures it uses. Tell the user which slides were split, which figures couldn't keep their size, which tables stayed crops, and what the checks still report.

@@ -13,6 +13,9 @@ Runs every check in CHECKS on the deck and reports the problems. Exits with 1 if
 - check_shadows: reports shapes with a shadow, or with a style whose effect could add one.
 - check_overlap: reports shapes whose boxes overlap (text running into a figure or table). Full-bleed
   backgrounds, arrows and the contents of a card (add_statement) are exempt.
+
+Then it prints how long the speaker notes take to say. No maintained library does this better than counting
+words, so it counts words at WORDS_PER_MINUTE, a typical presenting pace (120-150 is the usual range).
 """
 
 import sys
@@ -55,7 +58,8 @@ def check_fit(prs):
                 continue
             need, box, lines, runts = measure(shape, slide)
             for i in runts:
-                problems.append(f"slide {n}, {shape.name}: paragraph {i + 1} ends with one word on its last line; "
+                text = shape.text_frame.paragraphs[i].text
+                problems.append(f"slide {n}, {shape.name}: \"{text}\" ends with one word on its last line; "
                                 "reword it (save() already tried tighter spacing)")
             if need > box + 0.01:
                 problems.append(f"slide {n}, {shape.name}: text needs {need:.2f} in, box is {box:.2f} in")
@@ -141,10 +145,19 @@ def check_shadows(prs):
 
 CHECKS = [check_fit, check_grid, check_bounds, check_overlap, check_shadows]
 
+WORDS_PER_MINUTE = 130
+
+def talk_length(prs):
+    words = sum(len(slide.notes_slide.notes_text_frame.text.split()) for slide in prs.slides if slide.has_notes_slide)
+    if not words:
+        return "No speaker notes, so no talk length."
+    return f"Speaker notes: {words} words, about {words / WORDS_PER_MINUTE:.1f} min at {WORDS_PER_MINUTE} words/min."
+
 def main(path):
     prs = Presentation(path)
     problems = [problem for check in CHECKS for problem in check(prs)]
     print("\n".join(problems) or "No problems found.")
+    print(talk_length(prs))
     return 1 if problems else 0
 
 if __name__ == "__main__":

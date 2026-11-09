@@ -120,9 +120,9 @@ LAYOUTS = [
     ]),
     ("Statement", None, [
         title(),
-        card(20, box(0, 12, *rows(1, 2))),
-        body(1, box(0, 12, *rows(1, 2)), "The research question, in one or two sentences", anchor="ctr", inset=CARD_PADDING, size=17, align="ctr", gap=0),
-        body(2, box(0, 12, *rows(3, 1)), "Contribution", size=15),
+        card(20, box(0, 12, *rows(0, 2))),
+        body(1, box(0, 12, *rows(0, 2)), "The research question, in one or two sentences", anchor="ctr", inset=CARD_PADDING, size=17, align="ctr", gap=0),
+        body(2, box(0, 12, *rows(2, 1)), "Contribution", size=15),
         footnote(),
     ]),
     ("Two Content", None, [
@@ -233,12 +233,11 @@ for layout in layouts[len(LAYOUTS):]:
     prs.slide_layouts.remove(layout)
 
 
-# Example slides: one per example layout in content-guidelines.md, in the same order (examples.py). Each slide's
-# speaker notes name its layout. slides.new_deck() drops them.
+# Example slides: the showcase in examples.py, each slide's speaker notes naming it. slides.new_deck() drops them.
 for name, build in EXAMPLES:
     slide = build(prs)
     notes = slide.notes_slide.notes_text_frame
-    notes.text = f"Example layout: {name}" + ("\n" + notes.text if notes.text else "")
+    notes.text = f"Showcase: {name}" + ("\n" + notes.text if notes.text else "")
 
 tidy(prs)
 for part in prs.part.package.iter_parts():  # the notes master brings its own theme, with shadows; strip it too

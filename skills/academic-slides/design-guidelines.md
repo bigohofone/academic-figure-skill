@@ -1,35 +1,14 @@
 # Design Guidelines
 
-How every slide looks. These principles hold on every slide; within them, design each slide for its content. The helpers in `assets/slides.py` apply most of them for you, and `assets/check.py` catches the measurable ones. Design serves reading: a slide should be easier to read, not more interesting to look at.
+Design here serves one thing: reading. A slide is seen for a minute, from the back of a room, by people also listening to a speaker. Every choice below exists to make the point of a slide land faster, with less effort, and with nothing pulling the eye elsewhere. When a situation isn't covered, ask what helps that reader, and do that.
 
-## 1. Grid
+## The design system
 
-- 0.5 in side margins; the 9 in between is 12 columns with 0.2 in gutters. The content area runs from 1.45 in to 4.75 in and is 4 rows with the same gutters; a row holds two lines of 15 pt text.
-- Every block starts on a column and spans whole columns: `box(first_column, span, y, h)`.
-- Vertically, a block starts on a row (`rows(first_row, span)`), or, in a stack of blocks that size to their content (text, equations, a figure under its text), a gutter below the block above.
-- **One column by default.** Text, equations and a single figure or table run the full 12 columns, stacked top to bottom.
-- **Text and a figure stack by default:** the description or lead-in above, the figure below it at full width. This is how a slide reads naturally (what to look for, then the thing itself), and a wide figure keeps its size. Don't split a slide into columns just because it holds text and a figure.
-- **Columns only when stacking doesn't work:**
-  - a tall or square figure (about as tall as wide or taller), which would shrink to fit under text: figure on one side, text on the other;
-  - two to four parallel items that must read as separate (two settings, three components, images to compare);
-  - two things the audience compares side by side (before and after, ours and theirs).
-  - Use only simple ratios the eye reads at once:
+These are fixed by the theme and the helpers. They are deliberately few, because a small, consistent vocabulary is what makes a deck look designed rather than assembled.
 
-    | Ratio | Columns | For |
-    |---|---|---|
-    | 1 : 1 | 6 + 6 | Two sides of equal weight; the default for two sides |
-    | 2 : 1 | 8 + 4 | A tall figure with two or three short remarks beside it |
-    | 1 : 2 | 4 + 8 | A short label, list or small figure beside the main block |
-    | 1 : 1 : 1 | 4 + 4 + 4 | Three parallel items |
-    | 1 : 1 : 1 : 1 | 3 + 3 + 3 + 3 | Four parallel items |
+**Grid.** The slide is 10 × 5.625 in. Content sits between 0.5 in side margins, on 12 columns with 0.2 in gutters, and between 1.45 in and 4.75 in vertically, on 4 rows with the same gutters (a row holds two lines of body text). Blocks start on a column and span whole columns, and start on a row or a gutter below the block above them. Alignment to a shared grid is what lets separate blocks read as one composition.
 
-    Never other splits (5 + 7, 9 + 3, 3 + 9): ratios the eye can't name look like mistakes.
-- Off the grid: only a `highlight()` outline on a figure, an `add_arrow` across a gutter, and the contents of a card, which follow its padding.
-
-## 2. Type
-
-- One typeface, one weight: **Inter Regular**, titles included. Hierarchy comes from size and color, never weight.
-- Four sizes, by role:
+**Type.** One typeface, Inter, in one weight, Regular, titles included. Hierarchy comes from size and color, which stay clean on projectors where weights blur together.
 
 | Role | Size |
 |---|---|
@@ -39,91 +18,42 @@ How every slide looks. These principles hold on every slide; within them, design
 | Tables, footnotes, page numbers | 13 pt |
 | Title and section slides | 28 pt |
 
-- These suit the theme's 10 × 5.625 in slide: 15 pt here reads like 20 pt on a 13.33 in widescreen slide, the usual minimum for body text.
-- Never another size to make text fit: cut words or split the slide. (A restyle may drop one slide's body to 13 pt; restyle-guidelines.md.)
-- Line spacing 1.15. 10 pt before a bullet, 4 pt before a sub-point. Bullets • – ◦ by level.
-- Left-align body text. Center only captions under centered figures, the single sentence of a Statement slide, and term lines under a centered equation.
+On this 10 in slide, 15 pt reads like 20 pt on a 13.33 in widescreen slide, the usual minimum for body text. Line spacing is 1.15, with more space between bullets than within them and less before a sub-point. Body text is left-aligned; centering is for things that stand alone (a caption under a centered figure, a single statement).
 
-## 3. Color
+**Color.** Everything derives from one blue, Paul Tol's #4477AA, the blue of the academic-figure skill's charts, so slides and figures belong together.
 
-All from one blue, Paul Tol's #4477AA (the academic-figure skill's charts use the same). White background, gray text, one accent:
-
-| Role | Color | For |
+| Role | Color | Used for |
 |---|---|---|
-| Body | gray #6A737C | All running text |
-| Emphasis | dark navy #1B3A7A | Titles, lead-ins, key words, best values in tables, table rules, equations |
-| Structure | blue #4477AA | Subheadings, card headings, outlines on figures |
+| Body | gray #6A737C | Running text, quiet enough that emphasis stands out against it |
+| Emphasis | dark navy #1B3A7A | Titles, lead-ins, key words, best values, table rules, equations |
+| Structure | blue #4477AA | Subheadings, card headings, marks on figures |
 | Quiet | gray #8D949B | Footnotes, page numbers |
-| Surface | #EDF2F7 (cards, our table row), #E1EBF4 (title and section backgrounds) | Grouping, never meaning |
+| Surface | #EDF2F7, #E1EBF4 | Cards and our table row; title and section backgrounds |
 
-- Color directs attention; it never decorates.
-- Emphasize a few words per slide. If everything is navy, nothing is.
-- An underline may add to color where color alone isn't enough (the one key phrase of a dense slide, a second-best value), sparingly.
-- Words that name a figure's series may take that series' color.
-- Never let color alone carry meaning; pair it with a label or a shape.
+Emphasis is color, never weight. An underline may add to it where color alone isn't enough. Words that name a series in a figure may take that series' color.
 
-## 4. Spacing
+## Principles
 
-- Inside is tighter than outside: line gap < sub-point gap < bullet gap < padding inside a card (0.15 in, visually equal on all four sides) < gutter between blocks (0.2 in).
-- Related things sit close; unrelated things a gutter or more apart.
+**Hierarchy: one thing first.** Every slide has one point, and the eye should land on what carries it: usually the exhibit, then the title's claim, then the remarks. Size, position and contrast decide where the eye goes, so give them to the thing that matters and take them from everything else. Emphasis works by contrast: a few navy words in gray text stand out; a slide that is half navy has no emphasis at all.
 
-## 5. Reading order
+**Reading order.** People read top to bottom, then left to right, and they want to know what to look for before they look. So a description or lead-in goes above its figure, and remarks follow in the order the speaker will point at them. Stacking text above a figure is the natural layout for most slides; it also gives a wide figure the full width.
 
-- Decide what the audience must read first on each slide and make it the largest or highest-contrast thing there: usually the exhibit, then the title's claim, then the remarks.
-- One focal point per slide; everything else supports it.
-- Top to bottom, then left to right. What to look for comes before the figure: a lead-in above it, remarks after it, in the order the speaker will point at them.
+**Columns only when the content has columns.** One column is the default. Split the width when the content itself is side by side: a tall figure that would shrink under text, parallel items that must read as separate, or two things the audience compares. Splitting text-and-figure just to fill the width makes the eye zigzag and shrinks the figure. When you do split, use proportions the eye reads at once: 1 : 1 (6 + 6), 2 : 1 or 1 : 2 (8 + 4, 4 + 8), three or four equal columns. Odd ratios look like mistakes.
 
-## 6. Whitespace
+**Proximity and spacing.** Distance tells the audience what belongs together. Things that belong together sit close; separate things sit a clear gap apart. So space always grows outward: lines within a bullet < between bullets < inside a card < between blocks. When the inside of a group is as loose as the gap around it, the grouping disappears.
 
-- Whitespace is signal, not wasted canvas; a dense slide reads as unclear thinking.
-- Nothing runs past the content area, ever. Blocks keep at least a gutter between them and never touch the title, the footnote or each other.
-- Measure it: `python assets/aesthetics.py deck.pptx` renders the deck and reports, per slide, after AeSlides (Pan et al., 2026):
-  - **fill**, the share of the content area taken by text and drawn shapes (figures don't count). Over 0.72 the slide is crowded: cut words, give it more space, or split it.
-  - **whitespace**, the share of the content area left as large empty regions. Over 0.5 the slide is mostly empty: enlarge the exhibit or merge the slide with a neighbor.
-  - **balance**, how far the content's visual centroid sits from the middle, sideways counting more. Over 1 the slide leans to one side.
-- When in doubt: more space, fewer things.
+**Whitespace.** Empty space is not wasted; it is what lets the content be seen. A crowded slide reads as unclear thinking and makes the audience read instead of listen. Nothing runs past the content area, blocks never touch, and a slide with too much on it loses words or becomes two slides. The opposite failure is real too: a slide that is mostly empty, or whose content huddles in one corner, looks unfinished. Fill the content area in balance.
 
-## 7. Alignment and balance
+**Consistency.** The audience learns a deck's visual language on the first few slides and then reads by it. If results figures have their description above, all of them do; if a theorem sits on a card, every theorem does. Decide the treatment for each kind of content before building and keep it; vary only when the content is a different kind, never because one slide's text is a little longer.
 
-- Edges align to the grid and to each other: text blocks share a left edge, the columns of a split start on the same row, captions center under centered figures.
-- A single group (cards, a theorem with its points) sits in the vertical middle of the content area (`center_vertically`); anything else starts at the top row.
-- Use the content area: no empty lower half.
+**Restraint.** Every element on a slide should carry information. No borders, shadows, gradients, icons, clip art or decoration; no boxes where spacing already groups (card-usage-guidelines.md). Figures stay whole at their own proportions. Fewer, quieter elements make the ones that matter visible.
 
-## 8. Consistency
+**Honesty.** This is research, not marketing. Results come with their conditions and comparisons; claims are as strong as the evidence. Hero-number slides, superlatives and slogans make researchers trust the work less. Color never carries meaning on its own, so a slide reads in grayscale and for color-blind viewers too.
 
-- The same kind of content looks the same on every slide.
-- **Before building, write a layout plan:** list the kinds of content in the deck (a figure with its equations, a results table, a figure with remarks, a theorem) and give each one treatment: its split, which side holds what, where its lead-in goes.
-- Build every slide of a kind the same way, especially consecutive slides in one section: if one method slide puts the description above the figure, they all do; if one puts a tall figure left and its equations right on 6 + 6, they all do.
-- A slide may differ only when its content is a different kind, never because its text is a little longer.
+**Finish.** Small flaws read as carelessness: a single word alone on a line, a title broken mid-phrase, an empty placeholder, two edges almost but not quite aligned. `save()` fixes the first three where it can; the last only careful placement prevents.
 
-## 9. Restraint
+## Google Slides
 
-- No card by default; card-usage-guidelines.md has the gate. The exception: every theorem, lemma, proposition, definition and assumption sits on a statement card (`add_statement`).
-- Never nest cards. No borders, shadows, gradients, icons or decoration.
-- Tables have horizontal rules only.
-- Figures stay whole at their own aspect ratio, centered in their box; never stretched or cropped.
-- Marks on a figure are dotted outlines in the theme blue (`highlight`).
+The deck must look the same after Google Slides imports it. That rules out what Google Slides changes or drops: fonts other than Google Fonts (Inter is one), autofit (text never shrinks, so it must fit), Office equations (set them with `add_equation`), native charts (use images), and effects such as gradients, shadows, animations, transitions and embedded media. Hyperlinks and speaker notes survive.
 
-## 10. Tone: a research talk, not a pitch
-
-- Results come with their conditions and comparisons ("4.0 vs 4.6 WER on LibriSpeech clean, 10 h of labels"), never as headline claims.
-- No hero-number slides, superlatives ("dramatically", "game-changing") or slogans: researchers read them as overselling and trust the work less.
-
-## 11. Finish
-
-- No single word on a paragraph's last line: `save()` tightens spacing by at most 0.5 pt to fix it; otherwise reword.
-- Two-line titles break at a natural point (`save()` does this).
-- No empty placeholders (`save()` removes them).
-
-## Google Slides compatibility
-
-The deck must look the same after uploading to Google Drive and opening in Google Slides:
-
-- Inter only (a Google Font); Google Slides replaces fonts it doesn't have.
-- No autofit (Google Slides never shrinks text): keep text short enough for its box.
-- Equations as images (`add_equation`) or Unicode text (`R² = 0.91`); Office equations don't survive the import.
-- Charts as images: a native pptx chart becomes an uneditable picture.
-- Solid fills only; no gradients, shadows, 3D, animations, transitions, audio, video or embedded objects.
-- Hyperlinks and speaker notes survive; use them.
-
-A user's or institution's template replaces the theme when they give one; these principles still apply wherever it doesn't decide.
+When the user gives their own or an institution's template, it replaces the theme; these principles still apply wherever it doesn't decide.

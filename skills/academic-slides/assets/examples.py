@@ -5,7 +5,7 @@ from. theme.py runs it to build theme.pptx, and check.py must pass on it.
 from pathlib import Path
 
 from slides import (BLOCK_GAP, CONTENT_TOP, add_bullets, add_cards, add_equation, add_flow, add_image, add_slide,
-                    add_statement, add_table, add_text, center_vertically, highlight, rows)
+                    add_statement, add_table, add_text, highlight, rows)
 
 FIG = Path(__file__).parent
 
@@ -78,14 +78,13 @@ def equation(prs):
 
 
 def theorem(prs):
-    """A formal statement on a card, mixing text and an equation; what it means below, the group centered."""
+    """A formal statement on a card, mixing text and an equation; what it means below."""
     slide = add_slide(prs, "Title Only", "Re-clustering cannot make the targets worse")
     card = add_statement(slide, CONTENT_TOP, "Proposition 1", [
         "If the encoder lowers the masked-prediction loss, re-clustering its features never raises it:",
         r"$L(\theta_{k+1}; z^{(k+1)}) \leq L(\theta_k; z^{(k)})$"])
     below = (card[0].top + card[0].height) / 914400 + BLOCK_GAP
-    center_vertically(card + [add_bullets(slide, 0, 12, below, None, ["So iterations can only help",
-                                                                      "Proof in Appendix B"])])
+    add_bullets(slide, 0, 12, below, None, ["So iterations can only help", "Proof in Appendix B"])
     return slide
 
 
@@ -104,15 +103,14 @@ def results_table(prs):
 
 
 def contributions(prs):
-    """Cards, because the three items are of different kinds (card-usage-guidelines.md), centered vertically."""
+    """Cards, because the three items are of different kinds (card-usage-guidelines.md)."""
     slide = add_slide(prs, "Title Only", "The paper makes three contributions of different kinds")
     cards = add_cards(slide, CONTENT_TOP, [
         ("Dataset", ["8K hours of unlabeled speech in 40 languages, all of it public"]),
         ("Objective", ["Masked prediction of discrete targets, no negative pairs"]),
         ("Analysis", ["When and why pretraining helps below 10 hours of labels"])])
     below = (cards[0].top + cards[0].height) / 914400 + BLOCK_GAP
-    note = add_text(slide, 0, 12, below, None, ["Code, data and models: example.com/project"], align="center")
-    center_vertically(cards + [note])
+    add_text(slide, 0, 12, below, None, ["Code, data and models: example.com/project"], align="center")
     return slide
 
 

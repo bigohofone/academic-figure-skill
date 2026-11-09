@@ -3,7 +3,8 @@
 Layout metrics measured on the rendered slides, after AeSlides (Pan et al., 2026, "Incentivizing Aesthetic Layout
 in LLM-Based Slide Generation via Verifiable Rewards", arXiv 2604.22840). Renders the deck with LibreOffice and
 the bundled Inter, prints one line per slide, and flags the ones outside the thresholds; exits with 1 if any is
-flagged. Overlap and overflow are check.py's job.
+flagged. Overlap and overflow are check.py's job. It also saves a contact sheet, every slide small on one image, and
+prints where.
 
 Everything is measured on real pixels, not shape boxes: a pixel is ink when it is darker than INK_LEVEL (the
 slides are white), and ink is grown by a few pixels so the letters of a line merge into one region while the
@@ -75,11 +76,29 @@ def metrics(page, ppi):
     return fill, whitespace, float(np.hypot((x - 0.5) / X_TOL, (y - 0.5) / Y_TOL))
 
 
+def contact_sheet(pdf, columns=4, width=480):
+    """Every page of the PDF, small, on one image beside it, numbered by position."""
+    pages = []
+    for page in pymupdf.open(pdf):
+        pix = page.get_pixmap(matrix=pymupdf.Matrix(width / page.rect.width, width / page.rect.width))
+        pages.append(Image.frombytes("RGB", (pix.width, pix.height), pix.samples))
+    w, h = pages[0].size
+    gap = 8
+    sheet = Image.new("RGB", (columns * (w + gap) + gap, -(-len(pages) // columns) * (h + gap) + gap), "#9AA0A6")
+    for i, image in enumerate(pages):
+        sheet.paste(image, (gap + i % columns * (w + gap), gap + i // columns * (h + gap)))
+    out = pdf.with_name(pdf.stem + "-sheet.png")
+    sheet.save(out)
+    return out
+
+
 def main(path):
     prs = Presentation(path)
     ppi = WIDTH / (prs.slide_width / 914400)
     flagged = False
-    for n, (slide, page) in enumerate(zip(prs.slides, pymupdf.open(render(path))), 1):
+    pdf = render(path)
+    print(f"contact sheet: {contact_sheet(pdf)}")
+    for n, (slide, page) in enumerate(zip(prs.slides, pymupdf.open(pdf)), 1):
         if slide.slide_layout.name in SKIPPED_LAYOUTS:
             continue
         fill, whitespace, balance = metrics(page, ppi)

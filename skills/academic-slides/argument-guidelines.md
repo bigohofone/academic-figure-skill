@@ -1,71 +1,49 @@
 # Argument Guidelines
 
-What a research talk says and in what order: the audience, the storyline, titles, one job per slide, the slides every talk needs, and timing. Read it before planning a new talk. The order of priority in an academic talk is **argument > data > layout > aesthetics**: fix the argument before polishing anything else.
+What a talk says matters more than how it looks: argument first, then evidence, then layout, then polish. A beautiful deck with a muddled argument fails; a plain deck with a clear one works. These guidelines are about making the argument clear to a room that hears it once, at the speaker's pace, and can't scroll back.
 
-## Audience and scope
+## Know the room
 
-- Before outlining, settle three things with the user (or from the request): the venue and audience (specialists in the subfield, a broad department, a mixed panel), the time slot, and the one argument the talk makes.
-- Specialists expect technical precision; a mixed room needs broader framing, fewer acronyms and more intuition before the formalism.
-- **One argument.** Don't present the whole paper. Pick the part that can be made clearly in the time; everything else goes in the backup slides or stays in the paper.
-- International audience: plain sentences, no idioms or culture-bound jokes.
+Before outlining, settle who is listening, how long the talk is, and the one argument it makes. Specialists want precision; a mixed room needs the intuition before the formalism, and fewer acronyms. An international audience needs plain sentences without idioms. If the user hasn't said, ask or infer from the venue.
 
-## Storyline
+**One argument.** A paper holds more than a talk can carry. Choose the part that can be made clearly in the time, and let the rest wait in backup slides or in the paper. Presenting everything means the audience remembers nothing.
 
-- State the research question or central claim **by slide 3**, so the audience knows what everything after it is for.
-- Follow one spine:
-  - Situation → complication → resolution: what was known, what was missing or broken, what this work contributes.
-  - Or: context → gap → approach → findings → implications.
-- **One job per slide.** Each slide makes one point in the argument. If a slide does two things, split it into two slides.
-- Each slide should make the next one feel like its natural consequence; if the transition needs a long spoken bridge, the order is wrong.
-- Talks over ~15 minutes: a section slide (the Section Header layout, the section name alone) at the start of each part.
+## Shape the story
 
-## Titles
+Give the talk a spine the audience can follow, whatever its subject: where it starts, what is at stake, what moves the argument forward, and where it ends up. State the central claim or question early, by the third slide, because everything after it is evidence for it and the audience needs to know what it is evidence for.
 
-- Every content slide's title is an **action title**: one plain sentence stating the takeaway, with the number when there is one.
-  - Not "Results", but "Ours has the lowest WER on three of four test sets".
-  - Not "Related work", but "Prior methods need labels or give up streaming".
-- At most two lines (20 pt). If it needs more, the point isn't sharp yet.
-- **Ghost deck test:** read only the titles in order. They must tell the whole argument; if they don't, fix the outline, not the slides.
-- Structural slides (title, sections, outline, conclusions, references, backup) get plain labels.
-- No hype: no superlatives, slogans or hero numbers (design-guidelines.md, principle 10).
+Each slide has one job in that argument. A slide doing two things splits the audience's attention; make it two slides. Each slide should make the next one feel like a natural consequence; when a transition needs a long spoken bridge, the order is probably wrong. In talks longer than about fifteen minutes, section slides at the start of each part help the room keep its place.
 
-## Exhibits: one insight per slide
+## Titles carry the argument
 
-- At most one exhibit per slide (a chart, table, diagram or equation), and it supports the title directly. If it doesn't, change the title or the exhibit.
-- **Self-sufficient slide test:** would someone who can't hear the speaker still get the point? If not, mark the finding on the slide: a dotted `highlight()` on the part of the figure, the focal series in the theme blue, an `add_arrow`, or the finding stated as the first remark beside the exhibit.
-- Prefer a chart to a table for results and trends; a table is right when exact values matter (main results, ablations).
-- A figure with a description: the description above, the figure below at full width. Remarks beside the figure only when it is tall (design-guidelines.md, principle 1).
-- Show only what the talk discusses. An exhibit you'll skip over doesn't belong on a slide.
-- No decorative icons, clip art, stock photos or logos on content slides; logos at most on the title slide.
+A content slide's title is its takeaway, stated as one plain sentence, with the number when there is one: not "Results" but "Ours has the lowest error on three of four test sets". Someone who reads only the titles, in order, should get the whole argument; if they can't, the outline needs work, not the slides. A title that needs more than two lines isn't sharp yet. Structural slides (title, sections, conclusions, references, backup) keep plain labels.
 
-## Text on slides
+## Evidence, one piece per slide
 
-- Full sentences only in titles. Body text is short parallel bullets, one idea each; drop articles and filler ("Intervention cut costs 23% (p < 0.01)").
-- Keep body text short enough that the slide breathes; `aesthetics.py` reports crowded slides (design-guidelines.md, principle 6). Detail goes in the speaker notes or a backup slide.
-- If the audience is reading, they aren't listening: the slide supports the talk, it doesn't replace it.
+Each slide shows at most one exhibit (a chart, table, diagram or equation), and the exhibit proves the title. If it doesn't, change one of them.
 
-## Slides every talk needs
+A slide should make its point even to someone who can't hear the speaker. So mark the finding on the slide: outline the part of the figure that matters, color the focal series, or state the finding in the first remark. Don't leave the audience to search.
 
-| Slide | What it holds |
-|---|---|
-| Title | The title as a claim or question; authors, affiliations, venue, date |
-| Motivation | Why the problem matters: the real gap or open question |
-| Research question | Stated precisely, on its own slide (the Statement layout), by slide 3 |
-| Method | 1–2 slides of what the audience needs to judge the results; the rest to backup |
-| Results | One finding per slide, the finding marked on the exhibit |
-| Discussion | What the findings mean, their limits, back to the research question |
-| Conclusions | 2–3 takeaways; contact details and a link or QR code to the paper; stays on screen during Q&A |
-| References | Every source cited on the slides |
-| Backup | Answers to the 3–5 likeliest questions, labelled "Appendix A: ...", after References |
+Prefer a chart for trends and comparisons, and a table when exact values matter. Show only what the talk will discuss; an exhibit skipped over is noise. Decoration that carries no information (icons, stock photos, logos on content slides) only competes with the evidence.
 
-Never end on a "Thank you" or blank slide: Conclusions stays up during Q&A.
+## Words on slides
+
+Only titles are full sentences. Body text is short, parallel points, one idea each, with articles and filler dropped where the meaning survives. If the audience is reading, they aren't listening: the slide supports the speaker, it doesn't replace them. Detail belongs in the speaker notes or a backup slide.
+
+## What a talk contains
+
+There is no fixed list of parts: a talk contains what this audience needs to follow and judge its argument, and nothing else. Ask of each slide what the room would miss without it. Whatever the subject, the room needs to know early why the question matters and what the claim is, to see the evidence for each step, to hear where the evidence stops, and to leave with two or three takeaways. Everything borrowed is cited, and backup slides answer the likeliest questions.
+
+The title slide is read in the seconds before the talk starts, so it carries only what the audience needs then: what the talk is about and who is giving it. Each extra line (identifiers, long affiliation lists, logos) is something to read instead of listen; it belongs on a later slide, if anywhere.
+
+End on the conclusions, not on "Thank you": the last slide stays up through the questions, and it should give the room something to ask about.
 
 ## Time
 
-- At most about one slide per minute: 12–14 content slides for a 15-minute slot, not counting title and references.
-- Plan to finish 1–2 minutes early; nerves speed up the real talk, and overrunning eats the Q&A.
-- Put what to say in each slide's speaker notes (`slide.notes_slide.notes_text_frame.text`): the transition into the slide and the one sentence the audience must remember.
+At most about one content slide per minute, and a plan to finish a minute or two early, since nerves speed delivery and overrunning eats the questions.
 
-## Before handing over
+## The script
 
-Tell the user, briefly: rehearse aloud to time; try it on one specialist and one outsider; bring the deck in two formats and places (the .pptx and a PDF, on a USB stick and in the cloud); test on the venue's projector; at the end ask for "questions or feedback", not just questions.
+Write what to say in each slide's speaker notes (`add_slide(..., notes=...)`), and the talk can be timed and rehearsed before anyone hears it. Notes are written to be spoken, not read: short sentences, plain words, and a voice the speaker would actually use. They don't repeat the slide, which the room can read for itself; they say what the slide can't, why it matters and how it follows from the last one. Each slide's notes pick up from the one before and hand over to the next, so the talk sounds like one line of thought rather than a list of slides. A slide that needs a long spoken bridge is in the wrong place.
+
+`check.py` estimates the talk's length from the notes; `write_script` puts them in one file for rehearsing. The estimate is a floor: pauses, pointing and questions add to it, so rehearse aloud before trusting it.

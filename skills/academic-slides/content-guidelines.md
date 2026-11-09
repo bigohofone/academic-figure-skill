@@ -1,43 +1,27 @@
 # Content Guidelines
 
-How specific kinds of content go on a slide: figures, tables, equations, citations and wording. The storyline and titles are in argument-guidelines.md; the grid, type and color in design-guidelines.md.
+How the evidence of a talk goes on a slide: figures, tables, equations and citations. Each one is read in seconds from a distance, so each is shaped for that.
 
 ## Figures
 
-- This skill doesn't make figures; use the user's image files (the academic-figure skill makes charts in the same colors). If a figure doesn't exist yet, leave it out and list which slides need which figure.
-- One figure per slide unless the slide compares two. Two charts making one comparison become one chart.
-- Make figures at slide size with 14–15 pt text: about 5.9 × 3.3 in beside text (8 columns), 9.0 × 2.8 in across the full width with a row of text below. Figures pasted from a paper have print-size text that doesn't read on a screen; ask for the source or rebuild them when you can.
-- Charts: ours in the theme blue, baselines in grays, one legend, the metric's direction (lower or higher is better) stated.
-- **Mark the key finding on the figure:** the focal series in the theme blue with the rest gray, a dotted `highlight()` around the part that matters, or the finding stated as the first remark beside the figure.
-- Words that name a series in a figure may take that series' color (`"#RRGGBB"` runs).
-- Never stretch, crop or recolor a figure; `add_image` and `figure` keep it whole and centered.
+A figure on a slide is read from across a room, not held at arm's length like a printed page. Figures made for the paper have print-size text and fine detail that disappear on a screen; when you can, use figures made at slide size with text near body size (the academic-figure skill makes them, in this theme's colors). This skill doesn't draw figures itself: use the user's files, and when one is missing, leave its place and tell the user. A figure that only exists in a PDF (a paper, a source deck) is cropped whole with `crop.py`, at 300 dpi so it stays sharp when projected.
+
+Keep figures whole and at their own proportions; stretching or cropping changes what they show. Give the figure the space it needs to be read, and put what to look for above it. In charts, the series the slide is about takes the theme blue and comparisons take grays, so the eye finds it without a legend. Mark the finding on the figure itself, with a dotted outline around the part that matters, rather than leaving the audience to find it.
 
 ## Tables
 
-- At most about 6 columns and 8 rows. Larger: keep the key rows and move the full table to a backup slide.
-- `add_table` sets the style: 13 pt text; rules above, under the header and below, no vertical lines; dark navy header; a grouped header with `groups=` (a test set with several splits); the best value per column in dark navy with `best=`, or within each setting with `best_groups=`; a light tint on our row only; numbers right-aligned, marks (✓ ✗) centered.
-- Give each column enough grid columns that no cell wraps; `check.py` reports cells that do.
-- Put the unit on the metric and say whether lower or higher is better, in the header or the footnote.
-- Never paste a table as an image in a new talk (in a restyle, a table too big to rebuild stays a crop).
+A table is right when exact values matter, such as main results or ablations; for a trend, a chart reads faster. A slide table holds what can be read at a glance, about six columns and eight rows; larger tables keep the rows that make the point and send the full table to a backup slide. `add_table` sets the style: horizontal rules only, the header and the best values in navy, the focal row tinted, numbers right-aligned so digits line up. Give columns room so no cell wraps, put units on the metrics, and say whether lower or higher is better.
 
 ## Equations
 
-- Display equations: `add_equation(slide, first_column, span, y, tex, size)` sets LaTeX (matplotlib mathtext) in Computer Modern, the serif of LaTeX papers, as an image, so equations look as they do in the paper. Office equation objects don't survive the import into Google Slides.
-- Inline math in text: plain Unicode (`R² = 0.91`, `p < 0.001`), italic runs for variables, `"sub"` / `"super"` runs where Unicode has no character. Never combining accents (π̄, x̂): renderers misplace or drop them. Put a symbol with an accent in an `add_equation` line, or name it in words ("π-bar").
-- Explain the key symbols in short term lines below the equation; the equation itself stays dark navy.
-- Theorems, lemmas, propositions, definitions and assumptions: one statement card each (`add_statement`), the label as its heading, the statement's text and equations inside, what it means below the card.
+Display equations are set as in the paper, in a serif, with `add_equation`: the audience recognizes them, and LaTeX handles what plain text can't. Show only the equations the argument needs, and explain the symbols that matter right below, in words. Inline math in text stays in plain Unicode and italics, in the body font. A symbol the body font can't draw well, such as an accented letter, goes into an equation part instead (`add_statement` and `add_equation` both take LaTeX); never switch the body text to another font for it. Emoji in a source deck are the author's content: keep them.
+
+A theorem, lemma, proposition, definition or assumption is a formal statement, different in kind from the talk's own words. It always sits on its card (`add_statement`), the same way every time, so the audience recognizes one at once; what it means goes below the card.
 
 ## Citations
 
-- After a borrowed claim or number, a superscript number (`¹`); in the footnote, the same number and the author-year reference: "¹ Heckman et al. (2013), *Science*." Follow the field's convention (author-year in the sciences, numbered notes in the humanities), one style through the deck.
-- Under a borrowed figure, in the footnote: "Source: Jones et al. (2021), Fig. 3." Reusing a published figure may need the publisher's permission; mention it to the user.
-- The References slide lists every footnoted source in full.
-- Cite only sources the user gave or you read; never invent one.
+Everything borrowed (a claim, a number, a figure) is cited on the slide where it appears, with a superscript mark and the source in the footnote, and listed in full on the References slide. Use the field's citation style, one style throughout. A figure reproduced from a published paper may need the publisher's permission; mention it to the user. Cite only sources the user gave or you read.
 
 ## Wording
 
-- Define every acronym on first use.
-- Telegraphic bullets: drop articles and filler where the meaning survives ("Intervention cut costs 23% (p < 0.01)", not "Our study found that the intervention reduced costs").
-- Parallel bullets: same grammatical form, one idea each, a lead-in in dark navy when the bullets are a list of named things.
-- Plain words, no idioms.
-- Never end a paragraph with a single word on its last line; reword it if `check.py` reports one.
+Define acronyms on first use. Keep bullets parallel and plain, in the words the field uses. A paragraph never ends with a single word alone on its last line; reword it when `save()` can't pull the word back. The narrower the column, the shorter its text must be: a remark in a third or a quarter of the width should fit on one line, and a phrase that wraps there is usually one that can lose a word.

@@ -5,101 +5,78 @@ description: "Builds research talks as .pptx decks that open cleanly in Google S
 
 # Academic Slides
 
-Builds a research talk as a .pptx from `{skill-dir}/assets/theme.pptx` (`{skill-dir}` is this skill's base directory). The theme holds the colors, fonts, layouts and page numbers; **you design each slide yourself** under the guidelines below. The helpers in `assets/slides.py` put content on the grid in the theme's sizes and colors, and `assets/check.py` catches what can be measured.
+A research talk is an argument made out loud to a room that sees each slide for about a minute. A good slide lets that room get its point at a glance while still listening to the speaker: one claim, the evidence for it, nothing competing. Everything in this skill follows from that. Design each slide yourself with that reader in mind; the theme, the helpers and the checks get the mechanics right so your attention can go to judgment.
 
-## Guidelines
+## What to read
 
-| File | Covers | Read |
-|---|---|---|
-| [argument-guidelines.md](argument-guidelines.md) | Audience, storyline, action titles, one job per slide, the slides every talk needs, timing | Before planning a new talk |
-| [design-guidelines.md](design-guidelines.md) | Grid, type, color, spacing, reading order, whitespace, consistency, tone, Google Slides compatibility | Always, before building |
-| [content-guidelines.md](content-guidelines.md) | Figures, tables, equations, citations, wording | Always, before building |
-| [card-usage-guidelines.md](card-usage-guidelines.md) | When a card or box is allowed, and how it looks | Before adding any card or box |
-| [restyle-guidelines.md](restyle-guidelines.md) | Converting an existing deck: what must stay, what may change | Instead of Step 1, when restyling |
+- [argument-guidelines.md](argument-guidelines.md): what the talk says, in what order, and how each slide earns its place. For a new talk.
+- [design-guidelines.md](design-guidelines.md): how a slide looks: the design system (grid, type, color) and the principles of good layout. Always.
+- [content-guidelines.md](content-guidelines.md): figures, tables, equations and citations. Always.
+- [card-usage-guidelines.md](card-usage-guidelines.md): when grouping needs a card, and when it doesn't. Before drawing any box.
+- [restyle-guidelines.md](restyle-guidelines.md): converting an existing deck, where the content is the author's and only the design is yours.
 
-When they conflict, the order is: what the user asked > restyle rules (for a restyle) > design > content > argument.
+Read them for the reasoning, not as rules to look up: when a case isn't covered, the reasoning tells you what to do. When they pull in different directions, what the user asked comes first, then what the audience can read.
 
-## Step 1: Plan the argument (new talks)
+## Workflow
 
-1. Settle the audience, the time slot and the one argument the talk makes (argument-guidelines.md).
-2. Write a slide-by-slide outline: each slide's action title and its one exhibit or point.
-3. Ghost deck test: read only the titles in order; they must tell the whole argument. Fix the outline until they do.
-4. Check the count: at most about one content slide per minute.
-5. Show the outline to the user and wait for agreement when the deck has more than 10 slides or the content is complex.
+1. **Argument** (new talks). Settle the audience, the time and the one argument. Write the outline as action titles, one per slide, and read the titles alone: they should tell the whole story. Agree on it with the user when the deck is long or the content complex. For a restyle the argument is given; read the whole source deck instead.
+2. **Layout plan.** Before building, decide how each kind of content in this deck will look (a figure with its description, a results table, a theorem, a comparison) and keep to it, so the audience learns the deck's visual language once.
+3. **Build** with the helpers below, in one Python script in the user's project.
+4. **Check** with the tools, then look at every rendered page as the audience would, and fix what reads badly.
+5. **Hand over** with what the user needs to know.
 
-For a restyle, follow restyle-guidelines.md instead: the content and order are the author's.
-
-## Step 2: Plan the layout
-
-Write the layout plan (design-guidelines.md, principle 8): the kinds of content in the deck and one treatment for each kind, its column split, which side holds what, where the lead-in goes. One column unless the content needs more. Then for each slide: name its focal point, take its kind's treatment, place the rest in reading order.
-
-## Step 3: Build
-
-Write one Python script in the user's project:
+## Building
 
 ```python
 import sys; sys.path.insert(0, "{skill-dir}/assets")
-from slides import new_deck, add_slide, add_bullets, add_image, rows, save
+from slides import new_deck, add_slide, add_text, add_image, rows, next_row, save, write_script, CONTENT_BOTTOM
 
-prs = new_deck()  # the theme without its example slides
+prs = new_deck()  # theme.pptx without its example slides
 add_slide(prs, "Title", "Early childhood programs raise adult earnings",
           p1=["SOLE · May 2025", "Jane Smith¹, John Doe²", "¹ University of X · ² Lab Y"])
 
-slide = add_slide(prs, "Title Only", "Program children earn 18% more by age 35",
-                  p13=["Source: SSA earnings records."])
-add_image(slide, 0, 8, *rows(0, 4), "figures/earnings.png", valign="middle")
-add_bullets(slide, 8, 4, *rows(0, 4), [[("Bottom quartile: ", True), ("+28%", False)], "Gap opens after age 25"])
-slide.notes_slide.notes_text_frame.text = "Transition from the design slide; the one number to remember: 18%."
+slide = add_slide(prs, "Title Only", "Program children earn 18% more by age 35", p13=["Source: SSA earnings records."])
+lead = add_text(slide, 0, 12, rows(0, 1)[0], None, [[("Earnings at 35, ", False), ("program", True), (" vs control", False)]])
+top = rows(next_row((lead.top + lead.height) / 914400), 1)[0]
+add_image(slide, 0, 12, top, CONTENT_BOTTOM - top, "figures/earnings.png")
+add_slide(prs, "Section Header", "Results", notes="So what did the program change? Start with earnings.")
 
-save(prs, "talk.pptx")  # deletes empty placeholders, balances titles, fixes runts
+save(prs, "talk.pptx")  # removes empty placeholders, balances titles, fixes single-word last lines
+write_script(prs, "script.md")  # every slide's title and notes, for rehearsing
 ```
 
-**Layouts** (`add_slide(prs, layout, title, p<idx>=paragraphs)`; `p13` is the footnote): Title, Section Header (the section name alone, centered), Title and Content (bullets), Two Content, Figure and Text, Figure, Statement (the research question on a card), References, Title Only (compose the rest with helpers), Blank.
+`{skill-dir}` is this skill's base directory. Positions are grid columns (0–11) and rows (0–3): `box(first_column, span, y, h)`, `rows(first_row, span)`, `next_row(bottom)`.
 
-**Helpers** in `slides.py`, all on the grid; their docstrings give the arguments:
+**Layouts** for `add_slide(prs, layout, title, notes=..., p<idx>=...)`, where `notes` is what to say and `p13` is the footnote: Title, Section Header, Title and Content, Two Content, Figure and Text, Figure, Statement, References, Title Only (compose the rest with helpers), Blank.
 
-| Helper | Puts on the slide |
+**Helpers** in `assets/slides.py`; each docstring says what it does and takes:
+
+| Helper | For |
 |---|---|
-| `add_bullets`, `add_text` | Text in grid columns; `h=None` fits the height to the text. A 17 pt subheading is `add_text(..., [[(text, True, True)]], 17)` |
-| `add_image`, `figure` | A figure, whole and centered, in a grid box or a picture placeholder |
-| `add_table` | A table: 13 pt, horizontal rules, `best=`, `groups=`, `highlight=` |
-| `add_equation` | LaTeX in Computer Modern, the serif of papers, as an image |
-| `add_statement` | A theorem, lemma or definition on a card, text and equations inside |
-| `add_cards`, `add_card` | 2–4 cards in a row, only when the card gate passes |
-| `add_flow`, `add_arrow` | Steps with arrows; an arrow joining two blocks |
-| `highlight` | A dotted outline on part of a figure |
-| `box`, `rows`, `next_row`, `center_vertically`, `resize` | Positions on the grid |
-| `numbered`, `plain`, `align` | Numbered or unbulleted paragraphs, alignment |
+| `add_text`, `add_bullets` | Text in grid columns; `h=None` fits the box to the text |
+| `add_image`, `figure` | A figure, whole and centered |
+| `add_table` | A table in the theme's style |
+| `add_equation` | A display equation, LaTeX set in the serif of papers |
+| `add_statement` | A theorem, lemma or definition on its card |
+| `add_cards` | A row of cards, when grouping needs them |
+| `add_flow`, `add_arrow` | A process in steps; an arrow joining two blocks |
+| `highlight` | A dotted outline marking part of a figure |
+| `center_vertically`, `numbered`, `plain`, `align`, `resize` | Adjustments |
 
-**Text arguments:** a paragraph is a str, a list of runs, or `(level, ...)` for a sub-point. A run is `(text, style...)`: `True` is emphasis (dark navy), a second `True` or `"accent"` the theme blue, `"underline"` (sparingly, with emphasis), `"italic"` for variables and titles of works, `"super"` / `"sub"`, and `"#RRGGBB"` for words that name a figure's series.
+**Text** is a list of paragraphs. A paragraph is a str, a list of runs, or `(level, ...)` for a sub-point; a run is `(text, style...)`: `True` for emphasis, `True, True` or `"accent"` for the theme blue, `"underline"`, `"italic"`, `"super"`, `"sub"`, or `"#RRGGBB"` for words that name a figure's series.
 
-**Showcase:** `assets/examples.py` builds the example slides in `theme.pptx`, using every helper once in a whole slide. Read it to see how helpers compose; it is not a set of layouts to pick from.
+**Figures from a PDF:** `python {skill-dir}/assets/crop.py paper.pdf 3 "Figure 2" figures/fig2.png` finds the figure above that caption on page 3 and crops it at 300 dpi; `--box x0,y0,x1,y1` (in points) crops a region by hand when the caption doesn't anchor it. Look at every crop.
 
-To change the theme itself, edit `assets/theme.py`, run it, and commit the new `theme.pptx`.
+**Showcase:** `assets/examples.py` builds the example slides in `theme.pptx`, every helper used once in a whole slide. Read it to see how the pieces compose, not as layouts to copy. To change the theme itself, edit `assets/theme.py` and run it.
 
-## Step 4: Check
+## Checking
 
-1. `python {skill-dir}/assets/check.py deck.pptx`: measures every text box with Inter's real metrics (overflow, titles over two lines, table cells that wrap, single words on a last line), and reports shapes off the grid, past the bottom margin, overlapping or shadowed. Fix everything it reports, or (in a restyle) list it for the user.
-2. `python {skill-dir}/assets/aesthetics.py deck.pptx`: renders the deck and measures each slide after AeSlides: fill (crowding), whitespace (large empty regions) and balance (a lean to one side), and flags slides past the thresholds (design-guidelines.md, principle 6). Fix the flagged slides.
-3. Render and look at every page: `FONTCONFIG_FILE={skill-dir}/assets/fonts.conf soffice --headless --convert-to pdf deck.pptx` (the config points LibreOffice at the bundled Inter). For each page: is the focal point obvious, does the eye move in reading order, is anything crowded or empty, does it match the deck's other slides of its kind? Fix and render again.
-4. Academic checks:
+- `python {skill-dir}/assets/check.py deck.pptx` measures text with the font's real metrics: overflow, long titles, wrapping table cells, single words on a last line, and shapes off the grid, overlapping or past the margin. It also estimates the talk's length from the speaker notes.
+- `python {skill-dir}/assets/aesthetics.py deck.pptx` renders the deck and measures each slide on its pixels, after AeSlides: how crowded it is, how much of it is empty, whether it leans to one side. It also saves a contact sheet of every slide, to see the deck at once and spot slides that don't look like their siblings.
+- `FONTCONFIG_FILE={skill-dir}/assets/fonts.conf soffice --headless --convert-to pdf deck.pptx` renders it with the bundled Inter. Look at every page as someone in the room would: where does the eye land first, is that the point, does anything compete with it, does the slide look like its siblings?
 
-```
-□ The titles alone tell the argument; each is one sentence of at most two lines
-□ The research question has its own slide, by slide 3
-□ One exhibit per slide, supporting its title, with the finding marked on it
-□ Text above a figure stacks; columns only for tall figures or parallel items
-□ Every borrowed claim, figure or number has a footnote; the References slide lists them all
-□ Conclusions is the last main slide, with contact and a link or QR code; no "Thank you" slide
-□ Backup slides answer the likeliest questions
-□ No pitch-style slides: no hero numbers, superlatives or slogans
-□ Every card passes the card gate; slide count fits the time slot
-□ Missing figures listed for the user
-```
+The tools catch mechanics; only looking tells you whether a slide communicates. Before handing over, read the titles alone once more, and make sure every borrowed claim and figure is cited and the deck ends on its conclusions.
 
 ## Hand-over
 
-Tell the user:
-- How to open it in Google Slides: upload the .pptx to Google Drive, then File → Save as Google Slides. Keynote and PowerPoint need Inter installed, or they draw the text in Times New Roman: install `{skill-dir}/assets/Inter-Regular.ttf` and `Inter-Italic.ttf` (on a Mac, copy them to `~/Library/Fonts/`).
-- Which figures are missing, which slides `check.py` still flags, and (for a restyle) which slides were split.
-- To rehearse aloud to time and finish 1–2 minutes early, bring the deck as .pptx and PDF in two places, and test it on the venue's projector.
+Tell the user how to open the deck in Google Slides (upload the .pptx to Drive, then File → Save as Google Slides; Keynote and PowerPoint need Inter installed from `{skill-dir}/assets/`), which figures are missing, what the checks still report and why it stays, and for a restyle which slides were split. Suggest rehearsing aloud to time.

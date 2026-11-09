@@ -1,5 +1,5 @@
 """Building blocks for decks made from theme.pptx: the grid, text, figures, cards, tables and flows. Each helper
-applies the design system (SKILL.md), so a slide composed from them stays on the grid and in the type scale.
+applies the design system (design-guidelines.md), so a slide composed from them stays on the grid and in the type scale.
 
     import sys; sys.path.insert(0, "{skill-dir}/assets")
     from slides import new_deck, add_slide, add_bullets, add_image, rows, save
@@ -144,9 +144,9 @@ def fill(shape, paragraphs):
                 run.font.color.rgb = RGBColor.from_string(STRONG)
 
 
-def add_slide(prs, layout_name, title, **placeholders):
-    """A slide on a theme layout. title: a str or runs. placeholders: p<idx>=paragraphs, e.g. p1=[...],
-    p13=["footnote"]."""
+def add_slide(prs, layout_name, title, notes=None, **placeholders):
+    """A slide on a theme layout. title: a str or runs. notes: what the speaker says on it. placeholders:
+    p<idx>=paragraphs, e.g. p1=[...], p13=["footnote"]."""
     layout = next(layout for layout in prs.slide_layouts if layout.name == layout_name)
     slide = prs.slides.add_slide(layout)
     if isinstance(title, str):
@@ -155,6 +155,8 @@ def add_slide(prs, layout_name, title, **placeholders):
         fill(slide.shapes.title, [title])
     for key, paragraphs in placeholders.items():
         fill(slide.placeholders[int(key[1:])], paragraphs)
+    if notes:
+        slide.notes_slide.notes_text_frame.text = notes
     return slide
 
 
@@ -178,6 +180,16 @@ def tidy(prs):
 def save(prs, path):
     tidy(prs)
     prs.save(path)
+
+
+def write_script(prs, path):
+    """Every slide's title and speaker notes in one Markdown file, in slide order, for rehearsing."""
+    parts = ["# Script\n"]
+    for n, slide in enumerate(prs.slides, 1):
+        title = slide.shapes.title.text_frame.text.replace("\v", " ") if slide.shapes.title else ""
+        notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ""
+        parts.append(f"## {n}. {title}\n\n{notes}\n")
+    Path(path).write_text("\n".join(parts))
 
 
 # Text
@@ -300,7 +312,8 @@ def highlight(slide, picture, left, top, right, bottom):
 def add_equation(slide, first_column, span, y, tex, size=24, align="center"):
     """A LaTeX equation (matplotlib mathtext in Computer Modern, the serif of LaTeX papers, dark navy) as an image
     at its natural size for `size` pt, from y, centered in its columns by default. For anything Unicode text can't
-    set: stacked sub- and superscripts, sums with limits, fractions, \\mathbb, \\mathcal, \\left( \\right)."""
+    set: stacked sub- and superscripts, sums with limits, fractions, \\mathbb, \\mathcal, \\left( \\right).
+    mathtext is a subset of LaTeX: no environments (cases, align, matrix); write a case split as two equations."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -356,7 +369,7 @@ def text_height(paragraphs, width):
 
 def add_card(slide, first_column, span, y, heading=None, body=(), h=None):
     """A card on the grid: a 17 pt heading in the theme blue over 15 pt body lines, its height fitted to the text
-    (or `h`). Only when card-usage-guidelines.md's gate passes; never nest cards. For a group, use add_cards."""
+    (or `h`). Only when card-usage-guidelines.md calls for a card; never nest cards. For a group, use add_cards."""
     w = box(first_column, span, y, 0)[2]
     paragraphs = card_paragraphs(heading, body)
     top_inset, bottom_inset = card_insets(paragraphs) if paragraphs else (CARD_PADDING, CARD_PADDING)
