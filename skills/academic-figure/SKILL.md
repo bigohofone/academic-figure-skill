@@ -109,6 +109,10 @@ Paul Tol's color-blind-safe schemes, from `tol_colors` (imported as `tc`). Pick 
 
 - Use `bright` unless the user names another set or the case above fits better. One set per figure; the same set across a paper.
 
+### Custom palette
+
+When the user gives their own series colors (hex codes, a brand palette, or "match the original figure"), use them instead of a Tol set for the data series only: define them once in the notebook's setup cell as a named dict (e.g. `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`) and pass `color=PALETTE[...]` to each series. Everything else keeps the style: axes, ticks, gridlines, reference lines and neutral series stay grey/black, colormaps stay Tol, and series text uses the darkened series color (§2). If the user's colors include very light ones (e.g. cyan, yellow), say that they read weakly on white.
+
 ### Rules
 
 | Case | Color |

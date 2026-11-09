@@ -21,6 +21,8 @@ from paper import fit_height
 plt.style.use(ROOT.parent / "skills/academic-figure/assets/paper.mplstyle")
 ONE_HALF, DOUBLE = 5.0625, 6.75
 cset = tc.colorsets["bright"]
+# series colors taken from the original figures' vector paths, so each redraw matches its original
+PALETTE = {"purple": "#5F16A7", "cyan": "#63C9D2", "blue": "#4D8BD7"}
 data = json.load(open(OUT / "dapo.json"))
 
 
@@ -54,10 +56,10 @@ def panels(rows, titles, sharex=False):
     return fig, list(axes.flat)
 
 
-def ablation(name, keys, captions, ylabels, ours, other, smooth):
+def ablation(name, keys, captions, ylabels, ours, other, smooth, ours_color="purple", other_color="cyan"):
     fig, axes = panels(1, captions, sharex=True)
     for ax, key, ylabel, sm in zip(axes, keys, ylabels, smooth):
-        for label, color in [(other, cset.blue), (ours, cset.red)]:
+        for label, color in [(other, PALETTE[other_color]), (ours, PALETTE[ours_color])]:
             plot_curve(ax, data[key][label], color, label, sm)
         ax.set_xlabel("Training steps")
         ax.set_ylabel(ylabel)
@@ -83,17 +85,18 @@ def fig1():
     ax.plot(10000, 47, "o", color=cset.grey)
     ax.annotate("DeepSeek-R1-Zero-Qwen-32B", (10000, 47), xytext=(-6, -4), textcoords="offset points",
                 ha="right", va="top", fontsize=8, color=text_color(cset.grey))
-    for label, color, marker in [("DAPO avg@32", cset.red, "o"), ("DAPO pass@32", cset.blue, "v"),
-                                 ("DAPO cons@32", cset.green, "^")]:
+    for label, color, marker in [("DAPO avg@32", PALETTE["purple"], "o"),
+                                 ("DAPO pass@32", PALETTE["cyan"], "v"),
+                                 ("DAPO cons@32", PALETTE["blue"], "^")]:
         s = data["fig1"][label]
         ax.plot(s["step"], s["value"], color=color, marker=marker,
                 label=label)
     avg = data["fig1"]["DAPO avg@32"]
     peak = max(avg["value"])
     best = avg["step"][avg["value"].index(peak)]
-    ax.plot(best, peak, "*", markersize=8, markerfacecolor=cset.red,
-            markeredgecolor=text_color(cset.red))
-    label_value(ax, best, peak, f"{peak:.1f}", cset.red, markersize=8)
+    ax.plot(best, peak, "*", markersize=8, markerfacecolor=PALETTE["purple"],
+            markeredgecolor=text_color(PALETTE["purple"]))
+    label_value(ax, best, peak, f"{peak:.1f}", PALETTE["purple"], markersize=8)
     label_value(ax, 10000, 47, "47.0", cset.grey)
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME 2024 accuracy (%)")
@@ -106,7 +109,7 @@ def fig3():
     fig, axes = panels(1, ["Mean up-clipped probability", "Samples with an accuracy of 1"])
     for ax, key, ylabel in zip(axes, ["fig3a", "fig3b"],
                                ["Mean up-clipped probability", "Prompts with accuracy = 1"]):
-        plot_curve(ax, data[key], cset.blue, smooth=True)
+        plot_curve(ax, data[key], PALETTE["blue"], smooth=True)
         ax.set_xlabel("Training steps")
         ax.set_ylabel(ylabel)
     fit_height(fig, axes)
@@ -116,7 +119,8 @@ def fig3():
 def fig6():
     fig, ax = plt.subplots(figsize=(ONE_HALF, 2))
     ax.axhline(0.429, color=cset.grey, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
-    for label, color in [("w/o Dynamic Sampling", cset.blue), ("w/ Dynamic Sampling", cset.red)]:
+    for label, color in [("w/o Dynamic Sampling", PALETTE["cyan"]),
+                         ("w/ Dynamic Sampling", PALETTE["purple"])]:
         s = data["fig6"][label]
         peak = max(s["value"])
         best = s["step"][s["value"].index(peak)]
@@ -135,7 +139,7 @@ def fig7():
     labels = ["Mean response length", "Reward score", "Generation entropy", "Mean probability"]
     fig, axes = panels(2, labels, sharex=True)
     for ax, key, ylabel in zip(axes, ["fig7a", "fig7b", "fig7c", "fig7d"], labels):
-        ax.plot(data[key]["step"], data[key]["value"], color=cset.blue)
+        ax.plot(data[key]["step"], data[key]["value"], color=PALETTE["purple"])
         ax.set_ylabel(ylabel)
     for ax in axes[2:]:
         ax.set_xlabel("Training steps")
@@ -154,6 +158,7 @@ ablation("fig4", ["fig4a", "fig4b"],
          "w/ token-level loss", "w/o token-level loss", smooth=(True, True))
 ablation("fig5", ["fig5a", "fig5b"], ["Performance on AIME", "Entropy of actor model"],
          ["AIME avg@32", "Generation entropy"],
-         "w/ overlong filtering", "w/o overlong filtering", smooth=(False, True))
+         "w/ overlong filtering", "w/o overlong filtering", smooth=(False, True),
+         ours_color="cyan", other_color="purple")
 fig6()
 fig7()
