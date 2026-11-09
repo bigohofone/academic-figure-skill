@@ -81,7 +81,7 @@ def fig1():
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME 2024 accuracy (%)")
     ax.legend(loc="lower right", bbox_to_anchor=(9600, 0), bbox_transform=ax.get_xaxis_transform())
-    fit_height(fig, ax, aspect=1 / 3)
+    fit_height(fig, ax, aspect=0.382)
     save(fig, "fig1")
 
 
@@ -107,7 +107,7 @@ def fig6():
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME avg@32")
     ax.legend(loc="lower right")
-    fit_height(fig, ax, aspect=1 / 3)
+    fit_height(fig, ax, aspect=0.382)
     save(fig, "fig6")
 
 

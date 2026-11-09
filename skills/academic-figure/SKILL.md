@@ -24,17 +24,17 @@ Apply every rule unless the user says otherwise. Order: size → style → plot 
 
 ### Grid and panel aspect
 
-Choose the grid (rows × cols) and the panel aspect together, by judgment, for what this data needs to show. Use 3:2 unless the content needs another aspect. The aspect (width : height) is per panel, not for the whole figure, and is one of four:
+Choose the grid (rows × cols) and the panel aspect together, by judgment, for what this data needs to show. Use the golden ratio φ : 1 (φ ≈ 1.618) unless the content needs another aspect. The aspect (width : height) is per panel, not for the whole figure, and is one of four, all built on φ except the square:
 
 | Aspect | `aspect=` | Typical fit |
 |---|---|---|
-| 6 : 2 | 1 / 3 | a single panel at 1.5- or double-column width (curves, bars) |
-| 3 : 2 | 2 / 3 | curves, bars, histograms (default) |
+| φ² : 1 | 0.382 | a single panel at 1.5- or double-column width (curves, bars) |
+| φ : 1 | 0.618 | curves, bars, histograms (default) |
 | 1 : 1 | 1.0 | heatmap, confusion matrix, embedding |
-| 2 : 3 | 1.5 | content that is taller than wide (e.g. many horizontal bars) |
+| 1 : φ | 1.618 | content that is taller than wide (e.g. many horizontal bars) |
 
 - Ask what the reader must see: slopes and gaps between curves need height, many x categories need width, matrices need square cells.
-- Compare a few layouts before choosing. E.g. two line plots in one column: side by side gives ~1.3 in-wide panels that flatten the curves; stacked 2×1 at 3:2 gives each panel the full width and enough height, so it is better.
+- Compare a few layouts before choosing. E.g. two line plots in one column: side by side gives ~1.3 in-wide panels that flatten the curves; stacked 2×1 at φ : 1 gives each panel the full width and enough height, so it is better.
 - Spread panels evenly; turn off unused cells.
 - Turn on `sharex` / `sharey` when panels plot the same quantity on that axis (`plt.subplots(..., sharex=True, sharey=True)`); inner tick labels hide automatically, and axis labels go on the outer panels only.
 - After rendering, if curves look flattened or labels crowd, change the grid or aspect and re-render.
@@ -46,7 +46,7 @@ Don't compute it. Create the figure at the target width with any height, draw ev
 ```python
 fig, axes = plt.subplots(1, 2, figsize=(3.25, 2))  # after the §2 setup
 ...  # plot, labels, fig.legend, colorbar
-fit_height(fig, axes, aspect=2 / 3)
+fit_height(fig, axes, aspect=0.618)
 fig.savefig(...)  # never bbox_inches="tight"
 ```
 
@@ -66,7 +66,7 @@ plt.style.use("paper.mplstyle")
 
 It needs `tol-colors` (Paul Tol's own palette package; Python 3.10+) in the project's Python; if it is missing, tell the user and ask before installing it.
 
-It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 9, ticks 7, legend 7, titles 10 pt), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
+It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 6, legend 7, titles 9 pt), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
 
 - If text renders in DejaVu Sans, `paper` was not imported before plotting; fix that.
 - No figure title. Panel identifiers (dataset, setting) go in the axes title, never as text inside the axes.

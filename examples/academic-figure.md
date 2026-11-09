@@ -10,6 +10,24 @@ Redraws are made by [`academic-figure.py`](academic-figure.py) from [`academic-f
 uv run -p 3.12 --with matplotlib --with tol-colors python examples/academic-figure.py
 ```
 
+## On the page
+
+Each original page (left) next to the same page with the redrawn figure dropped in at the width LaTeX would give it (`\textwidth`; 1.5 column for Figure 6), with the text below moved to fit. Pages are shown at about half size; click one to open it full size. Made by [`academic-figure-pages.py`](academic-figure-pages.py):
+
+```
+uv run -p 3.12 --with pymupdf python examples/academic-figure-pages.py
+```
+
+| Original | Redrawn |
+|---|---|
+| <a href="academic-figure/page1-before.png"><img src="academic-figure/page1-before.png" width="400"></a> | <a href="academic-figure/page1-after.png"><img src="academic-figure/page1-after.png" width="400"></a> |
+| <a href="academic-figure/page2-before.png"><img src="academic-figure/page2-before.png" width="400"></a> | <a href="academic-figure/page2-after.png"><img src="academic-figure/page2-after.png" width="400"></a> |
+| <a href="academic-figure/page3-before.png"><img src="academic-figure/page3-before.png" width="400"></a> | <a href="academic-figure/page3-after.png"><img src="academic-figure/page3-after.png" width="400"></a> |
+| <a href="academic-figure/page4-before.png"><img src="academic-figure/page4-before.png" width="400"></a> | <a href="academic-figure/page4-after.png"><img src="academic-figure/page4-after.png" width="400"></a> |
+| <a href="academic-figure/page5-before.png"><img src="academic-figure/page5-before.png" width="400"></a> | <a href="academic-figure/page5-after.png"><img src="academic-figure/page5-after.png" width="400"></a> |
+| <a href="academic-figure/page6-before.png"><img src="academic-figure/page6-before.png" width="400"></a> | <a href="academic-figure/page6-after.png"><img src="academic-figure/page6-after.png" width="400"></a> |
+| <a href="academic-figure/page7-before.png"><img src="academic-figure/page7-before.png" width="400"></a> | <a href="academic-figure/page7-after.png"><img src="academic-figure/page7-after.png" width="400"></a> |
+
 ## Figure 1: AIME 2024 scores of DAPO
 
 <img src="academic-figure/fig1-before.png" width="577">
