@@ -67,13 +67,13 @@ def ablation(name, keys, captions, ylabels, ours, other, smooth):
 
 
 def text_color(color):
-    return [c * 0.6 for c in matplotlib.colors.to_rgb(color)]
+    return [c * 0.8 for c in matplotlib.colors.to_rgb(color)]
 
 
-def label_value(ax, x, y, text, color):
-    ax.annotate(text, (x, y), xytext=(0, 4), textcoords="offset points", ha="center", va="bottom",
-                fontsize=8, fontweight="bold", color=text_color(color),
-                bbox=dict(facecolor="white", edgecolor="none", pad=0.5))
+def label_value(ax, x, y, text, color, markersize=4):
+    ax.annotate(text, (x, y), xytext=(0, markersize / 2 + 2), textcoords="offset points",
+                ha="center", va="bottom", fontsize=8, fontweight="bold", color=text_color(color),
+                bbox=dict(boxstyle="square,pad=0", facecolor="white", edgecolor="none"))
 
 
 def fig1():
@@ -82,7 +82,7 @@ def fig1():
     ax.axvline(10000, color=cset.grey, linestyle="--", linewidth=1, alpha=0.5, zorder=1)
     ax.plot(10000, 47, "o", color=cset.grey)
     ax.annotate("DeepSeek-R1-Zero-Qwen-32B", (10000, 47), xytext=(-6, -4), textcoords="offset points",
-                ha="right", va="top", fontsize=7, color=text_color(cset.grey))
+                ha="right", va="top", fontsize=8, color=text_color(cset.grey))
     for label, color, marker in [("DAPO avg@32", cset.red, "o"), ("DAPO pass@32", cset.blue, "v"),
                                  ("DAPO cons@32", cset.green, "^")]:
         s = data["fig1"][label]
@@ -90,7 +90,10 @@ def fig1():
                 label=label)
     avg = data["fig1"]["DAPO avg@32"]
     peak = max(avg["value"])
-    label_value(ax, avg["step"][avg["value"].index(peak)], peak, f"{peak:.1f}", cset.red)
+    best = avg["step"][avg["value"].index(peak)]
+    ax.plot(best, peak, "*", markersize=8, markerfacecolor=cset.red,
+            markeredgecolor=text_color(cset.red))
+    label_value(ax, best, peak, f"{peak:.1f}", cset.red, markersize=8)
     label_value(ax, 10000, 47, "47.0", cset.grey)
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME 2024 accuracy (%)")
@@ -123,7 +126,7 @@ def fig6():
         label_value(ax, best, peak, f"{peak:.3f}", color)
     ax.set_xlabel("Training steps")
     ax.set_ylabel("AIME avg@32")
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower right", bbox_to_anchor=(5980, 0), bbox_transform=ax.get_xaxis_transform())
     fit_height(fig, ax, aspect=0.382)
     save(fig, "fig6")
 

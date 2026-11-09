@@ -66,7 +66,7 @@ plt.style.use("paper.mplstyle")
 
 It needs `tol-colors` (Paul Tol's own palette package; Python 3.10+) in the project's Python; if it is missing, tell the user and ask before installing it.
 
-It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 7, legend 7, titles 9 pt), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, lines and markers, the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
+It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lacks: labels 8, ticks 7, legend 8, titles 9 pt bold), left+bottom spines, 0.5 pt axes and ticks, horizontal #DDDDDD gridlines, 1.5 pt lines, hollow markers (white fill, 1 pt edge in the line color), the `bright` color cycle and `tol.iridescent` colormap (§4), legend frame defaults, constrained layout, 300 dpi, and fonttype 42 (PDF text stays text with Inter embedded, so it renders the same anywhere).
 
 - If text renders in DejaVu Sans, `paper` was not imported before plotting; fix that.
 - No figure title. Panel identifiers (dataset, setting) go in the axes title, never as text inside the axes.
@@ -76,8 +76,9 @@ It sets fonts (Inter for all text and math, STIX Sans for math symbols Inter lac
 - Reference lines (max/min, regression, threshold): color of related data, `--`, `alpha` 0.5, behind data, `linewidth=1` (thinner than the 1.5 data lines).
 - Category axes (bar charts, text tick labels): no tick marks, `ax.tick_params(axis="x", length=0)` (or `axis="y"` for horizontal bars); the label under each bar already marks it. With shared axes, apply it to every panel, including those whose labels are hidden.
 - Value labels (numbers on bars or points, e.g. `bar_label`): `fontsize=8`, bold for every series.
-- Text that belongs to one series (value labels, annotations): that series' color darkened to 60% (`[c * 0.6 for c in matplotlib.colors.to_rgb(color)]`), so even yellow, cyan and grey stay readable. Titles, axis labels, ticks and legend text stay black.
-- Peak or best values the reader must compare (best accuracy, best step): mark each with a marker in its series color and write the value just above it as a value label.
+- Text inside the axes (annotations such as a baseline's name): `fontsize=8`.
+- Text that belongs to one series (value labels, annotations): that series' color darkened to 80% (`[c * 0.8 for c in matplotlib.colors.to_rgb(color)]`). Titles, axis labels, ticks and legend text stay black.
+- Peak or best values the reader must compare (best accuracy, best step): mark each with a circle in its series color and write the value just above it as a value label. A single headline value to emphasize (e.g. the proposed method's final score against a baseline) gets a star instead (`"*"`, `markersize=8`, twice the style's 4 so its thin points read), filled with the series color and edged in the darkened text color of the series (`markerfacecolor=color, markeredgecolor=text_color(color)`), on top of the series' own marker if it has one.
 
 ## 3. Plot-type overrides
 
@@ -135,7 +136,7 @@ Paul Tol's color-blind-safe schemes, from `tol_colors` (imported as `tc`). Pick 
 | Multiple panels, different series per panel | one legend per panel, above its title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)`; never merge them into one legend |
 | Grouped series | rows = groups, columns = variants |
 
-- All legends use the style's 7 pt. Outside legends add `frameon=False, borderaxespad=0`.
+- All legends use the style's 8 pt. Outside legends add `frameon=False, borderaxespad=0`.
 
 ## 6. Save
 

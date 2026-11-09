@@ -11,11 +11,11 @@ font.size: 8
 axes.labelsize: 8
 xtick.labelsize: 7
 ytick.labelsize: 7
-legend.fontsize: 7
+legend.fontsize: 8
 axes.titlesize: 9
-axes.titleweight: normal
-axes.titlepad: 3
-axes.labelpad: 2
+axes.titleweight: bold
+axes.titlepad: 6
+axes.labelpad: 4
 
 axes.spines.top: False
 axes.spines.right: False
@@ -24,6 +24,10 @@ xtick.major.width: 0.5
 xtick.minor.width: 0.5
 ytick.major.width: 0.5
 ytick.minor.width: 0.5
+xtick.major.size: 3
+xtick.minor.size: 2
+ytick.major.size: 3
+ytick.minor.size: 2
 axes.grid: True
 axes.grid.axis: y
 axes.axisbelow: True
@@ -31,9 +35,11 @@ grid.color: DDDDDD
 grid.linewidth: 0.5
 
 lines.linewidth: 1.5
-lines.markersize: 4.5
-lines.markeredgecolor: FFFFFF
-lines.markeredgewidth: 0.5
+lines.markersize: 4
+# hollow markers: white fill, 1 pt edge in the line's color
+lines.markerfacecolor: FFFFFF
+lines.markeredgecolor: auto
+lines.markeredgewidth: 1
 # also sets the legend frame width (no legend.linewidth rcParam)
 patch.linewidth: 0.5
 hatch.linewidth: 0.5
