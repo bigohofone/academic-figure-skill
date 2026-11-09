@@ -34,26 +34,23 @@ def shared_legend(fig, ax):
                frameon=False, borderaxespad=0, fontsize=8)
 
 
-def ema(values, weight=0.9):
-    out, last = [], values[0]
-    for v in values:
-        last = weight * last + (1 - weight) * v
-        out.append(last)
-    return out
+def moving_average(values):
+    half = max(1, len(values) // 40)
+    return [sum(w) / len(w) for w in (values[max(0, i - half):i + half + 1] for i in range(len(values)))]
 
 
 def plot_curve(ax, s, color, label=None, smooth=False):
     if smooth:
         ax.plot(s["step"], s["value"], color=color, alpha=0.25)
-        ax.plot(s["step"], ema(s["value"]), color=color, label=label)
+        ax.plot(s["step"], moving_average(s["value"]), color=color, label=label)
     else:
         ax.plot(s["step"], s["value"], color=color, label=label)
 
 
 def panels(rows, titles, sharex=False):
     fig, axes = plt.subplots(rows, 2, figsize=(DOUBLE, 2 * rows), sharex=sharex)
-    for ax, title in zip(axes.flat, titles):
-        ax.set_title(title)
+    for ax, letter, title in zip(axes.flat, "abcd", titles):
+        ax.set_title(f"({letter}) {title}")
     return fig, list(axes.flat)
 
 
