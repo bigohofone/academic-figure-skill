@@ -42,6 +42,38 @@ def _freeze_ticks(panels):
             axis.set_major_locator(FixedLocator([t for t in axis.get_majorticklocs() if lo <= t <= hi]))
 
 
+def _keep_value_labels_inside(fig, panels):
+    """Grow each panel's y-limits, and turn labels at the side edges inward, so every
+    `mark_value` label lies inside its panel. Returns whether any y-limits changed."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    changed = False
+    for a in panels:
+        box = a.get_window_extent(renderer)
+        for t in a.texts:
+            if t.get_gid() != "value-label":
+                continue
+            label = t.get_window_extent(renderer)
+            if label.x1 > box.x1:
+                t.set_ha("right")
+            elif label.x0 < box.x0:
+                t.set_ha("left")
+            # the label's reach above / below its point is fixed in pixels, so solve for the limit
+            # that leaves exactly that much room between the point and the spine
+            y = t.xy[1]
+            point = a.transData.transform((t.xy[0], y))[1]
+            lo, hi = a.get_ylim()
+            if label.y1 > box.y1:
+                above = label.y1 - point + 1
+                a.set_ylim(lo, lo + (y - lo) * box.height / (box.height - above))
+                changed = True
+            elif label.y0 < box.y0:
+                below = point - label.y0 + 1
+                a.set_ylim((y * box.height - below * hi) / (box.height - below), hi)
+                changed = True
+    return changed
+
+
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
@@ -54,6 +86,9 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     Auto ticks can change with the height (e.g. 75, 80 → 77.5, 80.0), which changes the tick
     label width and so the panel width. If that keeps the ratio from converging, the major
     ticks are fixed at their current positions and the height is solved again.
+
+    `mark_value` labels that would stick out of their panel are brought inside: the y-limits
+    grow to make room above (or below), and labels at the left or right edge turn inward.
 
     Never save with `bbox_inches="tight"`: it changes the final size and breaks the width and
     the ratio this function set.
@@ -70,6 +105,8 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
         warnings.warn("fit_height expects layout='constrained'; ratios may be off.")
 
     ratios, widths = _solve(fig, panels, aspect, iters, tol)
+    if _keep_value_labels_inside(fig, panels):
+        ratios, widths = _solve(fig, panels, aspect, iters, tol)
     if abs(ratios[0] - aspect) / aspect >= tol:
         _freeze_ticks(panels)
         ratios, widths = _solve(fig, panels, aspect, iters, tol)
@@ -94,13 +131,14 @@ def smooth(values):
     return [np.mean(values[max(0, i - half):i + half + 1]) for i in range(len(values))]
 
 
-def mark_value(ax, x, y, text, color, star=False):
-    """Mark (x, y) and write `text` in bold just above it, in `darken(color)`.
+def mark_value(ax, x, y, text, color, star=False, below=False):
+    """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
+    a point at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
 
-    A circle for values the reader compares; `star=True` for one headline value: a star twice the
-    marker size (its thin points vanish at the normal size), filled with `color`, edged in `darken(color)`.
-    The label's white background hides gridlines and reference lines behind the text.
+    The point is a hollow circle, or with `star=True` a filled star twice the marker size (its thin
+    points vanish at the normal size).
     """
+    ax.axhline(y, linestyle="--", linewidth=1, color=darken(color), zorder=1)
     size = rcParams["lines.markersize"] * (2 if star else 1)
     if star:
         # matplotlib bevels star corners by default, which blunts the points; miter keeps them sharp
@@ -108,6 +146,6 @@ def mark_value(ax, x, y, text, color, star=False):
                 markerfacecolor=color, markeredgecolor=darken(color))
     else:
         ax.plot(x, y, "o", color=color)
-    ax.annotate(text, (x, y), xytext=(0, size / 2 + 2), textcoords="offset points", ha="center",
-                va="bottom", fontweight="bold", color=darken(color),
-                bbox=dict(boxstyle="square,pad=0", facecolor="white", edgecolor="none"))
+    offset = size / 2 + 2
+    ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
+                va="top" if below else "bottom", fontweight="bold", color=darken(color), gid="value-label")

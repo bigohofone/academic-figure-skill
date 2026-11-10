@@ -136,10 +136,30 @@ def test_darken_darkens():
     assert darken("#FFFFFF") == [0.8, 0.8, 0.8]
 
 
-def test_mark_value_star_is_twice_the_marker():
+def test_mark_value_line_point_and_label():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     mark_value(ax, 1, 1, "1.0", "#4477AA")
     mark_value(ax, 2, 2, "2.0", "#4477AA", star=True)
-    circle, star = ax.lines
+    line1, circle, line2, star = ax.lines
     assert star.get_markersize() == 2 * circle.get_markersize() == 2 * plt.rcParams["lines.markersize"]
+    assert line1.get_linestyle() == line2.get_linestyle() == "--"
+    assert line1.get_zorder() < circle.get_zorder()
     assert [t.get_text() for t in ax.texts] == ["1.0", "2.0"]
+
+
+def test_mark_value_below():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    mark_value(ax, 0, 0, "0.0", "#4477AA", below=True)
+    assert ax.texts[0].get_va() == "top"
+
+
+def test_fit_height_keeps_value_labels_inside():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([0, 1, 2], [0, 1, 2])
+    mark_value(ax, 2, 2, "2.0", "#4477AA")
+    fit_height(fig, ax)
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    label = ax.texts[0]
+    assert ax.get_window_extent(renderer).contains(*label.get_window_extent(renderer).p1)
+
