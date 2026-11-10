@@ -199,3 +199,47 @@ def test_fit_height_quiet_on_clean_figure():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         fit_height(fig, ax)
+
+
+def test_rotated_tick_labels_that_fit_do_not_warn():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    labels = [f"({i / 10:.1f},{(i + 1) / 10:.1f}]" for i in range(10)]
+    ax.bar(range(10), range(10))
+    ax.set_xticks(range(10), labels=labels, rotation=45, ha="right", rotation_mode="anchor")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        fit_height(fig, ax)
+
+
+def test_rotated_tick_labels_that_collide_warn():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar(range(40), range(40))
+    ax.set_xticks(range(40), labels=["long label"] * 40, rotation=45, ha="right", rotation_mode="anchor")
+    with pytest.warns(UserWarning, match="overlap"):
+        fit_height(fig, ax)
+
+
+def test_bar_labels_are_kept_inside():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar_label(ax.bar(range(3), [3, 5, 2]), fontweight="bold")
+    fit_height(fig, ax)
+    fig.canvas.draw()
+    box = ax.get_window_extent()
+    assert all(t.get_window_extent().y1 <= box.y1 + 0.5 for t in ax.texts)
+
+
+def test_horizontal_bar_labels_are_kept_inside():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar_label(ax.barh(range(3), [3, 113, 2]), fontweight="bold")
+    fit_height(fig, ax)
+    fig.canvas.draw()
+    box = ax.get_window_extent()
+    assert all(t.get_window_extent().x1 <= box.x1 + 0.5 for t in ax.texts)
+
+
+def test_fit_height_warns_legend_over_bar():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar(range(3), [5, 5, 5], label="a")
+    ax.legend(loc="center")
+    with pytest.warns(UserWarning, match="the legend covers a bar or box"):
+        fit_height(fig, ax)

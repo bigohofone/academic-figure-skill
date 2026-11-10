@@ -31,18 +31,18 @@ Steps, in order:
 
 ### Grid
 
-| Width | Max cols | Max rows | More panels |
-|---|---|---|---|
-| Single column | 2 | 3 | double column |
-| 1.5 column | 3 | 1 | double column |
-| Double column | 4 | 2 | split into two figures |
+| Width | Max cols |
+|---|---|
+| Single column | 2 |
+| 1.5 column | 3 |
+| Double column | 4 |
 
-1. Start with the most columns the limits allow.
-2. Render. `fit_height` warns when a panel's data area (inside the spines) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
-3. On such a warning, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. When the rows are at their limit, move to the next wider width.
+1. Start with every panel in one row, up to the width's column limit: a single column holds two panels side by side, and panels the reader compares (two problems, two settings) stay side by side, as in the paper being redrawn.
+2. Render. `fit_height` warns when a panel's data area (inside the box) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
+3. On such a warning, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), turn long text tick labels 45° (§2), shorten labels. Only when a panel is still narrower than 1.2 in, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. Rows have no limit.
 4. Turn off unused cells (5 panels in 2 × 3: the last cell).
-5. When panels plot the same quantity over the same range on an axis, share it (`plt.subplots(..., sharex=True, sharey=True)`); the axis label then goes on the outer panels only.
-6. Every panel with a value axis has a label on it (with `sharey`, the outer panels carry it). Embeddings and heatmaps with category axes have none.
+5. When panels plot the same quantity over the same range on an axis, share it (`plt.subplots(..., sharex=True, sharey=True)`). Every panel keeps its tick numbers, since sharing hides them on inner panels: `ax.tick_params(labelleft=True, labelbottom=True)` on each panel.
+6. Each axis quantity is labelled once per row or column of panels, shared axis or not: panels side by side that plot the same quantity on y carry the y label on the leftmost panel only, and panels stacked that plot the same quantity on x carry the x label on the bottom panel only. When a whole row of panels shares one x label, write it once under the row with `fig.supxlabel(label)` (`fig.supylabel` for one y label down a column). A panel whose quantity differs from its neighbours' carries its own label. Embeddings and heatmaps with category axes have none.
 
 ### Panel aspect
 
@@ -53,7 +53,7 @@ The aspect (width : height) is per panel. Use one of these, golden ratio φ : 1 
 | φ² : 1 | 0.382 | a single panel at 1.5- or double-column width |
 | φ : 1 | 0.618 | curves, bars, histograms (default) |
 | 1 : 1 | 1.0 | heatmap, confusion matrix, embedding |
-| 1 : φ | 1.618 | content taller than wide (many horizontal bars) |
+| 1 : φ | 1.618 | content taller than wide (box plots, panels side by side in one column) |
 
 Slopes and gaps between curves need height, many x categories need width, matrices need square cells. If curves look flat after rendering, pick a taller aspect. The aspect follows the data, never room for labels: a value label that covers a curve goes below the point (`below=True`), and if it still covers one, the comparison uses another point whose label stands clear.
 
@@ -69,7 +69,7 @@ fig.savefig("{id}.pdf")
 ```
 
 - `ax` may be one Axes, an array, a list, or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
-- `fit_height` also keeps every `mark_value` label inside its panel: it raises the y-limit to make room, and turns labels at a side edge inward.
+- `fit_height` also keeps every `mark_value` label and every bar label (`ax.bar_label`) inside its panel: it raises the y-limit to make room (the x-limit for horizontal bars), and turns `mark_value` labels at a side edge inward.
 - On `ValueError` (fixed aspect), draw images with `imshow(..., aspect="auto")`.
 - On the "different widths" warning, give all panels the same width (plain grid, equal columns).
 
@@ -87,17 +87,21 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 
 | The style sets | |
 |---|---|
-| Text | Inter for all text and math; titles 9 pt, ticks 7 pt, everything else 8 pt |
-| Axes | left and bottom spines, black, 0.75 pt; ticks 0.75 pt, 3 pt long (minor 2 pt) |
-| Grid | horizontal, #DDDDDD, 0.75 pt, behind the data |
-| Lines, markers | lines 1.25 pt; hollow markers, size 4 |
+| Text | Inter for all text and math; titles and row/column headers 11 pt, tick labels 7 pt, everything else (axis labels, legends, value labels) 9 pt |
+| Axes | a full box, black, 0.5 pt; ticks 0.5 pt, 1.5 pt long (minor 1 pt); tick labels 1.75 pt from the ticks, axis labels 1 pt from the tick labels |
+| Grid | both directions, black at 10% opacity, 0.5 pt, behind the data |
+| Lines, markers | lines 1 pt, dashed lines 0.75 pt; hollow markers, size 2.25 with a 0.75 pt edge |
 | Color | Paul Tol `bright` cycle, `tol.iridescent` colormap |
-| Layout | constrained layout, 0.16 in between panels side by side, 0.08 in stacked |
+| Layout | constrained layout: panels sit as close as their labels allow, with 0.02 in of white space on each side |
 | Output | 300 dpi; `pdf.fonttype: 42` (text stays text, Inter embedded) |
 
 - Keep these values as they are; the style is tuned for print.
 - Name panels with axes titles: in reading order, prefix each with its letter, `"(a) Accuracy on AIME"`, `"(b) …"`. A single panel has no title unless it needs one (dataset, setting). The figure itself has no title; the caption names it.
+- Grids of two factors (models × benchmarks, methods × datasets): name each row and column once instead of each panel, and either factor may be the rows. Headers are 11 pt, like panel titles. Column headers are the top row's axes titles (`ax.set_title(col_name)`); row headers go left of the first column's y-label: `axes[r, 0].annotate(row_name, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0), textcoords="offset points", ha="right", va="center", rotation=90, fontsize=11)`. Such panels carry no letters; the caption names a panel by its row and column.
 - Keep matplotlib's default axis limits and margins; `fit_height` makes room for value labels (§1, Height).
+- Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
+- Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
+- Log₂ axes (number of samples, batch size, model size): `ax.set_xscale("log", base=2)`, a tick at every power of 2 up to the first one at or above the largest x (`top`) with `ax.set_xticks(ks, labels=[str(k) for k in ks])`, and no minor ticks (`ax.set_xticks([], minor=True)`). The axis ends at `top` with the usual 5% margin, so every panel ends on a labelled tick: `margin = 2 ** (0.05 * math.log2(top))`, `ax.set_xlim(1 / margin, top * margin)`. Where those labels overlap, step by 4 (`1, 4, 16, 64`).
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
 
 ## 3. Lines and text
@@ -109,23 +113,23 @@ Every plotted quantity is one of two kinds; decide which before drawing:
 
 ### Lines
 
-- Curves are plain lines; add markers (the style's hollow markers) only when the user asks.
+- Curves are plain lines; add markers (the style's hollow markers) only when the user asks. Then each series gets its own marker shape, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`, the same shape for a series in every panel.
 - Diagnostics, however often they were logged: draw the raw values in the series color at `alpha=0.25` without a label, then `smooth(values)` on top with the label, and add to the caption: "smoothed with a moving average over 5% of the steps; faint lines show raw values".
 - Reported results are drawn raw.
 - Several runs per setting (seeds, folds, trials): draw the mean as the line and a band of ±1 std with `ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)`, and say in the caption what the band is and over how many runs.
-- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=1, zorder=1)` in #BBBBBB, fully opaque, named by a legend entry. Compared values get their lines from `mark_value` (Value labels below).
+- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=0.75, zorder=1)` in #BBBBBB, fully opaque, named by a legend entry. Compared values get their lines from `mark_value` (Value labels below).
 - Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
 
 ### Value labels
 
-When the takeaway compares reported results across series, write them on the plot so the reader can read them exactly. Diagnostics carry no value labels; their curves already show the trend.
+When the takeaway compares reported results across series, write them on the plot so the reader can read them exactly. Diagnostics carry no value labels; their curves already show the trend. Neither do distributions (histograms, box plots): their shape is the message, and the caption gives the numbers.
 
 - Find the point where the paper makes the comparison: the claim decides it. "Ours reaches a higher score" compares each series' best; "ours ends higher" compares final values (at the last x all series share, when they end at different x); "ours is ahead at the same budget" compares values at that shared x. The value is the plotted metric at that point.
 - If the request and the paper don't settle the comparison point, ask the user. When you can't ask, compare each series' best and say so in the reply.
 - Write each value with three significant figures.
-- Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a 1 pt dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value in bold just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
+- Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a 0.75 pt dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value in bold just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
 - If a label above the point covers a curve, put it below with `below=True`.
-- Bar charts of reported results: label every bar with `ax.bar_label(bars, fontweight="bold")`.
+- Bar charts of reported results: label every bar (§4).
 
 ### Other text
 
@@ -133,17 +137,19 @@ When the takeaway compares reported results across series, write them on the plo
 
 ## 4. Plot type
 
-| Plot type | Frame | Gridlines | Other |
-|---|---|---|---|
-| Line | Base | Horizontal | – |
-| Vertical bar, histogram | Base | Horizontal | `linewidth=0` |
-| Horizontal bar | Base | Vertical | `linewidth=0` |
-| Scatter | Full | Horizontal | `edgecolors="none"`, `alpha=0.5` |
-| Embedding (t-SNE, UMAP) | Full | None | ticks hidden; markers as scatter |
-| Heatmap, confusion matrix | Full | None | tick marks hidden; cell text `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"` |
+Every plot type uses the same parts as lines: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt (box plots get theirs from the style), dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity, except bands and scatter clouds.
 
-- Bar charts: name the bars on the x-axis. For several groups (benchmarks, datasets), use one panel per group, titled with the group.
-- Bars over several runs: error bars of ±1 std with `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`, named in the caption.
+- **Line**: `ax.plot(x, y, color=color)`; markers only on request (§3). Gridlines in both directions (style).
+- **Bar** (reported results, one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, grouped bars sharing 0.8 of each slot (`width = 0.8 / n_series`), every bar labelled with `ax.bar_label(bars, fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. For several groups (benchmarks, datasets), one panel per group, titled with the group. Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.
+- **Horizontal bar**: only for unordered categories with long names. As bars, with `ax.barh` and vertical gridlines only: `ax.grid(axis="y", visible=False)`.
+- **Stacked bar**: segments in series order from the bottom with white 0.5 pt seams, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=0.5)`; horizontal gridlines only.
+- **Histogram**: raw values as touching bars, `ax.hist(values, bins=bins, color=color, linewidth=0)`; several series on one axis as outlines, `histtype="step", linewidth=1`. Counts per bin (e.g. accuracy intervals) as grouped bars with the bins in order on the x-axis, never horizontal bars. No value labels (§3); horizontal gridlines only.
+- **Box plot**: `box = ax.boxplot(values, positions=[x], widths=0.7, showfliers=False)` (the box fills 0.7 of its slot), filled with its series color, `box["boxes"][0].set_facecolor(color)`; the style draws the black outline, whiskers, caps and median. With under ~30 points per box, show every point on top, jittered within the box, as the style's markers in black on white: `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color="black", markerfacecolor="white", linestyle="none")`. Horizontal gridlines only.
+- **Violin**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`; fill the body with its series color at full opacity with a black 0.75 pt edge (`body = parts["bodies"][0]`, `body.set_facecolor(color)`, `body.set_edgecolor("black")`, `body.set_linewidth(0.75)`, `body.set_alpha(1)`), and draw the median as a black 1 pt line across it; points as in box plots. Horizontal gridlines only.
+- **Scatter**: `ax.scatter(x, y, s=5, color=color, edgecolors="none", alpha=0.5)`, dots the size of the style's markers, translucent so dense regions read darker. Gridlines in both directions.
+- **Embedding** (t-SNE, UMAP): as scatter, with ticks hidden and no gridlines (`ax.grid(False)`).
+- **Heatmap, confusion matrix**: `ax.imshow(..., aspect="auto")`, tick marks hidden, no gridlines (`ax.grid(False)`), a colorbar for continuous values; cell text 7 pt in `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"`.
+- **Pie chart**: draw a bar chart instead.
 - Many exact numbers with no trend or comparison to see (e.g. every method on every dataset): suggest a table to the user instead of a figure.
 
 ## 5. Color
@@ -170,12 +176,12 @@ Paul Tol's color-blind-safe `bright` set, from `tol_colors` (`tc`): `cset = tc.c
 
 | Case | Legend |
 |---|---|
-| Single panel | inside, at an explicit `loc` where it covers no data; when no such spot exists, above the panel with `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
-| Panels with the same series | one `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` above the panels |
-| Panels with different series | one per panel above its title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
+| One panel, or several panels with the same series | one legend for the figure, placed by the first of these that covers no data: (1) a corner of a panel, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, in the first panel that has one free; (2) another free spot inside a panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panels: `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
+| Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel's title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
 | Grouped series | rows = groups, columns = variants |
 | One series per panel | none; the title names it |
 
+- Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, a bar or a box; on that warning, try the next spot.
 - Entry order: "ours" first, then the other series in color order, reference lines last.
 
 ## 7. Save and caption
@@ -231,6 +237,6 @@ figures/
 
 After the notebook has run:
 
-1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping, a value label or legend covering a curve, and a font other than Inter. Fix the cell until it runs without warnings.
+1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend covering a bar or box, and a font other than Inter. Fix the cell until it runs without warnings.
 2. Look at each PNG for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow §6's order; colors follow §5; the caption matches the figure.
 3. PDF fonts are embedded TrueType: `pdffonts {id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 {id}.pdf` prints 0).

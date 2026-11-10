@@ -1,10 +1,12 @@
 import warnings
 from pathlib import Path
 
+import matplotlib.path as mpath
 import numpy as np
 import tol_colors  # registers the tol.* colormaps that paper.mplstyle names
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
 
 # Inter ships with the skill because no environment has it installed; paper.mplstyle names it.
@@ -42,36 +44,76 @@ def _freeze_ticks(panels):
 
 
 def _keep_value_labels_inside(fig, panels):
-    """Grow each panel's y-limits, and turn labels at the side edges inward, so every
-    `mark_value` label lies inside its panel. Returns whether any y-limits changed."""
+    """Grow each panel's limits so every `mark_value` label and every bar label (`ax.bar_label`, or
+    any annotation placed in data coordinates) lies inside its panel. `mark_value` labels at a side
+    edge turn inward instead; bar labels past a side grow the x-limits (horizontal bars).
+    Returns whether any limits changed."""
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     changed = False
     for a in panels:
         box = a.get_window_extent(renderer)
         for t in a.texts:
-            if t.get_gid() != "value-label":
+            value_label = t.get_gid() == "value-label"
+            if not (value_label or (isinstance(t, Annotation) and t.xycoords == "data")):
                 continue
             label = t.get_window_extent(renderer)
+            # a label's reach past its point is fixed in pixels, so solve for the limit
+            # that leaves exactly that much room between the point and the box
+            x, y = t.xy
+            point_x, point_y = a.transData.transform((x, y))
+            lo, hi = a.get_xlim()
             if label.x1 > box.x1:
-                t.set_ha("right")
+                if value_label:
+                    t.set_ha("right")
+                else:
+                    reach = label.x1 - point_x + 1
+                    a.set_xlim(lo, lo + (x - lo) * box.width / (box.width - reach))
+                    changed = True
             elif label.x0 < box.x0:
-                t.set_ha("left")
-            # the label's reach above / below its point is fixed in pixels, so solve for the limit
-            # that leaves exactly that much room between the point and the spine
-            y = t.xy[1]
-            point = a.transData.transform((t.xy[0], y))[1]
+                if value_label:
+                    t.set_ha("left")
+                else:
+                    reach = point_x - label.x0 + 1
+                    a.set_xlim((x * box.width - reach * hi) / (box.width - reach), hi)
+                    changed = True
             lo, hi = a.get_ylim()
             if label.y1 > box.y1:
-                above = label.y1 - point + 1
-                a.set_ylim(lo, lo + (y - lo) * box.height / (box.height - above))
+                reach = label.y1 - point_y + 1
+                a.set_ylim(lo, lo + (y - lo) * box.height / (box.height - reach))
                 changed = True
             elif label.y0 < box.y0:
-                below = point - label.y0 + 1
-                a.set_ylim((y * box.height - below * hi) / (box.height - below), hi)
+                reach = point_y - label.y0 + 1
+                a.set_ylim((y * box.height - reach * hi) / (box.height - reach), hi)
                 changed = True
     return changed
 
+
+def _rotated_outline(t, box, renderer):
+    """The text's outline as a closed path in display coordinates: its upright box turned by its
+    rotation about the center of `box`, its upright bounding box once rotated."""
+    angle = t.get_rotation()
+    t.set_rotation(0)
+    upright = t.get_window_extent(renderer)
+    t.set_rotation(angle)
+    along = np.array([np.cos(np.radians(angle)), np.sin(np.radians(angle))]) * upright.width / 2
+    across = np.array([-along[1], along[0]]) / np.hypot(*along) * upright.height / 2
+    center = np.array([box.x0 + box.x1, box.y0 + box.y1]) / 2
+    corners = [center - along - across, center + along - across, center + along + across, center - along + across]
+    return mpath.Path(corners + corners[:1], closed=True)
+
+
+def _texts_overlap(a, box_a, b, box_b, renderer):
+    """Whether two texts overlap. A rotated text (e.g. a 45° tick label) is compared by its turned
+    outline, since its upright bounding box also covers the empty corners around it."""
+    a_rotated, b_rotated = a.get_rotation() % 180 != 0, b.get_rotation() % 180 != 0
+    if not (a_rotated or b_rotated):
+        return box_a.overlaps(box_b)
+    if a_rotated and b_rotated:
+        outline_a, outline_b = _rotated_outline(a, box_a, renderer), _rotated_outline(b, box_b, renderer)
+        return outline_a.intersects_path(outline_b, filled=True)
+    rotated, box_rotated, other_box = (a, box_a, box_b) if a_rotated else (b, box_b, box_a)
+    return _rotated_outline(rotated, box_rotated, renderer).intersects_bbox(other_box, filled=True)
 
 def _warn_layout_problems(fig, panels):
     """Warn about what makes a figure hard to read in print, so it can be fixed before saving."""
@@ -102,7 +144,7 @@ def _warn_layout_problems(fig, panels):
             warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; import paper before plotting")
     for i in range(len(texts)):
         for j in range(i + 1, len(texts)):
-            if boxes[i].overlaps(boxes[j]):
+            if _texts_overlap(texts[i], boxes[i], texts[j], boxes[j], renderer):
                 warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
 
     for a in panels:
@@ -115,6 +157,11 @@ def _warn_layout_problems(fig, panels):
         for name, box in covers:
             if any(curve.intersects_bbox(box, filled=False) for curve in curves):
                 warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
+        if a.get_legend():
+            box = a.get_legend().get_window_extent(renderer)
+            shapes = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible()]
+            if any(shape.intersects_bbox(box, filled=True) for shape in shapes):
+                warnings.warn(f"the legend covers a bar or box in panel {a.get_title()!r}; move it")
 
 
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
@@ -134,7 +181,8 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     grow to make room above (or below), and labels at the left or right edge turn inward.
 
     Last, it warns about what reads badly in print: a panel narrower than 1.2 in, text cut off at
-    the figure edge, overlapping text, a value label or legend covering a curve, a font other than Inter.
+    the figure edge, overlapping text, a value label or legend covering a curve, a legend covering a bar or
+    box, a font other than Inter.
 
     Never save with `bbox_inches="tight"`: it changes the final size and breaks the width and
     the ratio this function set.
@@ -182,7 +230,7 @@ def mark_value(ax, x, y, text, color, below=False):
     """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
     a hollow circle at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
     """
-    ax.axhline(y, linestyle="--", linewidth=1, color=darken(color), zorder=1)
+    ax.axhline(y, linestyle="--", linewidth=0.75, color=darken(color), zorder=1)
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
