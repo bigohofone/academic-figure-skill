@@ -1,6 +1,6 @@
 ---
 name: academic-figure
-description: Style rules for academic paper figures made with matplotlib or seaborn (size, fonts, colors, axes, legends, saving), plus a required delivery step - a `figures/` folder in the user's project holds a copy of the style files and `figures.ipynb`, where every figure is one self-contained cell, with a paper-style caption above it, so the user can run, edit, and re-export it (PDF/PNG) themselves. Always use this skill when creating or editing any figure, plot, graph, chart, heatmap, or visualization intended for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned, and even if the user asks only for the plotting code.
+description: Makes publication-ready figures for academic papers with matplotlib or seaborn - sizing to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, a paper-style caption - delivered as cells in `figures/figures.ipynb` in the user's project. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
 ---
 
 # Paper Figure Rules
@@ -38,13 +38,11 @@ Steps, in order:
 | Double column | 4 | 2 | split into two figures |
 
 1. Start with the most columns the limits allow.
-2. Render and check every panel:
-   - its data area (inside the spines) is at least 1.2 in wide;
-   - its tick labels, title and axis labels are all shown in full, each on one line.
-3. If a panel fails, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. When the rows are at their limit, move to the next wider width.
+2. Render. `fit_height` warns when a panel's data area (inside the spines) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
+3. On such a warning, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. When the rows are at their limit, move to the next wider width.
 4. Turn off unused cells (5 panels in 2 × 3: the last cell).
 5. When panels plot the same quantity over the same range on an axis, share it (`plt.subplots(..., sharex=True, sharey=True)`); the axis label then goes on the outer panels only.
-6. Every panel has a y-axis label (with `sharey`, the outer panels carry it).
+6. Every panel with a value axis has a label on it (with `sharey`, the outer panels carry it). Embeddings and heatmaps with category axes have none.
 
 ### Panel aspect
 
@@ -57,7 +55,7 @@ The aspect (width : height) is per panel. Use one of these, golden ratio φ : 1 
 | 1 : 1 | 1.0 | heatmap, confusion matrix, embedding |
 | 1 : φ | 1.618 | content taller than wide (many horizontal bars) |
 
-Slopes and gaps between curves need height, many x categories need width, matrices need square cells. If curves look flat after rendering, pick a taller aspect.
+Slopes and gaps between curves need height, many x categories need width, matrices need square cells. If curves look flat after rendering, pick a taller aspect. The aspect follows the data, never room for labels: a value label that covers a curve goes below the point (`below=True`), and if it still covers one, the comparison uses another point whose label stands clear.
 
 ### Height
 
@@ -104,22 +102,30 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 
 ## 3. Lines and text
 
+Every plotted quantity is one of two kinds; decide which before drawing:
+
+- **Reported results**: the numbers the paper claims, measured once per setting (accuracy, F1, latency, throughput, error rate, a score per method). Readers compare them exactly.
+- **Diagnostics**: quantities logged along a process to show its behavior (loss, gradient norm, entropy, temperature, queue length per iteration). Readers read their trend and shape.
+
 ### Lines
 
 - Curves are plain lines; add markers (the style's hollow markers) only when the user asks.
-- Training statistics logged during training (loss, reward, entropy, response length, probabilities): draw the raw values in the series color at `alpha=0.25` without a label, then `smooth(values)` on top with the label, and add to the caption: "smoothed with a moving average over 5% of the steps; faint lines show raw values".
-- Evaluation results (accuracy, scores on a benchmark) are drawn raw.
-- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=1, zorder=1)` in #BBBBBB, fully opaque. Compared values get their lines from `mark_value` (§3, Value labels).
+- Diagnostics, however often they were logged: draw the raw values in the series color at `alpha=0.25` without a label, then `smooth(values)` on top with the label, and add to the caption: "smoothed with a moving average over 5% of the steps; faint lines show raw values".
+- Reported results are drawn raw.
+- Several runs per setting (seeds, folds, trials): draw the mean as the line and a band of ±1 std with `ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)`, and say in the caption what the band is and over how many runs.
+- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=1, zorder=1)` in #BBBBBB, fully opaque, named by a legend entry. Compared values get their lines from `mark_value` (Value labels below).
+- Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
 
 ### Value labels
 
-Evaluation results (accuracy, benchmark scores) are the numbers a paper claims, so when the takeaway compares them across series, write them on the plot so the reader can read them exactly. Training statistics (loss, reward, entropy, length, probabilities) show trends, which the curves already show; their panels carry no marks.
+When the takeaway compares reported results across series, write them on the plot so the reader can read them exactly. Diagnostics carry no value labels; their curves already show the trend.
 
-- Find the point where the paper makes the comparison: the claim decides it. "Ours reaches higher accuracy" compares each run's best; "ours ends higher" compares final values; "ours is ahead at the same budget" compares values at that shared step. When runs end at different steps, "ends higher" compares values at the last step they share. The value is the plotted metric at that point.
+- Find the point where the paper makes the comparison: the claim decides it. "Ours reaches a higher score" compares each series' best; "ours ends higher" compares final values (at the last x all series share, when they end at different x); "ours is ahead at the same budget" compares values at that shared x. The value is the plotted metric at that point.
+- If the request and the paper don't settle the comparison point, ask the user. When you can't ask, compare each series' best and say so in the reply.
+- Write each value with three significant figures.
 - Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a 1 pt dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value in bold just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
 - If a label above the point covers a curve, put it below with `below=True`.
-- When the user names one headline value, mark it with `star=True` (a filled star).
-- Bar charts: label every bar with `ax.bar_label(bars, fontweight="bold")`.
+- Bar charts of reported results: label every bar with `ax.bar_label(bars, fontweight="bold")`.
 
 ### Other text
 
@@ -137,46 +143,40 @@ Evaluation results (accuracy, benchmark scores) are the numbers a paper claims, 
 | Heatmap, confusion matrix | Full | None | tick marks hidden; cell text `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"` |
 
 - Bar charts: name the bars on the x-axis. For several groups (benchmarks, datasets), use one panel per group, titled with the group.
+- Bars over several runs: error bars of ±1 std with `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`, named in the caption.
+- Many exact numbers with no trend or comparison to see (e.g. every method on every dataset): suggest a table to the user instead of a figure.
 
 ## 5. Color
 
-Paul Tol's color-blind-safe schemes from `tol_colors` (`tc`): colors by name from a set (`cset = tc.colorsets["bright"]`, then `cset.red`), colormaps by `cmap="tol.<name>"`.
-
-| Set | Colors (in order) | Use |
-|---|---|---|
-| `bright` | blue, red, green, yellow, cyan, purple, grey | default |
-| `vibrant` | orange, blue, cyan, magenta, red, teal, grey | when the user prefers it |
-| `muted` | rose, indigo, sand, green, cyan, wine, teal, olive, purple | 7–9 series |
-| `high_contrast` | blue, yellow, red | ≤ 3 series that must survive grayscale printing |
-| `medium_contrast` | light/dark blue, yellow, red | paired series, e.g. train/test per method |
+Paul Tol's color-blind-safe `bright` set, from `tol_colors` (`tc`): `cset = tc.colorsets["bright"]`, then colors by name (`cset.red`). The same set across the whole paper, so a method keeps its color in every figure.
 
 | Case | Color |
 |---|---|
-| Single series | the set's first color (`bright`: blue) |
-| Categorical | the set's colors in the order above |
-| "Ours" (the proposed method among baselines or ablations) | the set's red (`muted`: rose); the others take the rest in order. Without such a series, use the categorical order. |
-| Neutral, baselines, reference lines | `tc.colorsets["bright"].grey` (#BBBBBB) |
-| Grouped (sizes, sweeps) | one set color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
-| Sequential | `tol.iridescent`; also `tol.YlOrBr`, `tol.WhOrBr`, `tol.incandescent` |
-| Signed | `tol.sunset` centered at 0 (symmetric `vmin`/`vmax`); also `tol.BuRd`, `tol.PRGn` |
+| Single series | `cset.blue` |
+| Categorical | blue, red, green, yellow, cyan, purple, in this order |
+| "Ours" (the proposed method among baselines or ablations) | `cset.red`; the others take the categorical order without red. Without such a series, use the categorical order. |
+| Neutral, baselines, reference lines | `cset.grey` (#BBBBBB) |
+| Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
+| Sequential (heatmap) | `cmap="tol.iridescent"`; few levels: `tol.YlOrBr_discrete` |
+| Signed (heatmap) | `cmap="tol.sunset"` centered at 0 (symmetric `vmin`/`vmax`); few levels: `tol.sunset_discrete` |
 
-- One set per figure, the same set across the paper.
-- Few levels (e.g. a 5-step heatmap): the `_discrete` map (`tol.sunset_discrete`).
-- Grey lines, series and bands are #BBBBBB (`tc.colorsets["bright"].grey`) at full opacity; grey text is `darken("#BBBBBB")`.
-- Series that color alone can't separate (grayscale, many series): also vary line style.
-- Series are told apart by color, solid fills.
-- Emphasis, when the user names a series to emphasize: that series is the set's red, every other series #BBBBBB (bands and markers too), told apart by line style.
+- More than six series: group them (one color per group, shades within) or split them into panels.
+- Series are told apart by color with solid fills. When color alone can't separate them (grayscale printing, close shades), also vary line style.
+- Grey lines, series and bands are #BBBBBB at full opacity; grey text is `darken("#BBBBBB")`.
+- Emphasis, when the user names a series to emphasize: that series is `cset.red`, every other series #BBBBBB (bands too), told apart by line style.
 - Custom colors (hex codes, a brand palette, "match the original"): use them for the data series, defined once in the setup cell as a dict (`PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`); everything else keeps the style. If some are very light (cyan, yellow), tell the user they read weakly on white.
 
 ## 6. Legend
 
 | Case | Legend |
 |---|---|
-| Single panel | inside, at an explicit `loc` where it covers no data |
+| Single panel | inside, at an explicit `loc` where it covers no data; when no such spot exists, above the panel with `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
 | Panels with the same series | one `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` above the panels |
 | Panels with different series | one per panel above its title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
 | Grouped series | rows = groups, columns = variants |
 | One series per panel | none; the title names it |
+
+- Entry order: "ours" first, then the other series in color order, reference lines last.
 
 ## 7. Save and caption
 
@@ -217,18 +217,20 @@ figures/
 
 - Each figure cell runs on its own after the setup cell.
 - Load data from the project's result files (paths relative to `figures/`); write numbers inline only when there is no file.
-- The same `id` replaces its two cells; a new id appends two cells. Edit with `NotebookEdit`; create the notebook with `Write`.
+- Write the notebook yourself, top to bottom, the way a person would: create `figures/figures.ipynb` with `Write` as an empty notebook, then add each cell with `NotebookEdit` (insert after the last cell), and fix a cell by replacing it with `NotebookEdit`. The same `id` replaces its two cells; a new id appends two cells. If `NotebookEdit` is a deferred tool, load it first.
+
+  ```json
+  {"cells": [], "metadata": {"kernelspec": {"name": "python3", "display_name": "Python 3", "language": "python"}}, "nbformat": 4, "nbformat_minor": 5}
+  ```
+
+- Write each code cell as a person would write it by hand: top to bottom, plain matplotlib calls, data and labels spelled out where they are used. Use the `paper` helpers and write everything else inline in the cell; a loop over the series being plotted is as far as abstraction goes.
 - Run it with the project's Python: `jupyter nbconvert --to notebook --execute --inplace figures/figures.ipynb`. If jupyter is missing, tell the user and ask before installing it.
 - **Reply**: changes, LaTeX line, any `[TODO]`.
 
 ## 9. Check
 
-After the notebook has run, look at each PNG and fix and re-run until all hold:
+After the notebook has run:
 
-- Width equals the target; `fit_height` gave no warning.
-- Every panel passes the grid check (§1).
-- All text is Inter, shown in full, and overlaps no other text, curve or legend.
-- Value marks sit on evaluation results, at the points where the takeaway makes its comparison.
-- Colors follow §5.
-- PDF fonts are embedded TrueType: `pdffonts {id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 {id}.pdf` prints 0).
-- The caption matches the figure.
+1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping, a value label or legend covering a curve, and a font other than Inter. Fix the cell until it runs without warnings.
+2. Look at each PNG for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow §6's order; colors follow §5; the caption matches the figure.
+3. PDF fonts are embedded TrueType: `pdffonts {id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 {id}.pdf` prints 0).

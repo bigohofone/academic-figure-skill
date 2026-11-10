@@ -1,4 +1,5 @@
 import sys
+import warnings
 from pathlib import Path
 
 import matplotlib
@@ -139,12 +140,11 @@ def test_darken_darkens():
 def test_mark_value_line_point_and_label():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     mark_value(ax, 1, 1, "1.0", "#4477AA")
-    mark_value(ax, 2, 2, "2.0", "#4477AA", star=True)
-    line1, circle, line2, star = ax.lines
-    assert star.get_markersize() == 2 * circle.get_markersize() == 2 * plt.rcParams["lines.markersize"]
-    assert line1.get_linestyle() == line2.get_linestyle() == "--"
-    assert line1.get_zorder() < circle.get_zorder()
-    assert [t.get_text() for t in ax.texts] == ["1.0", "2.0"]
+    line, circle = ax.lines
+    assert line.get_linestyle() == "--"
+    assert circle.get_marker() == "o"
+    assert line.get_zorder() < circle.get_zorder()
+    assert [t.get_text() for t in ax.texts] == ["1.0"]
 
 
 def test_mark_value_below():
@@ -163,3 +163,39 @@ def test_fit_height_keeps_value_labels_inside():
     label = ax.texts[0]
     assert ax.get_window_extent(renderer).contains(*label.get_window_extent(renderer).p1)
 
+
+
+def test_fit_height_warns_narrow_panel():
+    fig, axes = plt.subplots(1, 3, figsize=(WIDTH, 2))
+    for a in axes:
+        a.plot([0, 1], [0, 1])
+    with pytest.warns(UserWarning, match="narrower than 1.2 in"):
+        fit_height(fig, axes)
+
+
+def test_fit_height_warns_overlapping_text():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([0, 1], [0, 1])
+    ax.text(0.5, 0.5, "first")
+    ax.text(0.5, 0.5, "second")
+    with pytest.warns(UserWarning, match="overlap"):
+        fit_height(fig, ax)
+
+
+def test_fit_height_warns_legend_over_curve():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([0, 1], [0, 1], label="a line through the middle")
+    ax.legend(loc="center")
+    with pytest.warns(UserWarning, match="the legend covers a curve"):
+        fit_height(fig, ax)
+
+
+def test_fit_height_quiet_on_clean_figure():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([0, 1], [0, 1], label="line")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.legend(loc="lower right")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        fit_height(fig, ax)

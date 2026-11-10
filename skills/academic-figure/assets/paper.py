@@ -5,7 +5,6 @@ import numpy as np
 import tol_colors  # registers the tol.* colormaps that paper.mplstyle names
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
-from matplotlib.markers import MarkerStyle
 from matplotlib.ticker import FixedLocator
 
 # Inter ships with the skill because no environment has it installed; paper.mplstyle names it.
@@ -74,6 +73,50 @@ def _keep_value_labels_inside(fig, panels):
     return changed
 
 
+def _warn_layout_problems(fig, panels):
+    """Warn about what makes a figure hard to read in print, so it can be fixed before saving."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    for a in panels:
+        if a.get_window_extent(renderer).width / fig.dpi < 1.2:
+            warnings.warn(f"panel {a.get_title()!r} is narrower than 1.2 in; use one column fewer")
+
+    texts = list(fig.texts)
+    for legend in fig.legends + [a.get_legend() for a in fig.axes if a.get_legend()]:
+        texts += legend.get_texts()
+    for a in fig.axes:
+        if not (a.get_visible() and a.axison):
+            continue
+        texts += [a.title, a.xaxis.label, a.yaxis.label, *a.texts]
+        for axis in (a.xaxis, a.yaxis):
+            lo, hi = sorted(axis.get_view_interval())
+            # matplotlib keeps labels for ticks just outside the view, which are never drawn
+            texts += [label for loc, label in zip(axis.get_majorticklocs(), axis.get_majorticklabels())
+                      if lo <= loc <= hi]
+    texts = [t for t in texts if t.get_visible() and t.get_text()]
+    boxes = [t.get_window_extent(renderer) for t in texts]
+    for t, box in zip(texts, boxes):
+        if box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:
+            warnings.warn(f"text {t.get_text()!r} is cut off at the figure edge")
+        if t.get_fontname() != "Inter":
+            warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; import paper before plotting")
+    for i in range(len(texts)):
+        for j in range(i + 1, len(texts)):
+            if boxes[i].overlaps(boxes[j]):
+                warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
+
+    for a in panels:
+        curves = [line.get_path().transformed(line.get_transform())
+                  for line in a.get_lines() if line.get_linestyle() == "-"]
+        covers = [(t.get_text(), t.get_window_extent(renderer))
+                  for t in a.texts if t.get_gid() == "value-label"]
+        if a.get_legend():
+            covers.append(("the legend", a.get_legend().get_window_extent(renderer)))
+        for name, box in covers:
+            if any(curve.intersects_bbox(box, filled=False) for curve in curves):
+                warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
+
+
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
@@ -89,6 +132,9 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
 
     `mark_value` labels that would stick out of their panel are brought inside: the y-limits
     grow to make room above (or below), and labels at the left or right edge turn inward.
+
+    Last, it warns about what reads badly in print: a panel narrower than 1.2 in, text cut off at
+    the figure edge, overlapping text, a value label or legend covering a curve, a font other than Inter.
 
     Never save with `bbox_inches="tight"`: it changes the final size and breaks the width and
     the ratio this function set.
@@ -116,6 +162,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     if max(widths) - min(widths) > tol * max(widths):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
+    _warn_layout_problems(fig, panels)
     return ratios
 
 
@@ -131,21 +178,12 @@ def smooth(values):
     return [np.mean(values[max(0, i - half):i + half + 1]) for i in range(len(values))]
 
 
-def mark_value(ax, x, y, text, color, star=False, below=False):
+def mark_value(ax, x, y, text, color, below=False):
     """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
-    a point at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
-
-    The point is a hollow circle, or with `star=True` a filled star twice the marker size (its thin
-    points vanish at the normal size).
+    a hollow circle at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
     """
     ax.axhline(y, linestyle="--", linewidth=1, color=darken(color), zorder=1)
-    size = rcParams["lines.markersize"] * (2 if star else 1)
-    if star:
-        # matplotlib bevels star corners by default, which blunts the points; miter keeps them sharp
-        ax.plot(x, y, marker=MarkerStyle("*", joinstyle="miter"), markersize=size,
-                markerfacecolor=color, markeredgecolor=darken(color))
-    else:
-        ax.plot(x, y, "o", color=color)
-    offset = size / 2 + 2
+    ax.plot(x, y, "o", color=color)
+    offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
                 va="top" if below else "bottom", fontweight="bold", color=darken(color), gid="value-label")
