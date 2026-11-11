@@ -286,8 +286,11 @@ def _warn_layout_problems(fig, panels, min_width):
     for a in panels:
         # data drawn in data coordinates; reference lines (axhline) and value marks span the panel on purpose
         # reference lines (axhline, axline) span the panel on purpose and are not data
-        data_lines = [line for line in a.get_lines() if line.get_transform() == a.transData and len(line.get_xdata())
-                      and not isinstance(line, AxLine)]
+        # a twin axis (ax.twinx()) draws its curves over the same panel
+        owners = [a] + [t for t in fig.axes if t is not a and t not in panels
+                        and np.allclose(t.get_position().bounds, a.get_position().bounds)]
+        data_lines = [line for o in owners for line in o.get_lines() if line.get_transform() == o.transData
+                      and len(line.get_xdata()) and not isinstance(line, AxLine)]
         curves = [line.get_path().transformed(line.get_transform())
                   for line in data_lines if line.get_linestyle() not in ("None", "none", "")]
         points = [line.get_transform().transform(line.get_xydata())

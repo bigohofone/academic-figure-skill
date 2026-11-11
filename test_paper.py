@@ -431,3 +431,13 @@ def test_legend_over_bar_ends_warns():
     ax.legend(loc="upper right")
     with pytest.warns(UserWarning, match="end of a bar"):
         fit_height(fig, ax)
+
+
+def test_legend_over_twin_curve_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.plot([0, 1], [0, 0.1], label="Loss")
+    twin = ax.twinx()
+    twin.plot([0, 1], [1, 1], color="C1", label="Learning rate")
+    ax.legend(loc="upper right")
+    with pytest.warns(UserWarning, match="covers a curve"):
+        fit_height(fig, ax)
