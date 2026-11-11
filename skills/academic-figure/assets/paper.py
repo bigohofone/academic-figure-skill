@@ -2,6 +2,7 @@ import math
 import warnings
 from pathlib import Path
 
+import matplotlib
 import matplotlib.path as mpath
 import matplotlib.style
 import numpy as np
@@ -56,6 +57,9 @@ def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
     global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, _greys
+    # one renderer everywhere: screen backends measure text differently, so fit_height's layout and
+    # checks would differ from what Agg saves; the scripts write files and never open a window
+    matplotlib.use("agg", force=True)
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]

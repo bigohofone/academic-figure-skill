@@ -1,5 +1,6 @@
 {
   "name": "academic-figure-skill",
+  "description": "Academic Figure: publication-ready paper figures for Claude Code.",
   "owner": {
     "name": "bigohofone"
   },
@@ -7,7 +8,7 @@
     {
       "name": "academic-figure",
       "source": "./",
-      "description": "Publication-ready academic paper figures with matplotlib or seaborn."
+      "description": "Publication-ready paper figures with matplotlib or seaborn: sized to the venue's column, print typography, color-blind-safe colors with meaning, panel sizes from a formula so every figure lines up, layout checks instead of eyeballing, and a caption written from the script's own numbers."
     }
   ]
 }

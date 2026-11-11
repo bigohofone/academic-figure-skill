@@ -1,10 +1,16 @@
 {
   "name": "academic-figure",
-  "version": "0.1.0",
-  "description": "Publication-ready academic paper figures with matplotlib or seaborn.",
+  "displayName": "Academic Figure",
+  "version": "1.0.0",
+  "description": "Publication-ready paper figures with matplotlib or seaborn: sized to the venue's column, print typography, color-blind-safe colors with meaning, panel sizes from a formula so every figure lines up, layout checks instead of eyeballing, and a caption written from the script's own numbers.",
   "author": {
-    "name": "bigohofone"
+    "name": "bigohofone",
+    "url": "https://github.com/bigohofone"
   },
+  "homepage": "https://wonjunoh.com/academic-figure-skill/",
   "repository": "https://github.com/bigohofone/academic-figure-skill",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": ["figures", "plots", "matplotlib", "seaborn", "data-visualization", "academic-papers", "research", "latex", "icml", "neurips", "iclr", "cvpr", "acl"],
+  "documentationUrl": "https://wonjunoh.com/academic-figure-skill/",
+  "supportUrl": "https://github.com/bigohofone/academic-figure-skill/issues"
 }
