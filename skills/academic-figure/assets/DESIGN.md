@@ -20,7 +20,7 @@ typography:
     fontSize: 7pt
   label:
     fontFamily: Inter
-    fontSize: 9pt
+    fontSize: 8pt
   legend:
     fontFamily: Inter
     fontSize: 7pt
@@ -30,7 +30,7 @@ typography:
     fontWeight: 400
   title:
     fontFamily: Inter
-    fontSize: 11pt
+    fontSize: 9pt
     fontWeight: 400
 spacing:
   layout-pad: 0.02in
@@ -70,7 +70,7 @@ components:
 
 # Academic Figure
 
-The design system for paper figures. The front matter holds the tokens: `paper.use_design()` reads them and sets matplotlib's style, so editing a token changes every figure. The sections below say how to apply them. In a project, the copy in the figures folder is the design; edit it there to give a paper its own look.
+The design system for paper figures. The front matter holds the tokens: `paper.use_design()` reads them and sets matplotlib's style, so editing a token changes every figure. The sections below say how to apply them; a chart type's file is more specific, and where it differs from a general rule here, the chart file wins. In a project, the copy in the figures folder is the design; edit it there to give a paper its own look.
 
 ## Overview
 
@@ -91,7 +91,7 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 
 | Case | Color |
 |---|---|
-| "Ours" among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` |
+| "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
 | Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
 | Some parts or series the takeaway names, among others it does not (two sources in a dataset's makeup) | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
@@ -118,9 +118,9 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 |---|---|---|
 | `tick-label` | 7 pt | tick labels |
 | `value-label` | 7 pt | everything written inside the chart (value labels, cell text, point names, pie labels); the default for `ax.text` and `ax.annotate` |
-| `label` | 9 pt | axis labels, subcaptions |
+| `label` | 8 pt | axis labels, subcaptions |
 | `legend` | 7 pt | legend entries |
-| `title` | 11 pt | panel titles, row and column headers |
+| `title` | 9 pt | panel titles, row and column headers |
 
 - **Numeric tick labels**: horizontal plain numbers (`fit_height` writes matplotlib's default numeric ticks this way, so `0.0, 0.5, 1.0` print as `0, 0.5, 1`), written as short as they read, `0, 0.5, 1`, `1024`, never rotated, never `2³` or `1e+06`: `ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))` (keeping the minus sign). Values of 10,000 and up take SI suffixes (`10K`, `1M`, `1B`), or the unit is scaled in the axis label ("Training step (K)"); on log axes, powers of ten are plain from 0.001 to 1000, then `1e-4` below. An axis of shares is labelled in percent, `0%, 50%, 100%`, as its values are written (Value labels).
 - **Tick choice**: the x values a chart file names (stage switches), or else numbers the reader can name, evenly spaced (on a log axis, powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose what reads best. When `fit_height` reports tick labels overlapping, label fewer of them, but keep a tick and gridline at every step, so the grid stays as fine as the data: `ax.set_xticks(ticks, labels=[str(t) if i % m == 0 else "" for i, t in enumerate(ticks)])`. Panels that share an axis share its ticks.
@@ -204,9 +204,9 @@ The aspect follows the data, never room for labels. Pie and radar charts are cir
 
 When `fit_height` reports text overlapping, covering data, cut off at the figure edge, sticking out of its panel or spilling out of its fill, resolve it by the first step that clears, rendering after each:
 
-1. **Move it**: to the next placement its chart file lists (another side of the point, below the value, the next legend spot).
+1. **Move it**: that one item to the next placement its chart file lists (another side of the point, below the value, the next legend spot); placements may differ item by item.
 2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
-3. **Give it width**: the full width, at φ² : 1, only when no figure width is given.
+3. **Give it width**: the full width, at φ² : 1 (a fixed-aspect panel keeps its aspect), only when no figure width is given; after widening, try the earlier placements again (horizontal before turned).
 4. **Write less, alike**: label every m-th item of an ordered kind (ticks, contour levels), keeping every tick, gridline and line; or drop a kind whole (all point names of non-cited models, all bar values, all shares of a band) and give the cited numbers in the caption.
 
 Never resolve a collision by shrinking text, changing a token, or changing the aspect for room.
@@ -306,10 +306,11 @@ Reported results the takeaway compares are written on the plot, so the reader re
 
 | Value | Written as |
 |---|---|
-| Copied from the source (a paper's table) | exactly as printed: `"0.82"` stays `"0.82"` |
-| A count or other whole number | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
+| Copied from the source (the task says the numbers are as printed in a paper) | exactly as printed: `"0.82"` stays `"0.82"` |
+| A count (a number of items) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
 | A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `0.69%` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
+| A difference or ratio of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
 | Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: `85.0`, `0.912` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.

@@ -62,7 +62,7 @@ figures/
   colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
   ```
 
-- **Data**: loaded from the project's result files (paths relative to `figures/`); numbers inline only when there is no file.
+- **Data**: loaded from the project's result files, wherever they are (paths relative to `figures/`, such as `../results/run.json`); numbers inline only when there is no file.
 - **Numbers from the data**: every number on the plot and in the caption is computed in the script from the loaded data, never typed in by hand, and every data point given is drawn (nothing dropped, smoothed or rounded away for looks). The script prints the takeaway's numbers and asserts its claim, so a reader can rerun it and see the figure is true:
 
   ```python

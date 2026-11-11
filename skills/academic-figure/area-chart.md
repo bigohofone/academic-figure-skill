@@ -4,7 +4,7 @@ Shares of a whole along a continuous x: the data mixture over training, the toke
 
 ## Draw
 
-- **Areas**: `ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])`, panel aspect 1 : 1. Colors follow the parts' order in the data (`series-1`, `series-2`, …); the stack puts the part whose share changes least over x (the smallest std) at the bottom, so the others read against a flat base, and the rest in data order above it.
+- **Areas**: `ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])`, panel aspect 1 : 1. Colors as DESIGN.md Colors gives them (the parts the takeaway names in color and the rest grey, or all parts in series order); the stack puts the part whose share changes least over x (the smallest std) at the bottom, so the others read against a flat base, and the rest in data order above it.
 - **Axes**: shares normalized to 1 at each x, the axis fixed to the whole, `ax.set_ylim(0, 1)`, `ax.margins(x=0)`.
 - **Gridlines**: horizontal only, over the areas so shares read off them, `ax.set_axisbelow(False)`, `ax.grid(axis="x", visible=False)`.
 
