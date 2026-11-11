@@ -6,7 +6,7 @@ Two quantities per item plotted against each other: accuracy against parameters,
 
 - **Many points** (samples, examples): dots of the design's marker size, translucent so dense regions read darker, `ax.scatter(x, y, s=rcParams["lines.markersize"] ** 2, color=color, edgecolors="none", alpha=0.5)`, gridlines in both directions.
 - **Few labelled points** (models compared on accuracy against cost): one hollow marker per model, `ax.plot(x, y, "o", color=color)`. With a proposed model, ours in `colors["ours"]` and every other model in `colors["neutral"]`; without one, `series-1`, or one color per model family when families are the message.
-- **Cost axes** (parameters, FLOPs, latency): log when they span over 100×, as DESIGN.md's log rule gives, labelled as in `line-chart.md`.
+- **Cost axes** (parameters, FLOPs, latency): log when they span over 10× (an order of magnitude), lower than DESIGN.md's 100×, because model sizes grow by factors and on a linear axis the small members of a family bunch at the left where their names cannot fit; labelled as in `line-chart.md`.
 
 ## Variants
 
