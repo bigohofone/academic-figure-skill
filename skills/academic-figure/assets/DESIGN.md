@@ -76,11 +76,14 @@ The design system for paper figures. The front matter holds the tokens: `paper.u
 
 A figure is read printed in a paper, at the width it is set at, by a reader who looks at it for a few seconds. Every rule serves one goal: the reader gets the figure's one message at a glance and can read the exact numbers the paper claims.
 
-- **Print first**: sizes are printed sizes; text is never scaled down; the figure is drawn at the width it is printed at.
-- **One message**: the takeaway is stated by what is drawn; everything else recedes (thin black box, faint grid, grey for context).
-- **Color for emphasis**: everything is `ink` and `neutral` grey by default; color goes only to what the reader must look at (ours, the series being compared). Several colors only when several series are compared on equal terms.
-- **Consistent**: a series keeps its color, marker and name in every figure of the paper.
-- **Tested, not judged**: where a rule depends on how the figure renders, `fit_height` reports it; every rule says what to do on its warning.
+Every rule below follows from these principles; when a case is not covered, apply them directly:
+
+1. **Print first**: sizes are printed sizes, from the tokens; text is never scaled down, and the figure is drawn at the width it is printed at.
+2. **One message, one emphasis**: color goes to what the takeaway is about (ours, or the series it names); everything it is compared against or that gives context (baselines, ablations, fronts, reference lines, grids) is `neutral` grey or `ink`. Several colors only when the takeaway compares series on equal terms.
+3. **Alike looks alike**: one treatment for every item of a kind, or for none: a series keeps its color, marker and name in every panel and figure; labels go on every bar, point or level of a kind, or on none; a style that tells two series apart is used the same way throughout.
+4. **Nothing hides data**: text, legends and marks never cover data, each other, or leave their panel or fill. Context (grid, reference lines) sits behind the data and never decides placement.
+5. **Exact where it is claimed**: a number the takeaway cites is written on the plot, in the format of the value table, or in the caption when it cannot fit.
+6. **Tested, not judged**: whether text collides is what `fit_height` reports, not a judgment; on a report, resolve it by Collisions (Layout).
 
 ## Colors
 
@@ -195,6 +198,17 @@ The aspect (width : height) is per panel, φ : 1 unless a row below applies:
 | φ : 1 | 0.618 | everything else: curves, bars, histograms, box plots, violins, scatter plots, and panels reflowed into rows |
 
 The aspect follows the data, never room for labels. Pie and radar charts are circles: `fit_height` sizes them to the width and ignores `aspect`.
+
+### Collisions
+
+When `fit_height` reports text overlapping, covering data, sticking out of its panel or spilling out of its fill, resolve it by the first step that clears, rendering after each:
+
+1. **Move it**: to the next placement its chart file lists (another side of the point, below the value, the next legend spot).
+2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
+3. **Write less, alike**: label every m-th tick, keeping every tick and gridline; drop the labels the takeaway does not cite, whole kinds at a time (all point names of non-cited models, all bar values), and give the cited numbers in the caption.
+4. **Give it width**: the full width, at φ² : 1, only when no width is given.
+
+Never resolve a collision by shrinking text, changing a token, or changing the aspect for room.
 
 ### Height
 

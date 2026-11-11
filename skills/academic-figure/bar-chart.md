@@ -17,8 +17,8 @@ Reported results compared across categories, one value each: methods, ablations 
 
 ## Labels
 
-- **Bar values**: every bar of a reported result, `ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values])`, written by DESIGN.md's value table. Every bar or none, never some. When `fit_height` reports neighbouring labels overlapping, turn them to read upward, `rotation=90, padding=2`; if they still overlap, take the full width when no width is given, and otherwise drop all bar labels and give the takeaway's numbers in the caption.
-- **Values on segments** (stacked, win rate): each segment's value inside it, `ax.bar_label(bars, labels=[f"{v:.0%}" for v in shares], label_type="center", color=text_color(color))`; a label that `fit_height` reports spilling out of its segment is dropped, and its value goes in the caption when the takeaway needs it.
+- **Bar values**: every bar of a reported result, `ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values])`, written by DESIGN.md's value table. Placements (for Collisions): horizontal, then turned to read upward, `rotation=90, padding=2`.
+- **Values on segments** (stacked, win rate): each segment's value inside it, `ax.bar_label(bars, labels=[f"{v:.0%}" for v in shares], label_type="center", color=text_color(color))`; a label that spills out of its segment is dropped (Collisions step 3; for segments, each segment is its own kind).
 
 ## Caption
 

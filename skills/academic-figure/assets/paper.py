@@ -12,6 +12,7 @@ from matplotlib.collections import FillBetweenPolyCollection, LineCollection, Pa
 from matplotlib.contour import ContourSet
 from matplotlib.transforms import Bbox
 from matplotlib.patches import Rectangle, Wedge
+from matplotlib.lines import AxLine
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
 
@@ -264,7 +265,9 @@ def _warn_layout_problems(fig, panels, min_width):
 
     for a in panels:
         # data drawn in data coordinates; reference lines (axhline) and value marks span the panel on purpose
-        data_lines = [line for line in a.get_lines() if line.get_transform() == a.transData and len(line.get_xdata())]
+        # reference lines (axhline, axline) span the panel on purpose and are not data
+        data_lines = [line for line in a.get_lines() if line.get_transform() == a.transData and len(line.get_xdata())
+                      and not isinstance(line, AxLine)]
         curves = [line.get_path().transformed(line.get_transform())
                   for line in data_lines if line.get_linestyle() not in ("None", "none", "")]
         points = [line.get_transform().transform(line.get_xydata())

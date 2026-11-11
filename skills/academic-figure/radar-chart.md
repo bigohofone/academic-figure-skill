@@ -37,5 +37,5 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
               color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1))
   ```
 
-  When `fit_height` still reports a value overlapping its spoke name, push the names out, `ax.tick_params(axis="x", pad=8)`, then 10, 12, …, the smallest pad that clears.
+  Placements (for Collisions): as above, then the spoke names pushed out, `ax.tick_params(axis="x", pad=8)`, then 10, 12, ….
 - **Legend**: outside above the chart, ours first although it is drawn last, `fig.legend(handles, labels, loc="outside upper center", ncol=len(labels), frameon=False, borderaxespad=0)`.
