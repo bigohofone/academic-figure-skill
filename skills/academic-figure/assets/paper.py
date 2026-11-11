@@ -268,8 +268,13 @@ def _warn_layout_problems(fig, panels, min_width):
             (x_ticks if axis is a.xaxis else y_ticks).update(map(id, labels))
     texts = [t for t in texts if t.get_visible() and t.get_text()]
     boxes = [t.get_window_extent(renderer) for t in texts]
+    axis_label_of = {id(a.yaxis.label): a for a in fig.axes}
     for t, box in zip(texts, boxes):
-        if box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:
+        owner = axis_label_of.get(id(t))
+        if owner is not None and box.height > owner.get_window_extent(renderer).height:
+            warnings.warn(f"axis label {t.get_text()!r} is longer than its panel is tall; shorten it, "
+                          "the detail in the caption (DESIGN.md Collisions step 2)")
+        elif box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:
             warnings.warn(f"text {t.get_text()!r} is cut off at the figure edge")
         if t.get_fontname() != rcParams["font.sans-serif"][0]:
             warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; call paper.use_design() before plotting")

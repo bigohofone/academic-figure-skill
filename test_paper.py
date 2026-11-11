@@ -441,3 +441,11 @@ def test_legend_over_twin_curve_warns():
     ax.legend(loc="upper right")
     with pytest.warns(UserWarning, match="covers a curve"):
         fit_height(fig, ax)
+
+
+def test_axis_label_longer_than_panel_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 1), layout="constrained")
+    ax.plot([0, 1], [0, 1])
+    ax.set_ylabel("A very long response length label (tokens)")
+    with pytest.warns(UserWarning, match="longer than its panel"):
+        fit_height(fig, ax, aspect=0.3)
