@@ -1,9 +1,27 @@
 # Scatter plot
 
-Two quantities per item plotted against each other: accuracy against parameters, FLOPs or latency (a model comparison, often with a Pareto front), one point per sample to show a correlation, or a 2-D embedding (t-SNE, UMAP). Read with `DESIGN.md`, whose rules all still apply.
+Two quantities per item plotted against each other: accuracy against parameters, FLOPs or latency (a model comparison, often with a Pareto front), one point per sample to show a correlation, or a 2-D embedding (t-SNE, UMAP). Panel aspect φ : 1, or 1 : 1 for an embedding: its two axes matter equally, so it never goes flatter at any width. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
 
-- **Many points** (samples, examples): `ax.scatter(x, y, s=6.25, color=color, edgecolors="none", alpha=0.5)`, dots the size of the design's markers (`s` is the marker size squared), translucent so dense regions read darker. Gridlines in both directions. A fitted trend line, when the takeaway is the correlation: a data line in `darken(color)` and the coefficient in the caption (Pearson r or Spearman ρ, with n).
-- **Few labelled points** (models compared on accuracy against cost): one marker per model, `ax.plot(x, y, "o", color=color)`, the design's hollow markers; colors as in DESIGN.md: with a proposed model, it is `colors["ours"]` and every other model `colors["neutral"]`, marker and name alike, so only ours stands out; without one, `series-1`, or one color per model family when families are the message. Name each point next to it, `ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", fontsize=7, color=darken(color))`, moving a label to another side (`xytext=(-3, 3), ha="right"`, or below) where `fit_height` reports an overlap. When the takeaway compares some of the labelled models, their values join their names, `"EfficientNet-B7 (84.4%)"`. When the labels can't all fit at half width and no width is given, the figure takes the full width, still at φ : 1 (or 1 : 1): a scatter plot's two axes matter equally, so it never goes flat. Cost axes (parameters, FLOPs, latency) spanning more than two orders of magnitude are log axes, labelled as in `line-chart.md`.
-- **Pareto front**: connect the models on the front, in x order, with a dashed line in `colors["neutral"]` under the markers (`linestyle="--"`, `linewidth=paper.dashed_width`, `zorder=1`), never in a series color: the front is context, not a series; dominated models stay as markers only.
-- **Model family** (sizes of one model, e.g. B0–B7): connect its points in size order with a solid data line in the family's color, `ax.plot(x, y, "o-", color=colors["ours"])` for ours; other families as grey markers (or grey lines when the paper connects them).
-- **Embedding** (t-SNE, UMAP): every point as the design's marker with a black edge and a translucent fill in the class color, so classes read by color and overlapping points stay visible through each other, `ax.plot(x, y, "o", markeredgecolor=colors["ink"], markerfacecolor=(*matplotlib.colors.to_rgb(color), 0.5), linestyle="none", label=name)`; one color per class with a legend, square panel (aspect 1 : 1), ticks and tick labels hidden (`ax.set_xticks([])`, `ax.set_yticks([])`), no gridlines (`ax.grid(False)`) and no axis labels: the axes of an embedding mean nothing.
+## Draw
+
+- **Many points** (samples, examples): dots of the design's marker size, translucent so dense regions read darker, `ax.scatter(x, y, s=rcParams["lines.markersize"] ** 2, color=color, edgecolors="none", alpha=0.5)`, gridlines in both directions.
+- **Few labelled points** (models compared on accuracy against cost): one hollow marker per model, `ax.plot(x, y, "o", color=color)`. With a proposed model, ours in `colors["ours"]` and every other model in `colors["neutral"]`; without one, `series-1`, or one color per model family when families are the message.
+- **Cost axes** (parameters, FLOPs, latency): log when they span over 100×, as DESIGN.md's log rule gives, labelled as in `line-chart.md`.
+
+## Variants
+
+- **Trend line** (the takeaway is a correlation): a data line in `darken(color)` over the points; the coefficient (Pearson r or Spearman ρ, with n) in the caption.
+- **Model family** (sizes of one model, B0–B7): its points joined in size order with a solid data line in the family's color, `ax.plot(x, y, "o-", color=colors["ours"])` for ours.
+- **Pareto front**: the models on the front joined in x order with a dashed `neutral` line under the markers, `ax.plot(x, y, linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)`; several fronts take the grey line styles in order (DESIGN.md Colors). Dominated models stay as markers.
+- **Embedding** (t-SNE, UMAP): each point as the design's marker with a black edge and a translucent fill in its class color, `ax.plot(x, y, "o", markeredgecolor=colors["ink"], markerfacecolor=(*to_rgb(color), 0.5), linestyle="none", label=name)`; one color per class (DESIGN.md Colors) with a legend; no ticks, tick labels, gridlines or axis labels (`ax.set_xticks([])`, `ax.set_yticks([])`, `ax.grid(False)`): the axes of an embedding mean nothing.
+
+## Labels
+
+- **Point names**: next to each labelled point in `darken(color)`, `ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", color=darken(color))`. When `fit_height` reports a name overlapping, covering a curve or sticking out of the panel, move it to another side (`xytext=(-3, 3), ha="right"`, or below, `va="top"`); `fit_height` never moves point names.
+- **Values**: when the takeaway compares some labelled models, their values join their names, `f"{name} ({v:#.3g}%)"`.
+- **Width**: with no width given, a figure whose names still overlap at half width after moving them takes the full width.
+
+## Caption
+
+- **Correlation**: the coefficient and n.
+- **Fronts and families**: what each line style joins ("the dashed line joins the NAS models on the Pareto front").

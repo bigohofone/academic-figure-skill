@@ -248,7 +248,7 @@ def test_fit_height_warns_legend_over_bar():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     ax.bar(range(3), [5, 5, 5], label="a")
     ax.legend(loc="center")
-    with pytest.warns(UserWarning, match="the legend covers bars or boxes"):
+    with pytest.warns(UserWarning, match="the legend covers filled marks"):
         fit_height(fig, ax)
 
 
@@ -292,20 +292,15 @@ def test_polar_panel_is_fitted_without_error():
     assert fig.get_figheight() < WIDTH
 
 
-def test_annotation_on_log_axis_stays_inside_with_positive_limits():
+def test_point_name_past_the_panel_is_reported_not_moved():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     ax.plot([3, 72], [0.6, 0.8], "o")
     ax.set_xscale("log")
     ax.annotate("Qwen2-72B-Instruct", (72, 0.8), xytext=(3, 3), textcoords="offset points")
-    ax.annotate("Phi-3-mini", (3, 0.6), xytext=(-3, 3), textcoords="offset points", ha="right")
-    fit_height(fig, ax)
-    renderer = fig.canvas.get_renderer()
-    box = ax.get_window_extent(renderer)
-    lo, hi = ax.get_xlim()
-    assert 0 < lo < 3 and hi > 72
-    for t in ax.texts:
-        label = t.get_window_extent(renderer)
-        assert box.x0 - 1 <= label.x0 and label.x1 <= box.x1 + 1
+    limits = ax.get_xlim()
+    with pytest.warns(UserWarning, match="sticks out of panel"):
+        fit_height(fig, ax)
+    assert ax.get_xlim() == limits
 
 
 def test_text_color_reads_on_its_fill():
@@ -348,3 +343,21 @@ def test_min_width_sets_the_narrow_panel_threshold():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         fit_height(fig, axes, min_width=1.0)
+
+
+def test_fit_height_warns_legend_over_band():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    x = np.linspace(0, 1, 50)
+    ax.fill_between(x, 0, 1, label="band")
+    ax.legend(loc="center")
+    with pytest.warns(UserWarning, match="the legend covers filled marks"):
+        fit_height(fig, ax)
+
+
+def test_fit_height_warns_text_spilling_out_of_its_fill():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar([0], [1], width=0.05)
+    ax.set_xlim(-1, 1)
+    ax.text(0, 0.5, "a long label", ha="center", va="center")
+    with pytest.warns(UserWarning, match="spills out of its fill"):
+        fit_height(fig, ax)

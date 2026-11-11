@@ -1,10 +1,18 @@
 # Pie chart
 
-The composition of one whole with few parts (two to six), when the message is the composition itself: a dataset's makeup by source, domain or language. Read with `DESIGN.md`, whose rules all still apply. With more parts, parts close in size, or several wholes to compare, draw a (stacked) bar chart instead (`bar-chart.md`): angles are hard to compare.
+The composition of one whole with two to six parts, when the composition itself is the message: a dataset's makeup by source, domain or language. With more parts, or several wholes to compare, draw a stacked bar chart instead (`bar-chart.md`): angles are hard to compare. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
 
-- Donut chart (a pie with its center cut out, the common form in papers): `ax.pie(shares, colors=series_colors, startangle=0, counterclock=False, wedgeprops=dict(width=0.4, edgecolor="white", linewidth=0.5))`; parts clockwise from 3 o'clock, largest first, a small "Other" part last, so the small parts end at the right side, where their outside labels stack vertically instead of crowding at the top.
-- Shares inside the ring, on each wedge's middle, 7 pt, in `text_color(wedge_color)`: `wedges, _ = ax.pie(...)`, then for each wedge `mid = np.deg2rad((w.theta1 + w.theta2) / 2)` and `ax.text(0.8 * np.cos(mid), 0.8 * np.sin(mid), f"{share:.0%}", ha="center", va="center", color=text_color(color))` (0.8 is the middle of a ring of width 0.4).
-- Names outside, next to their wedges, instead of a legend: `ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")` with `x, y = np.cos(mid), np.sin(mid)`.
-- A share too small to fit in its wedge (under ~6%): its number joins its name outside, `f"{name} {share:.0%}"`, with a straight leader line to the wedge, `arrowprops=dict(arrowstyle="-", color=colors["ink"], linewidth=0.5, relpos=(0, 0.5) if x > 0 else (1, 0.5))` (the line starts at the label's side, not through it). When two such labels still touch, move the later one outward along its wedge's direction (`xytext` at `1.35` instead of `1.12`). Parts under ~3% join "Other".
-- The whole's total (e.g. "1.2M examples") in the center, 7 pt: `ax.text(0, 0, "1.2M\nexamples", ha="center", va="center")`.
-- No axes, ticks or grid (`ax.pie` hides them). `fit_height` sizes the circle to the width; the `aspect` argument is ignored. Two wholes (train and test splits): two donuts side by side, titled.
+## Draw
+
+- **Donut** (a pie with its center cut out, the common form in papers): `wedges, _ = ax.pie(shares, colors=series_colors, startangle=0, counterclock=False, wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))`. Parts run clockwise from 3 o'clock, largest first, so the small parts end at the right side, where their outside labels stack vertically. Parts under 3% join one "Other" part, drawn last.
+- **Size**: `fit_height` sizes the circle to the width and ignores `aspect`; no axes, ticks or grid (`ax.pie` hides them).
+
+## Variants
+
+- **Two wholes** (train and test splits): two donuts side by side, titled.
+
+## Labels
+
+- **Names**: outside, next to their wedges, instead of a legend: for each wedge `mid = np.deg2rad((w.theta1 + w.theta2) / 2)`, `x, y = np.cos(mid), np.sin(mid)`, `ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")`.
+- **Shares**: inside the ring, on each wedge's middle, `ax.text(0.8 * x, 0.8 * y, f"{share:.0%}", ha="center", va="center", color=text_color(color))` (0.8 is the middle of a ring of width 0.4). A share that `fit_height` reports spilling out of its wedge joins its name outside instead, `f"{name} {share:.0%}"`, with a straight leader line from the label's side, `arrowprops=dict(arrowstyle="-", color=colors["ink"], linewidth=rcParams["grid.linewidth"], relpos=(0, 0.5) if x > 0 else (1, 0.5))`; when two outside labels overlap, move the later one outward (`xytext` at `1.35` instead of `1.12`).
+- **Total**: the whole's size in the center, `ax.text(0, 0, "1.24M\nexamples", ha="center", va="center")`.

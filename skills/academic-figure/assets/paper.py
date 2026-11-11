@@ -8,9 +8,10 @@ import yaml
 from cycler import cycler
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
-from matplotlib.collections import PathCollection
+from matplotlib.collections import FillBetweenPolyCollection, LineCollection, PathCollection, PolyCollection
+from matplotlib.contour import ContourSet
 from matplotlib.transforms import Bbox
-from matplotlib.patches import Wedge
+from matplotlib.patches import Rectangle, Wedge
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
 
@@ -25,6 +26,7 @@ def _size(a, original=False):
     return box.width / a.figure.dpi, box.height / a.figure.dpi
 
 dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to dashed and dotted lines
+highlight_size = 5  # the marker highlight-size token, set by use_design(); for a point of interest
 
 
 def _resolve(value, tokens):
@@ -47,7 +49,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, _greys
+    global dashed_width, highlight_size, _greys
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
@@ -85,6 +87,7 @@ def use_design(path="DESIGN.md"):
         "figure.constrained_layout.h_pad": _number(s["layout-pad"]),
     })
     dashed_width = _number(k["dashed-line"]["width"])
+    highlight_size = _number(k["marker"]["highlight-size"])
     return c
 
 
@@ -129,20 +132,39 @@ def _limit_for_reach(axis, lo, hi, v, reach, size, upper):
     return scale.inverted().transform([limit])[0]
 
 
+def _bar_ends(a):
+    """The points `ax.bar_label` anchors its labels to: each bar's ends and middle, in data coordinates."""
+    ends = []
+    for p in a.patches:
+        if isinstance(p, Rectangle):
+            x, y, w, h = p.get_x(), p.get_y(), p.get_width(), p.get_height()
+            ends += [(x + w / 2, y + h), (x + w / 2, y), (x + w, y + h / 2), (x, y + h / 2), (x + w / 2, y + h / 2)]
+    return np.array(ends)
+
+
+def _is_value_label(a, t):
+    """A `mark_value` label or a bar label (`ax.bar_label`), the labels fit_height keeps inside the panel."""
+    if t.get_gid() == "value-label":
+        return True
+    ends = _bar_ends(a)
+    return (isinstance(t, Annotation) and t.xycoords == "data" and len(ends) > 0
+            and bool(np.isclose(ends, t.xy).all(axis=1).any()))
+
+
 def _keep_value_labels_inside(fig, panels):
-    """Grow each panel's limits so every `mark_value` label and every bar label (`ax.bar_label`, or
-    any annotation placed in data coordinates) lies inside its panel. `mark_value` labels at a side
-    edge turn inward instead; bar labels past a side grow the x-limits (horizontal bars).
-    Returns whether any limits changed."""
+    """Grow each panel's limits so every `mark_value` label and every bar label (`ax.bar_label`) lies
+    inside its panel. `mark_value` labels at a side edge turn inward instead; bar labels past a side
+    grow the x-limits (horizontal bars). Other text is never moved: a piece sticking out of its panel
+    is reported instead. Returns whether any limits changed."""
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     changed = False
     for a in panels:
         box = a.get_window_extent(renderer)
         for t in a.texts:
-            value_label = t.get_gid() == "value-label"
-            if not (value_label or (isinstance(t, Annotation) and t.xycoords == "data")):
+            if not _is_value_label(a, t):
                 continue
+            value_label = t.get_gid() == "value-label"
             label = t.get_window_extent(renderer)
             # a label's reach past its point is fixed in pixels, so solve for the limit
             # that leaves exactly that much room between the point and the box
@@ -241,8 +263,28 @@ def _warn_layout_problems(fig, panels, min_width):
                   for line in data_lines if line.get_marker() not in (None, "None", "none", "")]
         points += [c.get_offset_transform().transform(c.get_offsets()) for c in a.collections
                    if isinstance(c, PathCollection) and len(c.get_offsets())]
-        covers = [(t.get_text(), t.get_window_extent(renderer))
-                  for t in a.texts if t.get_gid() == "value-label"]
+        curves += [path.transformed(c.get_transform()) for c in a.collections
+                   if isinstance(c, LineCollection) and not isinstance(c, PolyCollection) for path in c.get_paths()]
+        # filled shapes: bars and boxes, and bands, violins and stacked areas (PolyCollections)
+        fills = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible() and p.get_fill()]
+        fills += [path.transformed(c.get_transform()) for c in a.collections
+                  if type(c) in (PolyCollection, FillBetweenPolyCollection) and c.get_visible() for path in c.get_paths()]
+        contour_labels = [t for c in a.collections if isinstance(c, ContourSet) for t in c.labelTexts]
+        # text on a white box is meant to sit over data, and contour labels sit in gaps cut for them
+        plain = [t for t in a.texts if t.get_visible() and t.get_text() and t.get_bbox_patch() is None
+                 and t not in contour_labels and t.get_gid() != "contour-label"]
+        panel = a.get_window_extent(renderer)
+        for t in plain:
+            box = t.get_window_extent(renderer)
+            if not _is_value_label(a, t) and not _is_round(a) and isinstance(t, Annotation) and t.xycoords == "data" and not (
+                    panel.x0 - 1 <= box.x0 and box.x1 <= panel.x1 + 1 and panel.y0 - 1 <= box.y0 and box.y1 <= panel.y1 + 1):
+                warnings.warn(f"text {t.get_text()!r} sticks out of panel {a.get_title()!r}; move it")
+            corners = [(box.x0, box.y0), (box.x1, box.y0), (box.x1, box.y1), (box.x0, box.y1)]
+            for fill in fills:
+                if fill.contains_point(((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2)) and not fill.contains_points(corners).all():
+                    warnings.warn(f"text {t.get_text()!r} spills out of its fill in panel {a.get_title()!r}; drop or move it")
+                    break
+        covers = [(t.get_text(), t.get_window_extent(renderer)) for t in plain]
         if a.get_legend():
             covers.append(("the legend", a.get_legend().get_window_extent(renderer)))
         for name, box in covers:
@@ -255,10 +297,9 @@ def _warn_layout_problems(fig, panels, min_width):
             if any(t.get_visible() and t.get_text() and box.overlaps(t.get_window_extent(renderer)) for t in a.texts):
                 warnings.warn(f"the legend covers text in panel {a.get_title()!r}; move it")
             # the filled area under the legend, not the shapes' bounding boxes: a histogram is one wide polygon
-            shapes = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible() and p.get_fill()]
-            covered = sum(_polygon_area(poly) for shape in shapes for poly in shape.clip_to_bbox(box).to_polygons())
+            covered = sum(_polygon_area(poly) for shape in fills for poly in shape.clip_to_bbox(box).to_polygons())
             if covered > box.width * box.height / 10:
-                warnings.warn(f"the legend covers bars or boxes in panel {a.get_title()!r}; move it")
+                warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
 
 
 def _polygon_area(xy):
@@ -299,13 +340,16 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     label width and so the panel width. If that keeps the ratio from converging, the major
     ticks are fixed at their current positions and the height is solved again.
 
-    `mark_value` labels that would stick out of their panel are brought inside: the y-limits
-    grow to make room above (or below), and labels at the left or right edge turn inward.
+    `mark_value` labels and bar labels that would stick out of their panel are brought inside:
+    the limits grow to make room, and `mark_value` labels at the left or right edge turn inward.
+    Other text is never moved.
 
     Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
-    two-factor grid with shared axes and outer tick labels only passes 1.0), text cut off at
-    the figure edge, overlapping text, a value label or legend covering a curve or data points, a legend with more than a
-    tenth of its area over bars or boxes, a font other than Inter.
+    two-factor grid with shared axes and outer tick labels only passes 1.0); text cut off at the
+    figure edge, overlapping, sticking out of its panel or spilling out of its fill; text or a
+    legend covering a curve or data points; a legend over text or with more than a tenth of its
+    area over filled marks; a font other than Inter. Text on a white box and contour labels may
+    sit over data.
 
     Round panels (pie charts, polar axes such as radar charts) are always circles, so `aspect`
     does not apply: the height is cut to the content once the circles are as large as the width

@@ -1,8 +1,11 @@
 # Violin plot
 
-As a box plot (`box-plot.md`), when the shape of the spread matters: several modes, a long tail, a cluster at a bound. With few values per group (under ~20) the estimated shape is unreliable; draw a box plot with every point instead. Read with `DESIGN.md`, whose rules all still apply.
+As a box plot (`box-plot.md`), when the shape of the spread matters: several modes, a long tail, a cluster at a bound. With 30 or fewer values per group the estimated shape is unreliable: draw a box plot with every point instead. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
 
-- `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`; fill the body with its series color lightened, at full opacity, with a black 0.75 pt edge (`body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))`, `body.set_edgecolor("black")`, `body.set_linewidth(0.75)`, `body.set_alpha(1)`), and draw a box plot inside it, as seaborn's `inner="box"`, so the quartiles stay readable next to the shape: the whiskers as a thin black line to the furthest values within 1.5 × IQR, the interquartile range as a thick black bar, the median as a white dot on it:
+## Draw
+
+- **Body**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`, filled with its series color lightened at full opacity, with a black edge: `body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))`, `body.set_edgecolor(colors["ink"])`, `body.set_linewidth(rcParams["patch.linewidth"])`, `body.set_alpha(1)`.
+- **Box inside** (as seaborn's `inner="box"`), so the quartiles stay readable next to the shape: the whiskers as a thin black line to the furthest values within 1.5 × IQR, the interquartile range as a thick black bar, the median as a white dot on it:
 
   ```python
   q1, median, q3 = np.percentile(values, [25, 50, 75])
@@ -12,6 +15,13 @@ As a box plot (`box-plot.md`), when the shape of the spread matters: several mod
   ax.vlines(x, q1, q3, color=colors["ink"], linewidth=4 * rcParams["patch.linewidth"])
   ax.plot(x, median, "o", color=colors["ink"], markerfacecolor="white", zorder=3)
   ```
-- Groups on the x-axis are categories: hide their tick marks, horizontal gridlines only.
-- Grouped violins and legend entries as grouped box plots in `box-plot.md`.
-- Caption: "violins show the kernel density of the values; inside, the bar spans the quartiles, the thin line reaches 1.5× the interquartile range, and the white dot marks the median".
+
+- **Axis**: groups are categories: tick marks hidden, horizontal gridlines only.
+
+## Variants
+
+- **Grouped violins**: placed and named in the legend as grouped box plots (`box-plot.md`).
+
+## Caption
+
+- **Reading guide**: "violins show the kernel density of the values; inside, the bar spans the quartiles, the thin line reaches 1.5× the interquartile range, and the white dot marks the median".
