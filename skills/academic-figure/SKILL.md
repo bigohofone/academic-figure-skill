@@ -33,11 +33,12 @@ All figure work happens in one folder, even for one figure or a code-only reques
 figures/
 ├── {id}.py           # one script per figure, its caption on top
 ├── DESIGN.md         # the design system; edit it to restyle every figure
-├── style/            # paper.py, paper.mplstyle, Inter fonts, copied from the skill; not edited by hand
+├── style/            # paper.py (with paper_layout.py: sizes, paper_color.py: color-blind and grayscale safety,
+│                     #   paper_checks.py: readability checks), paper.mplstyle, Inter fonts; copied from the skill, not edited by hand
 └── outputs/          # {id}.pdf and {id}.png
 ```
 
-- **Setup**: `{skill-dir}` is this skill's base directory. `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/`, `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays.
+- **Setup**: `{skill-dir}` is this skill's base directory. `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/`, `cp -n {skill-dir}/assets/{paper*.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays.
 - **Requirements**: Python 3.10+, `matplotlib` 3.10+, `numpy` 2+, `pyyaml`, and `scipy` for density curves. If one is missing, tell the user and ask before installing it.
 - **Script**: `figures/{id}.py` (kebab-case id) runs on its own: the caption as its docstring, the setup below, then everything for that figure: load data, plot, `fit_height`, save PDF and PNG.
 

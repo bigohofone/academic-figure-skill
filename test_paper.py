@@ -12,6 +12,7 @@ import pytest
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
 import paper
+import paper_color
 from paper import fit_height, group_label, mark_value, smooth, darken, lighten, text_color
 
 WIDTH = 3.25
@@ -500,9 +501,9 @@ def test_point_name_may_touch_its_own_curve():
 
 
 def test_greys_skip_ours_lightness():
-    ours = paper._lightness(paper._ours)
+    ours = paper_color._lightness(paper._ours)
     for n in (2, 3, 4):
-        assert all(abs(paper._lightness(g) - ours) >= 12 - 1e-6 for g in paper.greys(n))
+        assert all(abs(paper_color._lightness(g) - ours) >= 12 - 1e-6 for g in paper.greys(n))
 
 
 def test_bars_alike_in_grayscale_warn():
