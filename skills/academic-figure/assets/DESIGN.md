@@ -68,6 +68,9 @@ components:
     width: 0.5pt
   heatmap:
     colormap: viridis
+  colorbar:
+    width: 0.1in
+    gap: 0.06in
 ---
 
 # Academic Figure
@@ -257,6 +260,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Seams between fills (stacked segments, wedges, area bands) | `grid` | white, 0.5 pt | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
 | Box plot median | `median` | 1 pt, black | set by the style |
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
+| Colorbar | `colorbar` | a bar 0.1 in wide, 0.06 in from the panels, its labels in a standard margin beside it | placed by `fit_height` |
 
 - **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (grey series too: `lighten(greys(n)[i])`, so the median stays readable on every fill).
 - **Reference lines** (a baseline's score, a threshold, a diagonal) are context, so they look like no data series: thin and solid in `neutral`, at the grid's width, `ax.axhline(..., color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)`, thinner than every data line and never dashed, the dash patterns being taken by grey series. Across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills, they are white and dashed. Several reference lines in one panel: the second and later ones dotted, `linestyle=":"`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.

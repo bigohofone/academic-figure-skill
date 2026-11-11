@@ -30,6 +30,7 @@ dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to da
 highlight_size = 5  # the marker highlight-size token, set by use_design(); for a point of interest
 filled_edge_width = 0.25  # the marker filled-edge-width token, set by use_design(); for filled markers
 canvas_pad_x = 0.1  # the canvas-pad-x token, in inches, set by use_design(): free space at the left and right edges
+colorbar_width, colorbar_gap = 0.1, 0.06  # the colorbar tokens, in inches, set by use_design()
 
 
 def _resolve(value, tokens):
@@ -52,7 +53,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, filled_edge_width, canvas_pad_x, _greys
+    global dashed_width, highlight_size, filled_edge_width, canvas_pad_x, colorbar_width, colorbar_gap, _greys
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
@@ -93,6 +94,7 @@ def use_design(path="DESIGN.md"):
     dashed_width = _number(k["dashed-line"]["width"])
     highlight_size = _number(k["marker"]["highlight-size"])
     canvas_pad_x = _number(s["canvas-pad-x"])
+    colorbar_width, colorbar_gap = _number(k["colorbar"]["width"]), _number(k["colorbar"]["gap"])
     filled_edge_width = _number(k["marker"]["filled-edge-width"])
     return c
 
@@ -330,12 +332,12 @@ def _warn_layout_problems(fig, panels, min_width):
 
 def _standard_margins(fig):
     """The left and right margins, in inches, of a standard panel: on the left a y-axis label and
-    four-character tick labels, on the right half of a four-character tick label at the x axis' end."""
+    four-character tick labels with a sign, on the right half of one at the x axis' end."""
     renderer = fig.canvas.get_renderer()
-    sample = fig.text(0, 0, "0000", fontsize=rcParams["ytick.labelsize"])
+    sample = fig.text(0, 0, "\u22120.00", fontsize=rcParams["ytick.labelsize"])  # four characters and a sign: −0.75, 1000, 100%
     ticks = sample.get_window_extent(renderer).width / fig.dpi
     sample.remove()
-    label = rcParams["axes.labelsize"] * 1.2 / 72  # one line of the axis label, rotated
+    label = rcParams["axes.labelsize"] * 1.35 / 72  # one line of the axis label, rotated, with room for (, β, _
     pads = (rcParams["axes.labelpad"] + rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72
     return canvas_pad_x + label + pads + ticks, canvas_pad_x + ticks / 2
 
@@ -344,9 +346,11 @@ def _standard_box(fig, panels, aspect):
     """Panels whose outer decorations fit the standard margins start and end exactly there, so the
     boxes of all figures at one width (and one number of columns) line up and match in size. The
     gaps between columns and rows stay as the layout found them; the columns share what is left.
-    Returns whether the panels moved."""
-    if (fig.subfigs or any(getattr(a, "_colorbar", None) is not None for a in fig.axes)
-            or len(fig.axes) != len(panels) or _is_round(panels[0])):
+    One colorbar is kept beside the panels (right) or under them (bottom), at the size and gap the
+    layout gave it, its labels inside a standard margin of their own. Returns whether they moved."""
+    cbars = [a for a in fig.axes if getattr(a, "_colorbar", None) is not None]
+    if (fig.subfigs or len(cbars) > 1 or len(fig.axes) != len(panels) + len(cbars)
+            or _is_round(panels[0])):
         return False
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
@@ -361,18 +365,32 @@ def _standard_box(fig, panels, aspect):
                for a in first_column):
         return False  # no y labels to align (an embedding): the layout centres the panel
     left, right = _standard_margins(fig)
+    side = left - canvas_pad_x  # an axis label and four-character tick labels
     pad = canvas_pad_x
+    panels_x1 = max(b.x1 for b in boxes.values()) * w
+    cbar = cbars[0] if cbars else None
+    vertical = cbar is not None and cbar._colorbar.orientation == "vertical"
+    if vertical:
+        cb = cbar.get_position()
+        cb_gap, cb_w = colorbar_gap, colorbar_width
+        if cbar.get_tightbbox(renderer).x1 / fig.dpi - cb.x1 * w > side + 1e-3:
+            return False
+        right = pad + side + cb_w + cb_gap
     for a, b in boxes.items():
         tight = a.get_tightbbox(renderer)
         if col_of[a] == 0 and b.x0 * w - tight.x0 / fig.dpi + pad > left + 1e-3:
             return False
-        if col_of[a] == len(columns) - 1 and tight.x1 / fig.dpi - b.x1 * w + pad > right + 1e-3:
+        if not vertical and col_of[a] == len(columns) - 1 and tight.x1 / fig.dpi - b.x1 * w + pad > right + 1e-3:
             return False
     first = {c: next(b for a, b in boxes.items() if col_of[a] == c) for c in range(len(columns))}
     col_gaps = [first[c + 1].x0 * w - first[c].x1 * w for c in range(len(columns) - 1)]
     top_row = {r: next(b for a, b in boxes.items() if row_of[a] == r) for r in range(len(rows))}
     row_gaps = [top_row[r].y0 * h - top_row[r + 1].y1 * h for r in range(len(rows) - 1)]
     bottom, top = top_row[len(rows) - 1].y0 * h, h - top_row[0].y1 * h
+    if cbar is not None and not vertical:
+        cb = cbar.get_position()
+        cb_below = bottom - cb.y1 * h  # the gap between the panels and the colorbar under them
+        cb_h, cb_bottom = cb.height * h, cb.y0 * h
     panel_w = (w - left - right - sum(col_gaps)) / len(columns)
     panel_h = aspect * panel_w
     new_h = bottom + top + len(rows) * panel_h + sum(row_gaps)
@@ -383,6 +401,12 @@ def _standard_box(fig, panels, aspect):
         x0 = left + c * panel_w + sum(col_gaps[:c])
         y0 = bottom + (len(rows) - 1 - r) * panel_h + sum(row_gaps[r:])
         a.set_position([x0 / w, y0 / new_h, panel_w / w, panel_h / new_h])
+    span_w = len(columns) * panel_w + sum(col_gaps)
+    span_h = len(rows) * panel_h + sum(row_gaps)
+    if vertical:
+        cbar.set_position([(left + span_w + cb_gap) / w, bottom / new_h, cb_w / w, span_h / new_h])
+    elif cbar is not None:
+        cbar.set_position([left / w, cb_bottom / new_h, span_w / w, cb_h / new_h])
     return True
 
 
