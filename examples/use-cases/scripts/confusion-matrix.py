@@ -8,7 +8,7 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import fit_height, text_color
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
@@ -30,6 +30,11 @@ ax.set_ylabel("True label")
 ax.tick_params(length=0)
 ax.grid(False)
 fig.colorbar(im, ax=ax, label="Fraction of true rating")
+for i in range(matrix.shape[0]):
+    for j in range(matrix.shape[1]):
+        v = matrix[i, j]
+        ax.text(j, i, f"{v:#.2g}", ha="center", va="center", fontsize=paper.bar_label_size,
+                color=text_color(im.cmap(im.norm(v))))
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/confusion-matrix.pdf")

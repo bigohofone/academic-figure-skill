@@ -8,7 +8,13 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value
+from paper import fit_height, mark_value, darken
+
+
+def mark_best(ax, x, y, text, color, **kw):
+    """The paper's figure draws each run's best as a line across the panel, so this one does too."""
+    ax.axhline(y, linewidth=plt.rcParams["grid.linewidth"], color=darken(color), zorder=1)
+    mark_value(ax, x, y, text, color, **kw)
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
@@ -29,9 +35,9 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 ax.plot(ours["step"], ours["value"], color=colors["ours"], label="w/ Clip-Higher")
 ax.plot(ablation["step"], ablation["value"], color=colors["neutral"], linestyle="--",
         linewidth=paper.dashed_width, label="w/o Clip-Higher")
-mark_value(ax, ours["step"][best_ours], ours["value"][best_ours],
+mark_best(ax, ours["step"][best_ours], ours["value"][best_ours],
            f"{ours['value'][best_ours]:#.3g}", colors["ours"])
-mark_value(ax, ablation["step"][best_ablation], ablation["value"][best_ablation],
+mark_best(ax, ablation["step"][best_ablation], ablation["value"][best_ablation],
            f"{ablation['value'][best_ablation]:#.3g}", colors["neutral"])
 ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")

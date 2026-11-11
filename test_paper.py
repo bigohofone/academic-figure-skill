@@ -152,10 +152,8 @@ def test_lighten_mixes_with_white():
 def test_mark_value_line_point_and_label():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     mark_value(ax, 1, 1, "1.0", "#4477AA")
-    line, circle = ax.lines
-    assert line.get_linestyle() == "-"
+    circle, = ax.lines
     assert circle.get_marker() == "o"
-    assert line.get_zorder() < circle.get_zorder()
     assert [t.get_text() for t in ax.texts] == ["1.0"]
 
 

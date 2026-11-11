@@ -38,7 +38,7 @@ for i, method in enumerate(methods):
     bars = ax.bar(x + (i - (len(methods) - 1) / 2) * width, values, width,
                   color=method_colors[method], linewidth=0, label=method)
     label_color = darken(colors["ours"] if method == "Ours" else colors["neutral"])  # one text grey for grey series
-    ax.bar_label(bars, labels=[f"{v:.3f}" for v in values], color=label_color,
+    ax.bar_label(bars, fontsize=paper.bar_label_size, labels=[f"{v:.3f}" for v in values], color=label_color,
                  rotation=90, padding=2)
 
 ax.set_xticks(x, labels=benchmarks)
