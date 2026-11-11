@@ -9,7 +9,7 @@ Means with their uncertainty, one point per method or setting: when the compared
 
 ## Variants
 
-- **Forest plot** (method names that don't fit side by side, DESIGN.md Typography): horizontal, `ax.errorbar(mean, y, xerr=err, fmt="o", ...)`, methods top to bottom (`ax.invert_yaxis()`), vertical gridlines only, and a dashed reference line at the baseline's value, or at 0 for differences.
+- **Forest plot** (method names that don't fit side by side, DESIGN.md Typography): horizontal, `ax.errorbar(mean, y, xerr=err, fmt="o", ...)`, methods top to bottom (`ax.invert_yaxis()`), vertical gridlines only, and a reference line (DESIGN.md Shapes) at the strongest baseline's value, or at 0 for differences.
 - **Several series per category**: the points of one category share 0.8 of its slot like grouped bars, `width = 0.8 / n_series`, series `i` at `x + (i - (n_series - 1) / 2) * width`; one legend entry per series.
 
 ## Labels

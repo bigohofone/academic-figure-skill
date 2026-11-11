@@ -244,6 +244,7 @@ def _warn_layout_problems(fig, panels, min_width):
 
     figures = [fig, *fig.subfigs]
     texts = [t for f in figures for t in f.texts]
+    x_ticks, y_ticks = set(), set()
     for legend in [l for f in figures for l in f.legends] + [a.get_legend() for a in fig.axes if a.get_legend()]:
         texts += legend.get_texts()
     for a in fig.axes:
@@ -253,8 +254,10 @@ def _warn_layout_problems(fig, panels, min_width):
         for axis in (a.xaxis, a.yaxis):
             lo, hi = sorted(axis.get_view_interval())
             # matplotlib keeps labels for ticks just outside the view, which are never drawn
-            texts += [label for loc, label in zip(axis.get_majorticklocs(), axis.get_majorticklabels())
+            labels = [label for loc, label in zip(axis.get_majorticklocs(), axis.get_majorticklabels())
                       if lo <= loc <= hi]
+            texts += labels
+            (x_ticks if axis is a.xaxis else y_ticks).update(map(id, labels))
     texts = [t for t in texts if t.get_visible() and t.get_text()]
     boxes = [t.get_window_extent(renderer) for t in texts]
     for t, box in zip(texts, boxes):
@@ -265,7 +268,12 @@ def _warn_layout_problems(fig, panels, min_width):
     for i in range(len(texts)):
         for j in range(i + 1, len(texts)):
             if _texts_overlap(texts[i], boxes[i], texts[j], boxes[j], renderer):
-                warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
+                pair = {id(texts[i]), id(texts[j])}
+                if pair & x_ticks and pair & y_ticks:
+                    warnings.warn(f"tick labels {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap at the corner; "
+                                  "drop the y axis's first label (DESIGN.md Corner labels)")
+                else:
+                    warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
 
     for a in panels:
         # data drawn in data coordinates; reference lines (axhline) and value marks span the panel on purpose

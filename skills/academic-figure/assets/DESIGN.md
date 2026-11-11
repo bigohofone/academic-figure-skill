@@ -128,6 +128,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 - **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])`.
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.
+  - **Names down the y axis** (a heatmap's rows, horizontal bars) that overlap: give the panel height, by widening it at its own aspect (Collisions step 3).
   - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")` (`ha="left"` on a top axis), then 90° (`rotation=90, ha="center"`) if they still overlap; if they overlap at 90°, give the panel the width a colorbar takes (colorbar below), then label every second category.
 - **Math**: mathtext, set in Inter like the rest (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); symbols Inter lacks (∝, ≈) go in mathtext too (`$\propto$`).
 - **Text on a fill** (a bar segment, a wedge, a heatmap cell, an area band): black or white, whichever reads on it, `color=text_color(fill)`.
@@ -245,7 +246,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Ticks | `tick` | outside the box, 0.5 pt, 1.5 pt long (minor 1 pt) | set by the style |
 | Grid | `grid` | `ink` at 10% opacity, 0.5 pt, behind the data, both directions unless the chart file says otherwise | `rcParams["grid.linewidth"]`, `rcParams["grid.alpha"]` |
 | Data lines | `line` | 1 pt, solid | set by the style |
-| Dashed and dotted lines (reference lines, value marks, fits, fronts, series told apart by line style) | `dashed-line` | 0.75 pt | `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
+| Dashed and dotted lines (value marks, fits, fronts, series told apart by line style) | `dashed-line` | 0.75 pt | `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
 | Markers | `marker` | hollow: white fill, a 0.5 pt edge in the series color, 2.5 pt | `rcParams["lines.markersize"]` |
 | Filled markers (embedding points) | `marker.filled-edge-width` | a black edge, 0.25 pt, around a translucent fill | `markeredgewidth=paper.filled_edge_width` |
 | Points of interest (a minimum, the trained solution) | `marker.highlight-size` | a filled star, 5 pt | `markersize=paper.highlight_size` |
@@ -255,7 +256,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
 
 - **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (grey series too: `lighten(greys(n)[i])`, so the median stays readable on every fill).
-- **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills. Several reference lines in one panel are told apart by line style, `"--"`, `":"`, `"-."`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
+- **Reference lines** (a baseline's score, a threshold, a diagonal) are context, so they look like no data series: thin and solid in `neutral`, at the grid's width, `ax.axhline(..., color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)`, thinner than every data line and never dashed, the dash patterns being taken by grey series. Across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills, they are white and dashed. Several reference lines in one panel: the second and later ones dotted, `linestyle=":"`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
 
 ## Components
 
@@ -303,12 +304,12 @@ Pick the first row that fits:
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart file says where (`mark_value` on curves, `ax.bar_label` on bars). Values are written by the first row that applies, in labels and caption alike:
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics carry none, and distributions only the summary statistics the takeaway cites (means), where their chart file places them. Each chart file says where (`mark_value` on curves, `ax.bar_label` on bars). Values are written by the first row that applies, in labels and caption alike:
 
 | Value | Written as |
 |---|---|
 | Copied from the source (the task says the numbers are as printed in a paper) | exactly as printed: `"0.82"` stays `"0.82"` |
-| A count (a number of items) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
+| A count (a number of items; a statistic of counts, such as a median, is not one) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
 | A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:#.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `1.0%`, `0.69%` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
 | A difference of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
