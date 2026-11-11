@@ -58,6 +58,8 @@ components:
     width: 0.75pt
   median:
     width: 1pt
+  contour:
+    width: 1pt
   heatmap:
     colormap: Blues
 ---
@@ -206,6 +208,7 @@ The marks every chart type is built from, sized by the `components` tokens:
 | Markers | `marker` | hollow: white fill, a 1 pt edge in the series color, 3 pt |
 | Outlines and edges (boxes, whiskers, bar edges where drawn) | `outline` | 0.75 pt, black |
 | Box plot median | `median` | 1 pt, black |
+| Contour lines | `contour` | 1 pt |
 
 - Fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
 - Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=0.75, zorder=1)` in `neutral`, fully opaque, named by a legend entry.

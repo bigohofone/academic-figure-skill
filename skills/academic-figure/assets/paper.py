@@ -74,6 +74,7 @@ def use_design(path=Path(__file__).parent / "DESIGN.md"):
         "boxplot.whiskerprops.linewidth": _number(k["outline"]["width"]),
         "boxplot.capprops.linewidth": _number(k["outline"]["width"]),
         "boxplot.medianprops.linewidth": _number(k["median"]["width"]),
+        "contour.linewidth": _number(k["contour"]["width"]),
         "axes.prop_cycle": cycler(color=[v for name, v in c.items() if name.startswith("series-")] + [c["neutral"]]),
         "image.cmap": k["heatmap"]["colormap"],
         "figure.constrained_layout.w_pad": _number(s["layout-pad"]),
