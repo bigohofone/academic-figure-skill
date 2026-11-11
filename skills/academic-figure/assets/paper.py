@@ -4,7 +4,6 @@ from pathlib import Path
 import matplotlib.path as mpath
 import matplotlib.style
 import numpy as np
-import tol_colors  # registers the tol.* colormaps that DESIGN.md names
 import yaml
 from cycler import cycler
 from matplotlib import colors, font_manager, rcParams

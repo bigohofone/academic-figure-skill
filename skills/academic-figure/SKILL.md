@@ -53,7 +53,7 @@ figures/
 ```
 
 - `{skill-dir}` is this skill's base directory. Copy with `cp -n {skill-dir}/assets/{DESIGN.md,paper.py,paper.mplstyle,Inter-*} figures/`, which keeps copies already there, so a design the user changed stays. The notebook uses only these copies.
-- It needs `tol-colors` and `pyyaml` (Python 3.10+). If they are missing, tell the user and ask before installing them.
+- It needs `pyyaml` (Python 3.10+). If it is missing, tell the user and ask before installing it.
 
 | Cell | Content |
 |---|---|

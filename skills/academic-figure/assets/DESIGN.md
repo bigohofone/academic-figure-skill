@@ -59,7 +59,7 @@ components:
   median:
     width: 1pt
   heatmap:
-    colormap: tol.iridescent
+    colormap: Blues
 ---
 
 # Academic Figure
@@ -77,7 +77,7 @@ A figure is read printed in a paper, at the column width it is set at, by a read
 
 ## Colors
 
-The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role. `colors = paper.use_design()` returns them by name, references resolved: `colors["series-1"]`, `colors["ours"]`.
+The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; continuous values use matplotlib's standard colormaps. `colors = paper.use_design()` returns them by name, references resolved: `colors["series-1"]`, `colors["ours"]`.
 
 Pick the first row that fits:
 
@@ -89,7 +89,7 @@ Pick the first row that fits:
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
 | Text, axes, ticks | `ink` |
-| Continuous values | the `heatmap.colormap` component (the default colormap); signed values in heatmap.md |
+| Continuous values | the `heatmap.colormap` component, matplotlib's `Blues` (the default colormap); signed values `RdBu_r`, in heatmap.md |
 
 - More than six series with no "ours": group them (one color per group, shades within) or split them into panels.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
@@ -105,12 +105,12 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | Token | Size | Used for |
 |---|---|---|
 | `tick-label` | 7 pt | tick labels |
-| `value-label` | 7 pt, bold | numbers and text written inside the chart: value labels on markers and bars, heatmap cell text, labels next to points, pie labels; the default for any text drawn with `ax.text` or `ax.annotate` |
+| `value-label` | 7 pt, bold | everything written inside the chart: value labels on markers and bars, heatmap cell text, labels next to points, pie labels; the default for any text drawn with `ax.text` or `ax.annotate` |
 | `label` | 9 pt | axis labels, subcaptions |
 | `legend` | 7 pt | legend entries |
 | `title` | 11 pt | panel titles, row and column headers |
 
-- Value labels are bold; other text inside the chart (cell text, labels next to points) is regular, at the same size; everything else is regular. Text is black (`ink`) unless it belongs to one series.
+- Everything written inside the chart is bold: value labels, cell text, labels next to points, pie labels, contour labels. Pass `fontweight="bold"` to every `ax.text`, `ax.annotate`, `ax.bar_label` and `ax.clabel` (`mark_value` does it). Everything outside the chart (tick labels, axis labels, titles, legends) is regular. Text is black (`ink`) unless it belongs to one series.
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
 - Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest.
