@@ -61,7 +61,7 @@ components:
   contour:
     width: 0.5pt
   heatmap:
-    colormap: Blues
+    colormap: viridis
 ---
 
 # Academic Figure
@@ -92,7 +92,7 @@ Pick the first row that fits:
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
 | Text, axes, ticks | `ink` |
-| Continuous values | the `heatmap.colormap` component, matplotlib's `Blues` (the default colormap); signed values `RdBu_r`, in heatmap.md |
+| Continuous values | the `heatmap.colormap` component, matplotlib's `viridis` (the default colormap: perceptually uniform, color-blind safe, readable in grayscale); signed values `RdBu_r`, in heatmap.md |
 
 - Several variants of ours (with and without a component): all in `ours`, told apart by line style on lines and by shade on fills, as grey series are.
 - More compared series than grey line styles (four): add the design's markers, a different shape per series; more than eight: draw the series the takeaway names, and the rest as one grey group named "Other baselines" in the legend.
