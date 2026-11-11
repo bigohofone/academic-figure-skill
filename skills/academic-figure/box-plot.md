@@ -4,7 +4,7 @@ The spread of many values per group, compared across groups: per-problem accurac
 
 ## Draw
 
-- **Box**: `box = ax.boxplot(values, positions=[x], widths=0.7)`, filled with its series color lightened so the black median and the points on it stay readable, `box["boxes"][0].set_facecolor(lighten(color))` (a grey series: `lighten(greys(n)[i])`); the design draws the black outline, whiskers, caps and median.
+- **Box**: `box = ax.boxplot(values, positions=[x], widths=0.7, patch_artist=True)`, filled with its series color lightened so the black median and the points on it stay readable, `box["boxes"][0].set_facecolor(lighten(color))` (a grey series: `lighten(greys(n)[i])`); the design draws the black outline, whiskers, caps and median.
 - **Axis**: groups are categories: tick marks hidden, horizontal gridlines only, `ax.grid(axis="x", visible=False)`.
 - **Points**: with 30 or fewer values per box, every value on top, jittered within the box as the design's markers in black on white, `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color=colors["ink"], markerfacecolor="white", linestyle="none")` with `rng = np.random.default_rng(0)`, and `showfliers=False`, since the points already show the values beyond the whiskers. With more values, only the values beyond the whiskers, as the design's markers (matplotlib's default fliers).
 

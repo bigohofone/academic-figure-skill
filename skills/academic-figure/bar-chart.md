@@ -9,7 +9,7 @@ Reported results compared across categories, one value each: methods, ablations 
 
 ## Variants
 
-- **Grouped bar chart** (several series per category): the series of one category share 0.8 of its slot, `width = 0.8 / n_series`, series `i` at `x + (i - (n_series - 1) / 2) * width`; one legend entry per series. Groups of categories in different units or ranges (one benchmark's values all below half of another's) go in one panel each, titled with the group.
+- **Grouped bar chart** (several series per category): the series of one category share 0.8 of its slot, `width = 0.8 / n_series`, series `i` at `x + (i - (n_series - 1) / 2) * width`; one legend entry per series. Groups of categories in different units or ranges (one group's largest value below half of another group's largest) go in one panel each, titled with the group.
 - **Horizontal bar chart** (category names that don't fit side by side, DESIGN.md Typography): `ax.barh`, categories top to bottom (`ax.invert_yaxis()`), vertical gridlines only, `ax.grid(axis="y", visible=False)`.
 - **Stacked bar chart** (parts of a whole per category): segments in series order from the bottom, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=rcParams["grid.linewidth"])`; shares fix the axis to the whole, `ax.set_ylim(0, 1)`.
 - **Win rate chart** (pairwise judgments of win, tie or loss): one horizontal stacked bar per opponent, segments win, tie, loss from the left, each bar summing to 1; win in `colors["ours"]`, tie and loss in `greys(2)`; a dashed reference line at 50% only when the paper reads win rates against it.

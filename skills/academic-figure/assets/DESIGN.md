@@ -94,6 +94,7 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | "Ours" among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
 | Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
+| Some parts or series the takeaway names, among others it does not (two sources in a dataset's makeup) | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
 | Several series compared on equal terms, no "ours" (models in a survey, data sources, error types) | `series-1` to `series-6`, in order |
 | More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20) |
 | Groups with sizes or sweeps inside (model sizes per family) | one color per group; within a group, blended with white at 40 / 70 / 100%, light to dark |
@@ -126,7 +127,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 - **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])`.
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.
-  - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, then 90° (`rotation=90, ha="center"`) if they still overlap; if they overlap at 90°, give the panel the width a colorbar takes (colorbar below), then label every second category.
+  - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")` (`ha="left"` on a top axis), then 90° (`rotation=90, ha="center"`) if they still overlap; if they overlap at 90°, give the panel the width a colorbar takes (colorbar below), then label every second category.
 - **Math**: mathtext, set in Inter like the rest (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); symbols Inter lacks (∝, ≈) go in mathtext too (`$\propto$`).
 - **Text on a fill** (a bar segment, a wedge, a heatmap cell, an area band): black or white, whichever reads on it, `color=text_color(fill)`.
 - **Text over mixed content** (a note over bars, gridlines and a reference line, where no single fill sets its contrast): on a white box, `bbox=dict(facecolor="white", edgecolor="none", pad=1)`. Contour labels take none: they sit in the gap cut for them.
@@ -152,7 +153,7 @@ Pick the first row that applies:
 | The user or the task gives a figure width (one column of the paper, a size in inches; a venue's text width alone is not one) | that width; the rules below fit the figure into it |
 | The user asks for a 1.5-column `figure*`, or the panels at single column still fail `min_width` after Grid step 3 | 1.5 column |
 | Single-column venue, several panels | the full text width |
-| Single-column venue, one panel | half the text width; the full width only when Collisions step 4 calls for it, at φ² : 1 (a panel whose aspect is fixed, such as a heatmap, keeps it) |
+| Single-column venue, one panel | half the text width; the full width only when Collisions step 3 calls for it, at φ² : 1 (a panel whose aspect is fixed, such as a heatmap, keeps it) |
 | Two-column venue | single column, or double column when the panels fail `min_width` there |
 
 The venue is the one the user names; with none, ICLR.
@@ -296,7 +297,7 @@ Pick the first row that fits:
 
 - **Inside is worth a small overlap**: the legend's opaque frame keeps it readable, and it costs no height. It must not hide values: `fit_height` warns when it covers a curve, data points or text, or when more than a tenth of its area lies over filled marks (bars, boxes, bands, violins, areas).
 - **Columns**: an outside legend starts with all entries in one row; when `fit_height` reports text cut off or matplotlib reports the layout collapsing, `ncol = ceil(n / 2)`, then `ceil(n / 3)`, and so on.
-- **Entry order**: curves: ours first, then the other series in color, line-style or shade order; side-by-side series (grouped bars, boxes): left to right; stacked bars and areas: the order the segments stack from the top. When the drawing order differs, pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], loc=...)`.
+- **Entry order**: curves: ours first, then the other series in color, line-style or shade order; side-by-side series (grouped bars, boxes): left to right; stacked bars and areas: the order of the segments as the reader meets them (top to bottom for vertical stacks, left to right for horizontal ones). When the drawing order differs, pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], loc=...)`.
 - **`loc`**: always explicit, never `"best"`.
 
 ### Value labels

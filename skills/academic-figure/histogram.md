@@ -1,6 +1,6 @@
 # Histogram
 
-How one quantity's values are spread: scores, confidences, lengths, per-problem accuracies. The shape is the message, so the bars carry no value labels. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
+How one quantity's values are spread: scores, confidences, lengths, per-problem accuracies. The shape is the message, so the bars of raw values carry no value labels (named bins with counts are labelled as bars, below). Read with `DESIGN.md`; its rules apply unless this file says otherwise.
 
 ## Draw
 
