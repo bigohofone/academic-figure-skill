@@ -658,7 +658,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column
     Other text is never moved.
 
     Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
-    two-factor grid with shared axes and outer tick labels only passes 1.0); text cut off at the
+    two-factor grid with shared axes and outer tick labels only passes 0.9); text cut off at the
     figure edge, overlapping, sticking out of its panel or spilling out of its fill; text or a
     legend covering a curve or data points; a legend over text or with more than a tenth of its
     area over filled marks; a font other than Inter. Text on a white box and contour labels may
