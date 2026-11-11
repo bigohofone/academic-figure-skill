@@ -267,8 +267,9 @@ def _warn_layout_problems(fig, panels, min_width):
         for axis in (a.xaxis, a.yaxis):
             lo, hi = sorted(axis.get_view_interval())
             # matplotlib keeps labels for ticks just outside the view, which are never drawn
-            labels = [label for loc, label in zip(axis.get_majorticklocs(), axis.get_majorticklabels())
-                      if lo <= loc <= hi]
+            # label2 is the right (top) side's: a twin axis draws its labels there
+            labels = [label for loc, tick in zip(axis.get_majorticklocs(), axis.get_major_ticks())
+                      if lo <= loc <= hi and axis.get_visible() for label in (tick.label1, tick.label2)]
             texts += labels
             (x_ticks if axis is a.xaxis else y_ticks).update(map(id, labels))
     texts = [t for t in texts if t.get_visible() and t.get_text()]
@@ -358,13 +359,39 @@ def _standard_margins(fig):
     return canvas_pad_x + label + ticks, canvas_pad_x + half
 
 
+def group_label(axes, text, axis="x"):
+    """One axis label for a group of panels: `axis="x"` under the group's columns (pass its bottom
+    panels), `axis="y"` beside its rows (pass its left panels). The label sits on the first panel and
+    `fit_height` centres it on the group once the panels are placed."""
+    (axes[0].set_xlabel if axis == "x" else axes[0].set_ylabel)(text)
+    fig = axes[0].figure
+    fig._group_labels = getattr(fig, "_group_labels", []) + [(list(axes), axis)]
+    _center_group_labels(fig)
+
+
+def _center_group_labels(fig):
+    for axes, axis in getattr(fig, "_group_labels", []):
+        boxes = [a.get_position() for a in axes]
+        first = boxes[0]
+        if axis == "x":
+            center = (min(b.x0 for b in boxes) + max(b.x1 for b in boxes)) / 2
+            axes[0].xaxis.label.set_x((center - first.x0) / first.width)
+        else:
+            center = (min(b.y0 for b in boxes) + max(b.y1 for b in boxes)) / 2
+            axes[0].yaxis.label.set_y((center - first.y0) / first.height)
+
+
 def _standard_gap(fig, column):
     """The standard gap before a grid column: half a tick label, so the end labels of neighbouring x
     axes clear each other, plus the column's own y tick labels and y label when it shows them."""
     ticks, label, half = _standard_parts(fig)
     shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
-    shows_label = any(a.yaxis.label.get_text() for a in column)
-    return half + ticks * shows_ticks + label * shows_label
+    label_lines = max(_lines(a.yaxis.label) for a in column)
+    return half + ticks * shows_ticks + label * label_lines
+
+
+def _lines(text):
+    return text.get_text().count("\n") + 1 if text.get_text() else 0
 
 
 def _standard_box(fig, panels, aspect):
@@ -377,8 +404,10 @@ def _standard_box(fig, panels, aspect):
     One colorbar is kept beside the panels (right) or under them (bottom), at the size and gap the
     layout gave it, its labels inside a standard margin of their own. Returns whether they moved."""
     cbars = [a for a in fig.axes if getattr(a, "_colorbar", None) is not None]
-    if (fig.subfigs or len(cbars) > 1 or len(fig.axes) != len(panels) + len(cbars)
-            or _is_round(panels[0])):
+    others = [a for a in fig.axes if a not in panels and a not in cbars]
+    twin_of = {t: p for t in others for p in panels
+               if np.allclose(t.get_position().bounds, p.get_position().bounds)}  # ax.twinx(): a right y axis
+    if fig.subfigs or len(cbars) > 1 or len(twin_of) != len(others) or _is_round(panels[0]):
         return False
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
@@ -404,11 +433,21 @@ def _standard_box(fig, panels, aspect):
         cb = cbar.get_position()
         cb_gap, cb_w = colorbar_gap, colorbar_width
         right = pad + side + cb_w + cb_gap
-    std_left = left
+    std_left, std_right = left, right
+    ticks, label, half = _standard_parts(fig)
     for a, b in boxes.items():
         if col_of[a] == 0:
             left = max(left, b.x0 * w - a.get_tightbbox(renderer).x0 / fig.dpi + pad)
-    col_gaps = [_standard_gap(fig, [a for a in panels if col_of[a] == c]) for c in range(1, len(columns))]
+    sup_y = fig._supylabel if fig._supylabel and fig._supylabel.get_text() else None
+    if sup_y:
+        left += label
+    # a right y axis mirrors the left one: its tick labels and label take room from the panels' width
+    right_column = {col_of[p] for p in twin_of.values()}
+    right_axis = ticks + label * max((_lines(t.yaxis.label) for t in twin_of), default=0)
+    if len(columns) - 1 in right_column and not vertical:
+        right = pad + right_axis
+    col_gaps = [_standard_gap(fig, [a for a in panels if col_of[a] == c]) + right_axis * (c - 1 in right_column)
+                for c in range(1, len(columns))]
     top_row = {r: next(b for a, b in boxes.items() if row_of[a] == r) for r in range(len(rows))}
     row_gaps = [top_row[r].y0 * h - top_row[r + 1].y1 * h for r in range(len(rows) - 1)]
     bottom, top = top_row[len(rows) - 1].y0 * h, h - top_row[0].y1 * h
@@ -417,7 +456,7 @@ def _standard_box(fig, panels, aspect):
         cb_below = bottom - cb.y1 * h  # the gap between the panels and the colorbar under them
         cb_h, cb_bottom = cb.height * h, cb.y0 * h
     panel_w = (w - left - right - sum(col_gaps)) / len(columns)
-    panel_h = aspect * (w - std_left - right - sum(col_gaps)) / len(columns)
+    panel_h = aspect * (w - std_left - std_right - sum(col_gaps)) / len(columns)
     row_h = [panel_h * _row_scale(next(a for a in panels if row_of[a] == r)) for r in range(len(rows))]
     new_h = bottom + top + sum(row_h) + sum(row_gaps)
     fig.set_layout_engine("none")
@@ -427,8 +466,18 @@ def _standard_box(fig, panels, aspect):
         x0 = left + c * panel_w + sum(col_gaps[:c])
         y0 = bottom + sum(row_h[r + 1:]) + sum(row_gaps[r:])
         a.set_position([x0 / w, y0 / new_h, panel_w / w, row_h[r] / new_h])
+    for t, p in twin_of.items():
+        t.set_position(p.get_position())
     span_w = len(columns) * panel_w + sum(col_gaps)
     span_h = sum(row_h) + sum(row_gaps)
+    sup_x = fig._supxlabel if fig._supxlabel and fig._supxlabel.get_text() else None
+    if sup_x:
+        sup_x.set_x((left + span_w / 2) / w)
+        sup_x.set_y(sup_x.get_position()[1] * h / new_h)
+    if sup_y:
+        sup_y.set_x(pad / w)
+        sup_y.set_horizontalalignment("left")
+        sup_y.set_y((bottom + span_h / 2) / new_h)
     if vertical:
         cbar.set_position([(left + span_w + cb_gap) / w, bottom / new_h, cb_w / w, span_h / new_h])
     elif cbar is not None:
@@ -572,6 +621,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
         _freeze_ticks(panels)  # growing limits for labels now must not add ticks the layout has no room for
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]
+    _center_group_labels(fig)
     _warn_layout_problems(fig, panels, min_width)
     return ratios
 

@@ -12,7 +12,7 @@ import pytest
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
 import paper
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color
+from paper import fit_height, group_label, mark_value, smooth, darken, lighten, text_color
 
 WIDTH = 3.25
 
@@ -404,3 +404,35 @@ def test_column_gaps_are_standard():
         p = [a.get_position() for a in axes]
         sizes.append(round((p[1].x0 - p[0].x1) * 5.5, 3))
     assert sizes[0] == sizes[1]
+
+
+def test_grouped_columns_gap_by_what_they_show():
+    fig, axes = plt.subplots(1, 4, figsize=(5.5, 2), layout="constrained")
+    for a in axes:
+        a.plot([0, 1], [0, 1])
+    for a, b in ((axes[0], axes[1]), (axes[2], axes[3])):
+        b.sharey(a)
+        b.tick_params(labelleft=False)
+    axes[0].set_ylabel("Accuracy")
+    axes[2].set_ylabel("Loss")
+    group_label(axes[:2], "Step")
+    group_label(axes[2:], "Step")
+    fit_height(fig, list(axes))
+    p = [a.get_position() for a in axes]
+    inside, between = (p[1].x0 - p[0].x1) * 5.5, (p[2].x0 - p[1].x1) * 5.5
+    assert between > 3 * inside
+    center = (p[0].x0 + p[1].x1) / 2
+    assert abs(p[0].x0 + axes[0].xaxis.label.get_position()[0] * p[0].width - center) < 1e-6
+
+
+def test_right_axis_mirrors_left():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.plot([0, 1], [0, 1])
+    ax.set_ylabel("Accuracy")
+    twin = ax.twinx()
+    twin.plot([0, 1], [1, 0])
+    twin.set_ylabel("Loss")
+    fit_height(fig, ax)
+    p = ax.get_position()
+    assert abs(p.x0 - (1 - p.x1)) < 1e-6
+    assert np.allclose(twin.get_position().bounds, p.bounds)

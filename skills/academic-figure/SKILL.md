@@ -57,7 +57,7 @@ figures/
 
   sys.path.insert(0, "style")
   import paper  # registers the bundled Inter font
-  from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+  from paper import fit_height, group_label, mark_value, smooth, darken, lighten, text_color, greys
 
   colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
   ```
