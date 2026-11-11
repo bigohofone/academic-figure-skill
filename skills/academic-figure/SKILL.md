@@ -24,7 +24,7 @@ Every plotted quantity is one of two kinds; decide which before drawing:
 
 ## Save and caption
 
-- Save `{id}.pdf` and `{id}.png` (kebab-case id) into `figures/` with relative paths. The design embeds fonts as TrueType, which venues accept; keep text as text.
+- Save `outputs/{id}.pdf` and `outputs/{id}.png` (kebab-case id), relative to `figures/`. The design embeds fonts as TrueType, which venues accept; keep text as text.
 - LaTeX line for the reply: single-column venue (ICLR, NeurIPS) → `figure`, `width=\textwidth` at full width, `width=0.5\textwidth` at half; two-column venue: single column → `figure`, `width=\columnwidth`; 1.5 column → `figure*`, `width=0.75\textwidth`; double → `figure*`, `width=\textwidth`.
 
 The caption is written as it appears under the figure in the paper, in the paper's language (default English), and stands alone:
@@ -46,13 +46,13 @@ All figure work happens in `figures/` at the root of the user's project, even fo
 
 ```
 figures/
-├── DESIGN.md                      # the design system; edit it to change how every figure looks
-├── paper.py, paper.mplstyle, Inter-*.ttf, Inter-LICENSE.txt
-├── figures.ipynb
-└── {id}.pdf, {id}.png
+├── figures.ipynb     # one cell per figure, with its caption
+├── DESIGN.md         # the design system; edit it to restyle every figure
+├── style/            # paper.py, paper.mplstyle, Inter fonts, copied from the skill; not edited by hand
+└── outputs/          # {id}.pdf and {id}.png
 ```
 
-- `{skill-dir}` is this skill's base directory. Copy with `cp -n {skill-dir}/assets/{DESIGN.md,paper.py,paper.mplstyle,Inter-*} figures/`, which keeps copies already there, so a design the user changed stays. The notebook uses only these copies.
+- `{skill-dir}` is this skill's base directory. Set up with `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/` and `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays. The notebook uses only these copies.
 - It needs `pyyaml` (Python 3.10+). If it is missing, tell the user and ask before installing it.
 
 | Cell | Content |
@@ -63,13 +63,16 @@ figures/
 
 ```python
 import json
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+sys.path.insert(0, "style")
 import paper  # registers the bundled Inter font
 from paper import fit_height, mark_value, smooth, darken, lighten
 
-colors = paper.use_design()  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
+colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
 ```
 
 - Each figure cell runs on its own after the setup cell.
@@ -90,4 +93,4 @@ After the notebook has run:
 
 1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend covering a bar or box, and a font other than the design's. Fix the cell until it runs without warnings.
 2. Look at each PNG for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow DESIGN.md's order; colors follow its roles; the chart type's file is followed; the caption matches the figure.
-3. PDF fonts are embedded TrueType: `pdffonts {id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 {id}.pdf` prints 0).
+3. PDF fonts are embedded TrueType: `pdffonts outputs/{id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 outputs/{id}.pdf` prints 0).

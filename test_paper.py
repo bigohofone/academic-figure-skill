@@ -20,7 +20,7 @@ WIDTH = 3.25
 @pytest.fixture(autouse=True)
 def style():
     with plt.rc_context():
-        paper.use_design()
+        paper.use_design(ASSETS / "DESIGN.md")
         yield
     plt.close("all")
 

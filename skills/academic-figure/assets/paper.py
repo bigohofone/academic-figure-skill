@@ -42,8 +42,8 @@ def _number(value):
     return float(str(value).rstrip("ptin"))
 
 
-def use_design(path=Path(__file__).parent / "DESIGN.md"):
-    """Set matplotlib's style from paper.mplstyle and the tokens in DESIGN.md's front matter.
+def use_design(path="DESIGN.md"):
+    """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
     global dashed_width
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])

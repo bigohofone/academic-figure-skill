@@ -185,7 +185,7 @@ Let `fit_height` set it. Create the figure at the target width with any height, 
 fig, axes = plt.subplots(2, 1, figsize=(3.25, 2), sharex=True)
 ...  # plot, labels, legend, colorbar
 fit_height(fig, axes, aspect=0.618)
-fig.savefig("{id}.pdf")
+fig.savefig("outputs/{id}.pdf")
 ```
 
 - `ax` may be one Axes, an array, a list (also of panels from several sub-figures), or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
