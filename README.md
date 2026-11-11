@@ -129,7 +129,7 @@ Figures from published papers, redrawn without any skill and following this skil
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="528"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.5** · Box plot: Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only (single column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
