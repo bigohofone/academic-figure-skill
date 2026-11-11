@@ -4,7 +4,7 @@ The composition of one whole with two to six parts, when the composition itself 
 
 ## Draw
 
-- **Donut** (a pie with its center cut out, the common form in papers): `wedges, _ = ax.pie(shares, colors=part_colors, startangle=0, counterclock=False, wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))`. `part_colors`: every part its own color, `series-1`, `series-2`, … (DESIGN.md Colors, parts of one whole). Parts run clockwise from 3 o'clock, largest first, so the small parts end at the right side, where their outside labels stack vertically. Parts under 3% join one "Other" part, drawn last.
+- **Donut** (a pie with its center cut out, the common form in papers): `wedges, _ = ax.pie(shares, colors=part_colors, startangle=0, counterclock=False, wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))`. `part_colors`: every part its own color, in DESIGN.md's parts order, `series-1`, `series-4`, `series-6`, `series-5`, `series-3`, `series-2`, (DESIGN.md Colors, parts of one whole). Parts run clockwise from 3 o'clock, largest first, so the small parts end at the right side, where their outside labels stack vertically. Parts under 3% join one "Other" part, drawn last.
 - **Size**: `fit_height` sizes the circle to the width and ignores `aspect`; no axes, ticks or grid (`ax.pie` hides them).
 
 ## Variants
