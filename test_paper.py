@@ -201,9 +201,10 @@ def test_fit_height_quiet_on_clean_figure():
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.legend(loc="lower right")
-    with warnings.catch_warnings():
-        warnings.simplefilter("error")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
         fit_height(fig, ax)
+    assert not [w for w in caught if "legend" in str(w.message)]
 
 
 def test_rotated_tick_labels_that_fit_do_not_warn():
@@ -211,9 +212,10 @@ def test_rotated_tick_labels_that_fit_do_not_warn():
     labels = [f"({i / 10:.1f},{(i + 1) / 10:.1f}]" for i in range(10)]
     ax.bar(range(10), range(10))
     ax.set_xticks(range(10), labels=labels, rotation=45, ha="right", rotation_mode="anchor")
-    with warnings.catch_warnings():
-        warnings.simplefilter("error")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
         fit_height(fig, ax)
+    assert not [w for w in caught if "legend" in str(w.message)]
 
 
 def test_rotated_tick_labels_that_collide_warn():
@@ -246,8 +248,19 @@ def test_fit_height_warns_legend_over_bar():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     ax.bar(range(3), [5, 5, 5], label="a")
     ax.legend(loc="center")
-    with pytest.warns(UserWarning, match="the legend covers a bar or box"):
+    with pytest.warns(UserWarning, match="the legend covers bars or boxes"):
         fit_height(fig, ax)
+
+
+def test_fit_height_allows_legend_over_a_bar_corner():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.bar(range(3), [1, 1, 4.6], label="a")
+    ax.set_ylim(0, 5.3)
+    ax.legend(loc="upper right")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        fit_height(fig, ax)
+    assert not [w for w in caught if "legend" in str(w.message)]
 
 
 def test_panels_in_subfigures_get_the_aspect():

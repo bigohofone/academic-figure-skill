@@ -53,7 +53,7 @@ figures/
 ```
 
 - `{skill-dir}` is this skill's base directory. Set up with `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/` and `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays. The notebook uses only these copies.
-- It needs `pyyaml` (Python 3.10+). If it is missing, tell the user and ask before installing it.
+- It needs `pyyaml` (Python 3.10+), and `scipy` for the charts whose files call it (interpolated contours, density curves). If one is missing, tell the user and ask before installing it.
 
 | Cell | Content |
 |---|---|
@@ -92,6 +92,6 @@ colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; col
 
 After the notebook has run:
 
-1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend covering a bar or box, and a font other than the design's. Fix the cell until it runs without warnings.
+1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend over text or with more than a tenth of its area over bars or boxes, and a font other than the design's. Fix the cell until it runs without warnings.
 2. Look at each PNG for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow DESIGN.md's order; colors follow its roles; the chart type's file is followed; the caption matches the figure.
 3. PDF fonts are embedded TrueType: `pdffonts outputs/{id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 outputs/{id}.pdf` prints 0).

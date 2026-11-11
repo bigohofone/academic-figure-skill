@@ -86,7 +86,7 @@ Pick the first row that fits:
 
 | Case | Color |
 |---|---|
-| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Several grey series are told apart by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas): `lighten(colors["neutral"])`, `colors["neutral"]`, `darken(colors["neutral"])`, running light to dark in the order the series are drawn, so a sorted row of bars also darkens toward ours |
+| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Variants of ours (with and without a component) all take `ours`: the full method solid, each reduced variant in the next line style, the full method first in the legend. Several grey series are told apart, taken in the order of Layout's Order rule, by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas): `lighten(colors["neutral"])`, `colors["neutral"]`, `darken(colors["neutral"])`, running light to dark in the order the series are drawn, so a sorted row of bars also darkens toward ours |
 | Several series compared on equal terms, with no "ours" (models in a survey, classes, data sources, error types) | `series-1` to `series-6`, in this order |
 | Single series | `series-1` |
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
@@ -116,10 +116,12 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | `title` | 11 pt | panel titles, row and column headers |
 
 - All text is regular weight, inside the chart and out; nothing is bold. Text is black (`ink`) unless it belongs to one series.
-- Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`), written as short as they read: `0, 0.5, 1`, not `0.0, 0.5, 1.0` (`ax.yaxis.set_major_formatter(lambda v, _: f"{v:g}")`). When `fit_height` reports overlapping numeric tick labels along an axis, use fewer ticks in that panel (every other one), not smaller text or rotation.
+- Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`), written as short as they read: `0, 0.5, 1`, not `0.0, 0.5, 1.0` (`ax.yaxis.set_major_formatter(lambda v, _: f"{v:g}".replace("-", "\u2212"))`, keeping the minus sign). When `fit_height` reports overlapping numeric tick labels along an axis, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Where both axes start at the same corner (0 and 0, −1 and −1), their first tick labels touch: keep the tick and drop only the y axis's corner label, `ax.set_yticks(ticks, labels=["", *labels[1:]])`.
 - Log axes: powers of ten as plain numbers from 0.001 up to 1000 (`0.01, 0.1, 1, 10`), and beyond that `1e-4, 1e-5` below and SI suffixes above (`10K, 1M, 1B`), never `10⁻⁵`.
-- Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, and 90° (`rotation=90, ha="center"`) when they still overlap at 45°. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
+- Text tick labels that don't fit side by side, by what they name:
+  - Categories with no natural order and one value each (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), since rotated names are hard to read; order top to bottom as under Order.
+  - Everything that keeps the x axis (bins, swept values, sizes, time, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, and 90° (`rotation=90, ha="center"`) when they still overlap at 45°. Keep the panels side by side rather than stacking them to avoid the rotation.
 - Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest. Symbols Inter lacks (∝, ≈ in some weights) go in mathtext too (`$\propto$`).
 - Text written on a fill (a bar segment, a wedge, a heatmap cell, an area) is black or white, whichever reads on that fill: `color=text_color(fill)`; it is never `darken(fill)` on its own fill.
 - Text that sits over mixed content, where no single fill sets its contrast (a note such as "ECE = 4.9" over bars, gridlines and a reference line), sits on a white box so it reads at full contrast: `bbox=dict(facecolor="white", edgecolor="none", pad=1)`. Contour labels take none: they sit in the gap cut for them.
@@ -139,6 +141,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | ICLR, NeurIPS | 2.75 in | 5.5 in |
 
 - Use the venue and width the user names. With no venue, ICLR.
+- A width the user or the task gives (one column of the paper, a size in inches) is used as given, and the rules below fit the figure into it (fewer labels, a squarer aspect, rows). Otherwise:
 - Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width, unless its x axis needs the width (many x categories, a long time axis read in detail): then the full width at φ² : 1.
 - 1.5 column (0.75 × double) is a `figure*` narrower than the text: use it when the user asks, or when single column is too narrow and double column leaves the content sparse.
 
@@ -152,7 +155,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | 1.5 column | 3 |
 | Double column | 4 |
 
-0. A grid of two factors (models × benchmarks, methods × datasets) keeps one factor per row and the other per column, whatever the column limit below: 4 models × 4 benchmarks is a 4 × 4 grid, so the reader compares along rows and down columns at a glance. Its panels share y across each row and x down each column, with tick numbers only on the left column and the bottom row (`plt.subplots(rows, cols, sharex="col", sharey="row")`, inner tick labels left hidden; step 5 does not apply). Because inner panels carry no tick labels, such a grid may go down to 1.0 in per panel: `fit_height(fig, axes, min_width=1.0)`. If a panel is still narrower, put the factor with fewer levels on the columns, and keep axis titles once per figure (`fig.supxlabel`, `fig.supylabel`); never reflow the grid into another shape. Such a grid carries no value marks or other emphasis in single panels; numbers go in the caption.
+0. A grid of two factors (models × benchmarks, methods × datasets; also rows of different plots over the same columns, where the plot type is the row factor and each row's y label names it, so it needs no row header) keeps one factor per row and the other per column, whatever the column limit below: 4 models × 4 benchmarks is a 4 × 4 grid, so the reader compares along rows and down columns at a glance. Its panels share y across each row and x down each column, with tick numbers only on the left column and the bottom row (`plt.subplots(rows, cols, sharex="col", sharey="row")`, inner tick labels left hidden; step 5 does not apply). Because inner panels carry no tick labels, such a grid may go down to 1.0 in per panel: `fit_height(fig, axes, min_width=1.0)`. If a panel is still narrower, put the factor with fewer levels on the columns, and keep axis titles once per figure (`fig.supxlabel`, `fig.supylabel`); never reflow the grid into another shape. Such a grid carries no value marks or other emphasis in single panels; numbers go in the caption.
 1. Start with every panel in one row, up to the width's column limit: a single column holds two panels side by side, and panels the reader compares (two problems, two settings) stay side by side, as in the paper being redrawn.
 2. Render. `fit_height` warns when a panel's data area (inside the box) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
 3. On such a warning, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), turn long text tick labels 45° (Typography), shorten labels. Only when a panel is still narrower than 1.2 in, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. Rows have no limit.
@@ -206,7 +209,7 @@ fig.savefig("outputs/{id}.pdf")
 - Order: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom for horizontal bars), so the eye reads a rise and ours, usually the best, ends at the right. A natural order stays as it is: sizes, time, bins, swept values, and a benchmark list the paper fixes. Legends of side-by-side series (grouped bars, boxes) follow the same left-to-right order.
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
 - Colorbars (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when on the right it would leave the panel narrower than the minimum width.
-- Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis. A log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`, from `matplotlib.ticker`), and its gridlines follow them, `ax.grid(True, which="both")`, so the reader sees the log spacing.
+- Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis. A log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`, from `matplotlib.ticker`), and, in a chart that has gridlines, its gridlines follow them, `ax.grid(True, which="both")`, so the reader sees the log spacing.
 
 ## Shapes
 
@@ -225,7 +228,7 @@ The marks every chart type is built from, sized by the `components` tokens:
 | Contour lines | `contour` | 0.5 pt |
 
 - Fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
-- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, fully opaque, named by a legend entry.
+- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, fully opaque. A line that carries a value of its own (a baseline's score, a threshold) gets a legend entry. A line whose meaning the axes already give (the y = x diagonal of a reliability diagram, the chance diagonal of an ROC curve, zero) gets none: the caption's reading guide names it ("the dashed diagonal marks perfect calibration"), which keeps the legend short enough to sit inside the panel.
 
 ## Components
 
@@ -254,14 +257,15 @@ Each chart type has its own file next to this one, with its marks, variants and 
 
 | Case | Legend |
 |---|---|
-| One panel | placed by the first of these that covers no data: (1) a corner, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`; (2) another free spot inside the panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panel, as below |
+| One panel | inside the panel, next to the data it names, at the first of these spots where `fit_height` stays silent: (1) a corner, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`; (2) another spot inside (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); only when none works, (3) outside, above the panel, as below |
 | Several panels with the same series | one legend for the figure, outside above the panels, never tucked into one panel where the reader has to hunt for it: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)`, with fewer columns (more rows) when one row of entries is wider than the figure |
+| Rows of different plots over the same columns (histograms above reliability diagrams), each row with its own series | one legend per row, inside the first panel of that row where it fits, else the next panel of the row, placed as for one panel |
 | Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=<entries>, frameon=False)`, with fewer columns (more rows) when one row is wider than the panel |
 | Sub-figures | one per sub-figure, above its panels, by the rows above: `left.legend(..., loc="outside upper center", ...)` |
 | Grouped series | rows = groups, columns = variants |
 | One series per panel | none; the title names it |
 
-- Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, data points, a bar or a box; on that warning, try the next spot. A filled plot (heatmap, filled contour, stacked area) has no free spot inside: its legend goes outside.
+- Always pass an explicit `loc`, never `"best"`. A legend inside is worth a small overlap: its opaque frame keeps it readable, and it costs no figure height. It must not hide values, so `fit_height` warns when it covers a curve or data points, or more than a tenth of its own area is over bars or boxes; on that warning, try the next spot. A filled plot (heatmap, filled contour, stacked area) has no free spot inside: its legend goes outside.
 - Entry order: for curves, "ours" first, then the other series in their color, line style or shade order, reference lines last; for side-by-side series (grouped bars, grouped boxes), the left-to-right order of the bars; for stacked bars and areas, the order the segments stack from the top. When the drawing order differs (ours drawn last to sit on top), pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], ...)`.
 
 ### Value labels

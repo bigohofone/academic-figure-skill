@@ -16,7 +16,7 @@ Please redraw a loss-landscape contour plot from a published paper, using the da
 
 **What the figure shows (from the paper):** with skip connections, ResNet-56 has a smooth landscape around the minimizer. The minimizer sits in a wide, nearly convex basin with roughly elliptical contours. The paper compares this with ResNet-56-noshort (Figure 5(e)), whose landscape is chaotic and highly non-convex. In the paper's words, "residual connections prevent the transition to chaotic behavior as depth increases" and "prevent the explosion of non-convexity that occurs when networks get deep."
 
-**Column width:** the paper uses a single-column (NeurIPS) layout. In the paper, this panel is one of a 2 × 3 grid that spans the full text width, so each panel is about one third of the text width. Here the panel should be redrawn on its own as a single-column figure.
+Width: the original is one panel of a 2 × 3 grid across the text width of a single-column layout (NeurIPS); redrawn on its own, it takes half the ICLR text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

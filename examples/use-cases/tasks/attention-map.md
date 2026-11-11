@@ -9,7 +9,7 @@ The data:
 
 What the paper wants this figure to show: the alignment between English and French is mostly monotonic, with strong weights along the diagonal, but the model also finds non-trivial, non-monotonic alignments. Adjectives and nouns are ordered differently in the two languages: the model aligns [zone] with [Area], jumping over [European] and [Economic], and then looks one word back at a time to finish the phrase [zone économique européenne].
 
-Column width: the paper uses a single-column layout, and this plot is one panel of a 2 x 2 grid, so it takes about half of the text width.
+Width: the original is one panel of a 2 × 2 grid in a single-column layout; in ICLR this is half the text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

@@ -9,7 +9,7 @@ Data (`win-rate.json`):
 
 What it shows: despite training on 52 times more data, Alpaca 65B produces less preferable outputs than LIMA, and so does DaVinci003, even though it was trained with RLHF. Bard, Claude and GPT-4 generally beat LIMA, but LIMA's response is equal or better in 58%, 46% and 43% of cases respectively, a non-trivial share. The paper takes this as support for its Superficial Alignment Hypothesis: almost all knowledge is learned in pretraining, and a small set of examples suffices for alignment.
 
-Width: the paper is single-column; this figure sits in a half-text-width minipage, side by side with Figure 2.
+Width: the original sits in a half-text-width minipage of a single-column layout; in ICLR this is half the text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

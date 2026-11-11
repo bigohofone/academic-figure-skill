@@ -11,7 +11,7 @@ Data keys:
 
 What the figure shows: the paper uses it to show that the Random Forest's predictions are skewed towards the two extremes. 1-star and 5-star reviews are mostly classified correctly (0.82 and 0.76), but 2-star reviews are confused with 1-star about as often as they are classified correctly (0.38 vs 0.37), and 4-star reviews are confused with 5-star about as often (0.37 vs 0.39). The paper explains this as 1- and 2-star reviews sharing negative sentiment words and 4- and 5-star reviews sharing positive ones, which a tree-based model handles poorly.
 
-Size: single column (the paper uses a two-column layout and this figure spans one column).
+Width: the original spans one column of a two-column layout; in ICLR this is half the text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

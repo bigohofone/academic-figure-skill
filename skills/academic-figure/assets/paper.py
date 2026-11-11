@@ -9,6 +9,7 @@ from cycler import cycler
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.collections import PathCollection
+from matplotlib.transforms import Bbox
 from matplotlib.patches import Wedge
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
@@ -188,7 +189,9 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     outline, since its upright bounding box also covers the empty corners around it."""
     a_rotated, b_rotated = a.get_rotation() % 180 != 0, b.get_rotation() % 180 != 0
     if not (a_rotated or b_rotated):
-        return box_a.overlaps(box_b)
+        # side by side, upright texts need a gap (1 pt each side), or neighbouring numbers read as one ("2561024")
+        gap = a.figure.dpi / 72
+        return Bbox.from_extents(box_a.x0 - gap, box_a.y0, box_a.x1 + gap, box_a.y1).overlaps(box_b)
     if a_rotated and b_rotated:
         outline_a, outline_b = _rotated_outline(a, box_a, renderer), _rotated_outline(b, box_b, renderer)
         return outline_a.intersects_path(outline_b, filled=True)
@@ -248,9 +251,18 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
         if a.get_legend():
             box = a.get_legend().get_window_extent(renderer)
-            shapes = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible()]
-            if any(shape.intersects_bbox(box, filled=True) for shape in shapes):
-                warnings.warn(f"the legend covers a bar or box in panel {a.get_title()!r}; move it")
+            if any(t.get_visible() and t.get_text() and box.overlaps(t.get_window_extent(renderer)) for t in a.texts):
+                warnings.warn(f"the legend covers text in panel {a.get_title()!r}; move it")
+            # the filled area under the legend, not the shapes' bounding boxes: a histogram is one wide polygon
+            shapes = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible() and p.get_fill()]
+            covered = sum(_polygon_area(poly) for shape in shapes for poly in shape.clip_to_bbox(box).to_polygons())
+            if covered > box.width * box.height / 10:
+                warnings.warn(f"the legend covers bars or boxes in panel {a.get_title()!r}; move it")
+
+
+def _polygon_area(xy):
+    x, y = xy[:, 0], xy[:, 1]
+    return abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1))) / 2
 
 
 def _is_round(a):
@@ -291,8 +303,8 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
 
     Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
     two-factor grid with shared axes and outer tick labels only passes 1.0), text cut off at
-    the figure edge, overlapping text, a value label or legend covering a curve or data points, a legend covering a bar or
-    box, a font other than Inter.
+    the figure edge, overlapping text, a value label or legend covering a curve or data points, a legend with more than a
+    tenth of its area over bars or boxes, a font other than Inter.
 
     Round panels (pie charts, polar axes such as radar charts) are always circles, so `aspect`
     does not apply: the height is cut to the content once the circles are as large as the width

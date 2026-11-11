@@ -14,7 +14,7 @@ Redraw a scaling-law figure from a published paper using the paper's own plotted
 
 **What the figure shows (from the paper):** Language modeling performance improves smoothly as model size grows. When not bottlenecked by dataset size or compute, test loss follows a power law in the number of non-embedding parameters, L(N) = (N_c/N)^α_N with α_N ≈ 0.076, across about six orders of magnitude in N, with no sign of deviation at the upper end. For example, doubling the number of parameters makes the loss smaller by a factor 2^-α_N ≈ 0.95.
 
-**Column width:** single column. The paper uses a one-column layout; the original Figure 1 spans the full text width as three panels, and this is the rightmost panel.
+Width: the original is the rightmost of three panels across the text width of a single-column layout; redrawn on its own, it takes half the ICLR text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

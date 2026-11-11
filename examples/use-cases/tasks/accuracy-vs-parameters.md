@@ -11,7 +11,7 @@ Please redraw Figure 1 of "EfficientNet: Rethinking Model Scaling for Convolutio
 
 What the figure shows, from the paper: "Figure 1 summarizes the ImageNet performance, where our EfficientNets significantly outperform other ConvNets." The scaled EfficientNet models reach better accuracy with an order of magnitude fewer parameters than other ConvNets. EfficientNet-B7 reaches the state-of-the-art 84.4% top-1 accuracy while being 8.4x smaller than GPipe (not plotted), and EfficientNet-B1 is 7.6x smaller than ResNet-152.
 
-Column width: one column. The original sits in one column of a two-column layout; in ICLR this is half the text width (2.75 in).
+Width: the original sits in one column of a two-column layout; in ICLR this is half the text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

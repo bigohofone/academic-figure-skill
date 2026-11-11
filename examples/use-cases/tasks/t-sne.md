@@ -6,7 +6,7 @@ Data is in `t-sne.json`. Its keys `class_1` to `class_10` are the ten CIFAR-10 c
 
 What the figure should show: the paper argues that the features of a pre-trained softmax classifier follow class-conditional Gaussian distributions. In its words, "all ten classes are clearly separated in the embedding space, which supports our intuition". This motivates the Mahalanobis-distance confidence score.
 
-Width: the paper uses a single-column layout (NeurIPS). This panel is the first of three side-by-side subfigures across the text width, so it takes up about a third of that width.
+Width: the original is the first of three side-by-side subfigures across the text width of a single-column layout (NeurIPS); redrawn on its own, it takes half the ICLR text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

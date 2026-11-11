@@ -37,7 +37,7 @@ legend.edgecolor: DDDDDD
 legend.facecolor: FFFFFF
 legend.framealpha: 1
 legend.borderpad: 0.3
-legend.borderaxespad: 0.5
+legend.borderaxespad: 0.25
 
 figure.constrained_layout.use: True
 figure.constrained_layout.hspace: 0
