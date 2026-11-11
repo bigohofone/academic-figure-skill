@@ -10,7 +10,7 @@ colors:
   series-5: "#66CCEE"
   series-6: "#AA3377"
   ours: "{colors.series-2}"
-  neutral: "#BBBBBB"
+  neutral: "#8C8C8C"
   ink: "#000000"
 typography:
   tick-label:
@@ -96,7 +96,7 @@ Pick the first row that fits:
 
 - More than six series with no "ours": group them (one color per group, shades within) or split them into panels.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
-- Grey lines, series and bands are `neutral` at full opacity; grey text is `darken(colors["neutral"])`.
+- Grey must stay readable on white: lines, markers and reference lines are `neutral` (#8C8C8C, 3.4:1 contrast, above the 3:1 that graphics need) at full opacity, and grey text is `darken(colors["neutral"])` (4.9:1, above the 4.5:1 that text needs). Lighter greys, such as `lighten(colors["neutral"])`, only as fills that have an outline or sit next to darker fills; never for lines, markers or text.
 - Text that belongs to one series (labels, annotations) uses `darken(series_color)`.
 - Emphasis, when the user names a series to emphasize: color it as ours, and every other series as the series ours is compared against.
 - A paper-wide palette (a lab's or a brand's): change the `colors` tokens in `figures/DESIGN.md`. A one-off palette for a single figure ("match the original"): a dict in that figure's cell, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`; everything else keeps the design. If some colors are very light (cyan, yellow), tell the user they read weakly on white.
