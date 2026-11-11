@@ -12,7 +12,7 @@ Goal: a figure that reads well printed in the paper, where the reader gets its o
 1. **Set up** the figures folder (Files), then read its `DESIGN.md`: the project's copy is the design, and the user may have changed it.
 2. **Takeaway**: work out what the paper uses this figure to show (the user's request, the paper text or caption, the figure's role), then write it as one sentence, with a number from the data when the data gives one. It decides the value labels and becomes the caption's takeaway.
 3. **Kind of data**: decide for every plotted quantity whether it is a reported result or a diagnostic (below).
-4. **Chart type**: pick it from DESIGN.md's Components table and read its file (`{skill-dir}/line-chart.md`, …), every one the figure uses.
+4. **Chart type**: pick it from DESIGN.md's Components table and read its file in `{skill-dir}/references/` (`references/line-chart.md`, …), every one the figure uses.
 5. **Draw** by DESIGN.md (width, grid, aspect, colors, legend, value labels) and the chart type's file.
 6. **Save and caption**, then **check**.
 
