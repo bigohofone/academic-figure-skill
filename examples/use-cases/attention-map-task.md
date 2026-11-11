@@ -11,4 +11,6 @@ What the paper wants this figure to show: the alignment between English and Fren
 
 Column width: the paper uses a single-column layout, and this plot is one panel of a 2 x 2 grid, so it takes about half of the text width.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `attention-map.png` and `attention-map.pdf`.

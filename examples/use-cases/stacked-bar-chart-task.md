@@ -16,4 +16,6 @@ Column width: the paper uses a single-column layout, and the figure spans the fu
 
 Original caption: "Figure 4: Distribution of failure in MAST-Data with MAST labels on total 210 traces. This plot visualizes the failure distributions of the first 30 traces for each system. As the specific tasks and benchmarks may differ across the MAS configurations shown, these results are intended to illustrate system-specific failure profiles rather than to serve as a performance comparison across MAS."
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `stacked-bar-chart.png` and `stacked-bar-chart.pdf`.

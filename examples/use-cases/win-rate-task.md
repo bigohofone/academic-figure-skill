@@ -11,4 +11,6 @@ What it shows: despite training on 52 times more data, Alpaca 65B produces less 
 
 Width: the paper is single-column; this figure sits in a half-text-width minipage, side by side with Figure 2.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `win-rate.png` and `win-rate.pdf`.

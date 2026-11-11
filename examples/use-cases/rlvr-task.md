@@ -8,9 +8,11 @@ Data, in your working folder:
 
 Figures:
 
-2. Pass@k curves of base models and their RLVR-trained counterparts across mathematical benchmarks. When k is small, RL-trained models outperform their base versions. However, as k increases to the tens or hundreds, base models consistently catch up and surpass RL-trained models. Full text width of the ICML two-column template (6.75 in).
-5. Qwen2.5-7B accuracy histogram on Minerva. RLVR increases the frequency of high accuracies near 1.0 and reduces the frequency of low accuracies (e.g., 0.1, 0.2); however, it also increases the frequency at accuracy 0, i.e. more unsolvable problems. One column of the ICML template.
-6. Perplexity distribution of responses to Problem 1 only (the conditioning problem x is omitted from the labels), one panel filling the column. PPL_Base(Y_RL) closely matches the lower portion of the PPL_Base(Y_Base) distribution: responses of the RL model are ones the base model already tends to generate. One column of the ICML template.
+2. Pass@k curves of base models and their RLVR-trained counterparts across mathematical benchmarks. When k is small, RL-trained models outperform their base versions. However, as k increases to the tens or hundreds, base models consistently catch up and surpass RL-trained models.
+5. Qwen2.5-7B accuracy histogram on Minerva. RLVR increases the frequency of high accuracies near 1.0 and reduces the frequency of low accuracies (e.g., 0.1, 0.2); however, it also increases the frequency at accuracy 0, i.e. more unsolvable problems.
+6. Perplexity distribution of responses to Problem 1 only (the conditioning problem x is omitted from the labels), one panel filling the column. PPL_Base(Y_RL) closely matches the lower portion of the PPL_Base(Y_Base) distribution: responses of the RL model are ones the base model already tends to generate.
+
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
 Deliverable: `fig2.png`, `fig5.png` and `fig6.png`, plus the code that produced them.
 Python: use `uv run -p 3.12 --with <packages> ...` (installing packages this way is allowed).

@@ -19,4 +19,6 @@ The paper's point: modern neural networks are no longer well calibrated. LeNet's
 
 Column width: single column (the figure sits in one column of the two-column ICML layout).
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `reliability-diagram.png` and `reliability-diagram.pdf`.

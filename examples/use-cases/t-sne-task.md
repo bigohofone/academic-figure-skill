@@ -8,4 +8,6 @@ What the figure should show: the paper argues that the features of a pre-trained
 
 Width: the paper uses a single-column layout (NeurIPS). This panel is the first of three side-by-side subfigures across the text width, so it takes up about a third of that width.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `t-sne.png` and `t-sne.pdf`.

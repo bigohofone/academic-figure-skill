@@ -16,4 +16,6 @@ Redraw a scaling-law figure from a published paper using the paper's own plotted
 
 **Column width:** single column. The paper uses a one-column layout; the original Figure 1 spans the full text width as three panels, and this is the rightmost panel.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `scaling-law.png` and `scaling-law.pdf`.

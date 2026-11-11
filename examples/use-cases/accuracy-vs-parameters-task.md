@@ -13,4 +13,6 @@ What the figure shows, from the paper: "Figure 1 summarizes the ImageNet perform
 
 The figure is single-column in the paper.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `accuracy-vs-parameters.png` and `accuracy-vs-parameters.pdf`.

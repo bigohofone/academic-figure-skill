@@ -13,4 +13,6 @@ What the figure shows: the paper uses it to show that the Random Forest's predic
 
 Size: single column (the paper uses a two-column layout and this figure spans one column).
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `confusion-matrix.png` and `confusion-matrix.pdf`.

@@ -48,12 +48,12 @@ components:
     color: "{colors.ink}"
     opacity: 0.1
   line:
-    width: 1.25pt
+    width: 1pt
   dashed-line:
     width: 0.75pt
   marker:
-    size: 3.25pt
-    edge-width: 0.75pt
+    size: 2.5pt
+    edge-width: 0.5pt
   outline:
     width: 0.75pt
   median:
@@ -205,9 +205,9 @@ The marks every chart type is built from, sized by the `components` tokens:
 | Panel box | `axes` | a full box on all four sides, `ink`, 0.5 pt |
 | Ticks | `tick` | outside the box, 0.5 pt, 1.5 pt long (minor 1 pt) |
 | Grid | `grid` | `ink` at 10% opacity, 0.5 pt, behind the data; both directions unless the chart type's file says otherwise |
-| Data lines | `line` | 1.25 pt, solid |
+| Data lines | `line` | 1 pt, solid |
 | Dashed and dotted lines (reference lines, value marks, fits, fronts, and series told apart by line style) | `dashed-line` | 0.75 pt: matplotlib has no separate default for them, so pass `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
-| Markers | `marker` | hollow: white fill, a 0.75 pt edge in the series color, 3.25 pt |
+| Markers | `marker` | hollow: white fill, a 0.5 pt edge in the series color, 2.5 pt |
 | Outlines and edges (boxes, whiskers, bar edges where drawn) | `outline` | 0.75 pt, black |
 | Box plot median | `median` | 1 pt, black |
 | Contour lines | `contour` | 1 pt |

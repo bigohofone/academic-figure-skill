@@ -12,4 +12,6 @@ What the figure shows: an attack's average accuracy says little about how it per
 
 Column width: single column (the figure sits in one column of the two-column paper).
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `roc-pr-curves.png` and `roc-pr-curves.pdf`.

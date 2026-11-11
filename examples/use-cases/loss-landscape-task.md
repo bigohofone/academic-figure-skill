@@ -18,4 +18,6 @@ Please redraw a loss-landscape contour plot from a published paper, using the da
 
 **Column width:** the paper uses a single-column (NeurIPS) layout. In the paper, this panel is one of a 2 × 3 grid that spans the full text width, so each panel is about one third of the text width. Here the panel should be redrawn on its own as a single-column figure.
 
+Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+
 Deliverable: the figure in `figures/figures.ipynb` with its caption, as `loss-landscape.png` and `loss-landscape.pdf`.
