@@ -1,11 +1,10 @@
-"""t-SNE embedding of ResNet-34 penultimate-layer features for CIFAR-10 test samples. Each point is one sample (100 per class), colored by its class. The classes form separate clusters: a 5-nearest-neighbour majority vote in the embedding, computed here, recovers the class of 93.4% of the 1000 samples."""
+"""t-SNE embedding of ResNet-34 penultimate-layer features on CIFAR-10 test samples, 100 per class. Each color is one class. The ten classes form separate clusters: a 5-nearest-neighbour classifier on the 2-D coordinates, computed leave-one-out, assigns 93.4% of the 1000 samples to their own class."""
 
 import json
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import rcParams
 from matplotlib.colors import to_rgb
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
@@ -17,33 +16,35 @@ colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 with open("../data/t-sne.json") as f:
     classes = json.load(f)
 
-# Takeaway: classes separate in the embedding, measured by leave-one-out 5-NN accuracy in 2-D.
-points = np.concatenate([np.column_stack([c["x"], c["y"]]) for c in classes.values()])
+# takeaway: the classes form separate clusters; measured by a 5-nearest-neighbour classifier
+# on the 2-D coordinates, each sample labelled by its neighbours (leave-one-out)
+points = np.concatenate([np.c_[c["x"], c["y"]] for c in classes.values()])
 labels = np.repeat(np.arange(len(classes)), [len(c["x"]) for c in classes.values()])
-dist = np.linalg.norm(points[:, None] - points[None], axis=-1)
+dist = ((points[:, None] - points[None]) ** 2).sum(-1)
 np.fill_diagonal(dist, np.inf)
-neighbours = labels[np.argsort(dist, axis=1)[:, :5]]
-votes = np.array([np.bincount(row, minlength=len(classes)).argmax() for row in neighbours])
-knn_acc = (votes == labels).mean()
-print("takeaway:", f"5-NN accuracy = {100 * knn_acc:#.3g}%", f"n = {len(labels)}")
-assert knn_acc > 0.5, "the takeaway does not hold"
+neighbours = np.argsort(dist, axis=1)[:, :5]
+predicted = np.array([np.bincount(labels[n], minlength=len(classes)).argmax() for n in neighbours])
+knn_accuracy = 100 * (predicted == labels).mean()
+print("takeaway:", {"5-NN accuracy": f"{knn_accuracy:#.3g}%", "n": f"{round(len(labels))}"})
+assert knn_accuracy > 90, "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
-
-palette = plt.get_cmap("tab10").colors
+tab10 = plt.get_cmap("tab10").colors
 for i, (name, c) in enumerate(classes.items()):
     ax.plot(c["x"], c["y"], "o", markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width,
-            markerfacecolor=(*to_rgb(palette[i]), 0.5), linestyle="none", label=f"Class {i + 1}")
+            markerfacecolor=(*to_rgb(tab10[i]), 0.5), linestyle="none", label=name.replace("class_", "Class "))
 
 ax.set_xticks([])
 ax.set_yticks([])
 ax.grid(False)
-
+# above the panel, three rows of four; matplotlib fills columns first, so reorder to read across each row
 handles, names = ax.get_legend_handles_labels()
 ncol = 4
-order = [i for c in range(ncol) for i in range(c, len(names), ncol)]
-ax.legend([handles[i] for i in order], [names[i] for i in order], loc="lower center", bbox_to_anchor=(0.5, 1),
-          borderaxespad=0.5, ncol=ncol, frameon=False)
+order = [i for c in range(ncol) for i in range(c, len(handles), ncol)]
+# a figure legend: with no tick labels, fit_height leaves this panel to the constrained layout, which
+# moves an ax.legend anchored above the panel a little further on every draw
+fig.legend([handles[i] for i in order], [names[i] for i in order], loc="outside upper center", ncol=ncol,
+           frameon=False, borderaxespad=0)
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/t-sne.pdf")

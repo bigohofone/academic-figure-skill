@@ -1,11 +1,10 @@
-"""Accuracy of four training methods on three reasoning and coding benchmarks. Ours scores highest on all three, ahead of the best baseline, DPO, by 0.036 on GSM8K, 0.043 on MATH and 0.029 on HumanEval."""
+"""Accuracy of four training methods on three benchmarks. Ours is the most accurate on every benchmark, 0.036, 0.043 and 0.029 above the best baseline, DPO, on GSM8K, MATH and HumanEval."""
 
 import json
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
@@ -18,28 +17,28 @@ with open("../data/grouped-bar-chart.json") as f:
 benchmarks = data["benchmarks"]
 scores = data["scores"]
 
-# Methods left to right in ascending order of mean accuracy, so Ours ends at the right.
+# takeaway: Ours beats every baseline on every benchmark
+baselines = [m for m in scores if m != "Ours"]
+best_baseline = [max(baselines, key=lambda m: scores[m][j]) for j in range(len(benchmarks))]
+margins = [scores["Ours"][j] - scores[best_baseline[j]][j] for j in range(len(benchmarks))]
+print("takeaway:", {b: (bb, f"{m:.3f}") for b, bb, m in zip(benchmarks, best_baseline, margins)})
+assert all(m > 0 for m in margins), "the takeaway does not hold"
+
+# methods left to right in ascending order of mean accuracy, so Ours ends at the right
 methods = sorted(scores, key=lambda m: np.mean(scores[m]))
-assert methods[-1] == "Ours", "the takeaway does not hold"
-baseline_colors = greys(len(methods) - 1)
-method_colors = {m: baseline_colors[i] for i, m in enumerate(methods[:-1])}
+assert methods[-1] == "Ours"
+method_colors = dict(zip(methods[:-1], greys(len(methods) - 1)))
 method_colors["Ours"] = colors["ours"]
 
-# Takeaway: Ours beats the best baseline on every benchmark.
-best_baseline = max((m for m in methods if m != "Ours"), key=lambda m: np.mean(scores[m]))
-gaps = [o - b for o, b in zip(scores["Ours"], scores[best_baseline])]
-print("takeaway: best baseline", best_baseline, {b: f"{g:.3f}" for b, g in zip(benchmarks, gaps)})
-for i in range(len(benchmarks)):
-    assert all(scores["Ours"][i] > scores[m][i] for m in methods if m != "Ours"), "the takeaway does not hold"
-
-fig, ax = plt.subplots(figsize=(2.75, 2.75))
+fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 x = np.arange(len(benchmarks))
 width = 0.8 / len(methods)
 for i, method in enumerate(methods):
     values = scores[method]
     bars = ax.bar(x + (i - (len(methods) - 1) / 2) * width, values, width,
                   color=method_colors[method], linewidth=0, label=method)
-    ax.bar_label(bars, labels=[f"{v:.3f}" for v in values], color=darken(method_colors[method]),
+    label_color = darken(colors["ours"] if method == "Ours" else colors["neutral"])  # one text grey for grey series
+    ax.bar_label(bars, labels=[f"{v:.3f}" for v in values], color=label_color,
                  rotation=90, padding=2)
 
 ax.set_xticks(x, labels=benchmarks)

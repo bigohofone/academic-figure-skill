@@ -1,4 +1,4 @@
-"""ROC curves of AI-text detectors. The thin diagonal marks chance; the area under each curve (AUC), in the legend, is computed from the curve by the trapezoidal rule. Ours with the golden prompt reaches an AUC of 0.987, ahead of Ours without it (0.905), GPTZero (0.647) and OpenAI (0.565)."""
+"""ROC curves of AI-text detectors. W/ P and W/o P are Ours with and without the golden prompt; the thin diagonal marks chance; the AUC in each legend entry is computed from the curve with the trapezoidal rule. With the golden prompt, Ours reaches an AUC of 0.987, against 0.905 without it and 0.647 for GPTZero, the best baseline."""
 
 import json
 import sys
@@ -13,37 +13,37 @@ from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-with open("../data/roc-curve.json") as f:
-    data = json.load(f)
+data = json.load(open("../data/roc-curve.json"))
 curves = {m["name"]: (np.array(m["fpr"]), np.array(m["tpr"])) for m in data["methods"]}
-auc = {name: np.trapezoid(tpr, fpr) for name, (fpr, tpr) in curves.items()}
 
+# the data gives no AUC: computed from each curve
+auc = {name: np.trapezoid(tpr, fpr) for name, (fpr, tpr) in curves.items()}
 print("takeaway:", {name: f"{v:#.3g}" for name, v in auc.items()})
 assert auc["Ours: W/ P"] > max(v for name, v in auc.items() if name != "Ours: W/ P"), "the takeaway does not hold"
+assert auc["Ours: W/o P"] > max(auc["OpenAI"], auc["GPTZero"]), "ours without the prompt does not beat the baselines"
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75))
+fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 
+# variants of ours in the ours color, told apart by line style; baselines grey, in ascending order of AUC
+styles = {
+    "Ours: W/ P": dict(color=colors["ours"], linestyle="-"),
+    "Ours: W/o P": dict(color=colors["ours"], linestyle="--", linewidth=paper.dashed_width),
+    "OpenAI": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_width),
+    "GPTZero": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_width),
+}
 ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
-
-# variants of ours: ours color, solid, told apart by marker; baselines grey, by line style,
-# in ascending order of AUC
-baselines = sorted(["OpenAI", "GPTZero"], key=lambda name: auc[name])
-series = [
-    ("Ours: W/ P", colors["ours"], "-", rcParams["lines.linewidth"], "o"),
-    ("Ours: W/o P", colors["ours"], "-", rcParams["lines.linewidth"], "s"),
-    (baselines[0], colors["neutral"], "--", paper.dashed_width, "^"),
-    (baselines[1], colors["neutral"], ":", paper.dashed_width, "D"),
-]
-for name, color, style, width, marker in series:
+for name in ["OpenAI", "GPTZero", "Ours: W/o P", "Ours: W/ P"]:
     fpr, tpr = curves[name]
-    ax.plot(fpr, tpr, linestyle=style, linewidth=width, marker=marker, markevery=max(1, len(fpr) // 10),
-            color=color, label=f"{name} (AUC {auc[name]:#.3g})")
+    ax.plot(fpr, tpr, label=f"{name} (AUC {auc[name]:#.3g})", **styles[name])
 
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
 ax.set_xlabel("False positive rate")
 ax.set_ylabel("True positive rate")
-ax.legend(loc="lower right")
+ax.grid(True)
+handles, labels = ax.get_legend_handles_labels()
+order = [3, 2, 0, 1]  # the full method first, then its variant, then the baselines
+ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower right")
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/roc-curve.pdf")

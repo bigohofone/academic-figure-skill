@@ -1,4 +1,4 @@
-"""Confusion matrix of a Random Forest that predicts Yelp review ratings. Each row is normalized to the fraction of reviews with that true rating, so the diagonal is the recall of each rating. The extreme ratings are recognized best, with recall 0.82 for 1 star and 0.76 for 5 stars, while 2, 3 and 4 stars reach only 0.37, 0.42 and 0.39 and are mostly confused with their neighbouring ratings."""
+"""Confusion matrix of the Random Forest that predicts Yelp review star ratings. Each row is normalized over the reviews of its true rating, so the diagonal is the per-rating recall. The extreme ratings are recognized best (recall 0.82 for 1 star and 0.76 for 5 stars), while the middle ratings reach only 0.37 to 0.42, and 2-star reviews are predicted as 1 star (0.38) as often as correctly."""
 
 import json
 import sys
@@ -12,32 +12,24 @@ from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-with open("../data/confusion-matrix.json") as f:
-    data = json.load(f)
+data = json.load(open("../data/confusion-matrix.json"))
 labels = data["labels"]
-matrix = np.array(data["matrix"])  # rows: true rating, columns: predicted rating
-
-
-def fmt(v):
-    # Values are given with 2 significant digits and shown unchanged.
-    return f"{v:#.2g}".rstrip(".")
-
+matrix = np.array(data["matrix"])  # rows: true rating, columns: predicted rating, each row sums to about 1
 
 recall = np.diag(matrix)
-print("takeaway:", {r: fmt(v) for r, v in zip(labels, recall)})
-assert min(recall[0], recall[-1]) > max(recall[1:-1]), "the extreme ratings are not recalled best"
+print("takeaway:", {f"{l} star": f"{r:#.2g}" for l, r in zip(labels, recall)}, "2 as 1:", f"{matrix[1, 0]:#.2g}")
+assert min(recall[0], recall[4]) > max(recall[1:4]), "the takeaway does not hold"
+assert matrix[1, 0] >= matrix[1, 1], "the takeaway does not hold"
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
 im = ax.imshow(matrix, aspect="auto", vmin=0, vmax=1)
-# No cell text: at this width "0.0069" collides with its neighbours (Collisions step 4);
-# the cited recalls are in the caption.
 ax.set_xticks(range(len(labels)), labels=labels)
 ax.set_yticks(range(len(labels)), labels=labels)
 ax.set_xlabel("Predicted label")
 ax.set_ylabel("True label")
 ax.tick_params(length=0)
 ax.grid(False)
-fig.colorbar(im, ax=ax, label="Recall")
+fig.colorbar(im, ax=ax, label="Fraction of true rating")
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/confusion-matrix.pdf")
