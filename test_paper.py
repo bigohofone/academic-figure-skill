@@ -512,3 +512,77 @@ def test_bars_alike_in_grayscale_warn():
     ax.bar([1], [2], color="#228833", label="B")
     with pytest.warns(UserWarning, match="look alike in grayscale"):
         finalize_figure(fig, ax)
+
+
+def test_legend_without_loc_takes_the_first_clear_spot():
+    fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+    x = np.linspace(0, 1, 50)
+    ax.plot(x, 1 - x, label="falling")
+    ax.plot(x, 1 - x ** 2, label="bowed")
+    ax.legend()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, ax)
+    assert not [w for w in caught if "legend" in str(w.message)]
+    box, panel = ax.get_legend().get_window_extent(), ax.get_window_extent()
+    assert panel.x0 <= box.x0 and box.x1 <= panel.x1 and panel.y0 <= box.y0 and box.y1 <= panel.y1
+
+
+def test_legend_without_loc_goes_above_when_no_spot_is_clear():
+    fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+    ax.bar(range(6), [1, 1, 1, 1, 1, 1], width=1.0, label="full")
+    ax.bar(range(6), [0.5] * 6, width=1.0, label="half")
+    ax.set_ylim(0, 1)
+    ax.legend()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, ax)
+    assert not [w for w in caught if "legend" in str(w.message)]
+    box, panel = ax.get_legend().get_window_extent(), ax.get_window_extent()
+    assert box.y0 >= panel.y1 - 1
+
+
+def test_crowded_bar_labels_turn_upward():
+    fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+    x = np.arange(3)
+    for i in range(4):
+        bars = ax.bar(x + (i - 1.5) * 0.2, [0.612, 0.774, 0.806], 0.2)
+        ax.bar_label(bars, labels=["0.612", "0.774", "0.806"], fontsize=paper.bar_label_size)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, ax)
+    assert not [w for w in caught if "overlap" in str(w.message)]
+    assert all(t.get_rotation() == 90 for t in ax.texts)
+
+
+def test_bar_labels_with_room_stay_level():
+    fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+    bars = ax.bar(np.arange(3), [0.6, 0.7, 0.8])
+    ax.bar_label(bars, labels=["0.6", "0.7", "0.8"], fontsize=paper.bar_label_size)
+    paper.finalize_figure(fig, ax)
+    assert all(t.get_rotation() == 0 for t in ax.texts)
+
+
+def test_height_search_skips_collapsed_layouts():
+    # four titled panels under a figure legend: short trial heights collapse the layout, which must not count
+    fig, axes = plt.subplots(1, 4, figsize=(5.5, 5.5), sharex=True)
+    for a, title in zip(axes, ["CIFAR-10", "CIFAR-100", "CIFAR-10", "CIFAR-100"]):
+        a.plot(np.arange(60), np.linspace(0, 1, 60), label="Ours")
+        a.plot(np.arange(60), np.linspace(0, 0.9, 60), label="Baseline")
+        a.set_title(title)
+    axes[1].sharey(axes[0])
+    axes[3].sharey(axes[2])
+    axes[1].tick_params(labelleft=False)
+    axes[3].tick_params(labelleft=False)
+    axes[0].set_ylabel("Accuracy")
+    axes[2].set_ylabel("Loss")
+    fig.supxlabel("Epoch")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside upper center", ncol=2, frameon=False, borderaxespad=0)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, axes, min_width=0.9)
+    assert not caught, [str(w.message) for w in caught]
+    fig.canvas.draw()
+    legend_bottom = fig.legends[0].get_window_extent().y0
+    assert all(legend_bottom >= a.title.get_window_extent().y1 for a in axes)
+    assert all(a.title.get_window_extent().y1 <= fig.bbox.y1 for a in axes)

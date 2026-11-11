@@ -1,70 +1,99 @@
 ---
 name: academic-figure
-description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (print sizes, typography, color-blind-safe colors, chart-type rules for line, bar, scatter, box, heatmap, histogram, error bar, area, contour, radar, pie and violin charts) - delivered as one script per figure, `{id}.py` in the folder the user names or else `figures/`, with a paper-style caption. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
+description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (venue widths, print-size type, color-blind-safe colors, chart-type rules) - one script per figure with a paper-style caption. Use it when creating or editing a figure, plot or chart meant for a paper (ICML, CVPR, ACL, NeurIPS, ICLR or any paper), even if only the plotting code is asked for. Not for quick exploratory plots, notebooks, dashboards or slides.
 ---
 
 # Paper Figures
 
-Goal: a figure that reads well printed in the paper, where the reader gets its one message at a glance. How figures look is set by the design system, `DESIGN.md`: its tokens (colors, type sizes, line widths) and its rules (layout, legends, chart types). This file is the workflow. Apply every rule unless the user says otherwise. A figure is delivered when its script, with its caption, is in the figures folder and has run without warnings.
+Goal: figure that reads well printed, one message at a glance. `DESIGN.md`: how figures look (tokens, rules). This file: workflow. Every rule applies unless the user says otherwise. Done: script with caption in the figures folder, runs without warnings.
 
 ## Steps
 
-1. **Set up** the figures folder (Files), then read its `DESIGN.md`: the project's copy is the design, and the user may have changed it.
-2. **Takeaway**: work out what the paper uses this figure to show (the user's request, the paper text or caption, the figure's role), then write it as one sentence, with a number from the data when the data gives one. It decides the value labels and becomes the caption's takeaway.
-3. **Kind of data**: decide for every plotted quantity whether it is a reported result or a diagnostic (below).
-4. **Chart type**: pick it from DESIGN.md's Components table and read its file in `{skill-dir}/references/` (`references/line-chart.md`, …), every one the figure uses.
-5. **Draw** by DESIGN.md (width, grid, aspect, colors, legend, value labels) and the chart type's file.
-6. **Save and caption**, then **check**.
+1. Set up the figures folder (Files); read its `DESIGN.md` once (the project's copy is the design; user may have changed it).
+2. Takeaway: one sentence on what the figure shows (from request, paper text, figure's role), with a number from the data if any. Decides value labels; becomes the caption's takeaway.
+3. Kind of data: each plotted quantity is a reported result or a diagnostic (below).
+4. Chart type: from DESIGN.md's chart type table; read its file in `{skill-dir}/references/`, one per type used. Several panels, sub-figures or a second y axis: also `references/multi-panel.md`.
+5. Draw by DESIGN.md and the chart files.
+6. Save, caption, check.
+
+## How to work
+
+Few turns, each finishing a step. Typical figure: 5-6 turns.
+
+1. First turn, all at once: setup commands, a printout of the data's structure, and Read of `figures/DESIGN.md` and the chart files. The files to read are named above; don't list or explore the skill folder, don't read the `paper` code.
+2. Read each file whole with the Read tool, once. Not `cat`: long output gets cut, then read twice.
+3. Data: one Python call printing the takeaway's numbers.
+4. Write the whole script once, rules applied up front. Leave placement to `finalize_figure`: panel legends without `loc`, bar values level (it turns crowded ones upward).
+5. Run the script and the font check in one command.
+6. Warnings: fix all of them in one edit, then rerun. No trial loops over placements, no temp scripts.
+7. Look at the PNG once, at the end.
 
 ## Kind of data
 
-| Kind | What it is | On the plot |
+| Kind | What | On the plot |
 |---|---|---|
-| Reported result | a number the paper claims, measured once per setting (accuracy, F1, latency, a score per method) | when the takeaway compares it, its value is written on the plot |
-| Diagnostic | a quantity logged along a process to show its behavior (loss, gradient norm, entropy per step) | its trend and shape; no value labels |
+| Reported result | number the paper claims, once per setting (accuracy, F1, latency) | value written when the takeaway compares it |
+| Diagnostic | quantity logged along a process (loss, gradient norm, entropy per step) | trend and shape; no value labels |
 
-An evaluation metric logged along training (validation accuracy per epoch, reward per step) is a reported result at the point the takeaway compares (drawn raw, marked there), and a diagnostic otherwise.
+Metric logged along training (validation accuracy per epoch): reported result at the compared point, diagnostic elsewhere.
 
 ## Files
 
-All figure work happens in one folder, even for one figure or a code-only request: the folder the user names ("put it in `paper/plots/`"), else `figures/` in the current working directory. Below, `figures/` stands for that folder. The user runs, edits and re-exports figures there without this skill, so each script is plain, readable code.
+One folder for all work: the one the user names, else `figures/` in the working directory. User reruns and edits scripts there without this skill: plain, readable code.
 
 ```
 figures/
-├── {id}.py           # one script per figure, its caption on top
-├── DESIGN.md         # the design system; edit it to restyle every figure
-├── style/paper/      # the paper package (design, layout: sizes, palette: color-blind and grayscale safety,
-│                     #   checks: readability, draw), paper.mplstyle, Inter fonts; copied from the skill, not edited by hand
-└── outputs/          # {id}.pdf and {id}.png
+├── {id}.py      # one script per figure, caption as docstring
+├── DESIGN.md    # the design; edit to restyle every figure
+├── style/paper/ # helpers, style, fonts (copied from the skill)
+└── outputs/     # {id}.pdf, {id}.png
 ```
 
-- **Setup**: `{skill-dir}` is this skill's base directory. `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/`, `cp -Rn {skill-dir}/assets/paper figures/style/`; `-n` keeps copies already there, so a design the user changed stays.
-- **Requirements**: Python 3.10+, `matplotlib` 3.10+, `numpy` 2+, `pyyaml`, and `scipy` for density curves. If one is missing, tell the user and ask before installing it.
-- **Script**: `figures/{id}.py` (kebab-case id) runs on its own: the caption as its docstring, the setup below, then everything for that figure: load data, plot, `finalize_figure`, save PDF and PNG.
+- Setup (`{skill-dir}`: this skill's base directory; `-n` keeps a design the user changed):
+
+  ```bash
+  mkdir -p figures/style figures/outputs
+  cp -n {skill-dir}/assets/DESIGN.md figures/
+  cp -Rn {skill-dir}/assets/paper figures/style/
+  ```
+
+- Requirements: Python 3.10+, matplotlib 3.10+, numpy 2+, pyyaml; scipy for density curves. Missing one: ask before installing.
+- Script `figures/{id}.py` (kebab-case id), self-contained: caption docstring, setup, data, plot, `finalize_figure`, save.
 
   ```python
   """Test accuracy versus training steps on CIFAR-10. Shaded bands show ±1 std over 3 seeds; ..."""
 
   import json
-  import math
   import sys
 
   import matplotlib.pyplot as plt
   import numpy as np
   from matplotlib import rcParams
-  from matplotlib.colors import Normalize, to_rgb
-  from matplotlib.patches import Patch
-  from matplotlib.ticker import NullFormatter
 
   sys.path.insert(0, "style")
-  import paper  # registers the bundled Inter font
-  from paper import finalize_figure, set_group_label, moving_average, darken, lighten, text_color_on, baseline_greys, part_colors
+  import paper
+  from paper import finalize_figure, baseline_greys, darken
 
-  colors = paper.apply_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
+  colors = paper.apply_design("DESIGN.md")  # colors["series-1"], colors["ours"], ...
   ```
 
-- **Data**: loaded from the project's result files, wherever they are (paths relative to `figures/`, such as `../results/run.json`); numbers inline only when there is no file.
-- **Numbers from the data**: every number on the plot and in the caption is computed in the script from the loaded data, never typed in by hand, and every data point given is drawn (nothing dropped, smoothed or rounded away for looks). The script prints the takeaway's numbers and asserts its claim, and the caption (its docstring) is written from that printout, each number in the form DESIGN.md's Value labels table gives (the example's accuracies are "anything else"), so a reader can rerun the script and see the figure and caption are true:
+- Helpers in `paper`:
+
+  | Helper | Use |
+  |---|---|
+  | `apply_design(path)` | style from DESIGN.md; returns colors by name |
+  | `finalize_figure(fig, axes, aspect=0.618, min_width=1.2, column_gap=0)` | call last: height, layout, warnings |
+  | `set_group_label(axes, text, axis="x")` | one axis label for a group of panels |
+  | `baseline_greys(n)` | grey fills for n compared series |
+  | `part_colors(n)` | colors for parts of one whole |
+  | `darken(color)` / `lighten(color)` | series text and edges / box and violin fills |
+  | `text_color_on(fill)` | black or white, whichever reads on the fill |
+  | `moving_average(values)` | smooth a logged curve |
+  | `mark_value(ax, x, y, text, color, below=False)` | circle and write a compared value |
+  | `paper.dashed_width`, `highlight_size`, `filled_edge_width`, `bar_label_size`, `contour_label_size` | token values |
+
+- Data: from the project's result files (paths relative to `figures/`, e.g. `../results/run.json`); inline numbers only when no file.
+- Numbers: every number on plot and caption computed from loaded data; every given point drawn. Script prints the takeaway's numbers and asserts the claim; caption written from that printout, in DESIGN.md value formats. Data doesn't support the claim: tell the user, don't draw around it.
 
   ```python
   best = {name: max(curve) for name, curve in runs.items()}
@@ -72,31 +101,53 @@ figures/
   assert best["Ours"] > max(v for name, v in best.items() if name != "Ours"), "the takeaway does not hold"
   ```
 
-  A claim the data does not support is a finding to report to the user, not a figure to draw around it.
-- **Code style**: top to bottom as a person would write it by hand: plain matplotlib calls, data and labels spelled out where they are used, the `paper` helpers for the rest; a loop over the plotted series is as far as abstraction goes.
-- **Run**: from the figures folder with the project's Python, `cd figures && python {id}.py`.
+- Code style: top to bottom, as written by hand; plain matplotlib calls; data and labels where used. Abstraction: at most a loop over series.
+- Run from the figures folder with the project's Python:
+
+  ```bash
+  cd figures && python {id}.py
+  ```
 
 ## Save and caption
 
-- **Files**: `fig.savefig("outputs/{id}.pdf")` and `fig.savefig("outputs/{id}.png")`. The design embeds fonts as TrueType, which venues accept; text stays text.
-- **LaTeX line** for the reply: single-column venue (ICLR, NeurIPS): `figure`, `width=\textwidth` at full width, `width=0.5\textwidth` at half; two-column venue: single column `figure`, `width=\columnwidth`; 1.5 column `figure*`, `width=0.75\textwidth`; double `figure*`, `width=\textwidth`.
-- **Caption**: the text of `\caption{}` (LaTeX adds the "Figure N:" number), as it appears under the figure in the paper, in the paper's language (default English), standing alone; one sentence per part, present tense, plain text with Unicode (±, ×, α); unknown details become `[TODO: …]` and go in the reply.
+- Save:
+
+  ```python
+  fig.savefig("outputs/{id}.pdf")
+  fig.savefig("outputs/{id}.png")
+  ```
+
+- LaTeX line for the reply:
+
+  | Venue | Width | LaTeX |
+  |---|---|---|
+  | Single-column (ICLR, NeurIPS) | full / half | `figure`, `width=\textwidth` / `width=0.5\textwidth` |
+  | Two-column | single column | `figure`, `width=\columnwidth` |
+  | Two-column | 1.5 column | `figure*`, `width=0.75\textwidth` |
+  | Two-column | double | `figure*`, `width=\textwidth` |
+
+- Caption: text of `\caption{}`; paper's language (default English); stands alone; one sentence per part; present tense; plain text with Unicode (±, ×, α). Unknown details: `[TODO: …]`, listed in the reply.
 
   | Part | Content |
   |---|---|
   | Lead (bold in the paper) | what the figure shows, one short sentence |
-  | Reading guide | what the axes and legend don't explain: bands, dashed lines, outlines, sub-figure letters, log axes (skip when there is nothing) |
-  | Takeaway | the takeaway from step 2, with its number, written by DESIGN.md's value table |
+  | Reading guide | what axes and legend don't explain: bands, dashed lines, outlines, sub-figure letters, log axes; skip if none |
+  | Takeaway | step 2's takeaway with its number |
 
-  > **Test accuracy versus training steps on CIFAR-10.** Shaded bands show ±1 std over 3 seeds; the dashed line marks the best baseline's final accuracy. Ours reaches it after 12k steps, 2.1× faster.
+  > Test accuracy versus training steps on CIFAR-10. Shaded bands show ±1 std over 3 seeds; the dashed line marks the best baseline's final accuracy. Ours reaches it after 12k steps, 2.1× faster.
 
-- **Reply**: what changed, the LaTeX line, any `[TODO]`.
+- Reply: what changed, LaTeX line, any `[TODO]`.
 
 ## Check
 
-After each script has run:
+After each run:
 
-1. **Warnings**: read its output. `finalize_figure` warns about a panel narrower than `min_width`; text cut off, overlapping, sticking out of its panel or spilling out of its fill; a value label, point name or legend covering a curve or data points; a legend over text, over a bar's end, or with more than a tenth of its area over filled marks; a legend wider than the figure; two series that look alike in grayscale; a font other than the design's. Each rule says what to do on its warning; fix the script until it runs without warnings.
-2. **Numbers**: the caption's numbers match the script's printed takeaway line exactly, and its assert passed; a derived number the data does not give directly (an ECE from binned data, an AUC from a curve) is named as computed in the caption.
-3. **Look** at the PNG at its printed size, as it will sit in the paper next to 10 pt body text (its pixel width / 300 in), never zoomed in, for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow DESIGN.md's order; colors follow its roles; the chart type's file is followed; the caption matches the figure.
-4. **Fonts**: embedded TrueType: `pdffonts outputs/{id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 outputs/{id}.pdf` prints 0).
+1. Warnings: each `finalize_figure` warning names the problem; fix by DESIGN.md until clean.
+2. Numbers: caption matches the printed takeaway exactly; assert passed. Derived numbers (ECE, AUC): named as computed in the caption.
+3. Look at the PNG at printed size (pixel width / 300 in), not zoomed: takeaway at a glance; value labels at compared points; legend order and colors per DESIGN.md; chart file followed; caption matches.
+4. Fonts embedded as TrueType: `pdffonts` shows `CID TrueType`, emb `yes`; without pdffonts, the `grep` prints 0.
+
+   ```bash
+   pdffonts outputs/{id}.pdf
+   grep -ac /Type3 outputs/{id}.pdf
+   ```

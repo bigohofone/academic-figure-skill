@@ -1,22 +1,49 @@
 # Histogram
 
-How one quantity's values are spread: scores, confidences, lengths, per-problem accuracies. The shape is the message, so the bars of raw values carry no value labels (named bins with counts are labelled as bars, below). Read with `DESIGN.md`; its rules apply unless this file says otherwise.
+Spread of one quantity: scores, confidences, lengths, per-problem accuracies. Shape is the message: raw-value bars carry no value labels (named bins with counts: labelled as bars, below). Read with `DESIGN.md`; its rules apply unless overridden here.
 
 ## Draw
 
-- **Bars**: raw values as touching bars, `ax.hist(values, bins=bins, color=color, linewidth=0)`, with bins from all series together so every series shares them, `bins = np.histogram_bin_edges(np.concatenate(all_values), bins="auto")`; horizontal gridlines only.
-- **y axis**: "Count", or "Density" with `density=True` when the series have different sizes.
+- Bars: raw values as touching bars; all series share bins computed from all values together; horizontal gridlines only.
+
+  ```python
+  bins = np.histogram_bin_edges(np.concatenate(all_values), bins="auto")
+  ax.hist(values, bins=bins, color=color, linewidth=0)
+  ```
+
+- y axis: "Count"; "Density" (`density=True`) when series differ in size.
 
 ## Variants
 
-- **Overlaid histograms** (two or three series on one axis): each as a translucent fill with its outline on top, so every series stays visible where they overlap, `ax.hist(values, bins=bins, histtype="stepfilled", color=color, alpha=0.2, linewidth=0)`, then `ax.hist(values, bins=bins, histtype="step", color=color, label=name)` (the outline carries the legend entry). More than three series: one panel each, sharing both axes.
-- **Counts per bin** (already computed): bins of a continuous quantity as touching bars on a numeric axis, `ax.bar(edges[:-1], counts, width=np.diff(edges), align="edge", linewidth=0)`; named bins (intervals, length buckets) as grouped bars (`bar-chart.md`), in order on x with text tick labels, labelled as bar-chart.md labels bars: every bar or none.
-- **Density curve** (KDE), only when the user asks: `scipy.stats.gaussian_kde(values)(xs)` as a data line in the series color, filled under at `alpha=0.2`.
+- Overlaid (2–3 series, one axis): each a translucent fill with outline on top; outline carries legend entry. > 3 series: one panel each, sharing both axes.
+
+  ```python
+  ax.hist(values, bins=bins, histtype="stepfilled", color=color, alpha=0.2, linewidth=0)
+  ax.hist(values, bins=bins, histtype="step", color=color, label=name)
+  ```
+
+- Precomputed counts per bin: continuous-quantity bins as touching bars on numeric axis (below). Named bins (intervals, length buckets): grouped bars (`bar-chart.md`), in order on x, text tick labels, labelled as in bar-chart.md: every bar or none.
+
+  ```python
+  ax.bar(edges[:-1], counts, width=np.diff(edges), align="edge", linewidth=0)
+  ```
+
+- Density curve (KDE): only on request; data line in series color, filled under at `alpha=0.2`.
+
+  ```python
+  density = scipy.stats.gaussian_kde(values)(xs)
+  ```
 
 ## Labels
 
-- **Means** (when the takeaway compares the series' centers): each mean as a thin solid vertical line in `darken(color)` (a reference line), `ax.axvline(mean, linewidth=rcParams["grid.linewidth"], color=darken(color))`, its value just above the panel at the line, `ax.annotate(f"{mean:#.3g}", (mean, 1), xycoords=("data", "axes fraction"), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom", color=darken(color))`.
+- Means (when takeaway compares series' centers): thin solid vertical reference line in `darken(color)`; value just above panel at the line.
+
+  ```python
+  ax.axvline(mean, linewidth=rcParams["grid.linewidth"], color=darken(color))
+  ax.annotate(f"{mean:#.3g}", (mean, 1), xycoords=("data", "axes fraction"), xytext=(0, 2), textcoords="offset points",
+              ha="center", va="bottom", color=darken(color))
+  ```
 
 ## Caption
 
-- **Reading guide**: "vertical lines mark the means"; "a kernel density estimate" for a density curve; "density" when the series are normalized.
+- Reading guide: "vertical lines mark the means"; "a kernel density estimate" for density curve; "density" when series normalized.

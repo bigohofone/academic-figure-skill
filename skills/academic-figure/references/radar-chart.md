@@ -1,12 +1,20 @@
 # Radar chart
 
-A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape of the profile is the message (where each model is strong or weak). Also called a spider chart. For exact comparisons, or more than four models, draw a grouped bar chart instead (`bar-chart.md`). Read with `DESIGN.md`; its rules apply unless this file says otherwise.
+A few models' profiles across 5–10 benchmarks or capabilities, when profile shape is the message (where each model is strong or weak). Also: spider chart. Exact comparisons or > 4 models: grouped bar chart (`bar-chart.md`). Read with `DESIGN.md`; its rules apply unless overridden here.
 
 ## Draw
 
-- **Axes**: polar, one spoke per benchmark, evenly spaced from the top, clockwise: `fig, ax = plt.subplots(figsize=(width, width), subplot_kw={"projection": "polar"})`, `angles = np.linspace(0, 2 * np.pi, n, endpoint=False)`, `ax.set_theta_offset(np.pi / 2)`, `ax.set_theta_direction(-1)`. `finalize_figure` sizes the chart to the width and ignores `aspect`.
-- **Scale**: one radial scale for all spokes when the benchmarks share a unit (accuracy in %), fixed from 0 to the outer ring, with 3 or 4 rings plus the outer edge. Benchmarks with different units: each spoke normalized to its best score (= 1), said in the caption.
-- **Grid**: an n-sided polygon grid, never circles: the circular grid and frame off, each ring and spoke drawn in the design's grid look, the outer polygon as the panel box:
+- Axes: polar; one spoke per benchmark, evenly spaced, clockwise from top. `finalize_figure` sizes chart to width, ignores `aspect`.
+
+  ```python
+  fig, ax = plt.subplots(figsize=(width, width), subplot_kw={"projection": "polar"})
+  angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
+  ax.set_theta_offset(np.pi / 2)
+  ax.set_theta_direction(-1)
+  ```
+
+- Scale: shared unit (accuracy in %): one radial scale, 0 to outer ring, 3–4 rings plus outer edge. Different units: each spoke normalized to its best score (= 1); say so in caption.
+- Grid: n-sided polygons, never circles. Circular grid and frame off; rings and spokes in design grid look; outer polygon = panel box.
 
   ```python
   ax.grid(False)
@@ -20,13 +28,34 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
   ax.set_ylim(0, rings[-1])
   ```
 
-- **Models**: each a closed polygon, filled lightly so overlaps stay visible, `ax.plot(loop, np.r_[values, values[:1]], color=color, linestyle=style, linewidth=1 if style == "-" else paper.dashed_width, label=name)`, `ax.fill(angles, values, color=color, alpha=0.1)`; ours in `colors["ours"]`, drawn last so it is on top, the compared models in `neutral` told apart by line style (DESIGN.md Colors).
-- **Spoke names**: `ax.set_xticks(angles, labels=names)`, off the outer polygon, `ax.tick_params(axis="x", pad=6)`.
-- **Ring values**: between two spokes so they sit on no line, where a polygon ring is at r·cos(π/n), not r: `ax.set_yticks([r * np.cos(np.pi / n) for r in rings[:-1]], labels=[str(r) for r in rings[:-1]])`, `ax.set_rlabel_position(180 / n)`.
+- Models: closed, lightly filled polygons. Ours: `colors["ours"]`, drawn last (on top). Compared: `neutral`, distinguished by line style (DESIGN.md Colors).
+
+  ```python
+  ax.plot(loop, np.r_[values, values[:1]], color=color, linestyle=style,
+          linewidth=1 if style == "-" else paper.dashed_width, label=name)
+  ax.fill(angles, values, color=color, alpha=0.1)
+  ```
+
+- Spoke names: off outer polygon.
+
+  ```python
+  ax.set_xticks(angles, labels=names)
+  ax.tick_params(axis="x", pad=6)
+  ```
+
+- Ring values: between two spokes (on no line); polygon ring at r·cos(π/n), not r.
+
+  ```python
+  ax.set_yticks([r * np.cos(np.pi / n) for r in rings[:-1]], labels=[str(r) for r in rings[:-1]])
+  ax.set_rlabel_position(180 / n)
+  ```
 
 ## Labels
 
-- **Values**: only ours, at each spoke, in `darken(colors["ours"])`, outside its vertex. On a side spoke the label sits beside the vertex, outward and hanging toward the horizontal axis, away from the spoke name that continues the spoke; on the top and bottom spokes it sits just beyond the vertex; on a white box where it crosses a ring line (angles clockwise from the top):
+- Values: ours only, at each spoke, in `darken(colors["ours"])`, outside vertex (angles clockwise from top):
+  - Side spokes: beside vertex, outward, hanging toward horizontal axis, away from spoke name.
+  - Top and bottom spokes: just beyond vertex.
+  - Crossing a ring line: white box.
 
   ```python
   side = np.sin(angle) if abs(np.sin(angle)) > 0.1 else 0
@@ -37,5 +66,9 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
               color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
   ```
 
-  Placements (for Collisions): as above, then the spoke names pushed out, `ax.tick_params(axis="x", pad=8)`, then 10, 12, ….
-- **Legend**: outside above the chart, ours first although it is drawn last, `fig.legend(handles, labels, loc="outside upper center", ncol=len(labels), frameon=False, borderaxespad=0)`.
+  Placements (for Collisions): as above; then spoke names pushed out (`pad=8`, then 10, 12, …).
+- Legend: outside, above chart; ours first though drawn last.
+
+  ```python
+  fig.legend(handles, labels, loc="outside upper center", ncol=len(labels), frameon=False, borderaxespad=0)
+  ```

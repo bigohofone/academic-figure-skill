@@ -5,6 +5,7 @@ import warnings
 import numpy as np
 from matplotlib import rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.legend import Legend
 from matplotlib.transforms import Bbox
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator, FuncFormatter, ScalarFormatter
@@ -19,14 +20,26 @@ def _panel_size(a, original=False):
 
 
 def _measure_panels(fig, panels):
-    fig.canvas.draw()
+    """Each panel's height / width and width. NaN ratios when the layout collapsed at this height:
+    matplotlib then leaves the panels where they were, so their sizes mean nothing."""
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        fig.canvas.draw()
     sizes = [_panel_size(a) for a in panels]
+    if any("constrained_layout not applied" in str(w.message) for w in caught):
+        return [np.nan] * len(panels), [w for w, _ in sizes]
+    for w in caught:
+        warnings.warn_explicit(w.message, w.category, w.filename, w.lineno)
     return [h / w for w, h in sizes], [w for w, _ in sizes]
 
 
 def _fit_height_to_aspect(fig, panels, aspect, iters, tol):
     h0 = fig.get_figheight()
     ratios, widths = _measure_panels(fig, panels)
+    while not np.isfinite(ratios[0]):  # the start is too short for the decorations: grow until the layout stands
+        h0 *= 2
+        fig.set_figheight(h0)
+        ratios, widths = _measure_panels(fig, panels)
     r0 = ratios[0]
     h1 = h0 * aspect / r0
     for _ in range(iters):
@@ -118,6 +131,50 @@ def _keep_value_labels_inside(fig, panels):
                 set_lim(*new)
                 changed = True
     return changed
+
+
+def _turn_crowded_bar_labels(fig, panels):
+    """Bar values written side by side that overlap all turn upward, in every panel where any two do."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    for a in panels:
+        anchors = checks._bar_label_anchors(a)
+        labels = [t for t in a.texts if isinstance(t, Annotation) and t.get_rotation() == 0 and len(anchors)
+                  and bool(np.isclose(anchors, t.xy).all(axis=1).any()) and t.get_va() in ("bottom", "top")]
+        boxes = [t.get_window_extent(renderer) for t in labels]
+        if any(checks._texts_overlap(labels[i], boxes[i], labels[j], boxes[j], renderer)
+               for i in range(len(labels)) for j in range(i + 1, len(labels))):
+            for t in labels:
+                t.set_rotation(90)
+                t.xyann = (0, 2 if t.get_va() == "bottom" else -2)
+
+
+INSIDE_SPOTS = ["upper left", "upper right", "lower left", "lower right",
+                "upper center", "lower center", "center left", "center right"]
+
+
+def _place_legends(fig, panels):
+    """A panel legend made without `loc` goes to the first inside spot where it hides nothing, else
+    above its panel in one row. Returns whether any went above."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    above = False
+    for a in panels:
+        legend = a.get_legend()
+        if legend is None or legend._loc != Legend.codes["best"]:
+            continue
+        for spot in INSIDE_SPOTS:
+            legend.set_loc(spot)
+            if not checks._legend_problems(fig, a, panels, renderer):
+                break
+        else:
+            legend.set_loc("lower center")
+            legend.set_bbox_to_anchor((0.5, 1), transform=a.transAxes)
+            legend.set_ncols(len(legend.get_texts()))
+            legend.set_frame_on(False)
+            legend.borderaxespad = 0.5
+            above = True
+    return above
 
 
 def _standard_y_widths(fig):
@@ -414,6 +471,11 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, c
     the limits grow to make room, and `mark_value` labels at the left or right edge turn inward.
     Other text is never moved.
 
+    Bar values side by side that overlap all turn upward (rotation 90), panel by panel.
+
+    A panel legend made without `loc` is placed here: the first spot of `INSIDE_SPOTS` where it
+    hides no data or text, else above its panel in one row.
+
     Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
     two-factor grid with shared axes and outer tick labels only passes 0.9); text cut off at the
     figure edge, overlapping, sticking out of its panel or spilling out of its fill; text or a
@@ -454,7 +516,10 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, c
         warnings.warn("finalize_figure expects layout='constrained'; ratios may be off.")
 
     ratios, widths = _fit_height_to_aspect(fig, panels, aspect, iters, tol)
+    _turn_crowded_bar_labels(fig, panels)
     if _keep_value_labels_inside(fig, panels):
+        ratios, widths = _fit_height_to_aspect(fig, panels, aspect, iters, tol)
+    if _place_legends(fig, panels):
         ratios, widths = _fit_height_to_aspect(fig, panels, aspect, iters, tol)
     if abs(ratios[0] - aspect) / aspect >= tol:
         _freeze_ticks(fig.axes)  # colorbars too: their auto ticks change width with the height

@@ -84,7 +84,8 @@ def _warn_hard_to_read(fig, panels, min_width):
         _warn_text_over_data(fig, a, panels, fills, renderer)
         _warn_grayscale_lookalikes(a)
         if a.get_legend():
-            _warn_legend_over_data(a, fills, renderer)
+            for problem in _legend_problems(fig, a, panels, renderer):
+                warnings.warn(problem)
 
 
 def _shown_texts(fig):
@@ -142,9 +143,8 @@ def _filled_shapes(a):
                     if type(c) in (PolyCollection, FillBetweenPolyCollection) and c.get_visible() for path in c.get_paths()]
 
 
-def _warn_text_over_data(fig, a, panels, fills, renderer):
-    """Text in a panel that sticks out of it, spills out of the fill it sits on, or covers a curve or
-    data points; the legend covering a curve or points too."""
+def _data_marks(fig, a, panels):
+    """The panel's curves (paths) and data points (arrays), in display coordinates, its twin axis's included."""
     # reference lines (axhline, axline) span the panel on purpose and are not data;
     # a twin axis (ax.twinx()) draws its curves over the same panel
     owners = [a] + [t for t in fig.axes if t is not a and t not in panels
@@ -159,6 +159,12 @@ def _warn_text_over_data(fig, a, panels, fills, renderer):
                if isinstance(c, PathCollection) and len(c.get_offsets())]
     curves += [path.transformed(c.get_transform()) for c in a.collections
                if isinstance(c, LineCollection) and not isinstance(c, PolyCollection) for path in c.get_paths()]
+    return curves, points
+
+
+def _warn_text_over_data(fig, a, panels, fills, renderer):
+    """Text in a panel that sticks out of it, spills out of the fill it sits on, or covers a curve or data points."""
+    curves, points = _data_marks(fig, a, panels)
     contour_labels = [t for c in a.collections if isinstance(c, ContourSet) for t in c.labelTexts]
     # text on a white box is meant to sit over data, and contour labels sit in gaps cut for them
     plain = [t for t in a.texts if t.get_visible() and t.get_text() and t.get_bbox_patch() is None
@@ -177,8 +183,6 @@ def _warn_text_over_data(fig, a, panels, fills, renderer):
     # a label anchored on a data point may touch the curve through that point (its own series)
     covers = [(t.get_text(), t.get_window_extent(renderer),
                a.transData.transform(t.xy) if isinstance(t, Annotation) and t.xycoords == "data" else None) for t in plain]
-    if a.get_legend():
-        covers.append(("the legend", a.get_legend().get_window_extent(renderer), None))
     for name, box, anchor in covers:
         others = [c for c in curves if anchor is None or np.hypot(*(c.vertices - anchor).T).min() > 2]
         if any(curve.intersects_bbox(box, filled=False) for curve in others):
@@ -187,23 +191,31 @@ def _warn_text_over_data(fig, a, panels, fills, renderer):
             warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
 
 
-def _warn_legend_over_data(a, fills, renderer):
-    """An inside legend that sticks out of its panel, or covers text, filled marks or a bar's end."""
-    box, panel = a.get_legend().get_window_extent(renderer), a.get_window_extent(renderer)
+def _legend_problems(fig, a, panels, renderer):
+    """What the panel's legend hides: a curve or data points, text, filled marks or a bar's end; or
+    an inside legend sticking out of its panel. Empty when the legend sits clear."""
+    box, panel, where = a.get_legend().get_window_extent(renderer), a.get_window_extent(renderer), f"in panel {a.get_title()!r}"
+    curves, points = _data_marks(fig, a, panels)
+    problems = []
+    if any(curve.intersects_bbox(box, filled=False) for curve in curves):
+        problems.append(f"the legend covers a curve {where}; move it")
+    elif any(box.contains(x, y) for xy in points for x, y in xy):
+        problems.append(f"the legend covers data points {where}; move it")
     # an inside legend (one that overlaps its panel) must fit in it; a wider one goes above
     if box.overlaps(panel) and (box.x0 < panel.x0 - 1 or box.x1 > panel.x1 + 1 or box.y1 > panel.y1 + 1):
-        warnings.warn(f"the legend sticks out of panel {a.get_title()!r}; put it above the panel "
-                      "(above its row in a grid, DESIGN.md Legend)")
+        problems.append(f"the legend sticks out of panel {a.get_title()!r}; put it above the panel "
+                        "(above its row in a grid, DESIGN.md Legend)")
     if any(t.get_visible() and t.get_text() and box.overlaps(t.get_window_extent(renderer)) for t in a.texts):
-        warnings.warn(f"the legend covers text in panel {a.get_title()!r}; move it")
+        problems.append(f"the legend covers text {where}; move it")
     # the filled area under the legend, not the shapes' bounding boxes: a histogram is one wide polygon
-    covered = sum(_polygon_area(poly) for shape in fills for poly in shape.clip_to_bbox(box).to_polygons())
+    covered = sum(_polygon_area(poly) for shape in _filled_shapes(a) for poly in shape.clip_to_bbox(box).to_polygons())
     if covered > box.width * box.height / 10:
-        warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
+        problems.append(f"the legend covers filled marks (bars, boxes, bands, areas) {where}; move it")
     # a bar's value is its end: covering even a sliver of it hides the number the bar shows
     if any(_bar_value_edge(bar, c.orientation, renderer).overlaps(box)
            for c in a.containers if isinstance(c, BarContainer) for bar in c.patches):
-        warnings.warn(f"the legend covers the end of a bar in panel {a.get_title()!r}; move it")
+        problems.append(f"the legend covers the end of a bar {where}; move it")
+    return problems
 
 
 def _bar_value_edge(bar, orientation, renderer):

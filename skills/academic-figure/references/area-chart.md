@@ -1,22 +1,43 @@
 # Area chart
 
-Shares of a whole along a continuous x: the data mixture over training, the token share of each domain over steps, the composition of outputs over a sweep. Values that are not parts of one whole are a line chart (`line-chart.md`), never unstacked areas. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
+Shares of a whole along continuous x: data mixture over training, each domain's token share over steps, output composition over a sweep. Values not parts of one whole: line chart (`line-chart.md`), never unstacked areas. Read with `DESIGN.md`; its rules apply unless overridden here.
 
 ## Draw
 
-- **Areas**: `ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])`, panel aspect 1 : 1. the stack puts the part whose share changes least over x (the smallest std) at the bottom, so the others read against a flat base, and the rest in data order above it; every band its own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole), from the bottom up (DESIGN.md Colors, parts of one whole).
-- **Axes**: shares normalized to 1 at each x, the axis fixed to the whole, `ax.set_ylim(0, 1)`, `ax.margins(x=0)`.
-- **Gridlines**: horizontal only, over the areas so shares read off them, `ax.set_axisbelow(False)`, `ax.grid(axis="x", visible=False)`.
+- Areas: panel aspect 1 : 1. Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
+
+  ```python
+  ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])
+  ```
+
+- Axes: shares normalized to 1 at each x; y fixed to the whole; no x margins.
+
+  ```python
+  ax.set_ylim(0, 1)
+  ax.margins(x=0)
+  ```
+
+- Gridlines: horizontal only, over the areas.
+
+  ```python
+  ax.set_axisbelow(False)
+  ax.grid(axis="x", visible=False)
+  ```
 
 ## Variants
 
-- **Stages** (a curriculum switching at set steps): `ax.stackplot(..., step="post")`, each switch marked with a dashed white vertical line (DESIGN.md reference lines over fills), `ax.axvline(step, linestyle="--", linewidth=paper.dashed_width, color="white")`, and ticks at the switches.
+- Stages (curriculum switching at set steps): stepped areas; each switch a dashed white vertical line (DESIGN.md reference lines over fills); ticks at switches.
+
+  ```python
+  ax.stackplot(..., step="post")
+  ax.axvline(step, linestyle="--", linewidth=paper.dashed_width, color="white")
+  ```
 
 ## Labels
 
-- **Band names**: a legend above the panel (DESIGN.md Legend, a filled plot), entries from the top band down.
-- **Shares**: a share the takeaway cites, inside its band at each stage, written as a share (DESIGN.md Value labels) in `text_color_on(band_color)`; when one share of a band spills out of it, all of that band's shares go to the caption (a band's shares are one kind).
+- Band names: legend above panel (DESIGN.md Legend, a filled plot), entries from top band down.
+- Shares: shares the takeaway cites, inside band at each stage, as shares (DESIGN.md Value labels), in `text_color_on(band_color)`; if one share of a band spills out: all that band's shares to caption.
 
 ## Caption
 
-- **Reading guide**: what the dashed lines mark.
+- Reading guide: what dashed lines mark.
