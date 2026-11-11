@@ -585,6 +585,19 @@ def test_legend_full_size_inside_when_it_fits_and_above():
     assert legends[0].get_texts()[0].get_fontsize() == plt.rcParams["legend.fontsize"]
 
 
+def test_legend_rows_write_the_shared_word_once_and_stay_in_the_canvas():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, WIDTH), layout="constrained")
+    handles = [axes[0].plot([0, 1], [0, d])[0] for d in (4, 8, 16, 32, 64)]
+    axes[1].plot([0, 1], [0, 1])
+    axes[0].set_ylabel("Time at goal")
+    legend = paper.legend_rows(fig, [("Depth", handles, [4, 8, 16, 32, 64])], loc="outside upper center", borderaxespad=0)
+    finalize_figure(fig, axes)
+    assert [t.get_text() for t in legend.get_texts()] == ["Depth", "4", "8", "16", "32", "64"]
+    fig.canvas.draw()
+    box = legend.get_window_extent()
+    assert box.x0 >= paper.canvas_pad * fig.dpi - 0.5 and box.x1 <= (WIDTH - paper.canvas_pad) * fig.dpi + 0.5
+
+
 def test_legend_sticking_out_of_its_panel_warns():
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2), layout="constrained")
     for a in axes:

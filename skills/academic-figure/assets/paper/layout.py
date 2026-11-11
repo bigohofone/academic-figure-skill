@@ -59,8 +59,9 @@ def _fit_height_to_aspect(fig, panels, aspect, iters, tol):
         if abs(r1 - aspect) / aspect < tol or r1 == r0:
             break
         step = h1 + (aspect - r1) * (h1 - h0) / (r1 - r0)
-        # a secant step can overshoot below zero while the layout is still settling: halve instead
-        h0, r0, h1 = h1, r1, step if np.isfinite(step) and step > 0 else h1 / 2
+        # a secant step can overshoot below zero while the layout is still settling: halve instead; on a
+        # nearly flat ratio (a legend wider than its panel) it can shoot far up: at most four times taller
+        h0, r0, h1 = h1, r1, min(step, 4 * h1) if np.isfinite(step) and step > 0 else h1 / 2
     return ratios, widths
 
 
@@ -232,39 +233,53 @@ def _recheck_legends(fig, panels):
         if legend is None or not getattr(legend, "_placed_inside", False) or not checks._legend_problems(fig, a, panels, renderer):
             continue
         if not _clear_spot(fig, a, legend, panels, renderer):
-            handles, labels = legend.legend_handles, [t.get_text() for t in legend.get_texts()]
+            handles, labels, layout = _legend_entries(legend)
             legend.remove()
-            if not _place_inside(fig, [a], handles, labels, panels, renderer):
-                _legend_above(fig, a, handles, labels, several=len(panels) > 1)
+            if not _place_inside(fig, [a], handles, labels, panels, renderer, layout):
+                _legend_above(fig, a, handles, labels, several=len(panels) > 1, layout=layout)
                 above = True
     return above
 
 
-def _place_inside(fig, candidates, handles, labels, panels, renderer):
+def _legend_entries(legend):
+    """A legend's handles and labels in the order it was made, and its layout (columns, spacing) when its
+    rows are set (`legend_rows`), else None."""
+    if hasattr(legend, "_entries"):
+        return legend._entries
+    return legend.legend_handles, [t.get_text() for t in legend.get_texts()], None
+
+
+def _place_inside(fig, candidates, handles, labels, panels, renderer, layout=None):
     """Put the legend inside the first of `candidates` with a spot where it hides nothing: at the legend
     size in every candidate first, then at the smaller legend-inside size. Whether it found one."""
     for size in (rcParams["legend.fontsize"], design.legend_inside_size):
         for a in candidates:
-            legend = a.legend(handles, labels, fontsize=size)
+            legend = a.legend(handles, labels, fontsize=size, **(layout or {}))
+            if layout:
+                legend._entries = (handles, labels, layout)
             if _clear_spot(fig, a, legend, panels, renderer):
                 return True
             legend.remove()
     return False
 
 
-def _legend_above(fig, a, handles, labels, several):
-    """A legend above the panels, in as few rows as fit the figure's width. Above several panels it is the
-    figure's legend: an axes legend that wide would count as part of its one panel and collapse the layout."""
+def _legend_above(fig, a, handles, labels, several, layout=None):
+    """A legend above the panels, in as few rows as fit the figure's width (or in its set rows, `layout`).
+    Above several panels it is the figure's legend: an axes legend that wide would count as part of its one
+    panel and collapse the layout."""
     room = fig.get_figwidth() * fig.dpi - 2 * design.canvas_pad * fig.dpi
-    for ncols in range(len(labels), 0, -1):
+    fixed = layout is not None
+    style = {k: v for k, v in (layout or {}).items() if k != "ncols"}
+    for ncols in [layout["ncols"]] if fixed else range(len(labels), 0, -1):
         # matplotlib fills a legend column by column; reorder so its rows read left to right in entry order
-        order = [i for c in range(ncols) for i in range(c, len(labels), ncols)]
+        # (set rows come in matplotlib's order already)
+        order = list(range(len(labels))) if fixed else [i for c in range(ncols) for i in range(c, len(labels), ncols)]
         h, l = [handles[i] for i in order], [labels[i] for i in order]
         if several:
-            legend = fig.legend(h, l, loc="outside upper center", ncols=ncols, borderaxespad=0)
+            legend = fig.legend(h, l, loc="outside upper center", ncols=ncols, borderaxespad=0, **style)
         else:
-            legend = a.legend(h, l, loc="lower center", bbox_to_anchor=(0.5, 1), ncols=ncols, borderaxespad=0.5)
-        if ncols == 1 or legend.get_window_extent(fig.canvas.get_renderer()).width <= room:
+            legend = a.legend(h, l, loc="lower center", bbox_to_anchor=(0.5, 1), ncols=ncols, borderaxespad=0.5, **style)
+        if fixed or ncols == 1 or legend.get_window_extent(fig.canvas.get_renderer()).width <= room:
             return
         legend.remove()
 
@@ -282,11 +297,11 @@ def _place_legends(fig, panels):
         legend = a.get_legend()
         if legend is None or legend._loc != Legend.codes["best"]:
             continue
-        handles, labels = legend.legend_handles, [t.get_text() for t in legend.get_texts()]
+        handles, labels, layout = _legend_entries(legend)
         legend.remove()
         candidates = [a, *[o for o in panels if o is not a and o.get_legend() is None]]
-        if not _place_inside(fig, candidates, handles, labels, panels, renderer):
-            _legend_above(fig, a, handles, labels, several=len(panels) > 1)
+        if not _place_inside(fig, candidates, handles, labels, panels, renderer, layout):
+            _legend_above(fig, a, handles, labels, several=len(panels) > 1, layout=layout)
             above = True
     return above
 
@@ -605,8 +620,11 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
         caption.set_verticalalignment("bottom")
     y = new_h - pad
     for lg in top_legends:
+        # centred over the panels, but never past the canvas pad: a wide legend shifts toward the figure's middle
+        half_w = lg.get_window_extent(renderer).width / fig.dpi / 2
+        x = min(max(left + span_w / 2, pad + half_w), w - pad - half_w)
         lg.set_loc("upper center")
-        lg.set_bbox_to_anchor(((left + span_w / 2) / w, y / new_h), transform=fig.transFigure)
+        lg.set_bbox_to_anchor((x / w, y / new_h), transform=fig.transFigure)
         y -= lg.get_window_extent(renderer).height / fig.dpi
     if sup_y:
         sup_y.set_x(pad / w)

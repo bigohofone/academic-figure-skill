@@ -375,6 +375,13 @@ ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=n
 - Frame: every legend, inside or outside, in its box (the style's light grey edge, opaque fill); never `frameon=False`.
 - Inside: worth a small overlap (opaque frame, no height cost). Hides nothing: no curve, data point, text or bar end; ≤1/10 of its area over filled marks. `finalize_figure` checks this when placing it, and warns when a legend with an explicit `loc` breaks it.
 - Outside legend columns: start in one row. On cut-off text or matplotlib layout collapse: `ncol = ceil(n / 2)`, then `ceil(n / 3)`, …, skip repeated counts, down to 1.
+- Shared words: entries that share a word and differ by a setting ("Depth 4", "Depth 8", …; a sweep in `ramp` shades): `paper.legend_rows`, one row per shared word, written once at the row's start, each entry only its setting ("Depth  4 8 16 32 64"; two sweeps: two rows). A row too wide for any panel: on the figure, above the panels.
+
+  ```python
+  paper.legend_rows(ax, [("Depth", handles, [4, 8, 16, 32, 64])])
+  paper.legend_rows(fig, [("Depth", depth_handles, depths), ("Width", width_handles, widths)],
+                    loc="outside upper center", borderaxespad=0)
+  ```
 - Entry order: curves: ours first, then others in color, line-style or shade order. Side-by-side series (grouped bars, boxes): left to right. Stacked bars and areas: segments as met (top to bottom for vertical stacks, left to right for horizontal). Drawing order differs: pass handles in entry order. Always pass entries in reading order: when `finalize_figure` lays a legend out in several columns, it keeps the rows reading left to right.
 
   ```python

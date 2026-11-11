@@ -91,6 +91,7 @@ figures/
   | `text_color_on(fill)` | black or white, whichever reads on the fill |
   | `moving_average(values)` | smooth a logged curve |
   | `mark_value(ax, x, y, text, color, below=False)` | circle and write a compared value |
+  | `legend_rows(ax_or_fig, [(name, handles, settings)], **legend_kw)` | legend in named rows: the shared word once, then only the settings (Depth 4 8 16) |
   | `paper.dashed_width`, `highlight_size`, `filled_edge_width`, `bar_label_size`, `contour_label_size` | token values |
 
 - Data: from the project's result files (paths relative to `figures/`, e.g. `../results/run.json`); inline numbers only when no file.
