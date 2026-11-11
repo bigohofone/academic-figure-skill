@@ -136,7 +136,7 @@ Figures from published papers, redrawn without any skill and following this skil
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig6.png"><img src="examples/use-cases/without-skill/rlvr-fig6.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig6.png"><img src="examples/use-cases/outputs/rlvr-fig6.png" width="528"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig6.png"><img src="examples/use-cases/without-skill/rlvr-fig6.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig6.png"><img src="examples/use-cases/outputs/rlvr-fig6.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.6** · Line chart: ROC curves of AI-text detectors. [Yang et al. (2024), DNA-GPT: Divergent N-Gram Analysis for Training-Free Detection of GPT-Generated Text](https://arxiv.org/abs/2305.17359), Figure 8 (left). Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)

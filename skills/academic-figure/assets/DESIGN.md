@@ -86,7 +86,7 @@ Pick the first row that fits:
 
 | Case | Color |
 |---|---|
-| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Several grey series are told apart by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas), in order `colors["neutral"]`, `darken(colors["neutral"])`, `lighten(colors["neutral"])` |
+| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Several grey series are told apart by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas): `lighten(colors["neutral"])`, `colors["neutral"]`, `darken(colors["neutral"])`, running light to dark in the order the series are drawn, so a sorted row of bars also darkens toward ours |
 | Several series compared on equal terms, with no "ours" (models in a survey, classes, data sources, error types) | `series-1` to `series-6`, in this order |
 | Single series | `series-1` |
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
@@ -99,7 +99,7 @@ Pick the first row that fits:
 - More than six series with no "ours": group them (one color per group, shades within) or split them into panels. Classes in an embedding (ten or more, unordered) are the exception: one color each from matplotlib's `tab10` (`tab20` beyond ten), defined in the cell.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
 - Grey must stay readable on white: lines, markers and reference lines are `neutral` (#8C8C8C, 3.4:1 contrast, above the 3:1 that graphics need) at full opacity, and grey text is `darken(colors["neutral"])` (4.9:1, above the 4.5:1 that text needs). Lighter greys, such as `lighten(colors["neutral"])`, only as fills that have an outline or sit next to darker fills; never for lines, markers or text.
-- Text that belongs to one series (labels, annotations) uses `darken(series_color)`.
+- Text that belongs to one series (labels, annotations) uses `darken(series_color)`; for any grey series, whatever its shade, `darken(colors["neutral"])`, so light grey bars still get readable labels.
 - Emphasis, when the user names a series to emphasize: color it as ours, and every other series as the series ours is compared against.
 - A paper-wide palette (a lab's or a brand's): change the `colors` tokens in `figures/DESIGN.md`. A one-off palette for a single figure ("match the original"): a dict in that figure's cell, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`; everything else keeps the design. If some colors are very light (cyan, yellow), tell the user they read weakly on white.
 
@@ -138,7 +138,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | ICLR, NeurIPS | 2.75 in | 5.5 in |
 
 - Use the venue and width the user names. With no venue, ICLR.
-- Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width, unless it needs width (many x categories, a long time axis read in detail), then the full width at φ² : 1.
+- Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width, unless its x axis needs the width (many x categories, a long time axis read in detail): then the full width at φ² : 1.
 - 1.5 column (0.75 × double) is a `figure*` narrower than the text: use it when the user asks, or when single column is too narrow and double column leaves the content sparse.
 
 ### Grid
@@ -176,9 +176,9 @@ The aspect (width : height) is per panel. Use one of these, golden ratio φ : 1 
 
 | Aspect | `aspect=` | Fit |
 |---|---|---|
-| φ² : 1 | 0.382 | a single panel at 1.5-column, double-column or full text width |
+| φ² : 1 | 0.382 | a panel whose x axis needs the width: a long training curve read in detail, many categories along x. Not a box plot, violin or bar chart with a few groups, which stay at φ : 1 at any width |
 | φ : 1 | 0.618 | curves, bars, histograms, box plots and violins (default) |
-| 1 : 1 | 1.0 | heatmap, confusion matrix, embedding, contour plot, and every panel of a two-factor grid, so rows and columns compare alike |
+| 1 : 1 | 1.0 | heatmap, confusion matrix, embedding, contour plot, stacked area chart (shares read as areas), reliability diagram and ROC curve (the unit square), and every panel of a grid with two or more rows and two or more columns (a two-factor grid, or rows of different plots over the same columns), so rows and columns compare alike |
 | 1 : φ | 1.618 | content that is itself taller than wide (a long list of categories down a horizontal bar chart or forest plot) |
 
 Slopes and gaps between curves need height, many x categories need width, matrices need square cells. If curves look flat after rendering, pick a taller aspect. The aspect follows the data, never room for labels: a value label that covers a curve goes below the point (`below=True`), and if it still covers one, the comparison uses another point whose label stands clear. Pie and radar charts are circles: `fit_height` sizes them to the width and ignores `aspect`.
@@ -202,6 +202,7 @@ fig.savefig("outputs/{id}.pdf")
 ### Axes
 
 - Keep matplotlib's default axis limits and margins unless the chart type's file says otherwise; `fit_height` makes room for value labels.
+- Order: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom for horizontal bars), so the eye reads a rise and ours, usually the best, ends at the right. A natural order stays as it is: sizes, time, bins, swept values, and a benchmark list the paper fixes. Legends of side-by-side series (grouped bars, boxes) follow the same left-to-right order.
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
 - Colorbars (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when on the right it would leave the panel narrower than the minimum width.
 - Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
@@ -260,7 +261,7 @@ Each chart type has its own file next to this one, with its marks, variants and 
 | One series per panel | none; the title names it |
 
 - Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, data points, a bar or a box; on that warning, try the next spot. A filled plot (heatmap, filled contour, stacked area) has no free spot inside: its legend goes outside.
-- Entry order: "ours" first, then the other series in their color, line style or shade order, reference lines last; for stacked bars and areas, the order the segments stack from the top. When the drawing order differs (ours drawn last to sit on top), pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], ...)`.
+- Entry order: for curves, "ours" first, then the other series in their color, line style or shade order, reference lines last; for side-by-side series (grouped bars, grouped boxes), the left-to-right order of the bars; for stacked bars and areas, the order the segments stack from the top. When the drawing order differs (ours drawn last to sit on top), pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], ...)`.
 
 ### Value labels
 
