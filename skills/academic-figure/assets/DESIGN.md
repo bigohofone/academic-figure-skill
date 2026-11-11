@@ -202,10 +202,10 @@ The aspect (width : height) is per panel, φ : 1 unless a row below applies:
 
 | Aspect | `aspect=` | For |
 |---|---|---|
-| 1 : 1 | 1.0 | heatmap (rows / columns instead when not square), embedding, contour plot, stacked area chart, reliability diagram, ROC curve, and every panel of a two-factor grid |
+| 1 : 1 | 1.0 | heatmap (rows / columns instead when not square), scatter plot and embedding (both axes are data), contour plot, stacked area chart, reliability diagram, ROC curve, and every panel of a two-factor grid |
 | φ² : 1 | 0.382 | a single panel at full width (Width) |
 | 1 : φ | 1.618 | a horizontal chart with more categories down y than its width holds at φ : 1 (`fit_height` reports the tick labels overlapping) |
-| φ : 1 | 0.618 | everything else: curves, bars, histograms, box plots, violins, scatter plots, and panels reflowed into rows |
+| φ : 1 | 0.618 | everything else: curves, bars, histograms, box plots, violins, and panels reflowed into rows |
 
 The aspect follows the data, never room for labels. Pie and radar charts are circles: `fit_height` sizes them to the width and ignores `aspect`.
 
@@ -301,7 +301,7 @@ Pick the first row that fits:
 | A filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above the panels (above the top row in a grid), or none when every segment is named inside it |
 | One panel | inside, at the first spot where `fit_height` stays silent: the corners `"upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, then `"upper center"`, `"lower center"`, `"center left"`, `"center right"`; when none works, outside, above the panel (above its row in a grid) |
 | Several panels with the same series | one legend for the figure, above the panels: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
-| A row of panels with its own series (rows of different plots) | one legend per row, in that row's first panel where it fits, else the next, placed as for one panel |
+| A row of panels with its own series (rows of different plots) | one legend per row, in that row's first panel where it fits, else the next, placed as for one panel; above the row when none fits, centred over the row (`fit_height` centres it) |
 | Panels with different series | one per panel, placed as for one panel |
 | Sub-figures | one per sub-figure, above its panels, `left.legend(..., loc="outside upper center", ...)` |
 | One series per panel | none; the title names it |

@@ -477,3 +477,14 @@ def test_legend_sticking_out_of_its_panel_warns():
     axes[0].legend(loc="upper left")
     with pytest.warns(UserWarning, match="sticks out of panel"):
         fit_height(fig, list(axes), min_width=0.9)
+
+
+def test_legend_above_a_row_is_centred_over_it():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2), layout="constrained", sharey=True)
+    for a in axes:
+        a.bar([0, 1], [1, 2], label="Accuracy")
+    axes[0].legend(loc="lower left", bbox_to_anchor=(0, 1), ncol=2)
+    fit_height(fig, list(axes), min_width=0.9)
+    box = axes[0].get_legend().get_window_extent()
+    row = (axes[0].get_window_extent().x0 + axes[1].get_window_extent().x1) / 2
+    assert abs((box.x0 + box.x1) / 2 - row) < 1

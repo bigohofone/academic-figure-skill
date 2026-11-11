@@ -1,6 +1,6 @@
 # Scatter plot
 
-Two quantities per item plotted against each other: accuracy against parameters, FLOPs or latency (a model comparison, often with a Pareto front), one point per sample to show a correlation, or a 2-D embedding (t-SNE, UMAP). Panel aspect φ : 1, or 1 : 1 for an embedding: its two axes matter equally, so it never goes flatter at any width. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
+Two quantities per item plotted against each other: accuracy against parameters, FLOPs or latency (a model comparison, often with a Pareto front), one point per sample to show a correlation, or a 2-D embedding (t-SNE, UMAP). Panel aspect 1 : 1: both axes are data and matter equally. Read with `DESIGN.md`; its rules apply unless this file says otherwise.
 
 ## Draw
 
@@ -11,7 +11,7 @@ Two quantities per item plotted against each other: accuracy against parameters,
 ## Variants
 
 - **Trend line** (the takeaway is a correlation): a data line in `darken(color)` over the points; Pearson r with n in the caption (Spearman ρ when the data are ranks or ordinal ratings).
-- **Model family** (sizes of one model, B0–B7): its points joined in size order with a solid data line in the family's color, `ax.plot(x, y, "o-", color=colors["ours"])` for ours.
+- **Model family** (sizes of one model, B0–B7): its points joined in size order with a solid data line in the family's color, `ax.plot(x, y, "o-", color=colors["ours"])` for ours; its members are one kind, so every one is named, by its short tag (`B0` … `B7`), the full names in the legend or caption.
 - **Pareto front**: the models on the front joined in x order with a dashed `neutral` line under the markers, `ax.plot(x, y, linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)`; a second front dotted, `":"`. Dominated models stay as markers.
 - **Embedding** (t-SNE, UMAP): each point as the design's marker with a black edge and a translucent fill in its class color, `ax.plot(x, y, "o", markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width, markerfacecolor=(*to_rgb(color), 0.5), linestyle="none", label=name)`; one color per class (DESIGN.md Colors) with a legend; no ticks, tick labels, gridlines or axis labels (`ax.set_xticks([])`, `ax.set_yticks([])`, `ax.grid(False)`): the axes of an embedding mean nothing.
 

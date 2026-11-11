@@ -402,6 +402,20 @@ def group_label(axes, text, axis="x"):
     _center_group_labels(fig)
 
 
+def _center_row_legends(fig, panels):
+    """A legend above a panel names the series of its whole row, so it is centred over the row."""
+    fig.canvas.draw()
+    for a in panels:
+        legend = a.get_legend()
+        box, panel = (legend.get_window_extent() if legend else None), a.get_position()
+        if not legend or box.y0 < a.get_window_extent().y1 - 1:
+            continue
+        row = [p.get_position() for p in panels if abs(p.get_position().y1 - panel.y1) < 1e-3]
+        center = (min(r.x0 for r in row) + max(r.x1 for r in row)) / 2
+        legend.set_loc("lower center")
+        legend.set_bbox_to_anchor((center, box.y0 / fig.bbox.height), transform=fig.transFigure)
+
+
 def _center_group_labels(fig):
     for axes, axis in getattr(fig, "_group_labels", []):
         boxes = [a.get_position() for a in axes]
@@ -723,6 +737,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]
     _center_group_labels(fig)
+    _center_row_legends(fig, panels)
     if max(ratios) - min(ratios) > tol * max(ratios):
         warnings.warn("panels have different shapes; one figure takes one aspect (no height_ratios or width_ratios)")
     _warn_layout_problems(fig, panels, min_width)
