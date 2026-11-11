@@ -406,17 +406,18 @@ def _center_group_labels(fig):
             axes[0].yaxis.label.set_y((center - first.y0) / first.height)
 
 
-def _standard_gap(fig, column):
+def _standard_gap(fig, column, column_gap):
     """The standard gap before a grid column. A column that shows its own y axis starts a new slot, as
     if a new figure began there: the right margin plus the left margin (more for a longer y label), so
     its edges line up with figures of that width. Otherwise half a tick label, so the end labels of
-    neighbouring x axes clear each other."""
+    neighbouring x axes clear each other. `column_gap` is the space between the page's text
+    columns, so in a double-column figure the slots line up with single-column figures."""
     ticks, label, half = _standard_parts(fig)
     shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
     label_lines = max(_lines(a.yaxis.label) for a in column)
     if not shows_ticks and not label_lines:
         return half
-    return (canvas_pad + half) + (canvas_pad + ticks + label * max(label_lines, 1))
+    return (canvas_pad + half) + column_gap + (canvas_pad + ticks + label * max(label_lines, 1))
 
 
 def _tick_height(fig):
@@ -440,7 +441,7 @@ def _lines(text):
     return text.get_text().count("\n") + 1 if text.get_text() else 0
 
 
-def _standard_box(fig, panels, aspect):
+def _standard_box(fig, panels, aspect, column_gap):
     """Panels sit at the standard margins and take the standard size, so the boxes of all figures at
     one width (and one number of columns) line up and match. The right margin is fixed; left labels
     that need more room widen the left margin and narrow the panels, which keep the standard height
@@ -492,7 +493,7 @@ def _standard_box(fig, panels, aspect):
     right_axis = ticks + label * max((_lines(t.yaxis.label) for t in twin_of), default=0)
     if len(columns) - 1 in right_column and not vertical:
         right = pad + right_axis
-    col_gaps = [_standard_gap(fig, [a for a in panels if col_of[a] == c]) + right_axis * (c - 1 in right_column)
+    col_gaps = [_standard_gap(fig, [a for a in panels if col_of[a] == c], column_gap) + right_axis * (c - 1 in right_column)
                 for c in range(1, len(columns))]
     # rows: above each, half a tick label or a title line; below, x tick labels and x label lines;
     # anything more (a legend above a panel, a second line, turned labels) widens that margin
@@ -639,7 +640,7 @@ def _trim_height(fig, panels):
         fig.set_figheight(fig.get_figheight() - empty)
 
 
-def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
+def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column_gap=0):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
@@ -666,6 +667,10 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     Round panels (pie charts, polar axes such as radar charts) are always circles, so `aspect`
     does not apply: the height is cut to the content once the circles are as large as the width
     allows.
+
+    `column_gap` (inches) is the space between a two-column page's text columns, for a figure
+    spanning both (DESIGN.md Width): a column with its own y axis starts after it, so the figure's
+    groups line up with the single-column figures above and below.
 
     Never save with `bbox_inches="tight"`: it changes the final size and breaks the width and
     the ratio this function set.
@@ -704,7 +709,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     _clear_corners(fig, panels)
-    if _standard_box(fig, panels, aspect):
+    if _standard_box(fig, panels, aspect, column_gap):
         _freeze_ticks(panels)  # growing limits for labels now must not add ticks the layout has no room for
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]

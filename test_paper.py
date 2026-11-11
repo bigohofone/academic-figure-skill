@@ -449,3 +449,22 @@ def test_axis_label_longer_than_panel_warns():
     ax.set_ylabel("A very long response length label (tokens)")
     with pytest.warns(UserWarning, match="longer than its panel"):
         fit_height(fig, ax, aspect=0.3)
+
+
+def test_column_gap_lines_groups_up_with_single_columns():
+    fig, axes = plt.subplots(1, 4, figsize=(6.75, 2), layout="constrained")
+    for a in axes:
+        a.plot([0, 1], [0, 1])
+    for a, b in ((axes[0], axes[1]), (axes[2], axes[3])):
+        b.sharey(a)
+        b.tick_params(labelleft=False)
+    axes[0].set_ylabel("Accuracy")
+    axes[2].set_ylabel("Loss")
+    fit_height(fig, list(axes), aspect=1.0, column_gap=0.25)
+    single, _ = plt.subplots(figsize=(3.25, 2), layout="constrained")
+    single.axes[0].plot([0, 1], [0, 1])
+    single.axes[0].set_ylabel("Accuracy")
+    fit_height(single, single.axes[0])
+    p, s = [a.get_position() for a in axes], single.axes[0].get_position()
+    assert abs(p[0].x0 * 6.75 - s.x0 * 3.25) < 1e-3
+    assert abs(p[3].x1 * 6.75 - (3.5 + s.x1 * 3.25)) < 1e-3
