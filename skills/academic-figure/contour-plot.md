@@ -6,8 +6,8 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
 
 - **Panel**: aspect 1 : 1, no gridlines (`ax.grid(False)`), both axes labelled with their variables.
 - **Values**: when they span over 100×, contour their logarithm (DESIGN.md's log rule) and say "contours of log loss" in the caption.
-- **Gradient with lines**: the values as a continuous gradient in the design's colormap (`viridis`, low values dark; signed values `RdBu_r` centered at 0, as in `heatmap.md`), exact at each data point and blended smoothly between them, `mesh = ax.pcolormesh(X, Y, Z, shading="gouraud")`; on it, the contour lines of the data itself, never of a smoothed copy, so each line marks exactly where the values cross its level, `lines = ax.contour(X, Y, Z, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])`. 6 to 8 levels at half width, 10 at full width, at round values inside the data's range: `levels = np.arange(lo, hi + step / 2, step)`.
-- **Colorbar**: always, labelled with the quantity, `fig.colorbar(mesh, ax=ax, label="Validation loss")`.
+- **Bands with lines**: the values as filled bands between the levels in the design's colormap (`viridis`, low values dark; signed values `RdBu_r` centered at 0, as in `heatmap.md`), one flat color per band so each step reads at a glance, never a smooth gradient, `mesh = ax.contourf(X, Y, Z, levels=np.r_[Z.min(), levels, Z.max()])`; on them, the contour lines of the data itself, never of a smoothed copy, so each line marks exactly where the values cross its level, `lines = ax.contour(X, Y, Z, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])`. 6 to 8 levels at half width, 10 at full width, at round values inside the data's range: `levels = np.arange(lo, hi + step / 2, step)`.
+- **Colorbar**: always, labelled with the quantity, ticked at the levels only (not at the data's ends), `fig.colorbar(mesh, ax=ax, label="Validation loss", ticks=levels)`.
 
 ## Variants
 
@@ -30,4 +30,4 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
 
 ## Caption
 
-- **Reading guide**: "colors blend between the N × M runs" for a measured grid; what the star marks.
+- **Reading guide**: "each band spans one level step" for the filled bands; what the star marks.

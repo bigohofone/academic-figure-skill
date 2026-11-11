@@ -1,4 +1,4 @@
-"""Validation loss of our model over learning rate and weight decay. Both axes are log scale; colors blend between the 13 × 13 runs, contour lines are drawn every 0.5 with every second one labelled, and the star marks the lowest loss. The loss is lowest, 1.91, at learning rate 0.000316 and weight decay 0.00562, and rises steeply toward small learning rates and small weight decay."""
+"""Validation loss of our model over learning rate and weight decay. Both axes are log scale; filled bands step between the levels of the 13 × 13 runs, contour lines are drawn every 0.5 with every second one labelled, and the star marks the lowest loss. The loss is lowest, 1.91, at learning rate 0.000316 and weight decay 0.00562, and rises steeply toward small learning rates and small weight decay."""
 
 import json
 import sys
@@ -28,9 +28,9 @@ assert val_loss[0, 0] == val_loss.max(), "the takeaway does not hold"
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 ax.set_xscale("log")
 ax.set_yscale("log")
-mesh = ax.pcolormesh(X, Y, val_loss, shading="gouraud")
 step = 0.5
 levels = np.arange(np.ceil(val_loss.min() / step) * step, val_loss.max(), step)  # 2 to 5.5: 8 levels
+mesh = ax.contourf(X, Y, val_loss, levels=np.r_[val_loss.min(), levels, val_loss.max()])
 lines = ax.contour(X, Y, val_loss, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])
 
 # level labels on the path from the minimum toward the farthest corner, where each level is crossed
@@ -68,7 +68,7 @@ for axis in (ax.xaxis, ax.yaxis):
 ax.set_xlabel("Learning rate")
 ax.set_ylabel("Weight decay")
 ax.grid(False)
-fig.colorbar(mesh, ax=ax, label="Validation loss")
+fig.colorbar(mesh, ax=ax, label="Validation loss", ticks=levels)
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/hyperparameter-surface.pdf")
