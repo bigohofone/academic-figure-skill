@@ -17,6 +17,6 @@ A few models' profiles across 5–10 benchmarks or capabilities, when the shape 
   ax.set_ylim(0, rings[-1])
   ```
 - Benchmark names as the spoke labels, `ax.set_xticks(angles, labels=names)`, pushed off the outer polygon, `ax.tick_params(axis="x", pad=6)`. Ring values labelled between two spokes so they sit on no line, where a polygon ring is at r·cos(π/n), not r: `ax.set_yticks([r * np.cos(np.pi / n) for r in rings[:-1]], labels=[str(r) for r in rings[:-1]])`, `ax.set_rlabel_position(180 / n)`.
-- Value labels: only for the proposed model, its value at each spoke in 7 pt `darken(colors["ours"])`, just outside its vertex.
-- Legend: outside above the chart, `fig.legend(loc="outside upper center", ncol=<models>, frameon=False)`.
+- Value labels: only for the proposed model, its value at each spoke in 7 pt `darken(colors["ours"])`, pushed outward from its vertex along the spoke so it clears the polygons, `ax.annotate(f"{v:#.3g}", (angle, v), xytext=(6 * np.sin(angle), 6 * np.cos(angle)), textcoords="offset points", ha="left" if np.sin(angle) > 0.1 else "right" if np.sin(angle) < -0.1 else "center", va="bottom" if np.cos(angle) > 0.1 else "top" if np.cos(angle) < -0.1 else "center")` (angles measured clockwise from the top).
+- Legend: outside above the chart, `fig.legend(handles, labels, loc="outside upper center", ncol=<models>, frameon=False, borderaxespad=0)`, ours first although it is drawn last.
 - `fit_height` sizes the chart to the width; the `aspect` argument is ignored.

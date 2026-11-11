@@ -18,10 +18,10 @@ Values along a continuous x: learning curves (training curves), scaling curves, 
 
 ## ROC and precision-recall curves
 
-- One panel, aspect 1 : 1, both axes from 0 to 1 (`ax.set_xlim(0, 1)`, `ax.set_ylim(0, 1)`, the one place limits are fixed, since the unit square is the space).
-- The curve is computed from a finite test set, so it is a staircase through the thresholds: draw it as computed (`drawstyle="steps-post"` for precision-recall), never smoothed, with markers at the operating points the paper reports or at ~10 evenly spaced thresholds.
+- One panel, aspect 1 : 1, both axes from 0 to 1 (`ax.set_xlim(0, 1)`, `ax.set_ylim(0, 1)`, the one place limits are fixed, since the unit square is the space). When the message is the low false-positive regime (membership inference, detection at 0.1% FPR), both axes on a log scale from the smallest rate shown to 1, the chance line still the diagonal.
+- The curve is computed from a finite test set, so it is a staircase through the thresholds: draw it as computed (`drawstyle="steps-post"` for precision-recall), never smoothed, with markers at the operating points the paper reports, or else at ~10 points evenly spaced along each curve (`markevery=max(1, len(fpr) // 10)`).
 - ROC: x "False positive rate", y "True positive rate", and the chance diagonal as a reference line (`ax.plot([0, 1], [0, 1], linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)`). Precision-recall: x "Recall", y "Precision", and the positive rate as a horizontal reference line.
-- The area under each curve goes in its legend entry, three significant figures: `label=f"Ours (AUC {auc:.3f})"`. No `mark_value`.
+- The area under each curve goes in its legend entry, three significant figures: `label=f"Ours (AUC {auc:.3f})"`; when the data gives none, compute it from the curve (`np.trapezoid(tpr, fpr)`) and say so in the caption. The chance diagonal is drawn even when the paper left it out. No `mark_value`.
 
 ## Value labels
 
@@ -31,3 +31,5 @@ When the takeaway compares reported results across series, mark the compared val
 - If the request and the paper don't settle the comparison point, ask the user. When you can't ask, compare each series' best and say so in the reply.
 - Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
 - If a label above the point covers a curve, put it below with `below=True`.
+- When the compared values sit too close for every label to stand clear (curves a few points apart at the comparison point), mark ours and its closest competitor only, and give the other values in the caption.
+- In a grid of panels, mark values in the one panel the caption's takeaway cites, not in every panel.

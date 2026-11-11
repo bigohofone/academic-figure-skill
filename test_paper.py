@@ -12,7 +12,7 @@ import pytest
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
 import paper
-from paper import fit_height, mark_value, smooth, darken, lighten
+from paper import fit_height, mark_value, smooth, darken, lighten, text_color
 
 WIDTH = 3.25
 
@@ -293,3 +293,45 @@ def test_annotation_on_log_axis_stays_inside_with_positive_limits():
     for t in ax.texts:
         label = t.get_window_extent(renderer)
         assert box.x0 - 1 <= label.x0 and label.x1 <= box.x1 + 1
+
+
+def test_text_color_reads_on_its_fill():
+    assert text_color("#08306B") == "white"
+    assert text_color("#F7FBFF") == "black"
+
+
+def test_legend_over_scatter_points_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    rng = np.random.default_rng(0)
+    ax.scatter(rng.uniform(0, 0.3, 50), rng.uniform(0.7, 1, 50), label="a")
+    ax.scatter([0.9], [0.1], label="b")
+    ax.legend(loc="upper left")
+    with pytest.warns(UserWarning, match="covers data points"):
+        fit_height(fig, ax)
+
+
+def test_legend_over_markers_only_line_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([0.05, 0.1, 0.15], [0.9, 0.95, 0.92], "o", label="a")
+    ax.plot([0.9], [0.1], "o", label="b")
+    ax.legend(loc="upper left")
+    with pytest.warns(UserWarning, match="covers"):
+        fit_height(fig, ax)
+
+
+def test_tall_outside_legend_does_not_collapse_the_layout():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 12))
+    for ax in axes:
+        ax.plot([0, 1], [0, 1], label="a long legend entry")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside upper center", ncol=1, frameon=False)
+    ratios = fit_height(fig, axes)
+    assert all(abs(r - 0.618) / 0.618 < 0.02 for r in ratios)
+
+
+def test_min_width_sets_the_narrow_panel_threshold():
+    fig, axes = plt.subplots(1, 4, figsize=(5.5, 2), sharey=True)
+    for ax in axes:
+        ax.plot([0, 1], [0, 1])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        fit_height(fig, axes, min_width=1.0)

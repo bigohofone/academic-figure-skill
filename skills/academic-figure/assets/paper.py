@@ -8,6 +8,7 @@ import yaml
 from cycler import cycler
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.collections import PathCollection
 from matplotlib.patches import Wedge
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
@@ -99,6 +100,10 @@ def _solve(fig, panels, aspect, iters, tol):
         fig.set_figheight(h1)
         ratios, widths = _panel_ratios(fig, panels)
         r1 = ratios[0]
+        if not np.isfinite(r1) or r1 <= 0:
+            # too short for the decorations (titles, outside legends): the layout collapsed
+            h0, r0, h1 = h1, r0, 2 * h1
+            continue
         if abs(r1 - aspect) / aspect < tol or r1 == r0:
             break
         h0, r0, h1 = h1, r1, h1 + (aspect - r1) * (h1 - h0) / (r1 - r0)
@@ -189,13 +194,13 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     rotated, box_rotated, other_box = (a, box_a, box_b) if a_rotated else (b, box_b, box_a)
     return _rotated_outline(rotated, box_rotated, renderer).intersects_bbox(other_box, filled=True)
 
-def _warn_layout_problems(fig, panels):
+def _warn_layout_problems(fig, panels, min_width):
     """Warn about what makes a figure hard to read in print, so it can be fixed before saving."""
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     for a in panels:
-        if a.get_window_extent(renderer).width / fig.dpi < 1.2:
-            warnings.warn(f"panel {a.get_title()!r} is narrower than 1.2 in; use one column fewer")
+        if a.get_window_extent(renderer).width / fig.dpi < min_width:
+            warnings.warn(f"panel {a.get_title()!r} is narrower than {min_width} in; use one column fewer")
 
     figures = [fig, *fig.subfigs]
     texts = [t for f in figures for t in f.texts]
@@ -223,8 +228,14 @@ def _warn_layout_problems(fig, panels):
                 warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
 
     for a in panels:
+        # data drawn in data coordinates; reference lines (axhline) and value marks span the panel on purpose
+        data_lines = [line for line in a.get_lines() if line.get_transform() == a.transData and len(line.get_xdata())]
         curves = [line.get_path().transformed(line.get_transform())
-                  for line in a.get_lines() if line.get_linestyle() == "-"]
+                  for line in data_lines if line.get_linestyle() not in ("None", "none", "")]
+        points = [line.get_transform().transform(line.get_xydata())
+                  for line in data_lines if line.get_marker() not in (None, "None", "none", "")]
+        points += [c.get_offset_transform().transform(c.get_offsets()) for c in a.collections
+                   if isinstance(c, PathCollection) and len(c.get_offsets())]
         covers = [(t.get_text(), t.get_window_extent(renderer))
                   for t in a.texts if t.get_gid() == "value-label"]
         if a.get_legend():
@@ -232,6 +243,8 @@ def _warn_layout_problems(fig, panels):
         for name, box in covers:
             if any(curve.intersects_bbox(box, filled=False) for curve in curves):
                 warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
+            elif any(box.contains(x, y) for xy in points for x, y in xy):
+                warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
         if a.get_legend():
             box = a.get_legend().get_window_extent(renderer)
             shapes = [p.get_path().transformed(p.get_transform()) for p in a.patches if p.get_visible()]
@@ -259,7 +272,7 @@ def _trim_height(fig, panels):
         fig.set_figheight(fig.get_figheight() - empty)
 
 
-def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
+def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
@@ -275,8 +288,9 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     `mark_value` labels that would stick out of their panel are brought inside: the y-limits
     grow to make room above (or below), and labels at the left or right edge turn inward.
 
-    Last, it warns about what reads badly in print: a panel narrower than 1.2 in, text cut off at
-    the figure edge, overlapping text, a value label or legend covering a curve, a legend covering a bar or
+    Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
+    two-factor grid with shared axes and outer tick labels only passes 1.0), text cut off at
+    the figure edge, overlapping text, a value label or legend covering a curve or data points, a legend covering a bar or
     box, a font other than Inter.
 
     Round panels (pie charts, polar axes such as radar charts) are always circles, so `aspect`
@@ -291,7 +305,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
-        _warn_layout_problems(fig, panels)
+        _warn_layout_problems(fig, panels, min_width)
         return _panel_ratios(fig, panels)[0]
     for a in panels:
         if a.get_aspect() != "auto" or a.get_box_aspect() is not None:
@@ -313,7 +327,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     if max(widths) - min(widths) > tol * max(widths):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
-    _warn_layout_problems(fig, panels)
+    _warn_layout_problems(fig, panels, min_width)
     return ratios
 
 
@@ -321,6 +335,11 @@ def darken(color):
     """`color` darkened to 80%: for text or edges that belong to a series, so they read on white."""
     return [c * 0.8 for c in colors.to_rgb(color)]
 
+
+
+def text_color(fill):
+    """Black or white, whichever reads on `fill`: for numbers written on bars, wedges, areas or heatmap cells."""
+    return "white" if np.dot(colors.to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else "black"
 
 
 def lighten(color):

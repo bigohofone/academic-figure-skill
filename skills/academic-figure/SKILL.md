@@ -63,6 +63,7 @@ figures/
 
 ```python
 import json
+import math
 import sys
 
 import matplotlib.pyplot as plt
@@ -70,14 +71,14 @@ import numpy as np
 
 sys.path.insert(0, "style")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten
+from paper import fit_height, mark_value, smooth, darken, lighten, text_color
 
 colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
 ```
 
 - Each figure cell runs on its own after the setup cell.
 - Load data from the project's result files (paths relative to `figures/`); write numbers inline only when there is no file.
-- Write the notebook yourself, top to bottom, the way a person would: create `figures/figures.ipynb` with `Write` as an empty notebook, then add each cell with `NotebookEdit` (insert after the last cell), and fix a cell by replacing it with `NotebookEdit`. The same `id` replaces its two cells; a new id appends two cells. If `NotebookEdit` is a deferred tool, load it first.
+- Write the notebook yourself, top to bottom, the way a person would: create `figures/figures.ipynb` with `Write` as an empty notebook, then add each cell with `NotebookEdit`, one at a time, each inserted after the cell added just before it (its id is in the previous edit's result; the first cell goes in with no id), and fix a cell by replacing it with `NotebookEdit`. The same `id` replaces its two cells; a new id appends two cells. If `NotebookEdit` is a deferred tool, load it first.
 
   ```json
   {"cells": [], "metadata": {"kernelspec": {"name": "python3", "display_name": "Python 3", "language": "python"}}, "nbformat": 4, "nbformat_minor": 5}

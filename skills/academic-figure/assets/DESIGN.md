@@ -94,7 +94,9 @@ Pick the first row that fits:
 | Text, axes, ticks | `ink` |
 | Continuous values | the `heatmap.colormap` component, matplotlib's `Blues` (the default colormap); signed values `RdBu_r`, in heatmap.md |
 
-- More than six series with no "ours": group them (one color per group, shades within) or split them into panels.
+- Several variants of ours (with and without a component): all in `ours`, told apart by line style on lines and by shade on fills, as grey series are.
+- More compared series than grey line styles (four): add the design's markers, a different shape per series; more than eight: draw the series the takeaway names, and the rest as one grey group named "Other baselines" in the legend.
+- More than six series with no "ours": group them (one color per group, shades within) or split them into panels. Classes in an embedding (ten or more, unordered) are the exception: one color each from matplotlib's `tab10` (`tab20` beyond ten), defined in the cell.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
 - Grey must stay readable on white: lines, markers and reference lines are `neutral` (#8C8C8C, 3.4:1 contrast, above the 3:1 that graphics need) at full opacity, and grey text is `darken(colors["neutral"])` (4.9:1, above the 4.5:1 that text needs). Lighter greys, such as `lighten(colors["neutral"])`, only as fills that have an outline or sit next to darker fills; never for lines, markers or text.
 - Text that belongs to one series (labels, annotations) uses `darken(series_color)`.
@@ -114,9 +116,12 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | `title` | 11 pt | panel titles, row and column headers |
 
 - All text is regular weight, inside the chart and out; nothing is bold. Text is black (`ink`) unless it belongs to one series.
-- Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
-- Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
-- Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest.
+- Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`), written as short as they read: `0, 0.5, 1`, not `0.0, 0.5, 1.0` (`ax.yaxis.set_major_formatter(lambda v, _: f"{v:g}")`). When `fit_height` reports overlapping numeric tick labels along an axis, use fewer ticks in that panel (every other one), not smaller text or rotation.
+- Where both axes start at the same corner (0 and 0, −1 and −1), their first tick labels touch: keep the tick and drop only the y axis's corner label, `ax.set_yticks(ticks, labels=["", *labels[1:]])`.
+- Log axes: powers of ten as plain numbers from 0.001 up to 1000 (`0.01, 0.1, 1, 10`), and beyond that `1e-4, 1e-5` below and SI suffixes above (`10K, 1M, 1B`), never `10⁻⁵`.
+- Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, and 90° (`rotation=90, ha="center"`) when they still overlap at 45°. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
+- Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest. Symbols Inter lacks (∝, ≈ in some weights) go in mathtext too (`$\propto$`).
+- Text written on a fill (a bar segment, a wedge, a heatmap cell, an area) is black or white, whichever reads on that fill: `color=text_color(fill)`; it is never `darken(fill)` on its own fill.
 
 ## Layout
 
@@ -146,7 +151,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | 1.5 column | 3 |
 | Double column | 4 |
 
-0. A grid of two factors (models × benchmarks, methods × datasets) keeps one factor per row and the other per column, whatever the column limit below: 4 models × 4 benchmarks is a 4 × 4 grid, so the reader compares along rows and down columns at a glance. Its panels share y across each row and x down each column, with tick numbers only on the left column and the bottom row (`plt.subplots(rows, cols, sharex="col", sharey="row")`, inner tick labels left hidden; step 5 does not apply). If a panel is still narrower than 1.2 in, put the factor with fewer levels on the columns; never reflow the grid into another shape.
+0. A grid of two factors (models × benchmarks, methods × datasets) keeps one factor per row and the other per column, whatever the column limit below: 4 models × 4 benchmarks is a 4 × 4 grid, so the reader compares along rows and down columns at a glance. Its panels share y across each row and x down each column, with tick numbers only on the left column and the bottom row (`plt.subplots(rows, cols, sharex="col", sharey="row")`, inner tick labels left hidden; step 5 does not apply). Because inner panels carry no tick labels, such a grid may go down to 1.0 in per panel: `fit_height(fig, axes, min_width=1.0)`. If a panel is still narrower, put the factor with fewer levels on the columns, and keep axis titles once per figure (`fig.supxlabel`, `fig.supylabel`); never reflow the grid into another shape.
 1. Start with every panel in one row, up to the width's column limit: a single column holds two panels side by side, and panels the reader compares (two problems, two settings) stay side by side, as in the paper being redrawn.
 2. Render. `fit_height` warns when a panel's data area (inside the box) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
 3. On such a warning, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), turn long text tick labels 45° (Typography), shorten labels. Only when a panel is still narrower than 1.2 in, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. Rows have no limit.
@@ -198,6 +203,7 @@ fig.savefig("outputs/{id}.pdf")
 
 - Keep matplotlib's default axis limits and margins unless the chart type's file says otherwise; `fit_height` makes room for value labels.
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
+- Colorbars (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when on the right it would leave the panel narrower than the minimum width.
 - Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
 
 ## Shapes
@@ -248,17 +254,17 @@ Each chart type has its own file next to this one, with its marks, variants and 
 |---|---|
 | One panel | placed by the first of these that covers no data: (1) a corner, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`; (2) another free spot inside the panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panel, as below |
 | Several panels with the same series | one legend for the figure, outside above the panels, never tucked into one panel where the reader has to hunt for it: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)`, with fewer columns (more rows) when one row of entries is wider than the figure |
-| Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
+| Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=<entries>, frameon=False)`, with fewer columns (more rows) when one row is wider than the panel |
 | Sub-figures | one per sub-figure, above its panels, by the rows above: `left.legend(..., loc="outside upper center", ...)` |
 | Grouped series | rows = groups, columns = variants |
 | One series per panel | none; the title names it |
 
-- Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, a bar or a box; on that warning, try the next spot.
-- Entry order: "ours" first, then the other series in their color, line style or shade order, reference lines last.
+- Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, data points, a bar or a box; on that warning, try the next spot. A filled plot (heatmap, filled contour, stacked area) has no free spot inside: its legend goes outside.
+- Entry order: "ours" first, then the other series in their color, line style or shade order, reference lines last; for stacked bars and areas, the order the segments stack from the top. When the drawing order differs (ours drawn last to sit on top), pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], ...)`.
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values have three significant figures, 7 pt (`value-label`), in `darken(series_color)`.
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values have three significant figures, trailing zeros kept (`f"{v:#.3g}"`: 85.0, not 85), or the precision the source gives when it has fewer (a paper's printed 0.82 stays 0.82); 7 pt (`value-label`), in `darken(series_color)` beside a mark, or `text_color(fill)` on a fill.
 
 ## Do's and Don'ts
 
