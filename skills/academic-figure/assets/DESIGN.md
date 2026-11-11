@@ -34,7 +34,7 @@ typography:
     fontWeight: 400
 spacing:
   layout-pad: 0.02in
-  canvas-pad-x: 0.1in
+  canvas-pad-x: 0.05in
   title-pad: 6pt
   label-pad: 1pt
   tick-pad: 1.75pt
@@ -159,7 +159,7 @@ Pick the first row that applies:
 |---|---|
 | The user or the task gives a figure width (one column of the paper, a size in inches; a venue's text width alone is not one) | that width; the rules below fit the figure into it |
 | The user asks for a 1.5-column `figure*`, or the panels at single column still fail `min_width` after Grid step 3 | 1.5 column |
-| Single-column venue, several panels | the full text width |
+| Single-column venue, several panels | half the text width when every panel there is at least `min_width` wide by the Standard box formula, else the full text width |
 | Single-column venue, one panel | half the text width; the full width only when Collisions step 3 calls for it |
 | Two-column venue | single column, or double column when the panels fail `min_width` there |
 
@@ -175,7 +175,7 @@ The venue is the one the user names; with none, ICLR.
 | 1.5 column | 3 |
 | Double column | 4 |
 
-0. **Two-factor grid** (models × benchmarks, methods × datasets; also rows of different plots over the same columns, where the plot type is the row factor and each row's y label names it): one factor per row, the other per column, whatever the column limit: 4 models × 4 benchmarks is 4 × 4. An axis that shows the same quantity in every panel has one range across the grid (`sharex=True` / `sharey=True`); an axis whose quantity changes between columns or rows is shared only down a column (`sharex="col"`) or across a row (`sharey="row"`). Tick numbers only on the left column and bottom row (step 5 does not apply), so panels may be as narrow as 1.0 in, `fit_height(fig, axes, min_width=1.0)`; if still narrower, put the factor with fewer levels on the columns; never reflow it. No value marks or emphasis that singles out one panel; compared numbers go in the caption.
+0. **Two-factor grid** (models × benchmarks, methods × datasets; also rows of different plots over the same columns, where the plot type is the row factor and each row's y label names it): one factor per row, the other per column, whatever the column limit: 4 models × 4 benchmarks is 4 × 4. An axis that shows the same quantity in every panel has one range across the grid (`sharex=True` / `sharey=True`); an axis whose quantity changes between columns or rows is shared only down a column (`sharex="col"`) or across a row (`sharey="row"`). Tick numbers only on the left column and bottom row (step 5 does not apply), so panels may be as narrow as 0.9 in, `fit_height(fig, axes, min_width=0.9)` (two columns fit half the text width); a row of a supporting plot (the counts behind the row below it, such as confidence histograms above reliability diagrams) is half as tall as the main row, `plt.subplots(..., height_ratios=[1, 2])`, the aspect being the main row's; if still narrower, put the factor with fewer levels on the columns; never reflow it. No value marks or emphasis that singles out one panel; compared numbers go in the caption.
 1. **Start**: every panel in one row, up to the column limit.
 2. **Render**: `fit_height` warns when a panel's data area is narrower than `min_width` (1.2 in), or when text is cut off or overlaps.
 3. **On a warning**, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), apply Typography's text tick rule, shorten labels. Only when a panel is still too narrow, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3), then render again. Rows have no limit.
@@ -230,7 +230,7 @@ fig.savefig("outputs/{id}.pdf")
 ```
 
 - **Panels**: `ax` may be one Axes, an array, a list (also of panels from several sub-figures), or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
-- **Standard box**: panels take a standard size and place: the margins are standard (left: the `canvas-pad-x` token plus an axis label and four-character tick labels; right: `canvas-pad-x` plus half a tick label, or a colorbar and its labels), and the panel height is the aspect times the width those margins leave. The right margin never changes, so every figure's right edge lines up; nothing but a colorbar sits right of the panels: names that would go there (band names, line-end names) go in a legend above the panel, and a label cut off at the right edge is a collision (see Collisions). Left labels that need more room (category names) widen the left margin and narrow the panels, which keep the standard height: the aspect gives way. `fit_height` does this.
+- **Standard box**: every panel's size follows from the figure width W and its number of columns c, never from what the layout engine found, so figures of one width and column count have panels of one size and line up: panel width p = (W − L − R − sum of gaps) / c, with the standard margins L = `canvas-pad-x` + one line of axis label + four-character tick labels (`−0.00`) and R = `canvas-pad-x` + half a tick label, and a gap before each later column of half a tick label (so the end labels of neighbouring x axes clear each other), plus a tick label when that column shows its own y tick numbers and a label line when it shows its own y label. Panel height = aspect × p (times the row's share of `height_ratios`). Nothing but a colorbar sits right of the panels, so R never changes: names that would go there (band names, line-end names) go in a legend above the panel, and a label cut off at the right edge is a collision (see Collisions). Left labels that need more than L (category names) widen the left margin and narrow the panels, which keep the standard height: the aspect gives way. `fit_height` does all this.
 - **Labels inside**: `fit_height` keeps every `mark_value` label and bar label (`ax.bar_label`) inside its panel, by growing the limits and turning `mark_value` labels at a side edge inward. Point names (annotations in data coordinates) get at most a quarter more axis range; a name that needs more is reported as sticking out, to be moved. Other text is never moved.
 - **Errors**: on `ValueError` (fixed aspect), draw images with `imshow(..., aspect="auto")`; on the "different widths" warning, give all panels the same width.
 

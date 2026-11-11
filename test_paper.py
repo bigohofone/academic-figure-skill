@@ -377,3 +377,30 @@ def test_wide_legend_warns():
     fig.legend(loc="outside upper center", ncol=8)
     with pytest.warns(UserWarning, match="wider than the figure"):
         fit_height(fig, ax)
+
+
+def test_supporting_row_is_half_as_tall():
+    fig, axes = plt.subplots(2, 2, figsize=(2.75, 3), layout="constrained", sharex=True, sharey="row",
+                             height_ratios=[1, 2])
+    for a in axes.ravel():
+        a.plot([0, 1], [0, 1])
+    axes[0, 0].set_ylabel("Share")
+    axes[1, 0].set_ylabel("Accuracy")
+    fit_height(fig, axes, aspect=1, min_width=0.9)
+    w, h = fig.get_size_inches()
+    top, bottom = axes[0, 0].get_position(), axes[1, 0].get_position()
+    assert abs(bottom.height * h - bottom.width * w) < 0.01
+    assert abs(top.height * h - bottom.height * h / 2) < 0.01
+
+
+def test_column_gaps_are_standard():
+    sizes = []
+    for label in ("Accuracy", "A much longer label"):
+        fig, axes = plt.subplots(1, 3, figsize=(5.5, 2), layout="constrained", sharey=True)
+        for a in axes:
+            a.plot([0, 1], [0, 1])
+        axes[0].set_ylabel(label)
+        fit_height(fig, axes)
+        p = [a.get_position() for a in axes]
+        sizes.append(round((p[1].x0 - p[0].x1) * 5.5, 3))
+    assert sizes[0] == sizes[1]

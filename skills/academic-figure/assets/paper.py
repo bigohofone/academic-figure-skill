@@ -100,10 +100,17 @@ def use_design(path="DESIGN.md"):
     return c
 
 
+def _row_scale(a):
+    """A panel's height relative to the tallest row of its grid (`height_ratios`), 1 without them."""
+    spec = a.get_subplotspec()
+    ratios = spec.get_gridspec().get_height_ratios() if spec else None
+    return sum(ratios[i] for i in spec.rowspan) / max(ratios) if ratios else 1
+
+
 def _panel_ratios(fig, panels):
     fig.canvas.draw()
     sizes = [_size(a) for a in panels]
-    return [h / w for w, h in sizes], [w for w, _ in sizes]
+    return [h / w / _row_scale(a) for a, (w, h) in zip(panels, sizes)], [w for w, _ in sizes]
 
 
 def _solve(fig, panels, aspect, iters, tol):
@@ -331,16 +338,33 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
 
 
-def _standard_margins(fig):
-    """The left and right margins, in inches, of a standard panel: on the left a y-axis label and
-    four-character tick labels with a sign, on the right half of one at the x axis' end."""
+def _standard_parts(fig):
+    """The standard widths, in inches, of the y decorations: four-character tick labels with a sign
+    and their pads, and one line of the axis label with its pad."""
     renderer = fig.canvas.get_renderer()
     sample = fig.text(0, 0, "\u22120.00", fontsize=rcParams["ytick.labelsize"])  # four characters and a sign: −0.75, 1000, 100%
     ticks = sample.get_window_extent(renderer).width / fig.dpi
     sample.remove()
-    label = rcParams["axes.labelsize"] * 1.35 / 72  # one line of the axis label, rotated, with room for (, β, _
-    pads = (rcParams["axes.labelpad"] + rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72
-    return canvas_pad_x + label + pads + ticks, canvas_pad_x + ticks / 2
+    ticks += (rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72
+    label = (rcParams["axes.labelsize"] * 1.35 + rcParams["axes.labelpad"]) / 72  # rotated, with room for (, β, _
+    half = (ticks - (rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72) / 2
+    return ticks, label, half
+
+
+def _standard_margins(fig):
+    """The left and right margins, in inches, of a standard panel: on the left a y-axis label and
+    four-character tick labels with a sign, on the right half of one at the x axis' end."""
+    ticks, label, half = _standard_parts(fig)
+    return canvas_pad_x + label + ticks, canvas_pad_x + half
+
+
+def _standard_gap(fig, column):
+    """The standard gap before a grid column: half a tick label, so the end labels of neighbouring x
+    axes clear each other, plus the column's own y tick labels and y label when it shows them."""
+    ticks, label, half = _standard_parts(fig)
+    shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
+    shows_label = any(a.yaxis.label.get_text() for a in column)
+    return half + ticks * shows_ticks + label * shows_label
 
 
 def _standard_box(fig, panels, aspect):
@@ -348,7 +372,8 @@ def _standard_box(fig, panels, aspect):
     one width (and one number of columns) line up and match. The right margin is fixed; left labels
     that need more room widen the left margin and narrow the panels, which keep the standard height
     (the aspect gives way). The
-    gaps between columns and rows stay as the layout found them; the columns share what is left.
+    gaps between columns are standard (`_standard_gap`); the gaps between rows stay as the layout
+    found them; the columns share what is left.
     One colorbar is kept beside the panels (right) or under them (bottom), at the size and gap the
     layout gave it, its labels inside a standard margin of their own. Returns whether they moved."""
     cbars = [a for a in fig.axes if getattr(a, "_colorbar", None) is not None]
@@ -383,8 +408,7 @@ def _standard_box(fig, panels, aspect):
     for a, b in boxes.items():
         if col_of[a] == 0:
             left = max(left, b.x0 * w - a.get_tightbbox(renderer).x0 / fig.dpi + pad)
-    first = {c: next(b for a, b in boxes.items() if col_of[a] == c) for c in range(len(columns))}
-    col_gaps = [first[c + 1].x0 * w - first[c].x1 * w for c in range(len(columns) - 1)]
+    col_gaps = [_standard_gap(fig, [a for a in panels if col_of[a] == c]) for c in range(1, len(columns))]
     top_row = {r: next(b for a, b in boxes.items() if row_of[a] == r) for r in range(len(rows))}
     row_gaps = [top_row[r].y0 * h - top_row[r + 1].y1 * h for r in range(len(rows) - 1)]
     bottom, top = top_row[len(rows) - 1].y0 * h, h - top_row[0].y1 * h
@@ -394,16 +418,17 @@ def _standard_box(fig, panels, aspect):
         cb_h, cb_bottom = cb.height * h, cb.y0 * h
     panel_w = (w - left - right - sum(col_gaps)) / len(columns)
     panel_h = aspect * (w - std_left - right - sum(col_gaps)) / len(columns)
-    new_h = bottom + top + len(rows) * panel_h + sum(row_gaps)
+    row_h = [panel_h * _row_scale(next(a for a in panels if row_of[a] == r)) for r in range(len(rows))]
+    new_h = bottom + top + sum(row_h) + sum(row_gaps)
     fig.set_layout_engine("none")
     fig.set_figheight(new_h)
     for a in panels:
         c, r = col_of[a], row_of[a]
         x0 = left + c * panel_w + sum(col_gaps[:c])
-        y0 = bottom + (len(rows) - 1 - r) * panel_h + sum(row_gaps[r:])
-        a.set_position([x0 / w, y0 / new_h, panel_w / w, panel_h / new_h])
+        y0 = bottom + sum(row_h[r + 1:]) + sum(row_gaps[r:])
+        a.set_position([x0 / w, y0 / new_h, panel_w / w, row_h[r] / new_h])
     span_w = len(columns) * panel_w + sum(col_gaps)
-    span_h = len(rows) * panel_h + sum(row_gaps)
+    span_h = sum(row_h) + sum(row_gaps)
     if vertical:
         cbar.set_position([(left + span_w + cb_gap) / w, bottom / new_h, cb_w / w, span_h / new_h])
     elif cbar is not None:
@@ -477,7 +502,8 @@ def _trim_height(fig, panels):
 
 
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
-    """Change only the figure height so each panel's height / width equals `aspect`.
+    """Change only the figure height so each panel's height / width equals `aspect` (in a grid with
+    `height_ratios`, the tallest row's; the other rows take their share of it).
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
     outside legends and colorbars are not measured. Call it last, after everything is drawn,
