@@ -213,7 +213,7 @@ When `fit_height` reports text overlapping, covering data, cut off at the figure
 
 1. **Move it**: that one item to the next placement its chart file lists (another side of the point, below the value, the next legend spot); placements may differ item by item.
 2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
-3. **Give it width**, when the crowding is in labels along an axis (tick labels, bar values, names side by side, a heatmap's rows or columns) and no figure width is given: the full width, at φ² : 1, or at its own aspect for a fixed-aspect panel (a heatmap's rows grow with it); after widening, try the earlier placements again (horizontal before turned). Crowding inside the data area (value labels on curves, contour labels) goes to step 4 instead.
+3. **Give it width**, when the crowding is in labels along an axis (tick labels, bar values, category names side by side, a heatmap's rows or columns) and no figure width is given: the full width, at φ² : 1, or at its own aspect for a fixed-aspect panel (a heatmap's rows grow with it); after widening, try the earlier placements again (horizontal before turned). Crowding inside the data area (value labels on curves, point names on a scatter, contour labels) goes to step 4 instead.
 4. **Write less, alike**: label every m-th item of an ordered kind (ticks, contour levels), keeping every tick, gridline and line; or drop a kind whole (all point names of non-cited models, all bar values, all shares of a band) and give the cited numbers in the caption.
 
 Never resolve a collision by shrinking text, changing a token, or changing the aspect for room.
@@ -230,7 +230,7 @@ fig.savefig("outputs/{id}.pdf")
 ```
 
 - **Panels**: `ax` may be one Axes, an array, a list (also of panels from several sub-figures), or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
-- **Standard box**: panels take a standard size and place: the margins are standard (left: the `canvas-pad-x` token plus an axis label and four-character tick labels; right: `canvas-pad-x` plus half a tick label, or a colorbar and its labels), and the panel height is the aspect times the width those margins leave. The right margin never changes, so every figure's right edge lines up; a label cut off at the right edge is a collision (see Collisions). Left labels that need more room (category names) widen the left margin and narrow the panels, which keep the standard height: the aspect gives way. `fit_height` does this.
+- **Standard box**: panels take a standard size and place: the margins are standard (left: the `canvas-pad-x` token plus an axis label and four-character tick labels; right: `canvas-pad-x` plus half a tick label, or a colorbar and its labels), and the panel height is the aspect times the width those margins leave. The right margin never changes, so every figure's right edge lines up; nothing but a colorbar sits right of the panels: names that would go there (band names, line-end names) go in a legend above the panel, and a label cut off at the right edge is a collision (see Collisions). Left labels that need more room (category names) widen the left margin and narrow the panels, which keep the standard height: the aspect gives way. `fit_height` does this.
 - **Labels inside**: `fit_height` keeps every `mark_value` label and bar label (`ax.bar_label`) inside its panel, by growing the limits and turning `mark_value` labels at a side edge inward. Point names (annotations in data coordinates) get at most a quarter more axis range; a name that needs more is reported as sticking out, to be moved. Other text is never moved.
 - **Errors**: on `ValueError` (fixed aspect), draw images with `imshow(..., aspect="auto")`; on the "different widths" warning, give all panels the same width.
 
@@ -263,7 +263,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Colorbar | `colorbar` | a bar 0.1 in wide, 0.06 in from the panels, its labels in a standard margin beside it | placed by `fit_height` |
 
 - **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (grey series too: `lighten(greys(n)[i])`, so the median stays readable on every fill).
-- **Reference lines** (a baseline's score, a threshold, a diagonal) are context, so they look like no data series: thin and solid in `neutral`, at the grid's width, `ax.axhline(..., color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)`, thinner than every data line and never dashed, the dash patterns being taken by grey series. Across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills, they are white and dashed. Several reference lines in one panel: the second and later ones dotted, `linestyle=":"`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
+- **Reference lines** (a baseline's score, a threshold, a diagonal) are context, so they look like no data series: thin and solid in `neutral`, at the grid's width, `ax.axhline(..., color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)`, thinner than every data line and never dashed, the dash patterns being taken by grey series. Across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills, they are white and dashed. Several reference lines in one panel: the second and later ones dotted, `linestyle=":"`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry when the panel has a legend, else the caption's reading guide names it with its value (Legend: a single entry); a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
 
 ## Components
 
@@ -295,7 +295,7 @@ Pick the first row that fits:
 | Case | Legend |
 |---|---|
 | A single entry (one series, or one marked point such as a minimum) | none: a lone entry above a panel reads as a title; the caption's reading guide names it ("the star marks the trained minimizer") |
-| A filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above the panel (last row), or none when the bands are named directly |
+| A filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above the panel (last row), or none when every segment is named inside it |
 | One panel | inside, at the first spot where `fit_height` stays silent: the corners `"upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, then `"upper center"`, `"lower center"`, `"center left"`, `"center right"`; when none works, outside, above the panel (last row) |
 | Several panels with the same series | one legend for the figure, above the panels: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
 | A row of panels with its own series (rows of different plots) | one legend per row, in that row's first panel where it fits, else the next, placed as for one panel |
@@ -305,7 +305,7 @@ Pick the first row that fits:
 | Outside, above one panel | `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=<entries>, frameon=False)` |
 
 - **Inside is worth a small overlap**: the legend's opaque frame keeps it readable, and it costs no height. It must not hide values: `fit_height` warns when it covers a curve, data points or text, or when more than a tenth of its area lies over filled marks (bars, boxes, bands, violins, areas).
-- **Columns**: an outside legend starts with all entries in one row; when `fit_height` reports text cut off or matplotlib reports the layout collapsing, `ncol = ceil(n / 2)`, then `ceil(n / 3)`, and so on.
+- **Columns**: an outside legend starts with all entries in one row; when `fit_height` reports text cut off or matplotlib reports the layout collapsing, `ncol = ceil(n / 2)`, then `ceil(n / 3)`, and so on, skipping a count that repeats, down to one column.
 - **Entry order**: curves: ours first, then the other series in color, line-style or shade order; side-by-side series (grouped bars, boxes): left to right; stacked bars and areas: the order of the segments as the reader meets them (top to bottom for vertical stacks, left to right for horizontal ones). When the drawing order differs, pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], loc=...)`.
 - **`loc`**: always explicit, never `"best"`.
 
@@ -316,6 +316,7 @@ Reported results the takeaway compares are written on the plot, so the reader re
 | Value | Written as |
 |---|---|
 | Copied from the source (the task says the numbers are as printed in a paper) | exactly as printed: `"0.82"` stays `"0.82"` |
+| Given in the data and shown unchanged (not computed by the script) | its digits as given, at most three significant figures: `0.076` stays `0.076`, `0.82` stays `0.82`, `0.54063` is `0.541` |
 | A count (a number of items; a statistic of counts, such as a median, is not one) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
 | A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:#.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `1.0%`, `0.69%` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
