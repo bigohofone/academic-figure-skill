@@ -1,4 +1,4 @@
-"""GLUE accuracy of five fine-tuning methods. Points mark the mean and error bars show ±1 std over 5 seeds; the vertical line marks the best baseline's mean. Ours reaches 0.879, 0.014 above the best baseline, full fine-tuning (0.865)."""
+"""GLUE accuracy of five fine-tuning methods. Error bars show ±1 std over 5 seeds; the vertical line marks the best baseline, full fine-tuning, at 0.865. Ours reaches 0.879, 0.014 above it."""
 
 import json
 import sys
@@ -16,25 +16,23 @@ colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 with open("../data/error-bar-plot.json") as f:
     runs = json.load(f)["accuracy_per_seed"]
 
-mean = {name: np.mean(acc) for name, acc in runs.items()}
-std = {name: np.std(acc, ddof=1) for name, acc in runs.items()}
-methods = sorted(runs, key=lambda name: mean[name])  # ascending top to bottom, so Ours ends at the bottom
-best_baseline = max((name for name in methods if name != "Ours"), key=lambda name: mean[name])
-gap = float(f"{mean['Ours']:#.3g}") - float(f"{mean[best_baseline]:#.3g}")
-print("takeaway:", {name: f"{mean[name]:#.3g} ± {std[name]:.4f}" for name in methods},
-      "best baseline:", best_baseline, "gap:", f"{gap:.3f}", "seeds:", len(runs["Ours"]))
-assert mean["Ours"] > mean[best_baseline], "the takeaway does not hold"
+means = {name: float(np.mean(v)) for name, v in runs.items()}
+stds = {name: float(np.std(v, ddof=1)) for name, v in runs.items()}
+names = sorted(runs, key=lambda name: means[name])  # ascending top to bottom, ours ends at the bottom
+best_baseline = max((n for n in names if n != "Ours"), key=lambda n: means[n])
+gap = round(means["Ours"], 3) - round(means[best_baseline], 3)
+print("takeaway:", {n: f"{means[n]:#.3g}" for n in names}, "best baseline:", best_baseline, f"gap: {gap:.3f}")
+assert names[-1] == "Ours", "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
-for y, name in enumerate(methods):
+ax.axvline(means[best_baseline], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+for y, name in enumerate(names):
     color = colors["ours"] if name == "Ours" else colors["neutral"]
-    ax.errorbar(mean[name], y, xerr=std[name], fmt="o", color=color, capsize=2,
+    ax.errorbar(means[name], y, xerr=stds[name], fmt="o", color=color, capsize=2,
                 elinewidth=rcParams["patch.linewidth"], capthick=rcParams["patch.linewidth"])
-    ax.annotate(f"{mean[name]:#.3g}", (mean[name] + std[name], y), xytext=(3, 0), textcoords="offset points",
+    ax.annotate(f"{means[name]:#.3g}", (means[name] + stds[name], y), xytext=(3, 0), textcoords="offset points",
                 ha="left", va="center", color=darken(color), gid="value-label")
-ax.axvline(mean[best_baseline], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
-
-ax.set_yticks(range(len(methods)), labels=methods)
+ax.set_yticks(range(len(names)), labels=names)
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)

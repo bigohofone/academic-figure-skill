@@ -1,4 +1,4 @@
-"""Accuracy of four training methods on three benchmarks. Ours is the most accurate on all three, ahead of DPO by 0.036 on GSM8K, 0.043 on MATH and 0.029 on HumanEval."""
+"""Accuracy of four training methods on three benchmarks. Ours scores highest on all three, ahead of the next best method, DPO, by 0.036 on GSM8K (0.842 vs. 0.806), 0.043 on MATH (0.531 vs. 0.488) and 0.029 on HumanEval (0.701 vs. 0.672)."""
 
 import json
 import sys
@@ -17,31 +17,30 @@ with open("../data/grouped-bar-chart.json") as f:
 benchmarks = data["benchmarks"]
 scores = data["scores"]
 
-# methods in ascending order of mean accuracy, so Ours ends at the right
-methods = sorted(scores, key=lambda m: np.mean(scores[m]))
-print("order:", methods)
-
-margins = {b: scores["Ours"][i] - max(scores[m][i] for m in scores if m != "Ours")
-           for i, b in enumerate(benchmarks)}
-runner_up = {b: max((m for m in scores if m != "Ours"), key=lambda m: scores[m][i])
-             for i, b in enumerate(benchmarks)}
-print("takeaway:", {b: f"{runner_up[b]} +{v:.3f}" for b, v in margins.items()})
-assert all(v > 0 for v in margins.values()), "the takeaway does not hold"
-
-baseline_colors = greys(len(methods) - 1)
-method_colors = {m: baseline_colors[i] for i, m in enumerate(m for m in methods if m != "Ours")}
+# Methods in ascending order of accuracy (the same on every benchmark), so Ours ends at the right.
+methods = ["Base", "SFT", "DPO", "Ours"]
+for b in range(len(benchmarks)):
+    assert [scores[m][b] for m in methods] == sorted(scores[m][b] for m in methods)
+method_colors = dict(zip(["Base", "SFT", "DPO"], greys(3)))
 method_colors["Ours"] = colors["ours"]
+
+# Takeaway: Ours is best on every benchmark; its margin over the next best method.
+for b, name in enumerate(benchmarks):
+    others = {m: scores[m][b] for m in methods if m != "Ours"}
+    best_other = max(others, key=others.get)
+    gap = scores["Ours"][b] - others[best_other]
+    print(f"takeaway: {name}: Ours {scores['Ours'][b]:.3f}, {best_other} {others[best_other]:.3f}, gap {gap:.3f}")
+    assert gap > 0, "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 x = np.arange(len(benchmarks))
 width = 0.8 / len(methods)
-for i, method in enumerate(methods):
-    values = scores[method]
-    bars = ax.bar(x + (i - (len(methods) - 1) / 2) * width, values, width,
-                  color=method_colors[method], linewidth=0, label=method)
-    ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values], color=darken(colors["ours"] if method == "Ours" else colors["neutral"]),
+for i, m in enumerate(methods):
+    bars = ax.bar(x + (i - (len(methods) - 1) / 2) * width, scores[m], width,
+                  color=method_colors[m], linewidth=0, label=m)
+    # Given in the data: three significant figures, as the most precise value has (0.64 -> 0.640).
+    ax.bar_label(bars, labels=[f"{v:.3f}" for v in scores[m]], color=darken(method_colors[m]),
                  rotation=90, padding=2)
-
 ax.set_xticks(x, labels=benchmarks)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)

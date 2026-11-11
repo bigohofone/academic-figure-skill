@@ -1,4 +1,4 @@
-"""Attention weights of the translation model from English source words (columns) to the French target words it generates (rows). Each row is one target word's attention distribution over the source words and sums to about 1. The alignment is mostly monotonic, but reverses for the noun phrase: “zone”, “économique” and “européenne” attend to “Area”, “Economic” and “European” with weights 0.710, 0.757 and 0.973."""
+"""Attention weights of an English-to-French translation model. Each row is a generated French word and shows its attention over the English source words, top. The model aligns each French word with its English counterpart and reverses the word order of "European Economic Area" into "zone économique européenne", with weights of 0.710, 0.757 and 0.973 on "Area", "Economic" and "European"."""
 
 import json
 import sys
@@ -16,19 +16,19 @@ with open("../data/attention-map.json") as f:
     data = json.load(f)
 source = data["source_tokens"]
 target = data["target_tokens"]
-weights = np.array(data["weights"])
+weights = np.array(data["weights"])  # rows: target words, columns: source words
 
-# Takeaway: the alignment reverses for "European Economic Area" -> "zone économique européenne".
+# Takeaway: the reversed phrase "European Economic Area" -> "zone économique européenne".
 pairs = [("zone", "Area"), ("économique", "Economic"), ("européenne", "European")]
-for t, s in pairs:
-    i, j = target.index(t), source.index(s)
-    print(f"takeaway: {t} -> {s}: {weights[i, j]:#.3g}")
-    assert np.argmax(weights[i]) == j, "the takeaway does not hold"
-src_cols = [source.index(s) for _, s in pairs]
-assert src_cols == sorted(src_cols, reverse=True), "the takeaway does not hold"
+reversed_weights = []
+for fr, en in pairs:
+    i, j = target.index(fr), source.index(en)
+    assert weights[i].argmax() == j, f"{fr} does not attend most to {en}"
+    reversed_weights.append(weights[i, j])
+print("takeaway:", {fr: f"{w:#.3g}" for (fr, _), w in zip(pairs, reversed_weights)})
 
-fig, ax = plt.subplots(figsize=(5.5, 5.5))
-im = ax.imshow(weights, aspect="auto", vmin=0, vmax=1)
+fig, ax = plt.subplots(figsize=(5.5, 5.5), layout="constrained")
+im = ax.imshow(weights, aspect="auto")
 ax.xaxis.tick_top()
 ax.set_xticks(range(len(source)), labels=source, rotation=45, ha="left", rotation_mode="anchor")
 ax.set_yticks(range(len(target)), labels=target)
@@ -36,6 +36,6 @@ ax.tick_params(length=0)
 ax.grid(False)
 fig.colorbar(im, ax=ax, label="Attention weight")
 
-fit_height(fig, ax, aspect=weights.shape[0] / weights.shape[1])
+fit_height(fig, ax, aspect=len(target) / len(source))
 fig.savefig("../outputs/attention-map.pdf")
 fig.savefig("../outputs/attention-map.png")

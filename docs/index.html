@@ -7,448 +7,558 @@
 <meta name="description" content="A Claude Code skill that makes every figure of a paper publication-ready and consistent: one design system, sizes from a formula, and checks instead of eyeballing.">
 <meta property="og:title" content="academic-figure: paper figures that belong together">
 <meta property="og:description" content="Claude Code alone vs with the academic-figure skill: same data, same tasks, printed size.">
-<meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/showcase/og.png">
+<meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
 <meta property="og:url" content="https://wonjunoh.com/academic-figure-skill/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://wonjunoh.com/academic-figure-skill/showcase/og.png">
+<meta name="twitter:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #ffffff; --bg-soft: #f6f6f4; --ink: #16181d; --ink-2: #4a4f5a; --ink-3: #7a808c;
-  --line: #e4e4e0; --accent: #d7344a; --accent-soft: #fbe9ec; --grey: #8a8f99; --card: #ffffff;
-  --code-bg: #f1f1ee; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+:root { --bg:#fff; --soft:#f6f6f3; --ink:#15171c; --ink2:#4b505b; --ink3:#7b818d; --line:#e5e5e0;
+  --accent:#d7344a; --accent-soft:#fbe9ec; --grey:#8a8f99; --card:#fff; --code:#f1f1ee; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#111317; --soft:#171a20; --ink:#eceef2;
+  --ink2:#b5bac4; --ink3:#878d99; --line:#2a2e36; --accent:#ff6b7f; --accent-soft:#3a1d24; --grey:#9aa0aa; --card:#1b1e24; --code:#1d2027; } }
+:root[data-theme="dark"] { --bg:#111317; --soft:#171a20; --ink:#eceef2; --ink2:#b5bac4; --ink3:#878d99; --line:#2a2e36;
+  --accent:#ff6b7f; --accent-soft:#3a1d24; --grey:#9aa0aa; --card:#1b1e24; --code:#1d2027; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:inherit; }
+.wrap { max-width:1120px; margin:0 auto; padding:0 24px; }
+nav { position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+nav .wrap { display:flex; align-items:center; gap:24px; height:56px; }
+nav .logo { font-weight:700; text-decoration:none; white-space:nowrap; }
+nav .links { display:flex; gap:20px; margin-left:auto; font-size:15px; color:var(--ink2); }
+nav .links a { text-decoration:none; } nav .links a:hover { color:var(--ink); }
+header { padding:72px 0 32px; text-align:center; }
+.eyebrow { display:inline-block; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:999px; }
+h1 { font-size:clamp(36px,6vw,62px); line-height:1.05; letter-spacing:-.035em; margin:20px auto 18px; max-width:14ch; font-weight:800; }
+h1 em { font-style:normal; color:var(--accent); }
+.lead { font-size:clamp(17px,2.2vw,20px); color:var(--ink2); max-width:640px; margin:0 auto; }
+.cta { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:28px; }
+.btn { padding:12px 20px; border-radius:10px; font-weight:600; font-size:15px; text-decoration:none; border:1px solid var(--line); }
+.btn.primary { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+section { padding:72px 0; border-top:1px solid var(--line); }
+section.soft { background:var(--soft); }
+h2 { font-size:clamp(28px,4vw,40px); letter-spacing:-.025em; line-height:1.15; margin:0 0 14px; font-weight:750; }
+.kicker { font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px; }
+.intro { color:var(--ink2); max-width:720px; margin:0 0 28px; }
+.note { font-size:14px; color:var(--ink3); text-align:center; margin-top:16px; }
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
+.card .num { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:10px; }
+.card h3 { margin:0 0 8px; font-size:18px; } .card p { margin:0; color:var(--ink2); font-size:15.5px; }
+ul.ticks { list-style:none; padding:0; margin:22px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+ul.ticks li { color:var(--ink2); font-size:15.5px; border-top:2px solid var(--accent); padding-top:12px; }
+ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom:4px; }
+.formula { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:15px; background:var(--code); border:1px solid var(--line); border-radius:12px; padding:16px 20px; overflow-x:auto; line-height:1.8; margin:0 0 28px; }
+.formula b { color:var(--accent); font-weight:500; }
+.warns { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 28px; }
+.warn { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:13px; background:var(--code); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; padding:8px 12px; color:var(--ink2); }
+/* print-scale layout: a .col is one 5.5 in text column; children size in % of it */
+.col { container-type:inline-size; position:relative; }
+.row { display:flex; justify-content:center; align-items:flex-start; }
+.row img { display:block; height:auto; }
+.paper { background:#fff; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,.06), 0 10px 30px rgba(0,0,0,.08); padding:7% 9%; }
+.paper p { font:calc(100cqw * 10 / 72 / 5.5)/1.2 "Times New Roman", Times, serif; color:#222; text-align:justify; margin:0 0 .9em; hyphens:auto; }
+.paper .row { margin:0 0 .9em; }
+.paper.two { padding:6% 6%; }
+.paper.two .col { display:grid; grid-template-columns:1fr 1fr; column-gap:calc(100% * 0.25 / 6.75); }
+.paper.two .pcol { container-type:inline-size; }
+.paper.two p { font-size:calc(100cqw * 10 / 72 / 3.25); }
+.block { background:#fff; border-radius:10px; padding:4% 0; }
+.block .row + .row { margin-top:3%; }
+.guide { position:absolute; top:0; bottom:0; border-left:1.5px dashed var(--accent); opacity:.8; pointer-events:none; z-index:2; }
+.compare .panes { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+.compare .tag { font-weight:700; font-size:15px; margin:0 0 10px; color:var(--grey); }
+.compare .with .tag { color:var(--accent); }
+.compare .switch { display:none; }
+.switch { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:3px; gap:2px; width:max-content; }
+.switch button { font:inherit; font-size:14px; font-weight:600; border:0; background:none; color:var(--ink3); padding:7px 12px; border-radius:8px; cursor:pointer; }
+.switch button[aria-pressed="true"][data-v="with"] { background:var(--accent); color:#fff; }
+.switch button[aria-pressed="true"][data-v="without"] { background:var(--grey); color:#fff; }
+.gallery-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 22px; }
+.gallery-tabs button { font:inherit; font-size:15px; font-weight:600; padding:9px 16px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink2); cursor:pointer; }
+.gallery-tabs button[aria-selected="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
+.gallery[hidden] { display:none; }
+.ex { margin:0; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.ex figcaption { font-size:15px; line-height:1.35; } .ex figcaption span { display:block; color:var(--ink3); font-size:13px; margin-top:2px; }
+.ex .switch { display:flex; } .ex .switch button { font-size:13px; padding:5px 10px; }
+.frame { background:#fff; border-radius:8px; padding:8px; display:grid; place-items:center; min-height:200px; }
+.frame img { grid-area:1/1; max-width:100%; max-height:380px; height:auto; }
+.ex[data-show="with"] .frame .without, .ex[data-show="without"] .frame .with { visibility:hidden; }
+pre { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:14.5px; background:var(--code); border:1px solid var(--line); border-radius:12px; padding:18px 20px; overflow-x:auto; margin:0; }
+footer { padding:40px 0 60px; border-top:1px solid var(--line); color:var(--ink3); font-size:14px; }
+footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-between; }
+@media (max-width:860px) {
+  .cards, ul.ticks { grid-template-columns:1fr; }
+  .compare .panes { grid-template-columns:1fr; }
+  .compare .switch { display:flex; margin:0 0 14px; }
+  .compare .tag { display:none; }
+  .compare[data-show="with"] .pane.without, .compare[data-show="without"] .pane.with { display:none; }
+  nav .links a.opt { display:none; }
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #111317; --bg-soft: #181b21; --ink: #eceef2; --ink-2: #b4b9c3; --ink-3: #868c98;
-    --line: #2a2e36; --accent: #ff6b7f; --accent-soft: #3a1d24; --grey: #9aa0aa; --card: #1b1e24;
-    --code-bg: #1d2027; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #111317; --bg-soft: #181b21; --ink: #eceef2; --ink-2: #b4b9c3; --ink-3: #868c98;
-  --line: #2a2e36; --accent: #ff6b7f; --accent-soft: #3a1d24; --grey: #9aa0aa; --card: #1b1e24;
-  --code-bg: #1d2027; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-a { color: inherit; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-nav { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-nav .wrap { display: flex; align-items: center; gap: 24px; height: 58px; }
-nav .logo { white-space: nowrap; font-weight: 700; letter-spacing: -.01em; text-decoration: none; }
-nav .links { display: flex; gap: 20px; margin-left: auto; font-size: 15px; color: var(--ink-2); }
-nav .links a { text-decoration: none; }
-nav .links a:hover { color: var(--ink); }
-.hero { padding: 72px 0 40px; text-align: center; }
-.eyebrow { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 5px 12px; border-radius: 999px; }
-h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.05; letter-spacing: -.035em; margin: 20px auto 18px; max-width: 14ch; font-weight: 800; }
-h1 em { font-style: normal; color: var(--accent); }
-.lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 640px; margin: 0 auto; }
-.cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 30px 0 0; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid var(--line); }
-.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.shot { margin: 48px auto 0; background: #fff; border-radius: 14px; box-shadow: var(--shadow); border: 1px solid var(--line); overflow: hidden; }
-.shot img { display: block; width: 100%; height: auto; }
-.note { font-size: 14px; color: var(--ink-3); margin-top: 14px; text-align: center; }
-section { padding: 72px 0; border-top: 1px solid var(--line); }
-section.soft { background: var(--bg-soft); }
-h2 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.025em; line-height: 1.15; margin: 0 0 14px; font-weight: 750; }
-.kicker { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 10px; letter-spacing: .02em; }
-.intro { color: var(--ink-2); max-width: 720px; margin: 0 0 32px; }
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
-.card h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -.01em; }
-.card p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
-.card .num { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
-.split { display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; align-items: center; }
-.split.rev { grid-template-columns: 1.3fr 1fr; }
-.split.rev .text { order: 2; }
-ul.ticks { list-style: none; padding: 0; margin: 18px 0 0; }
-ul.ticks li { padding-left: 28px; position: relative; margin: 10px 0; color: var(--ink-2); }
-ul.ticks li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 12px; height: 7px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg); }
-ul.ticks strong { color: var(--ink); }
-.formula { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; overflow-x: auto; line-height: 1.8; }
-.formula b { color: var(--accent); font-weight: 500; }
-.stat { display: flex; gap: 28px; margin: 22px 0 0; flex-wrap: wrap; }
-.stat div { font-size: 14px; color: var(--ink-3); }
-.stat strong { display: block; font-size: 30px; letter-spacing: -.02em; color: var(--ink); }
-.warns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 22px 0 0; }
-.warn { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; background: var(--code-bg); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 12px; color: var(--ink-2); }
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 24px; }
-.tabs button { font: inherit; font-size: 15px; font-weight: 600; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); cursor: pointer; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
-.gallery[hidden] { display: none; }
-.ex { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.ex figcaption { font-size: 15px; line-height: 1.35; }
-.ex figcaption span { display: block; color: var(--ink-3); font-size: 13px; margin-top: 2px; }
-.toggle { display: inline-flex; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 3px; align-self: flex-start; }
-.toggle button { font: inherit; font-size: 13px; font-weight: 600; border: 0; background: none; color: var(--ink-3); padding: 5px 10px; border-radius: 6px; cursor: pointer; }
-.toggle button[aria-pressed="true"][data-v="w"] { background: var(--accent); color: #fff; }
-.toggle button[aria-pressed="true"][data-v="wo"] { background: var(--grey); color: #fff; }
-.frame { background: #fff; border-radius: 8px; padding: 8px; display: grid; place-items: center; min-height: 220px; }
-.frame img { max-width: 100%; height: auto; max-height: 420px; object-fit: contain; grid-area: 1 / 1; }
-.ex[data-show="w"] .wo, .ex[data-show="wo"] .w { visibility: hidden; }
-pre { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14.5px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; overflow-x: auto; margin: 0; }
-footer { padding: 40px 0 60px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 14px; }
-footer .wrap { display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; }
-@media (max-width: 860px) {
-  .cards { grid-template-columns: 1fr; }
-  .split, .split.rev { grid-template-columns: 1fr; gap: 24px; }
-  .split.rev .text { order: 0; }
-  .warns { grid-template-columns: 1fr; }
-  nav .links a.opt { display: none; }
-}
-@media (max-width: 520px) {
-  .wrap { padding: 0 16px; }
-  .hero { padding-top: 44px; }
-  section { padding: 52px 0; }
-  .gallery { grid-template-columns: 1fr; }
-}
+@media (max-width:520px) { .wrap { padding:0 16px; } header { padding-top:44px; } section { padding:52px 0; } .gallery { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <nav><div class="wrap">
   <a class="logo" href="#">academic-figure</a>
-  <div class="links">
-    <a class="opt" href="#grid">Why</a><a class="opt" href="#formula">How</a><a href="#gallery">Examples</a><a href="#install">Install</a><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a>
-  </div>
+  <div class="links"><a class="opt" href="#page">Why</a><a class="opt" href="#grid">How</a><a href="#gallery">Examples</a><a href="#install">Install</a><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a></div>
 </div></nav>
 
-<header class="hero"><div class="wrap">
+<header><div class="wrap">
   <span class="eyebrow">A Claude Code skill</span>
   <h1>Paper figures that <em>belong together</em></h1>
   <p class="lead">Ask an AI agent for one plot and you get a decent plot. Ask it for the six plots of a paper and you get six fonts, six text sizes and six margins. academic-figure gives the agent a design system and checks its work, so every figure is publication-ready and they all match.</p>
   <div class="cta"><a class="btn primary" href="#install">Install in Claude Code</a><a class="btn" href="https://github.com/bigohofone/academic-figure-skill">View on GitHub</a></div>
-  <div class="shot" id="page"><a href="showcase/page.png"><img src="showcase/page.png" alt="Six figures on one ICLR page, without and with the skill" loading="lazy" class=""></a></div>
-  <p class="note">Same data, same tasks, same widths, drawn by fresh Claude Code sessions with no memory or project instructions. Nothing edited by hand.</p>
 </div></header>
 
-<section class="soft"><div class="wrap">
-  <div class="kicker">The problem</div>
+<section class="soft" id="page"><div class="wrap">
+  <div class="kicker">One paper page, printed size</div>
   <h2>Every figure looks fine. Together, they don't.</h2>
-  <p class="intro">Without guidance, an agent makes each figure in isolation. The trouble shows up when the figures land on the same page.</p>
-  <div class="cards">
-    <div class="card"><div class="num">01</div><h3>Sizes all over the place</h3><p>Tick labels from 5 pt to 8 pt, serif in one figure and sans in the next, every figure a different height for the same width.</p></div>
-    <div class="card"><div class="num">02</div><h3>No shared design</h3><p>Each chart picks its own palette, legend style and number format. A color means "ours" in one figure and nothing in the next.</p></div>
-    <div class="card"><div class="num">03</div><h3>Small defects everywhere</h3><p>Overlapping labels, a legend over the data, an axis label longer than its panel. All easy to miss until the camera-ready deadline.</p></div>
+  <p class="intro">Six figures on a two-column ICML page, at the size they print, next to 10 pt body text. Same data, same tasks, same widths, drawn by fresh Claude Code sessions with no memory or project instructions. Nothing edited by hand.</p>
+  
+<div class="compare" data-show="with" data-name="page">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col"><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-learning-curve.svg" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-confidence-histogram.svg" alt="confidence-histogram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-correlation.svg" alt="correlation" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col"><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-learning-curve.svg" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-confidence-histogram.svg" alt="confidence-histogram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-correlation.svg" alt="correlation" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div>
+  </div>
+</div>
+  <ul class="ticks">
+    <li><strong>One type scale</strong>8 pt labels, 7 pt ticks and values, one font, in every figure.</li>
+    <li><strong>One palette with meaning</strong>Color-blind safe. Your method in one color, baselines in grey, everywhere.</li>
+    <li><strong>One box per width</strong>Every single-column figure's panel starts and ends at the same place, so a column of figures lines up.</li>
+  </ul>
 </div></section>
 
 <section id="grid"><div class="wrap">
   <div class="kicker">One grid</div>
   <h2>Any grid, any aspect, the same edges</h2>
-  <p class="intro">Half width or full width, one panel or a 2×2 or a 1×4, wide 0.382 panels or square ones: every panel box starts and ends on the same lines. The dashed lines are the standard edges, drawn at the same place on both sides.</p>
-  <div class="shot"><a href="showcase/consistency.png"><img src="showcase/consistency.png" alt="Figures of different grids and aspects on one page column, without and with the skill" loading="lazy" class=""></a></div>
-  <ul class="ticks">
-    <li><strong>One type scale.</strong> 8 pt labels and 7 pt ticks and values, in every figure, in one font.</li>
-    <li><strong>One palette with meaning.</strong> Color-blind safe; your method in one color, baselines in grey, in every figure.</li>
-    <li><strong>Less page.</strong> The six figures at the top take 6.1 in of height instead of 7.1 in.</li>
-  </ul>
+  <p class="intro">Every panel's size follows from the figure width and its columns; the margins are fixed text measures. Half width or full width, one panel or 2×2 or 1×4, wide or square: every panel box starts and ends on the dashed lines.</p>
+  <div class="formula">panel width  = (<b>W</b> − left − right − gaps) / <b>columns</b><br>panel height = <b>aspect</b> × panel width</div>
+  
+<div class="compare" data-show="with" data-name="grid">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:46.691%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:96.691%"></span><div class="row"><img src="figures/without/learning-curve.svg" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/without/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/roc-curve.svg" alt="roc-curve" loading="lazy" style="width:50.000%"><img src="figures/without/grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div><div class="row"><img src="figures/without/rlvr-fig5.svg" alt="rlvr-fig5" loading="lazy" style="width:100.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:46.691%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:96.691%"></span><div class="row"><img src="figures/with/learning-curve.svg" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/with/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/roc-curve.svg" alt="roc-curve" loading="lazy" style="width:50.000%"><img src="figures/with/grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div><div class="row"><img src="figures/with/rlvr-fig5.svg" alt="rlvr-fig5" loading="lazy" style="width:100.000%"></div></div></div>
+  </div>
+</div>
 </div></section>
 
 <section class="soft"><div class="wrap">
   <div class="kicker">Heatmaps and contours</div>
   <h2>Square cells, one colorbar slot</h2>
-  <p class="intro">Plots with a colorbar follow their own standard: square cells, a colorbar of fixed width and gap, and a right margin that fits its labels. Every heatmap and contour in the paper lines up with every other.</p>
-  <div class="shot"><a href="showcase/colorbar.png"><img src="showcase/colorbar.png" alt="Heatmaps and contour plots, without and with the skill" loading="lazy" class=""></a></div>
-</div></section>
-
-<section id="formula"><div class="wrap">
-  <div class="split rev">
-    <div class="text">
-      <div class="kicker">Sizes from a formula</div>
-      <h2>Not eyeballed. Computed.</h2>
-      <p class="intro">Every panel's size follows from the figure width and its columns. The margins are fixed text measures, so every half-width figure has the same panel box and every right edge lines up.</p>
-      <div class="formula">panel width  = (<b>W</b> − left − right − gaps) / <b>columns</b><br>panel height = <b>aspect</b> × panel width</div>
-      <ul class="ticks">
-        <li><strong>One figure, one aspect.</strong> All four reliability panels are square.</li>
-        <li><strong>Long labels never stretch the figure.</strong> The panel gets narrower; its height stays.</li>
-      </ul>
-    </div>
-    <div class="shot"><a href="showcase/reliability-diagram.png"><img src="showcase/reliability-diagram.png" alt="Reliability diagrams, without and with the skill" loading="lazy" class=""></a></div>
+  <p class="intro">Plots with a colorbar keep their own standard: square cells, a colorbar of fixed width and gap, and a right margin that fits its labels, so every heatmap and contour lines up with the others.</p>
+  
+<div class="compare" data-show="with" data-name="cbar">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
-</div></section>
-
-<section class="soft"><div class="wrap">
-  <div class="kicker">Multi-panel layouts</div>
-  <h2>Grouped axes and second y axes, same rules</h2>
-  <p class="intro">Columns that share a quantity sit close together, groups stand apart, and each quantity is named once. A second y axis mirrors the first, with the same room for ticks and label.</p>
-  <div class="shot"><a href="showcase/accuracy-and-loss.png"><img src="showcase/accuracy-and-loss.png" alt="Accuracy and loss per dataset, without and with the skill" loading="lazy" class=""></a></div>
-  <div class="shot"><a href="showcase/loss-and-learning-rate.png"><img src="showcase/loss-and-learning-rate.png" alt="Training loss with its learning rate, without and with the skill" loading="lazy" class=""></a></div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/without/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/without/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/without/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/with/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/with/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/with/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
+  </div>
+</div>
 </div></section>
 
 <section><div class="wrap">
-  <div class="split">
-    <div class="text">
-      <div class="kicker">Tested, not judged</div>
-      <h2>"Looks fine" is not a test</h2>
-      <p class="intro">After drawing, the figure is checked. Each warning names its fix: rotate the labels, swap the axes, move the legend, or write less. The agent keeps going until the script runs clean.</p>
-      <div class="warns">
-        <div class="warn">texts 'Adapter' and 'LoRA' overlap</div>
-        <div class="warn">the legend covers the end of a bar</div>
-        <div class="warn">axis label is longer than its panel is tall</div>
-        <div class="warn">a legend of 10 entries is wider than the figure; use ncol=4</div>
-      </div>
-      <ul class="ticks">
-        <li><strong>Numbers you can rerun.</strong> Every value is computed and asserted in the script; the caption is written from its output.</li>
-      </ul>
-    </div>
-    <div class="shot"><a href="showcase/error-bar-plot.png"><img src="showcase/error-bar-plot.png" alt="Error bar plot, without and with the skill" loading="lazy" class=""></a></div>
+  <div class="kicker">Multi-panel layouts</div>
+  <h2>Grouped axes, second y axes, one shape</h2>
+  <p class="intro">Columns that share a quantity sit close, groups stand apart and line up with half-width figures, each quantity named once. A second y axis mirrors the first. Every panel of a figure has one shape: all four reliability panels are square.</p>
+  
+<div class="compare" data-show="with" data-name="accuracy-and-loss">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div></div></div>
+  </div>
+</div>
+  <div style="height:28px"></div>
+  
+<div class="compare" data-show="with" data-name="pair">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"><img src="figures/without/loss-and-learning-rate.svg" alt="loss-and-learning-rate" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"><img src="figures/with/loss-and-learning-rate.svg" alt="loss-and-learning-rate" loading="lazy" style="width:50.000%"></div></div></div>
+  </div>
+</div>
 </div></section>
 
-<section class="soft" id="gallery"><div class="wrap">
+<section class="soft"><div class="wrap">
+  <div class="kicker">Tested, not judged</div>
+  <h2>"Looks fine" is not a test</h2>
+  <p class="intro">After drawing, the figure is checked. Each warning names its fix, rotate, swap the axes, move the legend or write less, and the agent keeps going until the script runs clean. Every number is computed and asserted in the script, and the caption is written from its output.</p>
+  <div class="warns">
+    <div class="warn">texts 'Adapter' and 'LoRA' overlap</div>
+    <div class="warn">the legend covers the end of a bar</div>
+    <div class="warn">axis label is longer than its panel is tall</div>
+    <div class="warn">a legend of 10 entries is wider than the figure; use ncol=4</div>
+  </div>
+  
+<div class="compare" data-show="with" data-name="checks">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/without/rlvr-fig6.svg" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/with/rlvr-fig6.svg" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
+  </div>
+</div>
+</div></section>
+
+<section id="gallery"><div class="wrap">
   <div class="kicker">Examples</div>
   <h2>29 figures, both ways</h2>
   <p class="intro">Every chart type, and figures redrawn from published ML papers with their own values. Switch each between the version without the skill and the version with it.</p>
-  <div class="tabs" role="tablist">
+  <div class="gallery-tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="types">Chart types</button>
     <button role="tab" aria-selected="false" data-tab="papers">Paper figures</button>
     <button role="tab" aria-selected="false" data-tab="uses">Common ML plots</button>
   </div>
   <div class="gallery" data-panel="types">
-      <figure class="ex">
-        <figcaption><strong>Line chart</strong><span>Learning curve, mean ± std over 5 seeds</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/learning-curve.png" alt="Line chart, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/learning-curve.png" alt="Line chart, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Bar chart</strong><span>Grouped bar chart, methods × benchmarks</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/grouped-bar-chart.png" alt="Bar chart, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/grouped-bar-chart.png" alt="Bar chart, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Scatter plot</strong><span>Reward score against human rating, per response</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/correlation.png" alt="Scatter plot, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/correlation.png" alt="Scatter plot, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Box plot</strong><span>Grouped box plot of response lengths</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/grouped-box-plot.png" alt="Box plot, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/grouped-box-plot.png" alt="Box plot, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Heatmap</strong><span>Accuracy over a hyperparameter grid</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/hyperparameter-grid.png" alt="Heatmap, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/hyperparameter-grid.png" alt="Heatmap, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Histogram</strong><span>Overlaid histograms of confidence</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/confidence-histogram.png" alt="Histogram, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/confidence-histogram.png" alt="Histogram, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Error bar plot</strong><span>Means over seeds with ±1 std</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/error-bar-plot.png" alt="Error bar plot, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/error-bar-plot.png" alt="Error bar plot, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Area chart</strong><span>Stacked area chart of a data curriculum</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/data-mixture.png" alt="Area chart, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/data-mixture.png" alt="Area chart, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Contour plot</strong><span>Validation loss over learning rate × weight decay</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/hyperparameter-surface.png" alt="Contour plot, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/hyperparameter-surface.png" alt="Contour plot, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Radar chart</strong><span>Benchmark profiles of three models</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/radar-chart.png" alt="Radar chart, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/radar-chart.png" alt="Radar chart, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Pie chart</strong><span>Donut chart of a dataset&#x27;s composition</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/dataset-composition.png" alt="Pie chart, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/dataset-composition.png" alt="Pie chart, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Violin plot</strong><span>Bimodal reward distributions</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/reward-distribution.png" alt="Violin plot, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/reward-distribution.png" alt="Violin plot, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Small multiples</strong><span>One panel per dataset, ICML double column</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/small-multiples.png" alt="Small multiples, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/small-multiples.png" alt="Small multiples, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Grouped axes</strong><span>Accuracy and loss per dataset in one row, one label per group</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/accuracy-and-loss.png" alt="Grouped axes, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/accuracy-and-loss.png" alt="Grouped axes, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Right y axis</strong><span>Training loss with its learning-rate schedule</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/without-skill/loss-and-learning-rate.png" alt="Right y axis, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/chart-types/outputs/loss-and-learning-rate.png" alt="Right y axis, with the skill" loading="lazy" class="w"></div>
-      </figure></div>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Line chart</strong><span>Learning curve, mean ± std over 5 seeds</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/learning-curve.svg" alt="Line chart, without the skill" loading="lazy">
+    <img class="with" src="figures/with/learning-curve.svg" alt="Line chart, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Bar chart</strong><span>Grouped bar chart, methods × benchmarks</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/grouped-bar-chart.svg" alt="Bar chart, without the skill" loading="lazy">
+    <img class="with" src="figures/with/grouped-bar-chart.svg" alt="Bar chart, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Scatter plot</strong><span>Reward score against human rating, per response</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/correlation.svg" alt="Scatter plot, without the skill" loading="lazy">
+    <img class="with" src="figures/with/correlation.svg" alt="Scatter plot, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Box plot</strong><span>Grouped box plot of response lengths</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/grouped-box-plot.svg" alt="Box plot, without the skill" loading="lazy">
+    <img class="with" src="figures/with/grouped-box-plot.svg" alt="Box plot, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Heatmap</strong><span>Accuracy over a hyperparameter grid</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/hyperparameter-grid.svg" alt="Heatmap, without the skill" loading="lazy">
+    <img class="with" src="figures/with/hyperparameter-grid.svg" alt="Heatmap, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Histogram</strong><span>Overlaid histograms of confidence</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/confidence-histogram.svg" alt="Histogram, without the skill" loading="lazy">
+    <img class="with" src="figures/with/confidence-histogram.svg" alt="Histogram, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Error bar plot</strong><span>Means over seeds with ±1 std</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/error-bar-plot.svg" alt="Error bar plot, without the skill" loading="lazy">
+    <img class="with" src="figures/with/error-bar-plot.svg" alt="Error bar plot, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Area chart</strong><span>Stacked area chart of a data curriculum</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/data-mixture.svg" alt="Area chart, without the skill" loading="lazy">
+    <img class="with" src="figures/with/data-mixture.svg" alt="Area chart, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Contour plot</strong><span>Validation loss over learning rate × weight decay</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/hyperparameter-surface.svg" alt="Contour plot, without the skill" loading="lazy">
+    <img class="with" src="figures/with/hyperparameter-surface.svg" alt="Contour plot, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Radar chart</strong><span>Benchmark profiles of three models</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/radar-chart.svg" alt="Radar chart, without the skill" loading="lazy">
+    <img class="with" src="figures/with/radar-chart.svg" alt="Radar chart, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Pie chart</strong><span>Donut chart of a dataset&#x27;s composition</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/dataset-composition.svg" alt="Pie chart, without the skill" loading="lazy">
+    <img class="with" src="figures/with/dataset-composition.svg" alt="Pie chart, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Violin plot</strong><span>Bimodal reward distributions</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/reward-distribution.svg" alt="Violin plot, without the skill" loading="lazy">
+    <img class="with" src="figures/with/reward-distribution.svg" alt="Violin plot, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Small multiples</strong><span>One panel per dataset, ICML double column</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/small-multiples.svg" alt="Small multiples, without the skill" loading="lazy">
+    <img class="with" src="figures/with/small-multiples.svg" alt="Small multiples, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Grouped axes</strong><span>Accuracy and loss per dataset in one row, one label per group</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/accuracy-and-loss.svg" alt="Grouped axes, without the skill" loading="lazy">
+    <img class="with" src="figures/with/accuracy-and-loss.svg" alt="Grouped axes, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Right y axis</strong><span>Training loss with its learning-rate schedule</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/loss-and-learning-rate.svg" alt="Right y axis, without the skill" loading="lazy">
+    <img class="with" src="figures/with/loss-and-learning-rate.svg" alt="Right y axis, with the skill" loading="lazy">
+  </div>
+</figure></div>
   <div class="gallery" data-panel="papers" hidden>
-      <figure class="ex">
-        <figcaption><strong>DAPO, Figure 2</strong><span>Line chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/dapo-fig2.png" alt="DAPO, Figure 2, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/dapo-fig2.png" alt="DAPO, Figure 2, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>DAPO, Figure 6</strong><span>Line chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/dapo-fig6.png" alt="DAPO, Figure 6, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/dapo-fig6.png" alt="DAPO, Figure 6, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?, Figure 2: pass@k grid</strong><span>Line chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/rlvr-fig2.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 2: pass@k grid, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/rlvr-fig2.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 2: pass@k grid, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?, Figure 5</strong><span>Histogram</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/rlvr-fig5.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 5, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/rlvr-fig5.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 5, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only</strong><span>Box plot</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/rlvr-fig6.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/rlvr-fig6.png" alt="Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only, with the skill" loading="lazy" class="w"></div>
-      </figure></div>
+<figure class="ex" data-show="with">
+  <figcaption><strong>DAPO</strong><span>Line chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/dapo-fig2.svg" alt="DAPO, without the skill" loading="lazy">
+    <img class="with" src="figures/with/dapo-fig2.svg" alt="DAPO, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>DAPO</strong><span>Line chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/dapo-fig6.svg" alt="DAPO, without the skill" loading="lazy">
+    <img class="with" src="figures/with/dapo-fig6.svg" alt="DAPO, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Line chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/rlvr-fig2.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="with" src="figures/with/rlvr-fig2.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Histogram</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/rlvr-fig5.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="with" src="figures/with/rlvr-fig5.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Box plot</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/rlvr-fig6.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="with" src="figures/with/rlvr-fig6.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
+  </div>
+</figure></div>
   <div class="gallery" data-panel="uses" hidden>
-      <figure class="ex">
-        <figcaption><strong>ROC curves of AI-text detectors</strong><span>Line chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/roc-curve.png" alt="ROC curves of AI-text detectors, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/roc-curve.png" alt="ROC curves of AI-text detectors, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Confidence histograms and reliability diagrams</strong><span>Bar chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/reliability-diagram.png" alt="Confidence histograms and reliability diagrams, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/reliability-diagram.png" alt="Confidence histograms and reliability diagrams, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Scaling law with a power-law fit</strong><span>Line chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/scaling-law.png" alt="Scaling law with a power-law fit, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/scaling-law.png" alt="Scaling law with a power-law fit, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Accuracy against model size</strong><span>Scatter plot</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/accuracy-vs-parameters.png" alt="Accuracy against model size, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/accuracy-vs-parameters.png" alt="Accuracy against model size, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>t-SNE embedding of learned features</strong><span>Scatter plot</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/t-sne.png" alt="t-SNE embedding of learned features, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/t-sne.png" alt="t-SNE embedding of learned features, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Confusion matrix</strong><span>Heatmap</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/confusion-matrix.png" alt="Confusion matrix, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/confusion-matrix.png" alt="Confusion matrix, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Attention map (alignment)</strong><span>Heatmap</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/attention-map.png" alt="Attention map (alignment), without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/attention-map.png" alt="Attention map (alignment), with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Loss landscape</strong><span>Contour plot</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/loss-landscape.png" alt="Loss landscape, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/loss-landscape.png" alt="Loss landscape, with the skill" loading="lazy" class="w"></div>
-      </figure>
-      <figure class="ex">
-        <figcaption><strong>Win / tie / loss rates</strong><span>Bar chart</span></figcaption>
-        <div class="toggle" role="group" aria-label="Version">
-          <button type="button" aria-pressed="false" data-v="wo">Without skill</button>
-          <button type="button" aria-pressed="true" data-v="w">With skill</button>
-        </div>
-        <div class="frame"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/without-skill/win-rate.png" alt="Win / tie / loss rates, without the skill" loading="lazy" class="wo"><img src="https://raw.githubusercontent.com/bigohofone/academic-figure-skill/main/examples/use-cases/outputs/win-rate.png" alt="Win / tie / loss rates, with the skill" loading="lazy" class="w"></div>
-      </figure></div>
+<figure class="ex" data-show="with">
+  <figcaption><strong>ROC curves of AI-text detectors</strong><span>Line chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/roc-curve.svg" alt="ROC curves of AI-text detectors, without the skill" loading="lazy">
+    <img class="with" src="figures/with/roc-curve.svg" alt="ROC curves of AI-text detectors, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Confidence histograms and reliability diagrams</strong><span>Bar chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/reliability-diagram.svg" alt="Confidence histograms and reliability diagrams, without the skill" loading="lazy">
+    <img class="with" src="figures/with/reliability-diagram.svg" alt="Confidence histograms and reliability diagrams, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Scaling law with a power-law fit</strong><span>Line chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/scaling-law.svg" alt="Scaling law with a power-law fit, without the skill" loading="lazy">
+    <img class="with" src="figures/with/scaling-law.svg" alt="Scaling law with a power-law fit, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Accuracy against model size</strong><span>Scatter plot</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/accuracy-vs-parameters.svg" alt="Accuracy against model size, without the skill" loading="lazy">
+    <img class="with" src="figures/with/accuracy-vs-parameters.svg" alt="Accuracy against model size, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>t-SNE embedding of learned features</strong><span>Scatter plot</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/t-sne.svg" alt="t-SNE embedding of learned features, without the skill" loading="lazy">
+    <img class="with" src="figures/with/t-sne.svg" alt="t-SNE embedding of learned features, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Confusion matrix</strong><span>Heatmap</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/confusion-matrix.svg" alt="Confusion matrix, without the skill" loading="lazy">
+    <img class="with" src="figures/with/confusion-matrix.svg" alt="Confusion matrix, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Attention map (alignment)</strong><span>Heatmap</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/attention-map.svg" alt="Attention map (alignment), without the skill" loading="lazy">
+    <img class="with" src="figures/with/attention-map.svg" alt="Attention map (alignment), with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Loss landscape</strong><span>Contour plot</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/loss-landscape.svg" alt="Loss landscape, without the skill" loading="lazy">
+    <img class="with" src="figures/with/loss-landscape.svg" alt="Loss landscape, with the skill" loading="lazy">
+  </div>
+</figure>
+<figure class="ex" data-show="with">
+  <figcaption><strong>Win / tie / loss rates</strong><span>Bar chart</span></figcaption>
+  <div class="mini switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="with" aria-pressed="true">With</button>
+  </div>
+  <div class="frame">
+    <img class="without" src="figures/without/win-rate.svg" alt="Win / tie / loss rates, without the skill" loading="lazy">
+    <img class="with" src="figures/with/win-rate.svg" alt="Win / tie / loss rates, with the skill" loading="lazy">
+  </div>
+</figure></div>
 </div></section>
 
-<section id="install"><div class="wrap">
+<section class="soft" id="install"><div class="wrap">
   <div class="kicker">Install</div>
   <h2>Two commands in Claude Code</h2>
   <p class="intro">Then ask for a figure as usual: "plot the learning curves in results.json for my ICLR paper." Each figure comes as one script, <code>figures/&lt;id&gt;.py</code>, with its caption as the docstring.</p>
@@ -456,21 +566,17 @@ footer .wrap { display: flex; gap: 18px; flex-wrap: wrap; justify-content: space
 /plugin install academic-figure@academic-figure-skill</pre>
 </div></section>
 
-<footer><div class="wrap">
-  <span>academic-figure · open source</span>
-  <span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a> · <a href="https://github.com/bigohofone/academic-slides-skill">academic-slides-skill</a></span>
-</div></footer>
-
+<footer><div class="wrap"><span>academic-figure · open source</span>
+<span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a> · <a href="https://github.com/bigohofone/academic-slides-skill">academic-slides-skill</a></span></div></footer>
 <script>
-document.querySelectorAll(".ex").forEach(ex => {
-  ex.dataset.show = "w";
-  ex.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
-    ex.dataset.show = b.dataset.v;
-    ex.querySelectorAll(".toggle button").forEach(o => o.setAttribute("aria-pressed", o === b));
+document.querySelectorAll(".compare, .ex").forEach(box => {
+  box.querySelectorAll(".switch button").forEach(b => b.addEventListener("click", () => {
+    box.dataset.show = b.dataset.v;
+    box.querySelectorAll(".switch button").forEach(o => o.setAttribute("aria-pressed", o === b));
   }));
 });
-document.querySelectorAll(".tabs button").forEach(t => t.addEventListener("click", () => {
-  document.querySelectorAll(".tabs button").forEach(o => o.setAttribute("aria-selected", o === t));
+document.querySelectorAll(".gallery-tabs button").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".gallery-tabs button").forEach(o => o.setAttribute("aria-selected", o === t));
   document.querySelectorAll(".gallery").forEach(g => g.hidden = g.dataset.panel !== t.dataset.tab);
 }));
 </script>

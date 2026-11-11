@@ -1,4 +1,4 @@
-"""Training loss and learning rate over training steps. The loss is smoothed with a moving average over 5% of the steps; the faint line shows raw values; the learning rate is read on the right axis. The learning rate warms up linearly to 0.0003 over the first 1000 steps, then decays with a cosine to 0.00003, while the loss falls from 11.3 to 2.01."""
+"""Training loss and learning rate over training steps. The loss is smoothed with a moving average over 5% of the steps; the faint line shows raw values. The learning rate warms up linearly to its peak at step 1000, then decays along a cosine; the loss falls from 11.3 to 2.01 and covers 90% of that drop by step 3200."""
 
 import json
 import sys
@@ -18,32 +18,34 @@ steps = np.array(data["steps"])
 loss = np.array(data["training_loss"])
 lr = np.array(data["learning_rate"])
 
-# Takeaway: linear warmup to the peak, cosine decay after it, while the loss falls.
-peak = int(np.argmax(lr))
-print("takeaway:", {"peak lr": np.format_float_positional(lr[peak], 3, fractional=False, trim="-"), "warmup steps": int(steps[peak]),
-                    "final lr": np.format_float_positional(lr[-1], 3, fractional=False, trim="-"), "first loss": f"{loss[0]:.3g}", "last loss": f"{loss[-1]:.3g}"})
-assert np.all(np.diff(lr[:peak + 1]) > 0) and np.all(np.diff(lr[peak:]) <= 0), "the takeaway does not hold"
-assert loss[-1] < loss[0], "the takeaway does not hold"
+# Takeaway: the loss drops early, around warmup, and flattens as the learning rate decays.
+smoothed = np.array(smooth(loss))
+peak_step = steps[np.argmax(lr)]
+drop = smoothed[0] - smoothed[-1]
+step_90 = steps[np.argmax(smoothed <= smoothed[0] - 0.9 * drop)]
+print("takeaway:", {"first loss": f"{loss[0]:#.3g}", "last loss": f"{loss[-1]:#.3g}",
+                    "lr peak step": int(peak_step), "90% of drop by step": int(step_90)})
+assert step_90 < steps[-1] / 4, "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
-right = ax.twinx()
-ax.set_zorder(right.get_zorder() + 1)  # the legend on the left axis sits above the learning rate
-ax.patch.set_visible(False)
+twin = ax.twinx()
 
 ax.plot(steps, loss, color=colors["series-1"], alpha=0.25)
-loss_line, = ax.plot(steps, smooth(loss), color=colors["series-1"], label="Training loss")
-lr_line, = right.plot(steps, lr, color=colors["series-3"], label="Learning rate")
+ax.plot(steps, smoothed, color=colors["series-1"], label="Training loss")
+twin.plot(steps, lr * 1e4, color=colors["series-3"], label="Learning rate")
 
 ax.grid(True)
-ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5", "10", "15", "20"])
-ax.set_xlabel("Training step (K)")
+twin.grid(False)
+ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
+ax.set_xlabel("Training step")
 ax.set_ylabel("Training loss")
-right.set_ylabel("Learning rate (×10⁻⁴)")
-right.yaxis.set_major_formatter(lambda v, _: f"{v * 1e4:.10g}".replace("-", "−"))
-right.set_ylim(bottom=0)
+twin.set_ylabel("Learning rate (×10⁻⁴)")
 
-ax.legend([loss_line, lr_line], ["Training loss", "Learning rate"], loc="upper right")
+ax.set_zorder(twin.get_zorder() + 1)
+ax.patch.set_visible(False)
+handles = ax.get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
+ax.legend(handles, [h.get_label() for h in handles], loc="upper right")
 
-fit_height(fig, ax, aspect=0.618)
+fit_height(fig, ax)
 fig.savefig("../outputs/loss-and-learning-rate.pdf")
 fig.savefig("../outputs/loss-and-learning-rate.png")
