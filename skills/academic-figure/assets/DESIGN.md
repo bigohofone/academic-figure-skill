@@ -284,6 +284,7 @@ Pick the first row that fits:
 
 | Case | Legend |
 |---|---|
+| A single entry (one series, or one marked point such as a minimum) | none: a lone entry above a panel reads as a title; the caption's reading guide names it ("the star marks the trained minimizer") |
 | A filled plot (heatmap, contour gradient, stacked area, embedding) | outside, above the panel (last row), or none when the bands are named directly |
 | One panel | inside, at the first spot where `fit_height` stays silent: the corners `"upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, then `"upper center"`, `"lower center"`, `"center left"`, `"center right"`; when none works, outside, above the panel (last row) |
 | Several panels with the same series | one legend for the figure, above the panels: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
