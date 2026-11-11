@@ -178,7 +178,7 @@ The aspect (width : height) is per panel. Use one of these, golden ratio φ : 1 
 |---|---|---|
 | φ² : 1 | 0.382 | a single panel at 1.5-column, double-column or full text width |
 | φ : 1 | 0.618 | curves, bars, histograms, box plots and violins (default) |
-| 1 : 1 | 1.0 | heatmap, confusion matrix, embedding, contour plot |
+| 1 : 1 | 1.0 | heatmap, confusion matrix, embedding, contour plot, and every panel of a two-factor grid, so rows and columns compare alike |
 | 1 : φ | 1.618 | content that is itself taller than wide (a long list of categories down a horizontal bar chart or forest plot) |
 
 Slopes and gaps between curves need height, many x categories need width, matrices need square cells. If curves look flat after rendering, pick a taller aspect. The aspect follows the data, never room for labels: a value label that covers a curve goes below the point (`below=True`), and if it still covers one, the comparison uses another point whose label stands clear. Pie and radar charts are circles: `fit_height` sizes them to the width and ignores `aspect`.
