@@ -288,7 +288,7 @@ def test_round_panels_fill_the_width_with_no_empty_height():
         ax.pie([3, 2, 1])
     fit_height(fig, axes, aspect=1.0)
     circle = axes[0].get_position()
-    assert fig.get_figheight() - circle.height * fig.get_figheight() < 0.1
+    assert fig.get_figheight() - circle.height * fig.get_figheight() < 0.1 + 2 * paper.canvas_pad
     assert circle.width * WIDTH > 0.45 * WIDTH
 
 
