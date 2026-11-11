@@ -1,6 +1,6 @@
 ---
 name: academic-figure
-description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (print sizes, typography, color-blind-safe colors, chart-type rules for line, bar, scatter, box, heatmap, histogram, error bar, area, contour, radar, pie and violin charts) - delivered as one script per figure, `figures/{id}.py` in the user's project, with a paper-style caption. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
+description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (print sizes, typography, color-blind-safe colors, chart-type rules for line, bar, scatter, box, heatmap, histogram, error bar, area, contour, radar, pie and violin charts) - delivered as one script per figure, `{id}.py` in the folder the user names or else `figures/`, with a paper-style caption. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
 ---
 
 # Paper Figures
@@ -42,7 +42,7 @@ The caption is written as it appears under the figure in the paper, in the paper
 
 ## Files (required)
 
-All figure work happens in `figures/` at the root of the user's project, even for one figure or a code-only request. The user runs, edits and re-exports figures there, without this skill, so each script is plain, readable code.
+All figure work happens in one folder, even for one figure or a code-only request: the folder the user names ("put it in `paper/plots/`"), else `figures/` in the current working directory. Below, `figures/` stands for that folder. The user runs, edits and re-exports figures there, without this skill, so each script is plain, readable code.
 
 ```
 figures/

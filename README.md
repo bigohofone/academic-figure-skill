@@ -1,6 +1,6 @@
 # academic-figure-skill
 
-A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as one script per figure, `figures/{id}.py`, in your project.
+A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as one script per figure, `{id}.py`, in the folder you name or else `figures/`.
 
 ## Design
 
