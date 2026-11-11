@@ -111,6 +111,15 @@ def _freeze_ticks(panels):
             axis.set_major_locator(FixedLocator([t for t in axis.get_majorticklocs() if lo <= t <= hi]))
 
 
+def _limit_for_reach(axis, lo, hi, v, reach, size, upper):
+    """The new upper (or lower) limit that leaves `reach` pixels between value `v` and the panel edge,
+    solved in the axis's scale (linear, log), where data maps linearly to pixels."""
+    scale = axis.get_transform()
+    lo, hi, v = scale.transform([lo, hi, v])
+    limit = lo + (v - lo) * size / (size - reach) if upper else (v * size - reach * hi) / (size - reach)
+    return scale.inverted().transform([limit])[0]
+
+
 def _keep_value_labels_inside(fig, panels):
     """Grow each panel's limits so every `mark_value` label and every bar label (`ax.bar_label`, or
     any annotation placed in data coordinates) lies inside its panel. `mark_value` labels at a side
@@ -135,24 +144,20 @@ def _keep_value_labels_inside(fig, panels):
                 if value_label:
                     t.set_ha("right")
                 else:
-                    reach = label.x1 - point_x + 1
-                    a.set_xlim(lo, lo + (x - lo) * box.width / (box.width - reach))
+                    a.set_xlim(lo, _limit_for_reach(a.xaxis, lo, hi, x, label.x1 - point_x + 1, box.width, True))
                     changed = True
             elif label.x0 < box.x0:
                 if value_label:
                     t.set_ha("left")
                 else:
-                    reach = point_x - label.x0 + 1
-                    a.set_xlim((x * box.width - reach * hi) / (box.width - reach), hi)
+                    a.set_xlim(_limit_for_reach(a.xaxis, lo, hi, x, point_x - label.x0 + 1, box.width, False), hi)
                     changed = True
             lo, hi = a.get_ylim()
             if label.y1 > box.y1:
-                reach = label.y1 - point_y + 1
-                a.set_ylim(lo, lo + (y - lo) * box.height / (box.height - reach))
+                a.set_ylim(lo, _limit_for_reach(a.yaxis, lo, hi, y, label.y1 - point_y + 1, box.height, True))
                 changed = True
             elif label.y0 < box.y0:
-                reach = point_y - label.y0 + 1
-                a.set_ylim((y * box.height - reach * hi) / (box.height - reach), hi)
+                a.set_ylim(_limit_for_reach(a.yaxis, lo, hi, y, point_y - label.y0 + 1, box.height, False), hi)
                 changed = True
     return changed
 

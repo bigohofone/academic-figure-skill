@@ -277,3 +277,19 @@ def test_polar_panel_is_fitted_without_error():
     ax.plot([0, 1, 2], [1, 2, 3])
     fit_height(fig, ax, aspect=1.0)
     assert fig.get_figheight() < WIDTH
+
+
+def test_annotation_on_log_axis_stays_inside_with_positive_limits():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2))
+    ax.plot([3, 72], [0.6, 0.8], "o")
+    ax.set_xscale("log")
+    ax.annotate("Qwen2-72B-Instruct", (72, 0.8), xytext=(3, 3), textcoords="offset points")
+    ax.annotate("Phi-3-mini", (3, 0.6), xytext=(-3, 3), textcoords="offset points", ha="right")
+    fit_height(fig, ax)
+    renderer = fig.canvas.get_renderer()
+    box = ax.get_window_extent(renderer)
+    lo, hi = ax.get_xlim()
+    assert 0 < lo < 3 and hi > 72
+    for t in ax.texts:
+        label = t.get_window_extent(renderer)
+        assert box.x0 - 1 <= label.x0 and label.x1 <= box.x1 + 1
