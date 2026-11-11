@@ -1,4 +1,4 @@
-"""Validation accuracy on CIFAR-100 over training epochs. Lines show the mean over 5 seeds and shaded bands ±1 std; thin horizontal lines mark each marked method's best mean accuracy. Ours peaks at 0.915, 0.018 above Mixup (0.897) and above Baseline (0.882)."""
+"""Validation accuracy on CIFAR-100 over training epochs. Lines show the mean over 5 seeds and shaded bands ±1 std; Ours peaks at 0.915, 0.018 above Mixup (0.897) and above Baseline (0.882)."""
 
 import json
 import sys
@@ -8,7 +8,7 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value
+from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
@@ -43,8 +43,6 @@ for name in ["Baseline", "Mixup", "Ours"]:
     (handles[name],) = ax.plot(epochs, mean[name], label=name, **styles[name])
 
 # the three best values lie within 0.04 of each other: ours and its closest competitor are marked, Baseline's is in the caption
-mark_value(ax, best_epoch["Ours"], best["Ours"], f"{best['Ours']:#.3g}", styles["Ours"]["color"])
-mark_value(ax, best_epoch["Mixup"], best["Mixup"], f"{best['Mixup']:#.3g}", styles["Mixup"]["color"], below=True)
 
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Validation accuracy")
