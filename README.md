@@ -2,13 +2,15 @@
 
 A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as one script per figure, `{id}.py`, in the folder you name or else `figures/`.
 
+**[See the project site](https://bigohofone.github.io/academic-figure-skill/)**: the same figures on a paper page, without and with the skill.
+
 ## Design
 
 How figures look is defined in [`DESIGN.md`](skills/academic-figure/assets/DESIGN.md), in the [DESIGN.md](https://github.com/google-labs-code/design.md) format: tokens (colors, type sizes, spacing, line widths) in its front matter, then Overview, Colors, Typography, Layout, Shapes, Components (the chart types) and Do's and Don'ts. The skill copies it into your project's `figures/`, and `paper.use_design()` reads its tokens to set matplotlib's style, so editing `figures/DESIGN.md` restyles every figure of that paper. [`SKILL.md`](skills/academic-figure/SKILL.md) is the workflow: takeaway, chart type, script, caption and checks.
 
 ## Examples
 
-Every example shows the same figure drawn by fresh Claude Code sessions that load no project instructions and no memory, once without any skill and once following this skill, from the same data and task and at the same width, for an ICLR paper (ICML for small multiples). For why this matters across a whole paper, see [SHOWCASE.md](SHOWCASE.md). Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
+Every example shows the same figure drawn by fresh Claude Code sessions that load no project instructions and no memory, once without any skill and once following this skill, from the same data and task and at the same width, for an ICLR paper (ICML for small multiples). For why this matters across a whole paper, see the [project site](https://bigohofone.github.io/academic-figure-skill/). Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
 
 Each group in [`examples/`](examples) holds `data/` (the input), `tasks/` (the request the subagent got), `scripts/` (one script per figure written with the skill, runnable in place: `cd examples/use-cases/scripts && python roc-curve.py`), `outputs/` (the figures with the skill) and `without-skill/` (the same tasks drawn without it); use cases also hold `originals/` (the papers' figures).
 
