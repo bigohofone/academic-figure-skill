@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, text_color
+from paper import finalize_figure, text_color_on
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/confusion-matrix.json"))
 labels = data["labels"]
@@ -34,8 +34,8 @@ for i in range(matrix.shape[0]):
     for j in range(matrix.shape[1]):
         v = matrix[i, j]
         ax.text(j, i, f"{v:#.2g}", ha="center", va="center", fontsize=paper.bar_label_size,
-                color=text_color(im.cmap(im.norm(v))))
+                color=text_color_on(im.cmap(im.norm(v))))
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/confusion-matrix.pdf")
 fig.savefig("../outputs/confusion-matrix.png")

@@ -11,9 +11,9 @@ from matplotlib.path import Path
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/loss-landscape.json"))
 levels = data["levels"]
@@ -58,6 +58,6 @@ ax.set_ylabel("β")
 ax.grid(False)
 fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, label="Training loss")
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/loss-landscape.pdf")
 fig.savefig("../outputs/loss-landscape.png")

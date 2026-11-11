@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, smooth
+from paper import finalize_figure, moving_average
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/loss-and-learning-rate.json") as f:
     data = json.load(f)
@@ -19,7 +19,7 @@ loss = np.array(data["training_loss"])
 learning_rate = np.array(data["learning_rate"])
 
 # takeaway: most of the loss decrease happens during the warmup
-smoothed = np.array(smooth(loss))
+smoothed = np.array(moving_average(loss))
 warmup_end = int(np.argmax(learning_rate))
 share = (loss[0] - loss[warmup_end]) / (loss[0] - smoothed[-1])
 print("takeaway:", "warmup steps", steps[warmup_end], "loss start", f"{loss[0]:#.3g}",
@@ -45,6 +45,6 @@ ax.patch.set_visible(False)
 handles = ax.get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
 ax.legend(handles, [h.get_label() for h in handles], loc="upper right")
 
-fit_height(fig, ax)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/loss-and-learning-rate.pdf")
 fig.savefig("../outputs/loss-and-learning-rate.png")

@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, darken
+from paper import finalize_figure, darken
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/error-bar-plot.json") as f:
     runs = json.load(f)["accuracy_per_seed"]
@@ -38,6 +38,6 @@ ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
 ax.set_xlabel("GLUE accuracy")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/error-bar-plot.pdf")
 fig.savefig("../outputs/error-bar-plot.png")

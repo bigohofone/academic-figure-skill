@@ -10,9 +10,9 @@ from matplotlib.patches import Patch
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, lighten
+from paper import finalize_figure, lighten
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/grouped-box-plot.json") as f:
     data = json.load(f)
@@ -47,6 +47,6 @@ handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] 
            for m in models]
 ax.legend(handles=handles, loc="upper left")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/grouped-box-plot.pdf")
 fig.savefig("../outputs/grouped-box-plot.png")

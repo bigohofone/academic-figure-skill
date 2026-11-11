@@ -23,7 +23,7 @@ Values over two categorical axes: confusion matrix, attention map, a grid of res
 
 ## Labels
 
-- **Cell text**: with at most 12 rows and 12 columns, every cell's value, written by DESIGN.md's value table, in `text_color(im.cmap(im.norm(v)))`, `ax.text(j, i, label, ha="center", va="center", color=...)`. Larger matrices carry none.
+- **Cell text**: with at most 12 rows and 12 columns, every cell's value, written by DESIGN.md's value table, in `text_color_on(im.cmap(im.norm(v)))`, `ax.text(j, i, label, ha="center", va="center", color=...)`. Larger matrices carry none.
 
 ## Caption
 

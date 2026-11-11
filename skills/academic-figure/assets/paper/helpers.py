@@ -1,11 +1,11 @@
-"""Drawing helpers for scripts: smoothing a logged curve and marking a value."""
+"""Helpers for scripts: smoothing a logged curve and marking a value."""
 import numpy as np
 from matplotlib import rcParams
 
 from .palette import darken
 
 
-def smooth(values):
+def moving_average(values):
     """Centered moving average over 5% of the points (2.5% each side), shrinking at the ends.
     Centered, not EMA, so the smoothed curve does not lag the raw one."""
     half = max(1, len(values) // 40)

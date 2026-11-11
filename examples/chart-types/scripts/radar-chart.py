@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, fit_height
+from paper import darken, finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/radar-chart.json") as f:
     data = json.load(f)
@@ -74,6 +74,6 @@ labels = [ours] + baselines
 fig.legend([handles[l] for l in labels], labels, loc="outside upper center", ncol=len(labels), frameon=False,
            borderaxespad=0)
 
-fit_height(fig, ax)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/radar-chart.pdf")
 fig.savefig("../outputs/radar-chart.png")

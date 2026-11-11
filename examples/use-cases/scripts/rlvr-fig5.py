@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, fit_height
+from paper import darken, finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/rlvr-fig5.json") as f:
     data = json.load(f)
@@ -34,6 +34,6 @@ ax.set_xlabel("Per-problem accuracy")
 ax.set_ylabel("Problems")
 ax.legend(loc="upper right")
 
-fit_height(fig, ax, aspect=0.382)
+finalize_figure(fig, ax, aspect=0.382)
 fig.savefig("../outputs/rlvr-fig5.pdf")
 fig.savefig("../outputs/rlvr-fig5.png")

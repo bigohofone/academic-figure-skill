@@ -10,9 +10,9 @@ from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, text_color
+from paper import finalize_figure, text_color_on
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/hyperparameter-surface.json"))
 learning_rate = np.array(data["learning_rate"])
@@ -51,7 +51,7 @@ for level in levels:
 # every second level labelled: 4.5, 5 and 5.5 crowd in the corner
 labels = ax.clabel(lines, levels=levels[::2], fmt="%.2g", manual=positions[::2], fontsize=paper.contour_label_size)
 for label in labels:
-    label.set_color(text_color(mesh.cmap(mesh.norm(float(label.get_text())))))
+    label.set_color(text_color_on(mesh.cmap(mesh.norm(float(label.get_text())))))
 
 ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markerfacecolor=colors["ours"],
         markersize=paper.highlight_size, linestyle="none")
@@ -70,6 +70,6 @@ ax.set_ylabel("Weight decay")
 ax.grid(False)
 fig.colorbar(mesh, ax=ax, label="Validation loss", ticks=levels)
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/hyperparameter-surface.pdf")
 fig.savefig("../outputs/hyperparameter-surface.png")

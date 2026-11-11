@@ -4,7 +4,7 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
 
 ## Draw
 
-- **Axes**: polar, one spoke per benchmark, evenly spaced from the top, clockwise: `fig, ax = plt.subplots(figsize=(width, width), subplot_kw={"projection": "polar"})`, `angles = np.linspace(0, 2 * np.pi, n, endpoint=False)`, `ax.set_theta_offset(np.pi / 2)`, `ax.set_theta_direction(-1)`. `fit_height` sizes the chart to the width and ignores `aspect`.
+- **Axes**: polar, one spoke per benchmark, evenly spaced from the top, clockwise: `fig, ax = plt.subplots(figsize=(width, width), subplot_kw={"projection": "polar"})`, `angles = np.linspace(0, 2 * np.pi, n, endpoint=False)`, `ax.set_theta_offset(np.pi / 2)`, `ax.set_theta_direction(-1)`. `finalize_figure` sizes the chart to the width and ignores `aspect`.
 - **Scale**: one radial scale for all spokes when the benchmarks share a unit (accuracy in %), fixed from 0 to the outer ring, with 3 or 4 rings plus the outer edge. Benchmarks with different units: each spoke normalized to its best score (= 1), said in the caption.
 - **Grid**: an n-sided polygon grid, never circles: the circular grid and frame off, each ring and spoke drawn in the design's grid look, the outer polygon as the panel box:
 

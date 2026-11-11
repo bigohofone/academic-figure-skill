@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, smooth
+from paper import finalize_figure, moving_average
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/accuracy-and-loss.json") as f:
     data = json.load(f)
@@ -45,9 +45,9 @@ for ax, name in zip(axes[2:], datasets):
     ax.plot(epochs, loss[name]["Baseline"], color=colors["neutral"], linestyle="--",
             linewidth=paper.dashed_width, alpha=0.25)
     ax.plot(epochs, loss[name]["Ours"], color=colors["ours"], alpha=0.25)
-    ax.plot(epochs, smooth(loss[name]["Baseline"]), color=colors["neutral"], linestyle="--",
+    ax.plot(epochs, moving_average(loss[name]["Baseline"]), color=colors["neutral"], linestyle="--",
             linewidth=paper.dashed_width, label="Baseline")
-    ax.plot(epochs, smooth(loss[name]["Ours"]), color=colors["ours"], label="Ours")
+    ax.plot(epochs, moving_average(loss[name]["Ours"]), color=colors["ours"], label="Ours")
     ax.set_title(name)
 axes[2].set_ylabel("Training loss")
 
@@ -58,6 +58,6 @@ fig.supxlabel("Epoch")
 handles, labels = axes[0].get_legend_handles_labels()
 fig.legend(handles[::-1], labels[::-1], loc="outside upper center", ncol=2, frameon=False, borderaxespad=0)
 
-fit_height(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
 fig.savefig("../outputs/accuracy-and-loss.pdf")
 fig.savefig("../outputs/accuracy-and-loss.png")

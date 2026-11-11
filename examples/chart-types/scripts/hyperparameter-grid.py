@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, text_color
+from paper import finalize_figure, text_color_on
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/hyperparameter-grid.json"))
 learning_rates = data["learning_rates"]
@@ -27,7 +27,7 @@ im = ax.imshow(accuracy, aspect="auto", origin="lower")
 for i in range(len(learning_rates)):
     for j in range(len(batch_sizes)):
         v = accuracy[i, j]
-        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color=text_color(im.cmap(im.norm(v))))
+        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color=text_color_on(im.cmap(im.norm(v))))
 ax.add_patch(plt.Rectangle((bj - 0.5, bi - 0.5), 1, 1, fill=False, edgecolor=colors["ink"],
                            linewidth=rcParams["patch.linewidth"]))
 ax.set_xticks(range(len(batch_sizes)), labels=[str(b) for b in batch_sizes])
@@ -38,6 +38,6 @@ ax.tick_params(length=0)
 ax.grid(False)
 fig.colorbar(im, ax=ax, label="Validation accuracy")
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/hyperparameter-grid.pdf")
 fig.savefig("../outputs/hyperparameter-grid.png")

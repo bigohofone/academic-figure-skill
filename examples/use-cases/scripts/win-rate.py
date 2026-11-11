@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, text_color, greys
+from paper import finalize_figure, text_color_on, baseline_greys
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/win-rate.json") as f:
     data = json.load(f)
@@ -24,7 +24,7 @@ wins, ties, losses = (shares[c] for c in categories)
 print("takeaway:", {o: (f"{w:.0%}", f"{l:.0%}", f"win+tie {w + t:.0%}") for o, w, t, l in zip(opponents, wins, ties, losses)})
 assert wins[0] > losses[0] and wins[1] > losses[1], "the takeaway does not hold"
 
-category_colors = [colors["ours"], *greys(2)]
+category_colors = [colors["ours"], *baseline_greys(2)]
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 y = np.arange(len(opponents))
@@ -33,7 +33,7 @@ for category, color in zip(categories, category_colors):
     values = shares[category]
     bars = ax.barh(y, values, left=left, color=color, edgecolor="white",
                    linewidth=plt.rcParams["grid.linewidth"], label=category)
-    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color=text_color(color))
+    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color=text_color_on(color))
     left += values
 
 ax.set_yticks(y, labels=opponents)
@@ -45,6 +45,6 @@ ax.set_xticks([0, 0.25, 0.5, 0.75, 1], labels=["0%", "25%", "50%", "75%", "100%"
 ax.set_xlabel("Share of test prompts")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(categories), frameon=False)
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/win-rate.pdf")
 fig.savefig("../outputs/win-rate.png")

@@ -10,9 +10,9 @@ from scipy import stats
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, fit_height
+from paper import darken, finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/correlation.json") as f:
     data = json.load(f)
@@ -36,6 +36,6 @@ ax.set_xticks(range(1, 8))
 ax.set_xlabel("Human rating")
 ax.set_ylabel("Reward score")
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/correlation.pdf")
 fig.savefig("../outputs/correlation.png")

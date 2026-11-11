@@ -9,9 +9,9 @@ from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/scaling-law.json"))
 n = np.array(data["non_embedding_parameters"])
@@ -46,6 +46,6 @@ ax.set_ylabel("Test loss (nats/token)")
 ax.grid(True, which="both")
 ax.legend(loc="upper right")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/scaling-law.pdf")
 fig.savefig("../outputs/scaling-law.png")

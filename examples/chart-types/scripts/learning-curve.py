@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/learning-curve.json"))
 epochs = np.array(data["epochs"])
@@ -49,6 +49,6 @@ ax.set_ylabel("Validation accuracy")
 ax.grid(True)
 ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Baseline", "Mixup"], loc="lower right")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/learning-curve.pdf")
 fig.savefig("../outputs/learning-curve.png")

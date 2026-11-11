@@ -1,12 +1,6 @@
-"""Color-blind and grayscale safety: greys and part colors spread in lightness, color helpers, and the
-check that series stay apart when printed in black and white."""
-import warnings
-
+"""Color-blind and grayscale safety: greys and part colors spread in lightness, and color helpers."""
 import numpy as np
 from matplotlib import colors
-from matplotlib.collections import PolyCollection
-from matplotlib.container import BarContainer
-from matplotlib.patches import Rectangle
 
 from . import design
 
@@ -27,19 +21,19 @@ def _over_white(rgba):
     return tuple(alpha * c + (1 - alpha) for c in (r, g, b))
 
 
-def _grey(lightness):
+def _grey_of_lightness(lightness):
     y = ((lightness + 16) / 116) ** 3
     c = 12.92 * y if y <= 0.0031308 else 1.055 * y ** (1 / 2.4) - 0.055
     return (c, c, c)
 
 
-def greys(n):
+def baseline_greys(n):
     """n grey fills, evenly spaced in lightness from the design's neutral-light to neutral-dark, light to
     dark, skipping the band around ours' lightness; one series takes neutral."""
-    neutral, light, dark = design._greys
+    neutral, light, dark = (design.colors[k] for k in ("neutral", "neutral-light", "neutral-dark"))
     if n == 1:
         return [tuple(colors.to_rgb(neutral))]
-    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(design._ours)
+    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(design.colors["ours"])
     segments = [(top, min(top, ours + GREY_GAP)), (max(bottom, ours - GREY_GAP), bottom)]
     segments = [(a, b) for a, b in segments if a > b]
     total = sum(a - b for a, b in segments)
@@ -48,17 +42,17 @@ def greys(n):
         t = total * i / (n - 1)
         for a, b in segments:
             if t <= a - b + 1e-9:
-                out.append(_grey(a - t))
+                out.append(_grey_of_lightness(a - t))
                 break
             t -= a - b
     return out
 
 
-def parts(n):
+def part_colors(n):
     """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
     hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
     two parts stay apart when printed in black and white."""
-    hues = [colors.to_rgb(design._palette[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
+    hues = [colors.to_rgb(design.colors[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
     levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
     order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
     out = []
@@ -80,7 +74,7 @@ def darken(color):
     return [c * 0.8 for c in colors.to_rgb(color)]
 
 
-def text_color(fill):
+def text_color_on(fill):
     """Black or white, whichever reads on `fill`: for numbers written on bars, wedges, areas or heatmap cells."""
     return "white" if np.dot(colors.to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else "black"
 
@@ -88,34 +82,3 @@ def text_color(fill):
 def lighten(color):
     """`color` mixed with white, 40% color: a box or violin fill, so the black median and points on it stay readable."""
     return [0.4 * c + 0.6 for c in colors.to_rgb(color)]
-
-
-def _warn_grayscale(a):
-    """Series told apart by color alone (lines of one style and marker, or bars) must differ in lightness,
-    or they merge when printed in black and white."""
-    groups = {}
-    for line in a.get_lines():
-        if not line.get_label().startswith("_"):
-            key = ("line", str(line.get_linestyle()), str(line.get_marker()))
-            groups.setdefault(key, []).append((line.get_label(), line.get_color()))
-    for c in a.containers:
-        if isinstance(c, BarContainer) and c.patches and not str(c.get_label()).startswith("_"):
-            groups.setdefault(("bar",), []).append((c.get_label(), _over_white(c.patches[0].get_facecolor())))
-    # histograms (step outlines or filled shapes) and labelled bands, translucent fills as seen over white
-    for p in a.patches:
-        label = p.get_label() or ""
-        if not isinstance(p, Rectangle) and label and not label.startswith("_"):
-            color = _over_white(p.get_facecolor()) if p.get_fill() else p.get_edgecolor()
-            groups.setdefault(("fill",), []).append((label, color))
-    for c in a.collections:
-        label = c.get_label() or ""
-        if isinstance(c, PolyCollection) and label and not label.startswith("_") and len(c.get_facecolor()):
-            groups.setdefault(("fill",), []).append((label, _over_white(c.get_facecolor()[0])))
-    for series in groups.values():
-        for i in range(len(series)):
-            for j in range(i + 1, len(series)):
-                (n1, c1), (n2, c2) = series[i], series[j]
-                if abs(_lightness(c1) - _lightness(c2)) < 10:
-                    warnings.warn(f"series {n1!r} and {n2!r} look alike in grayscale in panel {a.get_title()!r} "
-                                  f"(L* {_lightness(c1):.0f} vs {_lightness(c2):.0f}); use greys(n), or tell them "
-                                  "apart by line style or marker (DESIGN.md Colors)")

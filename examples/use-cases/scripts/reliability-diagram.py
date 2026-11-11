@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, darken, lighten
+from paper import finalize_figure, darken, lighten
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/reliability-diagram.json") as f:
     data = json.load(f)
@@ -70,6 +70,6 @@ fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", 
            borderaxespad=0)
 axes[1, 0].legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=2, frameon=False)
 
-fit_height(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
 fig.savefig("../outputs/reliability-diagram.pdf")
 fig.savefig("../outputs/reliability-diagram.png")

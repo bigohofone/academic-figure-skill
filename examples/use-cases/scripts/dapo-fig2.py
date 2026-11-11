@@ -8,7 +8,7 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, darken
+from paper import finalize_figure, mark_value, darken
 
 
 def mark_best(ax, x, y, text, color, **kw):
@@ -16,7 +16,7 @@ def mark_best(ax, x, y, text, color, **kw):
     ax.axhline(y, linewidth=plt.rcParams["grid.linewidth"], color=darken(color), zorder=1)
     mark_value(ax, x, y, text, color, **kw)
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/dapo.json") as f:
     runs = json.load(f)["fig2a"]
@@ -43,6 +43,6 @@ ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")
 ax.legend(loc="lower right")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/dapo-fig2.pdf")
 fig.savefig("../outputs/dapo-fig2.png")

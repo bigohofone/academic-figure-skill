@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, lighten
+from paper import finalize_figure, lighten
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/rlvr-fig6.json") as f:
     groups = json.load(f)["Problem 1"]
@@ -36,6 +36,6 @@ ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
 ax.set_xlabel("Perplexity")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/rlvr-fig6.pdf")
 fig.savefig("../outputs/rlvr-fig6.png")

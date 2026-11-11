@@ -97,6 +97,8 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 html.bw body > *:not(.bwtoggle) { filter:grayscale(1); }
 .guide.text { border-left-color:#2f6fd6; }
 .compare .panes { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+.compare .pane { display:flex; flex-direction:column; }
+.compare .pane > .block { flex:1; display:flex; flex-direction:column; justify-content:center; }
 .compare .tag { font-weight:700; font-size:15px; margin:0 0 10px; color:var(--grey); }
 .compare .with .tag { color:var(--accent); }
 .compare .switch { display:none; }

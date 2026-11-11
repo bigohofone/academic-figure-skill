@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, darken, greys
+from paper import finalize_figure, darken, baseline_greys
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/grouped-bar-chart.json") as f:
     data = json.load(f)
@@ -27,7 +27,7 @@ assert all(m > 0 for m in margins), "the takeaway does not hold"
 # methods left to right in ascending order of mean accuracy, so Ours ends at the right
 methods = sorted(scores, key=lambda m: np.mean(scores[m]))
 assert methods[-1] == "Ours"
-method_colors = dict(zip(methods[:-1], greys(len(methods) - 1)))
+method_colors = dict(zip(methods[:-1], baseline_greys(len(methods) - 1)))
 method_colors["Ours"] = colors["ours"]
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
@@ -47,6 +47,6 @@ ax.grid(axis="x", visible=False)
 ax.set_ylabel("Accuracy")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(methods), frameon=False)
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/grouped-bar-chart.pdf")
 fig.savefig("../outputs/grouped-bar-chart.png")

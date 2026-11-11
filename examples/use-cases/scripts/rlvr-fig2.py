@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/rlvr.json") as f:
     data = json.load(f)
@@ -61,6 +61,6 @@ for r, model in enumerate(models):
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
 
-fit_height(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
 fig.savefig("../outputs/rlvr-fig2.pdf")
 fig.savefig("../outputs/rlvr-fig2.png")

@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, darken
+from paper import finalize_figure, darken
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/confidence-histogram.json") as f:
     data = json.load(f)
@@ -37,6 +37,6 @@ ax.set_xlabel("Confidence")
 ax.set_ylabel("Density")
 ax.legend(loc="upper left")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/confidence-histogram.pdf")
 fig.savefig("../outputs/confidence-histogram.png")

@@ -17,7 +17,7 @@ Two quantities per item plotted against each other: accuracy against parameters,
 
 ## Labels
 
-- **Point names**: next to each labelled point in `darken(color)`, `ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", color=darken(color))`. Placements (for Collisions): upper right, upper left (`xytext=(-3, 3), ha="right"`), lower right and lower left (`va="top"`). `fit_height` grows the limits by up to a quarter to keep names inside; beyond that it reports them.
+- **Point names**: next to each labelled point in `darken(color)`, `ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", color=darken(color))`. Placements (for Collisions): upper right, upper left (`xytext=(-3, 3), ha="right"`), lower right and lower left (`va="top"`). `finalize_figure` grows the limits by up to a quarter to keep names inside; beyond that it reports them.
 - **Values**: when the takeaway compares some labelled models, their values join their names, `f"{name} ({v:#.3g}%)"`.
 
 ## Caption

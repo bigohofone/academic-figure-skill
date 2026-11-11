@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/small-multiples.json") as f:
     data = json.load(f)
@@ -49,6 +49,6 @@ order = [2, 0, 1]  # ours first, then the grey series in line-style order
 fig.legend([handles[i] for i in order], [labels[i] for i in order], loc="outside upper center", ncol=3,
            frameon=False, borderaxespad=0)
 
-fit_height(fig, axes)
+finalize_figure(fig, axes)
 fig.savefig("../outputs/small-multiples.pdf")
 fig.savefig("../outputs/small-multiples.png")

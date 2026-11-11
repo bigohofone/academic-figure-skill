@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 data = json.load(open("../data/roc-curve.json"))
 curves = {m["name"]: (np.array(m["fpr"]), np.array(m["tpr"])) for m in data["methods"]}
@@ -45,6 +45,6 @@ handles, labels = ax.get_legend_handles_labels()
 order = [3, 2, 0, 1]  # the full method first, then its variant, then the baselines
 ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower right")
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/roc-curve.pdf")
 fig.savefig("../outputs/roc-curve.png")

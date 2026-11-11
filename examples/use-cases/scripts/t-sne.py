@@ -9,9 +9,9 @@ from matplotlib.colors import to_rgb
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/t-sne.json") as f:
     classes = json.load(f)
@@ -42,11 +42,11 @@ ax.grid(False)
 handles, names = ax.get_legend_handles_labels()
 ncol = 4
 order = [i for c in range(ncol) for i in range(c, len(handles), ncol)]
-# a figure legend: with no tick labels, fit_height leaves this panel to the constrained layout, which
+# a figure legend: with no tick labels, finalize_figure leaves this panel to the constrained layout, which
 # moves an ax.legend anchored above the panel a little further on every draw
 fig.legend([handles[i] for i in order], [names[i] for i in order], loc="outside upper center", ncol=ncol,
            frameon=False, borderaxespad=0)
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/t-sne.pdf")
 fig.savefig("../outputs/t-sne.png")

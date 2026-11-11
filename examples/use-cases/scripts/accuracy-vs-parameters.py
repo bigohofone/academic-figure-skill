@@ -10,9 +10,9 @@ from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, fit_height
+from paper import darken, finalize_figure
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/accuracy-vs-parameters.json") as f:
     models = json.load(f)
@@ -73,6 +73,6 @@ order = [0, 2, 1, 3]  # matplotlib fills columns first; this reads across each r
 ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower center", bbox_to_anchor=(0.5, 1),
           borderaxespad=0.5, ncol=2, frameon=False)
 
-fit_height(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/accuracy-vs-parameters.pdf")
 fig.savefig("../outputs/accuracy-vs-parameters.png")

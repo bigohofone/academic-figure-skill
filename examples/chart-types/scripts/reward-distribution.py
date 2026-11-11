@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, lighten, greys
+from paper import finalize_figure, lighten, baseline_greys
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/reward-distribution.json") as f:
     rewards = json.load(f)["rewards"]
@@ -21,7 +21,7 @@ names = sorted(rewards, key=lambda name: means[name])  # ascending, ours ends at
 print("takeaway:", {n: f"{means[n]:#.3g}" for n in names})
 assert names[-1] == "Ours", "the takeaway does not hold"
 
-baseline_greys = greys(len(names) - 1)
+baseline_greys = baseline_greys(len(names) - 1)
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 for x, name in enumerate(names):
     values = rewards[name]
@@ -43,6 +43,6 @@ ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Reward")
 
-fit_height(fig, ax, aspect=0.618)
+finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/reward-distribution.pdf")
 fig.savefig("../outputs/reward-distribution.png")
