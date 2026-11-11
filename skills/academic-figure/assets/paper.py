@@ -337,11 +337,11 @@ def smooth(values):
 
 def mark_value(ax, x, y, text, color, below=False):
     """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
-    a hollow circle at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
+    a hollow circle at (x, y), and `text` just above it (`below=True`: just below), in `darken(color)`.
     """
     ax.axhline(y, linestyle="--", linewidth=_dashed_width, color=darken(color), zorder=1)
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
-                va="top" if below else "bottom", fontweight="bold", color=darken(color), gid="value-label")
+                va="top" if below else "bottom", color=darken(color), gid="value-label")
 

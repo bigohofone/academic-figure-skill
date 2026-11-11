@@ -25,7 +25,7 @@ typography:
   value-label:
     fontFamily: Inter
     fontSize: 7pt
-    fontWeight: 700
+    fontWeight: 400
   title:
     fontFamily: Inter
     fontSize: 11pt
@@ -108,12 +108,12 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | Token | Size | Used for |
 |---|---|---|
 | `tick-label` | 7 pt | tick labels |
-| `value-label` | 7 pt, bold | everything written inside the chart: value labels on markers and bars, heatmap cell text, labels next to points, pie labels; the default for any text drawn with `ax.text` or `ax.annotate` |
+| `value-label` | 7 pt | everything written inside the chart: value labels on markers and bars, heatmap cell text, labels next to points, pie labels; the default for any text drawn with `ax.text` or `ax.annotate` |
 | `label` | 9 pt | axis labels, subcaptions |
 | `legend` | 7 pt | legend entries |
 | `title` | 11 pt | panel titles, row and column headers |
 
-- Everything written inside the chart is bold: value labels, cell text, labels next to points, pie labels, contour labels. Pass `fontweight="bold"` to every `ax.text`, `ax.annotate`, `ax.bar_label` and `ax.clabel` (`mark_value` does it). Everything outside the chart (tick labels, axis labels, titles, legends) is regular. Text is black (`ink`) unless it belongs to one series.
+- All text is regular weight, inside the chart and out; nothing is bold. Text is black (`ink`) unless it belongs to one series.
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
 - Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest.
@@ -252,7 +252,7 @@ Each chart type has its own file next to this one, with its marks, variants and 
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values have three significant figures and are 7 pt bold (`value-label`), in `darken(series_color)`.
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values have three significant figures, 7 pt (`value-label`), in `darken(series_color)`.
 
 ## Do's and Don'ts
 

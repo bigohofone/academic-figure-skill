@@ -29,5 +29,5 @@ When the takeaway compares reported results across series, mark the compared val
 
 - Find the point where the paper makes the comparison: the claim decides it. "Ours reaches a higher score" compares each series' best; "ours ends higher" compares final values (at the last x all series share, when they end at different x); "ours is ahead at the same budget" compares values at that shared x. The value is the plotted metric at that point.
 - If the request and the paper don't settle the comparison point, ask the user. When you can't ask, compare each series' best and say so in the reply.
-- Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value in bold just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
+- Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
 - If a label above the point covers a curve, put it below with `below=True`.
