@@ -4,4 +4,4 @@ Draw how our three-stage curriculum changes the pretraining data mixture over tr
 
 The data is synthetic, made to look like a real experiment. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `data-mixture.png` and `data-mixture.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `data-mixture.png` and `data-mixture.pdf`.

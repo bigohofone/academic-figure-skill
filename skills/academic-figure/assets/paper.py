@@ -112,7 +112,9 @@ def _solve(fig, panels, aspect, iters, tol):
             continue
         if abs(r1 - aspect) / aspect < tol or r1 == r0:
             break
-        h0, r0, h1 = h1, r1, h1 + (aspect - r1) * (h1 - h0) / (r1 - r0)
+        step = h1 + (aspect - r1) * (h1 - h0) / (r1 - r0)
+        # a secant step can overshoot below zero while the layout is still settling: halve instead
+        h0, r0, h1 = h1, r1, step if np.isfinite(step) and step > 0 else h1 / 2
     return ratios, widths
 
 

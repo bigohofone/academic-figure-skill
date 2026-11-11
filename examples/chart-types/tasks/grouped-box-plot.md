@@ -4,4 +4,4 @@ Draw the distribution of response lengths (tokens) of the base model and our RL-
 
 The data is synthetic, made to look like typical results. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `grouped-box-plot.png` and `grouped-box-plot.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `grouped-box-plot.png` and `grouped-box-plot.pdf`.

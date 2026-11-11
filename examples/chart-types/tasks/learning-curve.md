@@ -4,4 +4,4 @@ Draw validation accuracy over training on CIFAR-100 for our augmentation, Mixup 
 
 The data is synthetic, made to look like a real experiment. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `learning-curve.png` and `learning-curve.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `learning-curve.png` and `learning-curve.pdf`.

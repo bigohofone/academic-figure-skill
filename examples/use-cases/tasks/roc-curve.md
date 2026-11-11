@@ -14,4 +14,4 @@ The test texts start with gpt-3.5-turbo output and continue with human writing. 
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `roc-curve.png` and `roc-curve.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `roc-curve.png` and `roc-curve.pdf`.

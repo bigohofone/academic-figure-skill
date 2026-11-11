@@ -21,4 +21,4 @@ Width: the original sits in one column of a two-column layout; in ICLR this is h
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `reliability-diagram.png` and `reliability-diagram.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `reliability-diagram.png` and `reliability-diagram.pdf`.

@@ -14,7 +14,7 @@ Means with their uncertainty, one point per method or setting: when the compared
 
 ## Labels
 
-- **Means**: each mean beside the end of its error bar, clear of the bar, in `darken(color)`: above the upper cap, `ax.annotate(f"{m:#.3g}", (x, m + err), xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", color=darken(color))`; in a forest plot, right of the right cap, `(m + err, y)`, `xytext=(3, 0)`, `ha="left", va="center"`.
+- **Means**: each mean beside the end of its error bar, clear of the bar, in `darken(color)`: above the upper cap, `ax.annotate(f"{m:#.3g}", (x, m + err), xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", color=darken(color), gid="value-label")`; in a forest plot, right of the right cap, `(m + err, y)`, `xytext=(3, 0)`, `ha="left", va="center"`.
 
 ## Caption
 

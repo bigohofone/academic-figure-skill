@@ -5,7 +5,7 @@ Values along a continuous x: learning curves, scaling curves, pass@k, a metric o
 ## Draw
 
 - **Line**: `ax.plot(x, y, color=color)`, gridlines in both directions.
-- **Markers**: a curve through 30 or fewer measured points shows each point as the design's hollow marker, `ax.plot(x, y, "o-", color=color)`, so the reader sees where the data is; a curve through more points is a plain line. Each series keeps one marker shape in every panel, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`.
+- **Markers**: a series whose curves have 30 or fewer measured points each (its longest curve decides, in every panel alike) shows each point as the design's hollow marker, `ax.plot(x, y, "o-", color=color)`, so the reader sees where the data is; otherwise plain lines. Each series keeps one marker shape in every panel, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`.
 - **Diagnostics**: the raw values in the series color at `alpha=0.25` without a label, then `smooth(values)` on top with the label. Reported results are drawn raw.
 - **Several runs per setting** (seeds, folds): the mean as the line and ±1 std as a band, `ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)`.
 

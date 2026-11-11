@@ -10,4 +10,4 @@ Width: the original is the first of three side-by-side subfigures across the tex
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `t-sne.png` and `t-sne.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `t-sne.png` and `t-sne.pdf`.

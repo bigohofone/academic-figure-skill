@@ -23,6 +23,8 @@ Goal: a figure that reads well printed in the paper, where the reader gets its o
 | Reported result | a number the paper claims, measured once per setting (accuracy, F1, latency, a score per method) | when the takeaway compares it, its value is written on the plot |
 | Diagnostic | a quantity logged along a process to show its behavior (loss, gradient norm, entropy per step) | its trend and shape; no value labels |
 
+An evaluation metric logged along training (validation accuracy per epoch, reward per step) is a reported result at the point the takeaway compares (drawn raw, marked there), and a diagnostic otherwise.
+
 ## Files
 
 All figure work happens in one folder, even for one figure or a code-only request: the folder the user names ("put it in `paper/plots/`"), else `figures/` in the current working directory. Below, `figures/` stands for that folder. The user runs, edits and re-exports figures there without this skill, so each script is plain, readable code.

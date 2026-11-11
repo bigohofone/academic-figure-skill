@@ -13,4 +13,4 @@ Width: the original is one panel of a 2 × 2 grid in a single-column layout; in 
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `attention-map.png` and `attention-map.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `attention-map.png` and `attention-map.pdf`.

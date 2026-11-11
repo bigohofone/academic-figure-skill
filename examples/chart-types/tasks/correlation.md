@@ -4,4 +4,4 @@ Draw our reward model's score against the human rating (1–7 Likert, averaged o
 
 The data is synthetic, made to look like a real experiment. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `correlation.png` and `correlation.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `correlation.png` and `correlation.pdf`.

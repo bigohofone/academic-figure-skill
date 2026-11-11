@@ -116,9 +116,9 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 | `legend` | 7 pt | legend entries |
 | `title` | 11 pt | panel titles, row and column headers |
 
-- **Numeric tick labels**: horizontal plain numbers, written as short as they read, `0, 0.5, 1` and `1,000`, never rotated, never `2³` or `1e+06`: `ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))` (keeping the minus sign). On log axes, powers of ten are plain from 0.001 to 1000, then `1e-4` below and SI suffixes above (`10K`, `1M`, `1B`).
+- **Numeric tick labels**: horizontal plain numbers, written as short as they read, `0, 0.5, 1`, `1024`, never rotated, never `2³` or `1e+06`: `ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))` (keeping the minus sign). Values of 10,000 and up take SI suffixes (`10K`, `1M`, `1B`), or the unit is scaled in the axis label ("Training step (K)"); on log axes, powers of ten are plain from 0.001 to 1000, then `1e-4` below. An axis of shares is labelled in percent, `0%, 50%, 100%`, as its values are written (Value labels).
 - **Tick choice**: numbers the reader can name, evenly spaced (on a log axis, powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose what reads best. When `fit_height` reports tick labels overlapping, take fewer ticks. Panels that share an axis share its ticks.
-- **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:,.10g}" for t in ticks[1:]]])`.
+- **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])`.
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.
   - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, then 90° (`rotation=90, ha="center"`) if they still overlap.
@@ -162,7 +162,7 @@ The venue is the one the user names; with none, ICLR.
 | 1.5 column | 3 |
 | Double column | 4 |
 
-0. **Two-factor grid** (models × benchmarks, methods × datasets; also rows of different plots over the same columns, where the plot type is the row factor and each row's y label names it): one factor per row, the other per column, whatever the column limit: 4 models × 4 benchmarks is 4 × 4. An axis that shows the same quantity in every panel has one range across the grid (`sharex=True` / `sharey=True`); an axis whose quantity changes between columns or rows is shared only down a column (`sharex="col"`) or across a row (`sharey="row"`). Tick numbers only on the left column and bottom row (step 5 does not apply), so panels may be as narrow as 1.0 in, `fit_height(fig, axes, min_width=1.0)`; if still narrower, put the factor with fewer levels on the columns; never reflow it. No value marks or other emphasis in single panels; numbers go in the caption.
+0. **Two-factor grid** (models × benchmarks, methods × datasets; also rows of different plots over the same columns, where the plot type is the row factor and each row's y label names it): one factor per row, the other per column, whatever the column limit: 4 models × 4 benchmarks is 4 × 4. An axis that shows the same quantity in every panel has one range across the grid (`sharex=True` / `sharey=True`); an axis whose quantity changes between columns or rows is shared only down a column (`sharex="col"`) or across a row (`sharey="row"`). Tick numbers only on the left column and bottom row (step 5 does not apply), so panels may be as narrow as 1.0 in, `fit_height(fig, axes, min_width=1.0)`; if still narrower, put the factor with fewer levels on the columns; never reflow it. No value marks or emphasis that singles out one panel; compared numbers go in the caption.
 1. **Start**: every panel in one row, up to the column limit.
 2. **Render**: `fit_height` warns when a panel's data area is narrower than `min_width` (1.2 in), or when text is cut off or overlaps.
 3. **On a warning**, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), apply Typography's text tick rule, shorten labels. Only when a panel is still too narrow, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3), then render again. Rows have no limit.
@@ -211,10 +211,10 @@ fig.savefig("outputs/{id}.pdf")
 
 ### Axes
 
-- **Limits**: matplotlib's defaults and margins, except an axis that is a bounded whole, fixed to it: shares (0–1), probabilities and the unit square (ROC, reliability), a radar's scale.
+- **Limits**: matplotlib's defaults and margins, except an axis that is a bounded whole, fixed to it: shares of a whole (0–1), the unit square of ROC and reliability diagrams, a radar's scale. Metrics such as accuracy keep the defaults.
 - **Order**: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom when horizontal), so ours, usually the best, ends at the right. A natural order stays: sizes, time, bins, swept values, a benchmark list the paper fixes. Legends of side-by-side series follow the same order.
 - **Category axes**: tick marks hidden on that axis on every panel, `ax.tick_params(axis="x", length=0)` (`axis="y"` when horizontal).
-- **Log axes**: an axis whose positive values span over 100× (max / min > 100) is log, `ax.set_xscale("log")`, named in the caption; a log₁₀ axis keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`), and in a chart with gridlines its gridlines follow them, `ax.grid(True, which="both")`.
+- **Log axes**: an axis whose positive values span over 100× (max / min > 100) is log, `ax.set_xscale("log")`, named in the caption; a log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`), and in a chart with gridlines its gridlines follow them, `ax.grid(True, which="both")`.
 - **Colorbars** (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when `fit_height` reports the panel narrower than `min_width` with it on the right.
 
 ## Shapes
@@ -235,8 +235,8 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Box plot median | `median` | 1 pt, black | set by the style |
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
 
-- **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
-- **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
+- **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (a grey series takes its `greys(n)` shade as it is: those are already light).
+- **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills. Several reference lines in one panel are told apart by line style, `"--"`, `":"`, `"-."`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
 
 ## Components
 
@@ -288,12 +288,13 @@ Reported results the takeaway compares are written on the plot, so the reader re
 | Value | Written as |
 |---|---|
 | Copied from the source (a paper's table) | exactly as printed: `"0.82"` stays `"0.82"` |
-| A count or other whole number | an integer, `f"{round(v):,}"`: `93`, `1,024` |
-| A share of a whole (pie, stacked bar, win rate, area) | a whole percent, `f"{v:.0%}"`: `38%` |
-| 1000 or more | a whole number, `f"{v:,.0f}"`: `1,234` |
+| A count or other whole number | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
+| A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a whole percent, `f"{v:.0%}"`: `38%` |
+| 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
 | Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: `85.0`, `0.912` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.
+- **Tag**: a value label written with `ax.annotate` or `ax.text` (not by `mark_value` or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs.
 
 ## Do's and Don'ts
 

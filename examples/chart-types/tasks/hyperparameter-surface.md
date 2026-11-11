@@ -4,4 +4,4 @@ Draw validation loss over a sweep of learning rate and weight decay (13 × 13 ru
 
 The data is synthetic, made to look like a real experiment. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `hyperparameter-surface.png` and `hyperparameter-surface.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `hyperparameter-surface.png` and `hyperparameter-surface.pdf`.

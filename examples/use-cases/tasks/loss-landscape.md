@@ -20,4 +20,4 @@ Width: the original is one panel of a 2 × 3 grid across the text width of a sin
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `loss-landscape.png` and `loss-landscape.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `loss-landscape.png` and `loss-landscape.pdf`.

@@ -15,4 +15,4 @@ Width: the original spans one column of a two-column layout; in ICLR this is hal
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 
-Deliverable: the figure in `figures/figures.ipynb` with its caption, as `confusion-matrix.png` and `confusion-matrix.pdf`.
+Deliverable: the figure in the figures folder with its caption, as `confusion-matrix.png` and `confusion-matrix.pdf`.
