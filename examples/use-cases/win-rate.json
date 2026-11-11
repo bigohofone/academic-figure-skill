@@ -1,0 +1,8 @@
+{
+  "unit": "percent of 300 test prompts",
+  "categories": ["LIMA wins", "Tie", "LIMA Loses"],
+  "opponents": ["Alpaca 65B", "DaVinci003", "BARD (April)", "Claude (April)", "GPT-4 (April)"],
+  "LIMA wins":  [53, 44, 33, 24, 18],
+  "Tie":        [21, 21, 25, 22, 25],
+  "LIMA Loses": [26, 35, 42, 54, 57]
+}

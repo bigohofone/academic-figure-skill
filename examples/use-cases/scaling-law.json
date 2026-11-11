@@ -1,0 +1,74 @@
+{
+  "source": "Kaplan et al. 2020, Scaling Laws for Neural Language Models, arXiv:2001.08361, Figure 1 (right panel, 'Parameters')",
+  "recovery": "vector marker centers from the PDF; x calibrated from the 10^5/10^7/10^9 tick labels, y calibrated from the drawn fit line L=(N/8.8e13)^-0.076",
+  "non_embedding_parameters": [
+    6129.0,
+    55130.0,
+    97990.0,
+    330600.0,
+    587700.0,
+    783500.0,
+    1175000.0,
+    1530000.0,
+    2350000.0,
+    3133000.0,
+    4699000.0,
+    9396000.0,
+    10570000.0,
+    18790000.0,
+    25050000.0,
+    39140000.0,
+    75130000.0,
+    84520000.0,
+    150200000.0,
+    300400000.0,
+    703900000.0,
+    1457000000.0,
+    1466000000.0
+  ],
+  "test_loss": [
+    5.945,
+    4.925,
+    4.698,
+    4.341,
+    4.121,
+    4.077,
+    3.98,
+    3.878,
+    3.753,
+    3.653,
+    3.595,
+    3.395,
+    3.369,
+    3.216,
+    3.143,
+    3.034,
+    2.897,
+    2.855,
+    2.746,
+    2.6,
+    2.444,
+    2.338,
+    2.346
+  ],
+  "fit": {
+    "formula": "L = (N / 8.8e13)^(-0.076)",
+    "N_c": 88000000000000.0,
+    "alpha_N": 0.076,
+    "plotted_N_range": [
+      9970.0,
+      1990000000.0
+    ]
+  },
+  "axes": {
+    "x": "Parameters (non-embedding), log scale",
+    "y": "Test Loss (nats/token), log scale",
+    "y_ticks": [
+      2.4,
+      3.2,
+      4.0,
+      4.8,
+      5.6
+    ]
+  }
+}

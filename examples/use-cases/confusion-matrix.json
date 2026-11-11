@@ -1,60 +1,15 @@
 {
- "labels": [
-  "anger",
-  "fear",
-  "joy",
-  "love",
-  "sadness",
-  "surprise"
- ],
- "counts": [
-  [
-   275,
-   21,
-   4,
-   2,
-   14,
-   3
-  ],
-  [
-   18,
-   196,
-   3,
-   1,
-   9,
-   11
-  ],
-  [
-   5,
-   4,
-   640,
-   39,
-   8,
-   9
-  ],
-  [
-   2,
-   1,
-   44,
-   108,
-   3,
-   1
-  ],
-  [
-   12,
-   8,
-   6,
-   2,
-   548,
-   5
-  ],
-  [
-   2,
-   13,
-   9,
-   1,
-   3,
-   38
+  "source": "Liu, Yelp Review Rating Prediction: Machine Learning and Deep Learning Models, arXiv:2012.06690, Figure 5 (Random Forest, testing set)",
+  "values": "row-normalized fractions: rows = true label, columns = predicted label; each row sums to ~1 (values as printed, 2 significant digits)",
+  "labels": ["1", "2", "3", "4", "5"],
+  "label_meaning": "Yelp star rating (1 = worst, 5 = best)",
+  "row_axis": "True label",
+  "column_axis": "Predicted label",
+  "matrix": [
+    [0.82, 0.13, 0.018, 0.0069, 0.026],
+    [0.38, 0.37, 0.17, 0.029, 0.054],
+    [0.14, 0.17, 0.42, 0.17, 0.11],
+    [0.042, 0.03, 0.17, 0.39, 0.37],
+    [0.029, 0.01, 0.034, 0.17, 0.76]
   ]
- ]
 }

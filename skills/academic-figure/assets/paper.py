@@ -22,7 +22,7 @@ def _size(a, original=False):
     box = a.get_position(original=original).transformed(a.figure.transSubfigure)
     return box.width / a.figure.dpi, box.height / a.figure.dpi
 
-_dashed_width = 0.75
+dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to dashed and dotted lines
 
 
 def _resolve(value, tokens):
@@ -45,7 +45,7 @@ def _number(value):
 def use_design(path=Path(__file__).parent / "DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in DESIGN.md's front matter.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global _dashed_width
+    global dashed_width
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
@@ -80,7 +80,7 @@ def use_design(path=Path(__file__).parent / "DESIGN.md"):
         "figure.constrained_layout.w_pad": _number(s["layout-pad"]),
         "figure.constrained_layout.h_pad": _number(s["layout-pad"]),
     })
-    _dashed_width = _number(k["dashed-line"]["width"])
+    dashed_width = _number(k["dashed-line"]["width"])
     return c
 
 
@@ -339,7 +339,7 @@ def mark_value(ax, x, y, text, color, below=False):
     """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
     a hollow circle at (x, y), and `text` just above it (`below=True`: just below), in `darken(color)`.
     """
-    ax.axhline(y, linestyle="--", linewidth=_dashed_width, color=darken(color), zorder=1)
+    ax.axhline(y, linestyle="--", linewidth=dashed_width, color=darken(color), zorder=1)
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",

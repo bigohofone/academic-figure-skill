@@ -14,13 +14,13 @@ Values along a continuous x: learning curves (training curves), scaling curves, 
 
 - Log₂ axes (number of samples, batch size): `ax.set_xscale("log", base=2)`, a tick at every power of 2 up to the first one at or above the largest x (`top`) with `ax.set_xticks(ks, labels=[str(k) for k in ks])`, and no minor ticks (`ax.set_xticks([], minor=True)`). The axis ends at `top` with the usual 5% margin, so every panel ends on a labelled tick: `margin = 2 ** (0.05 * math.log2(top))`, `ax.set_xlim(1 / margin, top * margin)`. Where those labels overlap, step by 4 (`1, 4, 16, 64`).
 - Scaling curves (parameters, FLOPs, tokens, data size): `ax.set_xscale("log")`, ticks at the powers of 10 in range, labelled with SI suffixes as plain text (`ax.set_xticks([1e8, 1e9, 1e10], labels=["100M", "1B", "10B"])`), no minor tick labels. A scaling law (loss against compute) also takes a log y axis.
-- Scaling law fits: the measured points as markers without a line, and the fitted power law as a dashed line in the same color over the fitted range, `ax.plot(x_fit, a * x_fit ** -b, linestyle="--", color=color)`; the fitted exponent goes in the legend entry, `label=f"Ours (fit: $L \\propto C^{{-{b:.3f}}}$)"` (mathtext, since Inter has no ∝ glyph), or in the caption.
+- Scaling law fits: the measured points as markers without a line, and the fitted power law as a dashed line in the same color over the fitted range, `ax.plot(x_fit, a * x_fit ** -b, linestyle="--", linewidth=paper.dashed_width, color=color)`; the fitted exponent goes in the legend entry, `label=f"Ours (fit: $L \\propto C^{{-{b:.3f}}}$)"` (mathtext, since Inter has no ∝ glyph), or in the caption.
 
 ## ROC and precision-recall curves
 
 - One panel, aspect 1 : 1, both axes from 0 to 1 (`ax.set_xlim(0, 1)`, `ax.set_ylim(0, 1)`, the one place limits are fixed, since the unit square is the space).
 - The curve is computed from a finite test set, so it is a staircase through the thresholds: draw it as computed (`drawstyle="steps-post"` for precision-recall), never smoothed, with markers at the operating points the paper reports or at ~10 evenly spaced thresholds.
-- ROC: x "False positive rate", y "True positive rate", and the chance diagonal as a reference line (`ax.plot([0, 1], [0, 1], linestyle="--", linewidth=0.75, color=colors["neutral"], zorder=1)`). Precision-recall: x "Recall", y "Precision", and the positive rate as a horizontal reference line.
+- ROC: x "False positive rate", y "True positive rate", and the chance diagonal as a reference line (`ax.plot([0, 1], [0, 1], linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)`). Precision-recall: x "Recall", y "Precision", and the positive rate as a horizontal reference line.
 - The area under each curve goes in its legend entry, three significant figures: `label=f"Ours (AUC {auc:.3f})"`. No `mark_value`.
 
 ## Value labels
