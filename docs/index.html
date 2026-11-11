@@ -141,40 +141,33 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <section id="features" class="feat"><div class="wrap">
   <img class="hero" src="hero.png" alt="academic-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style">
   <div class="cards six">
-    <a class="card" href="#venue"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
-    <a class="card" href="#readable"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
+    <a class="card" href="#lines"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
+    <a class="card" href="#lines"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
     <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, the same meaning in every figure.</p></a>
     <a class="card" href="#lines"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></a>
-    <a class="card" href="#clean"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
+    <a class="card" href="#gallery"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
     <a class="card" href="#install"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></a>
   </div>
 </div></section>
 
-<section class="soft" id="venue"><div class="wrap">
-  <div class="kicker">Sized for your venue</div>
-  <h2>The right width, every time</h2>
-  <p class="intro">Name the venue and you get its exact sizes: half the text width, one column, or both columns. Shown here at print size.</p>
-  <div class="col block venue"><div class="row"><div class="vitem" style="width:40.741%"><img src="figures/with/learning-curve.svg?v=e49b6ee67e" alt="learning-curve" loading="lazy"><div class="vlabel">ICLR · half text width · 2.75 in</div></div><div class="vitem" style="width:48.148%"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="icml-learning-curve" loading="lazy"><div class="vlabel">ICML · one column · 3.25 in</div></div></div><div class="row"><div class="vitem" style="width:100.000%"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy"><div class="vlabel">ICML · both columns · 6.75 in</div></div></div></div>
-</div></section>
-
-<section id="readable"><div class="wrap">
-  <div class="kicker">Readable at print size</div>
-  <h2>Text that matches the paper</h2>
-  <p class="intro">At print size, labels sit just under the 10 pt body text, in one font across the paper. No squinting, no oversized ticks.</p>
+<section class="soft" id="lines"><div class="wrap">
+  <div class="kicker">Sized for your venue · Readable at print size · Every panel lines up</div>
+  <h2>Every figure looks fine. Together, they don't.</h2>
+  <p class="intro">The same figures on an A4 ICML page, at print size. With the skill, each figure takes the venue's exact width, its text sits just under the 10 pt body text, and every panel starts and ends on the dashed lines, the one across both columns too. Same data, same request, nothing edited by hand.</p>
   
-<div class="compare" data-show="with" data-name="readable">
+<div class="compare" data-show="with" data-name="page">
   <div class="switch" role="group" aria-label="Version">
     <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="paper narrow"><div class="col"><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type. We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-reliability-diagram.svg?v=fcf2817055" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="paper narrow"><div class="col"><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type. We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-reliability-diagram.svg?v=f55d15d700" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div>
+    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/without/small-multiples.svg?v=1fda2f92d1" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/without/icml-learning-curve.svg?v=d394b0cf88" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/without/icml-scaling-law.svg?v=8b40aafd50" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
   </div>
 </div>
 </div></section>
 
-<section class="soft" id="color"><div class="wrap">
+<section id="color"><div class="wrap">
   <div class="kicker">Color-blind safe</div>
   <h2>Colors that mean something</h2>
   <p class="intro">Your method stands out in one color and the baselines step back in grey, in bars and curves alike, from a color-blind-safe palette.</p>
@@ -191,41 +184,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </div>
 </div></section>
 
-<section id="lines"><div class="wrap">
-  <div class="kicker">Every panel lines up</div>
-  <h2>Every figure looks fine. Together, they don't.</h2>
-  <p class="intro">The same figures on an A4 ICML page, at print size. The dashed lines mark where panels start and end: with the skill, every figure sits on them, the one across both columns too. Same data, same request, nothing edited by hand.</p>
-  
-<div class="compare" data-show="with" data-name="page">
-  <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
-    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
-  </div>
-  <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/without/small-multiples.svg?v=1fda2f92d1" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/without/icml-learning-curve.svg?v=d394b0cf88" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/without/icml-scaling-law.svg?v=8b40aafd50" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
-  </div>
-</div>
-</div></section>
-
-<section class="soft" id="clean"><div class="wrap">
-  <div class="kicker">Clean, modern style</div>
-  <h2>Nothing overlaps, nothing is cut off</h2>
-  <p class="intro">Long method names, crowded values and legends that would sit on the data are handled before you see the figure.</p>
-  
-<div class="compare" data-show="with" data-name="checks">
-  <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
-    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
-  </div>
-  <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/error-bar-plot.svg?v=4b192f0e9b" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/without/rlvr-fig6.svg?v=d132a40a96" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/error-bar-plot.svg?v=dbeb010751" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/with/rlvr-fig6.svg?v=e2f3904135" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
-  </div>
-</div>
-</div></section>
-
-<section id="gallery"><div class="wrap">
+<section class="soft" id="gallery"><div class="wrap">
   <div class="kicker">Examples</div>
   <h2>29 figures, both ways</h2>
   <p class="intro">Every chart type, and figures redrawn from published ML papers with their own values. Switch each between the version without the skill and the version with it.</p>
@@ -558,7 +517,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </figure></div>
 </div></section>
 
-<section class="soft" id="install"><div class="wrap">
+<section id="install"><div class="wrap">
   <div class="kicker">Nice and easy</div>
   <h2>Two commands, then just ask</h2>
   <p class="intro">Then ask as usual: "plot the learning curves in results.json for my ICLR paper." You get the figure sized for your venue, a caption ready to paste, and one short script per figure, <code>figures/&lt;id&gt;.py</code>, to rerun or tweak later.</p>
