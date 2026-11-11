@@ -236,7 +236,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
 
 - **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
-- **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, filled contour), where grey sinks into the fills. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
+- **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
 
 ## Components
 
@@ -267,7 +267,7 @@ Pick the first row that fits:
 
 | Case | Legend |
 |---|---|
-| A filled plot (heatmap, filled contour, stacked area, embedding) | outside, above the panel (last row), or none when the bands are named directly |
+| A filled plot (heatmap, contour gradient, stacked area, embedding) | outside, above the panel (last row), or none when the bands are named directly |
 | One panel | inside, at the first spot where `fit_height` stays silent: the corners `"upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, then `"upper center"`, `"lower center"`, `"center left"`, `"center right"`; when none works, outside, above the panel (last row) |
 | Several panels with the same series | one legend for the figure, above the panels: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
 | A row of panels with its own series (rows of different plots) | one legend per row, in that row's first panel where it fits, else the next, placed as for one panel |

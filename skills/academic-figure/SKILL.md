@@ -36,7 +36,7 @@ figures/
 ```
 
 - **Setup**: `{skill-dir}` is this skill's base directory. `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/`, `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays.
-- **Requirements**: Python 3.10+, `matplotlib` 3.10+, `numpy` 2+, `pyyaml`, and `scipy` for the charts whose files call it (smoothed contours, density curves). If one is missing, tell the user and ask before installing it.
+- **Requirements**: Python 3.10+, `matplotlib` 3.10+, `numpy` 2+, `pyyaml`, and `scipy` for density curves. If one is missing, tell the user and ask before installing it.
 - **Script**: `figures/{id}.py` (kebab-case id) runs on its own: the caption as its docstring, the setup below, then everything for that figure: load data, plot, `fit_height`, save PDF and PNG.
 
   ```python
