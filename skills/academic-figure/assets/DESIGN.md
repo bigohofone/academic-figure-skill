@@ -94,9 +94,9 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
 | Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
-| Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole |
+| Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole (parts are not compared series, so all six colors are free here) |
 | Some series the takeaway names, among others it does not | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
-| Several series compared on equal terms, no "ours" (models in a survey, data sources, error types) | `series-1` to `series-6`, in order |
+| Several series compared on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-3`, `series-4`, … in order, skipping the `ours` color, which means ours in every figure of the paper |
 | More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20) |
 | Groups with sizes or sweeps inside (model sizes per family) | one color per group; within a group, blended with white at 40 / 70 / 100%, light to dark |
 | Single series, or one quantity over categories (groups in one box plot) | `series-1` |
@@ -104,7 +104,7 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | Text, axes, ticks | `ink` |
 | Continuous values | the `heatmap.colormap` token, `viridis`, low values dark; signed values `RdBu_r` (`heatmap.md`) |
 
-- **Grey series**: told apart in the Order rule's order (Layout), on lines by line style, `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and on fills (bars, boxes, violins, areas) by shade, `greys(n)` for n grey series, evenly spaced from `neutral-light` to `neutral-dark`, light to dark (one grey series takes `neutral`).
+- **Grey series**: told apart in the Order rule's order (Layout), on lines by line style, `"--"`, `":"`, `"-."` (a solid line is ours' alone) (dashed and dotted at `linewidth=paper.dashed_width`), and on fills (bars, boxes, violins, areas) by shade, `greys(n)` for n grey series, evenly spaced from `neutral-light` to `neutral-dark`, light to dark (one grey series takes `neutral`).
 - **Many grey series**: more than four lines: add markers, one shape per series (`line-chart.md`); more than six: draw the series the takeaway names, and group the rest as one grey series, "Other baselines".
 - **Same color, several series**: whenever two or more drawn series share a color (ours and its variants, greys), they differ by line style or shade as above.
 - **Readable on white**: grey lines, markers and reference lines are `neutral` at full opacity; `neutral-light` only as a fill. Text that belongs to a series is `darken(series_color)` (any grey series: `darken(colors["neutral"])`), so light series still get readable labels; text on a fill follows Typography.
@@ -154,7 +154,7 @@ Pick the first row that applies:
 | The user or the task gives a figure width (one column of the paper, a size in inches; a venue's text width alone is not one) | that width; the rules below fit the figure into it |
 | The user asks for a 1.5-column `figure*`, or the panels at single column still fail `min_width` after Grid step 3 | 1.5 column |
 | Single-column venue, several panels | the full text width |
-| Single-column venue, one panel | half the text width; the full width only when Collisions step 3 calls for it, at φ² : 1 (a panel whose aspect is fixed, such as a heatmap, keeps it) |
+| Single-column venue, one panel | half the text width; the full width only when Collisions step 3 calls for it |
 | Two-column venue | single column, or double column when the panels fail `min_width` there |
 
 The venue is the one the user names; with none, ICLR.
@@ -207,7 +207,7 @@ When `fit_height` reports text overlapping, covering data, cut off at the figure
 
 1. **Move it**: that one item to the next placement its chart file lists (another side of the point, below the value, the next legend spot); placements may differ item by item.
 2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
-3. **Give it width**, when the crowding runs along x (tick labels, bar values, names side by side) and no figure width is given: the full width at φ² : 1; after widening, try the earlier placements again (horizontal before turned). Crowding inside the data area (value labels on curves, contour labels) and fixed-aspect panels go to step 4 instead.
+3. **Give it width**, when the crowding is in labels along an axis (tick labels, bar values, names side by side, a heatmap's rows or columns) and no figure width is given: the full width, at φ² : 1, or at its own aspect for a fixed-aspect panel (a heatmap's rows grow with it); after widening, try the earlier placements again (horizontal before turned). Crowding inside the data area (value labels on curves, contour labels) goes to step 4 instead.
 4. **Write less, alike**: label every m-th item of an ordered kind (ticks, contour levels), keeping every tick, gridline and line; or drop a kind whole (all point names of non-cited models, all bar values, all shares of a band) and give the cited numbers in the caption.
 
 Never resolve a collision by shrinking text, changing a token, or changing the aspect for room.
@@ -309,9 +309,10 @@ Reported results the takeaway compares are written on the plot, so the reader re
 |---|---|
 | Copied from the source (the task says the numbers are as printed in a paper) | exactly as printed: `"0.82"` stays `"0.82"` |
 | A count (a number of items) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
-| A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `0.69%` |
+| A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:#.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `1.0%`, `0.69%` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
-| A difference or ratio of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
+| A difference of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
+| A ratio | three significant figures: `1.91×` |
 | Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: `85.0`, `0.912` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.
