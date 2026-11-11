@@ -92,7 +92,7 @@ Pick the first row that fits:
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
 | Text, axes, ticks | `ink` |
-| Continuous values | the `heatmap.colormap` component, matplotlib's `viridis` (the default colormap: perceptually uniform, color-blind safe, readable in grayscale), with the best values bright: lower-is-better values (loss, error, perplexity) take it reversed, `viridis_r`; signed values `RdBu_r`, in heatmap.md |
+| Continuous values | the `heatmap.colormap` component, matplotlib's `viridis` (the default colormap: perceptually uniform, color-blind safe, readable in grayscale), low values dark and high values bright, whichever end is better; signed values `RdBu_r`, in heatmap.md |
 
 - Several variants of ours (with and without a component): all in `ours`, told apart by line style on lines and by shade on fills, as grey series are.
 - More compared series than grey line styles (four): add the design's markers, a different shape per series; more than eight: draw the series the takeaway names, and the rest as one grey group named "Other baselines" in the legend.
@@ -228,7 +228,7 @@ The marks every chart type is built from, sized by the `components` tokens:
 | Contour lines | `contour` | 0.5 pt |
 
 - Fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
-- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, fully opaque. A line that carries a value of its own (a baseline's score, a threshold) gets a legend entry. A line whose meaning the axes already give (the y = x diagonal of a reliability diagram, the chance diagonal of an ROC curve, zero) gets none: the caption's reading guide names it ("the dashed diagonal marks perfect calibration"), which keeps the legend short enough to sit inside the panel.
+- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, fully opaque; drawn across a filled plot (stacked area, heatmap, filled contour), where grey sinks into mid-tone fills, it is white, like the seams between fills. A line that carries a value of its own (a baseline's score, a threshold) gets a legend entry. A line whose meaning the axes already give (the y = x diagonal of a reliability diagram, the chance diagonal of an ROC curve, zero) gets none: the caption's reading guide names it ("the dashed diagonal marks perfect calibration"), which keeps the legend short enough to sit inside the panel.
 
 ## Components
 
