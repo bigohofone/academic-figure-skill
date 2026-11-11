@@ -101,7 +101,7 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 |---|---|
 | "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
-| Variants of ours compared together against other methods | all `ours` and solid (the dashes belong to grey series), told apart by marker shape, `"o"`, `"s"`, `"^"`; the full method first in the legend |
+| Variants of ours compared together against other methods | all `ours`, told apart by marker shape, `"o"`, `"s"`, `"^"`, on solid lines (the dashes belong to grey series); on curves drawn without markers (ROC and PR staircases, smoothed logs), by line style instead, the full method solid and the others `"--"`, `":"`; the full method first in the legend |
 | Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole (parts are not compared series, so all six colors are free here) |
 | Some series the takeaway names, among others it does not | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
 | Several series compared on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-3`, `series-4`, … in order, skipping the `ours` color, which means ours in every figure of the paper |
