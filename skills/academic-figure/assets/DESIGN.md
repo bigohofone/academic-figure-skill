@@ -181,7 +181,7 @@ The venue is the one the user names; with none, ICLR.
 3. **On a warning**, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), apply Typography's text tick rule, shorten labels. Only when a panel is still too narrow, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3), then render again. Rows have no limit.
 4. **Unused cells**: turned off (5 panels in 2 × 3: the last one).
 5. **Shared axes**: when panels plot the same quantity over the same range, share it (`plt.subplots(..., sharex=True, sharey=True)`); outside a two-factor grid, every panel keeps its tick numbers, `ax.tick_params(labelleft=True, labelbottom=True)`.
-6. **Axis labels**: each quantity named once. Panels side by side with the same x quantity: one `fig.supxlabel(label)` under the row, none on the panels; panels stacked with the same y quantity: the y label on the leftmost panel of each row only (or `fig.supylabel` once down the column); inside sub-figures, whose `supxlabel` is the subcaption, each panel keeps its own. A panel whose quantity differs carries its own label.
+6. **Axis labels**: each quantity named once. Panels side by side with the same x quantity: one `fig.supxlabel(label)` under the row, none on the panels; panels stacked with the same y quantity: the y label on the leftmost panel of each row only (or `fig.supylabel` once down the column); inside sub-figures, whose `supxlabel` is the subcaption, each panel keeps its own. Panels side by side with the same y quantity, shared or not: the y label on the leftmost panel only. A panel whose quantity differs carries its own label.
    **Grouped axes**: when columns fall into groups that each plot their own quantity (two panels of accuracy, then two of loss), the first column of each group carries the group's y label and tick numbers, `sharey` within the group, `labelleft=False` on the rest, and each group's x label is one label centred under it, `paper.group_label(bottom_panels_of_group, "Step")` (`axis="y"` for a group of rows, passing its left panels). The gaps follow from what each column shows (Standard box), so a group's columns sit close and the groups stand apart.
    **Right y axis** (`ax.twinx()`, a second quantity on the same x): it mirrors the left one, four-character tick labels and a label line, in the right margin; the panel narrows and keeps its standard height. Its curves take their own color and its label names the color's series.
 
@@ -214,7 +214,7 @@ The aspect follows the data, never room for labels. Pie and radar charts are cir
 When `fit_height` reports text overlapping, covering data, cut off at the figure edge, sticking out of its panel or spilling out of its fill, resolve it by the first step that clears, rendering after each:
 
 1. **Move it**: that one item to the next placement its chart file lists (another side of the point, below the value, the next legend spot); placements may differ item by item.
-2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
+2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text (an axis label longer than its panel: the short name of the quantity, its detail in the caption).
 3. **Give it width**, when the crowding is in labels along an axis (tick labels, bar values, category names side by side, a heatmap's rows or columns) and no figure width is given: the full width, at φ² : 1, or at its own aspect for a fixed-aspect panel (a heatmap's rows grow with it); after widening, try the earlier placements again (horizontal before turned). Crowding inside the data area (value labels on curves, point names on a scatter, a heatmap's cell values, contour labels) goes to step 4 instead.
 4. **Write less, alike**: label every m-th item of an ordered kind (ticks, contour levels), keeping every tick, gridline and line; or drop a kind whole (all point names of non-cited models, all bar values, all cell values, all shares of a band) and give the cited numbers in the caption.
 
@@ -222,7 +222,7 @@ Never resolve a collision by shrinking text, changing a token, or changing the a
 
 ### Height
 
-`fit_height` sets it. Create the figure at the target width with any height, draw everything (labels, legend, colorbar), call `fit_height` last, then save with plain `fig.savefig`:
+`fit_height` sets it. Create the figure at the target width with a height equal to it (a start; too short a start can collapse a layout with an outside legend), draw everything (labels, legend, colorbar), call `fit_height` last, then save with plain `fig.savefig`:
 
 ```python
 fig, axes = plt.subplots(2, 1, figsize=(3.25, 2), sharex=True)
@@ -297,7 +297,7 @@ Pick the first row that fits:
 | Case | Legend |
 |---|---|
 | A single entry (one series, or one marked point such as a minimum) | none: a lone entry above a panel reads as a title; the caption's reading guide names it ("the star marks the trained minimizer") |
-| A filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above the panel (last row), or none when every segment is named inside it |
+| A filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above the panels (above the top row in a grid), or none when every segment is named inside it |
 | One panel | inside, at the first spot where `fit_height` stays silent: the corners `"upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, then `"upper center"`, `"lower center"`, `"center left"`, `"center right"`; when none works, outside, above the panel (last row) |
 | Several panels with the same series | one legend for the figure, above the panels: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)` |
 | A row of panels with its own series (rows of different plots) | one legend per row, in that row's first panel where it fits, else the next, placed as for one panel |
@@ -320,7 +320,7 @@ Reported results the takeaway compares are written on the plot, so the reader re
 | Copied from the source (the task says the numbers are as printed in a paper) | exactly as printed: `"0.82"` stays `"0.82"` |
 | A count (a number of items; a statistic of counts, such as a median, is not one) | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
 | A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:#.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `1.0%`, `0.69%` |
-| Given in the data and shown unchanged (not computed by the script) | as given, to at most three significant figures, every value of the kind with the decimals of its most precise one (the data drops trailing zeros): `0.076` stays `0.076`; `0.64` among `0.612` and `0.774` is `0.640`; `0.54063` is `0.541` |
+| Given in the data and shown unchanged (not computed by the script) | as given, every value of the kind with as many significant figures as the most precise one has, at most three (the data drops trailing zeros): `0.076` stays `0.076`; `0.64` among `0.612` and `0.774` is `0.640`; `0.82` and `0.0069` stay as they are; `0.54063` is `0.541` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
 | A difference of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
 | A ratio | three significant figures: `1.91×` |
