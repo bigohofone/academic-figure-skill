@@ -72,6 +72,7 @@ A figure is read printed in a paper, at the column width it is set at, by a read
 
 - Print first: sizes are the printed sizes, text is never scaled down, and the figure is drawn at the width it is printed at.
 - One message per figure, stated by the takeaway and supported by what is drawn; everything else recedes (thin black box, faint grid, neutral grey for context).
+- Color only for emphasis: by default everything is `ink` and `neutral` grey, and color goes only to what the reader must look at (ours, the series being compared). Context (baselines, fronts, reference lines, other models) stays grey. Several colors only when several series are compared on equal terms.
 - Color-blind safe colors, told apart in grayscale too where needed.
 - Plain and consistent: the same series keeps its color, marker and name in every figure of the paper.
 
