@@ -6,7 +6,7 @@
 <title>academic-figure</title>
 <meta name="description" content="A Claude Code skill that makes every figure of a paper publication-ready and consistent: one design system, sizes from a formula, and checks instead of eyeballing.">
 <meta property="og:title" content="academic-figure: paper figures that belong together">
-<meta property="og:description" content="Claude Code alone vs with the academic-figure skill: same data, same tasks, printed size.">
+<meta property="og:description" content="Matplotlib defaults vs the academic-figure skill: same data, same tasks, printed size.">
 <meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
 <meta property="og:url" content="https://wonjunoh.com/academic-figure-skill/">
 <meta name="twitter:card" content="summary_large_image">
@@ -90,6 +90,13 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 .frame img { grid-area:1/1; max-width:100%; max-height:380px; height:auto; }
 .ex[data-show="with"] .frame .without, .ex[data-show="without"] .frame .with { visibility:hidden; }
 pre { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:14.5px; background:var(--code); border:1px solid var(--line); border-radius:12px; padding:18px 20px; overflow-x:auto; margin:0; }
+.star { display:inline-flex; align-items:center; gap:7px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); font-weight:600; font-size:14px; text-decoration:none; }
+.star:hover { border-color:var(--ink3); }
+.star svg { color:#e3b341; }
+.star .count { padding-left:8px; margin-left:2px; border-left:1px solid var(--line); color:var(--ink2); font-variant-numeric:tabular-nums; }
+.star.big { padding:12px 18px; font-size:15px; border-radius:10px; }
+nav .links { align-items:center; }
+.thanks { margin:22px 0 0; color:var(--ink2); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 footer { padding:40px 0 60px; border-top:1px solid var(--line); color:var(--ink3); font-size:14px; }
 footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-between; }
 @media (max-width:860px) {
@@ -106,35 +113,35 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <body>
 <nav><div class="wrap">
   <a class="logo" href="#">academic-figure</a>
-  <div class="links"><a class="opt" href="#page">Why</a><a class="opt" href="#grid">How</a><a href="#gallery">Examples</a><a href="#install">Install</a><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a></div>
+  <div class="links"><a class="opt" href="#page">Why</a><a class="opt" href="#grid">How</a><a href="#gallery">Examples</a><a class="opt" href="#install">Install</a><a class="star" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star<span class="count" hidden></span></a></div>
 </div></nav>
 
 <header><div class="wrap">
   <span class="eyebrow">A Claude Code skill</span>
   <h1>Paper figures that <em>belong together</em></h1>
-  <p class="lead">Ask an AI agent for one plot and you get a decent plot. Ask it for the six plots of a paper and you get six fonts, six text sizes and six margins. academic-figure gives the agent a design system and checks its work, so every figure is publication-ready and they all match.</p>
-  <div class="cta"><a class="btn primary" href="#install">Install in Claude Code</a><a class="btn" href="https://github.com/bigohofone/academic-figure-skill">View on GitHub</a></div>
+  <p class="lead">Matplotlib's defaults are made for a screen, not a page: 10 pt text in a 3 in figure, labels that collide, legends on top of the data, colors that mean nothing. academic-figure gives Claude Code a design system and checks its work, so every figure of a paper is publication-ready and they all match.</p>
+  <div class="cta"><a class="btn primary" href="#install">Install in Claude Code</a><a class="star big" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star on GitHub<span class="count" hidden></span></a></div>
 </div></header>
 
 <section class="soft" id="page"><div class="wrap">
   <div class="kicker">One paper page, printed size</div>
-  <h2>Every figure looks fine. Together, they don't.</h2>
-  <p class="intro">Six figures on a two-column ICML page, at the size they print, next to 10 pt body text. Same data, same tasks, same widths, drawn by fresh Claude Code sessions with no memory or project instructions. Nothing edited by hand.</p>
+  <h2>Defaults are made for a screen, not a page</h2>
+  <p class="intro">Six figures on a two-column ICML page, at the size they print, next to 10 pt body text. Left: plain matplotlib at its defaults (default style and 4:3 shape, only <code>tight_layout</code>). Right: Claude Code with the skill. Same data, same tasks, same widths; both drawn by fresh Claude Code sessions with no memory or project instructions, nothing edited by hand.</p>
   
 <div class="compare" data-show="with" data-name="page">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col"><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-learning-curve.svg" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-confidence-histogram.svg" alt="confidence-histogram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-correlation.svg" alt="correlation" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="paper two"><div class="col"><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-learning-curve.svg" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-confidence-histogram.svg" alt="confidence-histogram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/default/icml-correlation.svg" alt="correlation" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col"><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-learning-curve.svg" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-confidence-histogram.svg" alt="confidence-histogram" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-correlation.svg" alt="correlation" loading="lazy" style="width:100.000%"></div><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div>
   </div>
 </div>
   <ul class="ticks">
-    <li><strong>One type scale</strong>8 pt labels, 7 pt ticks and values, one font, in every figure.</li>
-    <li><strong>One palette with meaning</strong>Color-blind safe. Your method in one color, baselines in grey, everywhere.</li>
-    <li><strong>One box per width</strong>Every single-column figure's panel starts and ends at the same place, so a column of figures lines up.</li>
+    <li><strong>Print-sized text</strong>8 pt labels and 7 pt ticks in every figure, smaller than the 10 pt body text, in one font.</li>
+    <li><strong>Nothing collides</strong>No overlapping labels, no legend on the data, nothing cut off. The figure is checked, not eyeballed.</li>
+    <li><strong>Colors with meaning</strong>Color-blind safe. Your method in one color, baselines in grey, in every figure.</li>
   </ul>
 </div></section>
 
@@ -146,11 +153,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   
 <div class="compare" data-show="with" data-name="grid">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:46.691%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:96.691%"></span><div class="row"><img src="figures/without/learning-curve.svg" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/without/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/roc-curve.svg" alt="roc-curve" loading="lazy" style="width:50.000%"><img src="figures/without/grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div><div class="row"><img src="figures/without/rlvr-fig5.svg" alt="rlvr-fig5" loading="lazy" style="width:100.000%"></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:46.691%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:96.691%"></span><div class="row"><img src="figures/default/learning-curve.svg" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/default/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/default/roc-curve.svg" alt="roc-curve" loading="lazy" style="width:50.000%"><img src="figures/default/grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/default/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div><div class="row"><img src="figures/default/rlvr-fig5.svg" alt="rlvr-fig5" loading="lazy" style="width:100.000%"></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:46.691%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:96.691%"></span><div class="row"><img src="figures/with/learning-curve.svg" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/with/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/roc-curve.svg" alt="roc-curve" loading="lazy" style="width:50.000%"><img src="figures/with/grouped-bar-chart.svg" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div><div class="row"><img src="figures/with/rlvr-fig5.svg" alt="rlvr-fig5" loading="lazy" style="width:100.000%"></div></div></div>
   </div>
 </div>
@@ -163,11 +170,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   
 <div class="compare" data-show="with" data-name="cbar">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/without/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/without/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/without/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/default/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/default/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/default/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/default/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/with/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/with/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/with/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
   </div>
 </div>
@@ -180,11 +187,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   
 <div class="compare" data-show="with" data-name="accuracy-and-loss">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="col block"><div class="row"><img src="figures/default/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/accuracy-and-loss.svg" alt="accuracy-and-loss" loading="lazy" style="width:100.000%"></div></div></div>
   </div>
 </div>
@@ -192,11 +199,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   
 <div class="compare" data-show="with" data-name="pair">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"><img src="figures/without/loss-and-learning-rate.svg" alt="loss-and-learning-rate" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="col block"><div class="row"><img src="figures/default/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"><img src="figures/default/loss-and-learning-rate.svg" alt="loss-and-learning-rate" loading="lazy" style="width:50.000%"></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/reliability-diagram.svg" alt="reliability-diagram" loading="lazy" style="width:50.000%"><img src="figures/with/loss-and-learning-rate.svg" alt="loss-and-learning-rate" loading="lazy" style="width:50.000%"></div></div></div>
   </div>
 </div>
@@ -215,11 +222,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   
 <div class="compare" data-show="with" data-name="checks">
   <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="without" aria-pressed="false">Matplotlib defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/without/rlvr-fig6.svg" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane without"><div class="tag">Matplotlib defaults</div><div class="col block"><div class="row"><img src="figures/default/error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/default/rlvr-fig6.svg" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
     <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/error-bar-plot.svg" alt="error-bar-plot" loading="lazy" style="width:50.000%"><img src="figures/with/rlvr-fig6.svg" alt="rlvr-fig6" loading="lazy" style="width:50.000%"></div></div></div>
   </div>
 </div>
@@ -228,7 +235,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <section id="gallery"><div class="wrap">
   <div class="kicker">Examples</div>
   <h2>29 figures, both ways</h2>
-  <p class="intro">Every chart type, and figures redrawn from published ML papers with their own values. Switch each between the version without the skill and the version with it.</p>
+  <p class="intro">Every chart type, and figures redrawn from published ML papers with their own values. Switch each between plain matplotlib at its defaults and the version with the skill.</p>
   <div class="gallery-tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="types">Chart types</button>
     <button role="tab" aria-selected="false" data-tab="papers">Paper figures</button>
@@ -238,165 +245,165 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <figure class="ex" data-show="with">
   <figcaption><strong>Line chart</strong><span>Learning curve, mean ± std over 5 seeds</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/learning-curve.svg" alt="Line chart, without the skill" loading="lazy">
+    <img class="without" src="figures/default/learning-curve.svg" alt="Line chart, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/learning-curve.svg" alt="Line chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Bar chart</strong><span>Grouped bar chart, methods × benchmarks</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/grouped-bar-chart.svg" alt="Bar chart, without the skill" loading="lazy">
+    <img class="without" src="figures/default/grouped-bar-chart.svg" alt="Bar chart, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/grouped-bar-chart.svg" alt="Bar chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Scatter plot</strong><span>Reward score against human rating, per response</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/correlation.svg" alt="Scatter plot, without the skill" loading="lazy">
+    <img class="without" src="figures/default/correlation.svg" alt="Scatter plot, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/correlation.svg" alt="Scatter plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Box plot</strong><span>Grouped box plot of response lengths</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/grouped-box-plot.svg" alt="Box plot, without the skill" loading="lazy">
+    <img class="without" src="figures/default/grouped-box-plot.svg" alt="Box plot, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/grouped-box-plot.svg" alt="Box plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Heatmap</strong><span>Accuracy over a hyperparameter grid</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/hyperparameter-grid.svg" alt="Heatmap, without the skill" loading="lazy">
+    <img class="without" src="figures/default/hyperparameter-grid.svg" alt="Heatmap, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/hyperparameter-grid.svg" alt="Heatmap, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Histogram</strong><span>Overlaid histograms of confidence</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/confidence-histogram.svg" alt="Histogram, without the skill" loading="lazy">
+    <img class="without" src="figures/default/confidence-histogram.svg" alt="Histogram, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/confidence-histogram.svg" alt="Histogram, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Error bar plot</strong><span>Means over seeds with ±1 std</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/error-bar-plot.svg" alt="Error bar plot, without the skill" loading="lazy">
+    <img class="without" src="figures/default/error-bar-plot.svg" alt="Error bar plot, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/error-bar-plot.svg" alt="Error bar plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Area chart</strong><span>Stacked area chart of a data curriculum</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/data-mixture.svg" alt="Area chart, without the skill" loading="lazy">
+    <img class="without" src="figures/default/data-mixture.svg" alt="Area chart, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/data-mixture.svg" alt="Area chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Contour plot</strong><span>Validation loss over learning rate × weight decay</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/hyperparameter-surface.svg" alt="Contour plot, without the skill" loading="lazy">
+    <img class="without" src="figures/default/hyperparameter-surface.svg" alt="Contour plot, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/hyperparameter-surface.svg" alt="Contour plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Radar chart</strong><span>Benchmark profiles of three models</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/radar-chart.svg" alt="Radar chart, without the skill" loading="lazy">
+    <img class="without" src="figures/default/radar-chart.svg" alt="Radar chart, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/radar-chart.svg" alt="Radar chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Pie chart</strong><span>Donut chart of a dataset&#x27;s composition</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/dataset-composition.svg" alt="Pie chart, without the skill" loading="lazy">
+    <img class="without" src="figures/default/dataset-composition.svg" alt="Pie chart, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/dataset-composition.svg" alt="Pie chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Violin plot</strong><span>Bimodal reward distributions</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/reward-distribution.svg" alt="Violin plot, without the skill" loading="lazy">
+    <img class="without" src="figures/default/reward-distribution.svg" alt="Violin plot, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/reward-distribution.svg" alt="Violin plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Small multiples</strong><span>One panel per dataset, ICML double column</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/small-multiples.svg" alt="Small multiples, without the skill" loading="lazy">
+    <img class="without" src="figures/default/small-multiples.svg" alt="Small multiples, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/small-multiples.svg" alt="Small multiples, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Grouped axes</strong><span>Accuracy and loss per dataset in one row, one label per group</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/accuracy-and-loss.svg" alt="Grouped axes, without the skill" loading="lazy">
+    <img class="without" src="figures/default/accuracy-and-loss.svg" alt="Grouped axes, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/accuracy-and-loss.svg" alt="Grouped axes, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Right y axis</strong><span>Training loss with its learning-rate schedule</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/loss-and-learning-rate.svg" alt="Right y axis, without the skill" loading="lazy">
+    <img class="without" src="figures/default/loss-and-learning-rate.svg" alt="Right y axis, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/loss-and-learning-rate.svg" alt="Right y axis, with the skill" loading="lazy">
   </div>
 </figure></div>
@@ -404,55 +411,55 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <figure class="ex" data-show="with">
   <figcaption><strong>DAPO</strong><span>Line chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/dapo-fig2.svg" alt="DAPO, without the skill" loading="lazy">
+    <img class="without" src="figures/default/dapo-fig2.svg" alt="DAPO, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/dapo-fig2.svg" alt="DAPO, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>DAPO</strong><span>Line chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/dapo-fig6.svg" alt="DAPO, without the skill" loading="lazy">
+    <img class="without" src="figures/default/dapo-fig6.svg" alt="DAPO, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/dapo-fig6.svg" alt="DAPO, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Line chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/rlvr-fig2.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="without" src="figures/default/rlvr-fig2.svg" alt="Does RL Really Incentivize Reasoning Capacity?, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/rlvr-fig2.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Histogram</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/rlvr-fig5.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="without" src="figures/default/rlvr-fig5.svg" alt="Does RL Really Incentivize Reasoning Capacity?, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/rlvr-fig5.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Does RL Really Incentivize Reasoning Capacity?</strong><span>Box plot</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/rlvr-fig6.svg" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
+    <img class="without" src="figures/default/rlvr-fig6.svg" alt="Does RL Really Incentivize Reasoning Capacity?, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/rlvr-fig6.svg" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
   </div>
 </figure></div>
@@ -460,99 +467,99 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <figure class="ex" data-show="with">
   <figcaption><strong>ROC curves of AI-text detectors</strong><span>Line chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/roc-curve.svg" alt="ROC curves of AI-text detectors, without the skill" loading="lazy">
+    <img class="without" src="figures/default/roc-curve.svg" alt="ROC curves of AI-text detectors, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/roc-curve.svg" alt="ROC curves of AI-text detectors, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Confidence histograms and reliability diagrams</strong><span>Bar chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/reliability-diagram.svg" alt="Confidence histograms and reliability diagrams, without the skill" loading="lazy">
+    <img class="without" src="figures/default/reliability-diagram.svg" alt="Confidence histograms and reliability diagrams, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/reliability-diagram.svg" alt="Confidence histograms and reliability diagrams, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Scaling law with a power-law fit</strong><span>Line chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/scaling-law.svg" alt="Scaling law with a power-law fit, without the skill" loading="lazy">
+    <img class="without" src="figures/default/scaling-law.svg" alt="Scaling law with a power-law fit, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/scaling-law.svg" alt="Scaling law with a power-law fit, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Accuracy against model size</strong><span>Scatter plot</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/accuracy-vs-parameters.svg" alt="Accuracy against model size, without the skill" loading="lazy">
+    <img class="without" src="figures/default/accuracy-vs-parameters.svg" alt="Accuracy against model size, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/accuracy-vs-parameters.svg" alt="Accuracy against model size, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>t-SNE embedding of learned features</strong><span>Scatter plot</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/t-sne.svg" alt="t-SNE embedding of learned features, without the skill" loading="lazy">
+    <img class="without" src="figures/default/t-sne.svg" alt="t-SNE embedding of learned features, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/t-sne.svg" alt="t-SNE embedding of learned features, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Confusion matrix</strong><span>Heatmap</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/confusion-matrix.svg" alt="Confusion matrix, without the skill" loading="lazy">
+    <img class="without" src="figures/default/confusion-matrix.svg" alt="Confusion matrix, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/confusion-matrix.svg" alt="Confusion matrix, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Attention map (alignment)</strong><span>Heatmap</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/attention-map.svg" alt="Attention map (alignment), without the skill" loading="lazy">
+    <img class="without" src="figures/default/attention-map.svg" alt="Attention map (alignment), matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/attention-map.svg" alt="Attention map (alignment), with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Loss landscape</strong><span>Contour plot</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/loss-landscape.svg" alt="Loss landscape, without the skill" loading="lazy">
+    <img class="without" src="figures/default/loss-landscape.svg" alt="Loss landscape, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/loss-landscape.svg" alt="Loss landscape, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
   <figcaption><strong>Win / tie / loss rates</strong><span>Bar chart</span></figcaption>
   <div class="mini switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without</button>
+    <button type="button" data-v="without" aria-pressed="false">Defaults</button>
     <button type="button" data-v="with" aria-pressed="true">With</button>
   </div>
   <div class="frame">
-    <img class="without" src="figures/without/win-rate.svg" alt="Win / tie / loss rates, without the skill" loading="lazy">
+    <img class="without" src="figures/default/win-rate.svg" alt="Win / tie / loss rates, matplotlib defaults" loading="lazy">
     <img class="with" src="figures/with/win-rate.svg" alt="Win / tie / loss rates, with the skill" loading="lazy">
   </div>
 </figure></div>
@@ -564,11 +571,17 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <p class="intro">Then ask for a figure as usual: "plot the learning curves in results.json for my ICLR paper." Each figure comes as one script, <code>figures/&lt;id&gt;.py</code>, with its caption as the docstring.</p>
   <pre>/plugin marketplace add bigohofone/academic-figure-skill
 /plugin install academic-figure@academic-figure-skill</pre>
+  <p class="thanks">If it saves you an evening before a deadline, a star helps other researchers find it. <a class="star big" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star on GitHub<span class="count" hidden></span></a></p>
 </div></section>
 
 <footer><div class="wrap"><span>academic-figure · open source</span>
 <span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a> · <a href="https://github.com/bigohofone/academic-slides-skill">academic-slides-skill</a></span></div></footer>
 <script>
+fetch("https://api.github.com/repos/bigohofone/academic-figure-skill").then(r => r.ok ? r.json() : null).then(d => {
+  if (!d || typeof d.stargazers_count !== "number") return;
+  const n = d.stargazers_count >= 1000 ? (d.stargazers_count / 1000).toFixed(1) + "k" : String(d.stargazers_count);
+  document.querySelectorAll(".star .count").forEach(c => { c.textContent = n; c.hidden = false; });
+}).catch(() => {});
 document.querySelectorAll(".compare, .ex").forEach(box => {
   box.querySelectorAll(".switch button").forEach(b => b.addEventListener("click", () => {
     box.dataset.show = b.dataset.v;

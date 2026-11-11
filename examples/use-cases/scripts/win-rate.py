@@ -1,10 +1,11 @@
-"""Human preference judgments of LIMA against five baselines on 300 test prompts. Each bar splits the prompts into LIMA wins, ties and LIMA losses. LIMA wins or ties on 74% of prompts against Alpaca 65B and on 65% against DaVinci003, and still on 43% against GPT-4 (April)."""
+"""Human preference between LIMA and five baselines on 300 test prompts. Each bar splits the prompts into those where LIMA's response is preferred, both are judged equivalent, or the baseline's is preferred. LIMA wins outright against Alpaca 65B (53%) and DaVinci003 (44%), and even against GPT-4 it wins or ties on 43% of prompts."""
 
 import json
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
@@ -14,33 +15,36 @@ colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/win-rate.json") as f:
     data = json.load(f)
-opponents = data["opponents"]  # fixed order, given by the data
-categories = data["categories"]  # "LIMA wins", "Tie", "LIMA Loses"
+opponents = data["opponents"]
+categories = data["categories"]
 shares = {c: np.array(data[c]) / 100 for c in categories}
 assert np.allclose(sum(shares.values()), 1)
+
+# Takeaway: LIMA beats the weaker baselines outright, and wins or ties against GPT-4 on 43% of prompts.
+win, tie, loss = (shares[c] for c in categories)
+print("takeaway: wins", {o: f"{w:.0%}" for o, w in zip(opponents, win)},
+      "win or tie vs GPT-4:", f"{win[-1] + tie[-1]:.0%}")
+assert win[0] > loss[0] and win[1] > loss[1], "the takeaway does not hold"
+
 segment_colors = [colors["ours"], *greys(2)]
 
-# Takeaway: LIMA wins or ties against each opponent on this share of prompts.
-win_or_tie = shares["LIMA wins"] + shares["Tie"]
-print("takeaway:", {o: f"{v:.0%}" for o, v in zip(opponents, win_or_tie)})
-assert win_or_tie[0] > 0.5 and win_or_tie[1] > 0.5, "the takeaway does not hold"
-
-fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
 y = np.arange(len(opponents))
 left = np.zeros(len(opponents))
-for c, color in zip(categories, segment_colors):
-    v = shares[c]
-    bars = ax.barh(y, v, left=left, color=color, edgecolor="white",
-                   linewidth=plt.rcParams["grid.linewidth"], label=c)
-    ax.bar_label(bars, labels=[f"{s:.0%}" for s in v], label_type="center", color=text_color(color))
-    left += v
+for category, color in zip(categories, segment_colors):
+    values = shares[category]
+    bars = ax.barh(y, values, left=left, color=color, edgecolor="white",
+                   linewidth=rcParams["grid.linewidth"], label=category)
+    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color=text_color(color))
+    left += values
+
 ax.set_yticks(y, labels=opponents)
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
 ax.set_xlim(0, 1)
-ax.set_xticks([0, 0.25, 0.5, 0.75, 1], labels=["0%", "25%", "50%", "75%", "100%"])
-ax.set_xlabel("Share of prompts")
+ax.xaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
+ax.set_xlabel("Share of test prompts")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(categories), frameon=False)
 
 fit_height(fig, ax, aspect=0.618)

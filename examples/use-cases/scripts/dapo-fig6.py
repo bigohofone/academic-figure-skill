@@ -1,5 +1,4 @@
-"""AIME accuracy with and without Dynamic Sampling over training steps. Accuracy is avg@32. Thin horizontal lines mark each run's best accuracy. With Dynamic Sampling, training reaches the best accuracy of the run without it (0.421) after 2160 steps instead of 6080, 2.81× fewer.
-"""
+"""AIME accuracy (avg@32) over training steps, with and without dynamic sampling. Thin horizontal lines and circles mark each run's best accuracy. With dynamic sampling, accuracy passes the ablation's best (0.421, at step 6080) at step 2160, 2.81× fewer steps, and peaks higher, at 0.438."""
 
 import json
 import sys
@@ -18,22 +17,28 @@ with open("../data/dapo.json") as f:
 ours = runs["w/ Dynamic Sampling"]
 ablation = runs["w/o Dynamic Sampling"]
 
-ablation_best = max(ablation["value"])
-ablation_step = ablation["step"][int(np.argmax(ablation["value"]))]
-ours_step = next(s for s, v in zip(ours["step"], ours["value"]) if v >= ablation_best)
-print("takeaway:", f"w/o best {ablation_best:#.3g} at step {ablation_step:.0f}; w/ reaches it at step {ours_step:.0f};",
-      f"{ablation_step / ours_step:#.3g}x fewer steps; w/ best {max(ours['value']):#.3g}")
-assert ours_step < ablation_step, "the takeaway does not hold"
+best_ours = int(np.argmax(ours["value"]))
+best_ablation = int(np.argmax(ablation["value"]))
+ablation_best = ablation["value"][best_ablation]
+ablation_best_step = ablation["step"][best_ablation]
+ours_reaches = next(s for s, v in zip(ours["step"], ours["value"]) if v >= ablation_best)
+speedup = ablation_best_step / ours_reaches
+print("takeaway:", {
+    "w/ best": f"{ours['value'][best_ours]:#.3g}",
+    "w/o best": f"{ablation_best:#.3g}",
+    "w/o best step": f"{ablation_best_step:.0f}",
+    "w/ reaches it at": f"{ours_reaches:.0f}",
+    "speedup": f"{speedup:#.3g}×",
+})
+assert ours["value"][best_ours] > ablation_best and ours_reaches < ablation_best_step, "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 ax.plot(ours["step"], ours["value"], color=colors["ours"], label="w/ Dynamic Sampling")
-ax.plot(ablation["step"], ablation["value"], "--", linewidth=paper.dashed_width, color=colors["neutral"],
-        label="w/o Dynamic Sampling")
-
-for run, color in ((ours, colors["ours"]), (ablation, colors["neutral"])):
-    i = int(np.argmax(run["value"]))
-    mark_value(ax, run["step"][i], run["value"][i], f"{run['value'][i]:#.3g}", color)
-
+ax.plot(ablation["step"], ablation["value"], color=colors["neutral"], linestyle="--",
+        linewidth=paper.dashed_width, label="w/o Dynamic Sampling")
+mark_value(ax, ours["step"][best_ours], ours["value"][best_ours],
+           f"{ours['value'][best_ours]:#.3g}", colors["ours"])
+mark_value(ax, ablation_best_step, ablation_best, f"{ablation_best:#.3g}", colors["neutral"])
 ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")
 ax.legend(loc="lower right")

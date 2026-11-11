@@ -1,5 +1,4 @@
-"""AIME accuracy with and without Clip-Higher over training steps. Accuracy is avg@32. Thin horizontal lines mark each run's best accuracy. With Clip-Higher, the best accuracy is 0.406, against 0.269 without it.
-"""
+"""AIME accuracy (avg@32) over training steps, with and without Clip-Higher. Thin horizontal lines and circles mark each run's best accuracy. With Clip-Higher, the best accuracy reaches 0.406, against 0.269 without it."""
 
 import json
 import sys
@@ -18,19 +17,22 @@ with open("../data/dapo.json") as f:
 ours = runs["w/ Clip-Higher"]
 ablation = runs["w/o Clip-Higher"]
 
-best = {name: max(run["value"]) for name, run in runs.items()}
-print("takeaway:", {name: f"{v:#.3g}" for name, v in best.items()})
-assert best["w/ Clip-Higher"] > best["w/o Clip-Higher"], "the takeaway does not hold"
+best_ours = int(np.argmax(ours["value"]))
+best_ablation = int(np.argmax(ablation["value"]))
+print("takeaway:", {
+    "w/ Clip-Higher": (ours["step"][best_ours], f"{ours['value'][best_ours]:#.3g}"),
+    "w/o Clip-Higher": (ablation["step"][best_ablation], f"{ablation['value'][best_ablation]:#.3g}"),
+})
+assert ours["value"][best_ours] > ablation["value"][best_ablation], "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 ax.plot(ours["step"], ours["value"], color=colors["ours"], label="w/ Clip-Higher")
-ax.plot(ablation["step"], ablation["value"], "--", linewidth=paper.dashed_width, color=colors["neutral"],
-        label="w/o Clip-Higher")
-
-for run, color in ((ours, colors["ours"]), (ablation, colors["neutral"])):
-    i = int(np.argmax(run["value"]))
-    mark_value(ax, run["step"][i], run["value"][i], f"{run['value'][i]:#.3g}", color)
-
+ax.plot(ablation["step"], ablation["value"], color=colors["neutral"], linestyle="--",
+        linewidth=paper.dashed_width, label="w/o Clip-Higher")
+mark_value(ax, ours["step"][best_ours], ours["value"][best_ours],
+           f"{ours['value'][best_ours]:#.3g}", colors["ours"])
+mark_value(ax, ablation["step"][best_ablation], ablation["value"][best_ablation],
+           f"{ablation['value'][best_ablation]:#.3g}", colors["neutral"])
 ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")
 ax.legend(loc="lower right")
