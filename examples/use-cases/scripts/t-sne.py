@@ -1,32 +1,24 @@
-"""Figure 3: t-SNE embedding of penultimate-layer features of a ResNet-34 trained on CIFAR-10, for
-CIFAR-10 test samples. Each color is one of the ten classes, 100 samples each. All ten classes form
-clearly separated clusters, consistent with class-conditional Gaussian features.
-"""
+"""Figure 1: t-SNE embedding of penultimate-layer features of a ResNet-34 trained on CIFAR-10, for CIFAR-10 test samples. Each color is one of the ten classes, 100 samples each, numbered in the original paper's order. All ten classes form separate clusters, consistent with class-conditional Gaussian features."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.colors
+from matplotlib.colors import to_rgb
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")  # the skill's style files
+sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-embedding = json.load(open("../data/t-sne.json"))
-class_colors = plt.get_cmap("tab10").colors
+data = json.load(open("../data/t-sne.json"))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
-for i in range(10):
-    points = embedding[f"class_{i + 1}"]
-    color = class_colors[i]
-    ax.plot(points["x"], points["y"], "o", markeredgecolor=colors["ink"],
-            markerfacecolor=(*matplotlib.colors.to_rgb(color), 0.5), linestyle="none", label=f"Class {i + 1}")
-
+for i, color in enumerate(plt.get_cmap("tab10").colors, start=1):
+    points = data[f"class_{i}"]
+    ax.plot(points["x"], points["y"], "o", markeredgecolor=colors["ink"], markerfacecolor=(*to_rgb(color), 0.5),
+            linestyle="none", label=f"Class {i}")
 ax.set_xticks([])
 ax.set_yticks([])
 ax.grid(False)

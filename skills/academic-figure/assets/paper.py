@@ -154,43 +154,47 @@ def _is_value_label(a, t):
 
 
 def _keep_value_labels_inside(fig, panels):
-    """Grow each panel's limits so every `mark_value` label and every bar label (`ax.bar_label`) lies
-    inside its panel. `mark_value` labels at a side edge turn inward instead; bar labels past a side
-    grow the x-limits (horizontal bars). Other text is never moved: a piece sticking out of its panel
-    is reported instead. Returns whether any limits changed."""
+    """Grow each panel's limits so every `mark_value` label, bar label (`ax.bar_label`) and point name
+    (an annotation in data coordinates) lies inside its panel. `mark_value` labels at a side edge
+    turn inward instead. A point name gets at most a quarter more axis range; one that needs more
+    is left out and reported, to be moved. Returns whether any limits changed."""
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     changed = False
     for a in panels:
+        if _is_round(a):
+            continue
         box = a.get_window_extent(renderer)
         for t in a.texts:
-            if not _is_value_label(a, t):
-                continue
             value_label = t.get_gid() == "value-label"
+            point_name = not _is_value_label(a, t) and isinstance(t, Annotation) and t.xycoords == "data"
+            if not (_is_value_label(a, t) or point_name):
+                continue
             label = t.get_window_extent(renderer)
             # a label's reach past its point is fixed in pixels, so solve for the limit
             # that leaves exactly that much room between the point and the box
             x, y = t.xy
             point_x, point_y = a.transData.transform((x, y))
-            lo, hi = a.get_xlim()
-            if label.x1 > box.x1:
-                if value_label:
-                    t.set_ha("right")
+            for axis, low_edge, high_edge, v, point, size, set_lim, get_lim in (
+                    (a.xaxis, label.x0 < box.x0, label.x1 > box.x1, x, point_x, box.width, a.set_xlim, a.get_xlim),
+                    (a.yaxis, label.y0 < box.y0, label.y1 > box.y1, y, point_y, box.height, a.set_ylim, a.get_ylim)):
+                if not (low_edge or high_edge):
+                    continue
+                if value_label and axis is a.xaxis:
+                    t.set_ha("left" if low_edge else "right")
+                    continue
+                lo, hi = get_lim()
+                if high_edge:
+                    reach = (label.x1 if axis is a.xaxis else label.y1) - point + 1
+                    new = (lo, _limit_for_reach(axis, lo, hi, v, reach, size, True))
                 else:
-                    a.set_xlim(lo, _limit_for_reach(a.xaxis, lo, hi, x, label.x1 - point_x + 1, box.width, True))
-                    changed = True
-            elif label.x0 < box.x0:
-                if value_label:
-                    t.set_ha("left")
-                else:
-                    a.set_xlim(_limit_for_reach(a.xaxis, lo, hi, x, point_x - label.x0 + 1, box.width, False), hi)
-                    changed = True
-            lo, hi = a.get_ylim()
-            if label.y1 > box.y1:
-                a.set_ylim(lo, _limit_for_reach(a.yaxis, lo, hi, y, label.y1 - point_y + 1, box.height, True))
-                changed = True
-            elif label.y0 < box.y0:
-                a.set_ylim(_limit_for_reach(a.yaxis, lo, hi, y, point_y - label.y0 + 1, box.height, False), hi)
+                    reach = point - (label.x0 if axis is a.xaxis else label.y0) + 1
+                    new = (_limit_for_reach(axis, lo, hi, v, reach, size, False), hi)
+                scale = axis.get_transform()
+                old_span = np.ptp(scale.transform([lo, hi]))
+                if point_name and np.ptp(scale.transform(list(new))) > 1.25 * old_span:
+                    continue
+                set_lim(*new)
                 changed = True
     return changed
 

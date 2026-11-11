@@ -1,43 +1,34 @@
-"""Figure 2: GLUE accuracy of five fine-tuning methods, averaged over 5 seeds. Error bars show ±1 std
-over 5 seeds; the dashed line marks full fine-tuning's mean. Ours reaches 0.879, 0.014 above full
-fine-tuning (0.865), about three times the seed std of either method (≤0.0046).
-"""
+"""Figure 1: GLUE accuracy of five fine-tuning methods. Error bars show ±1 std over 5 seeds. Ours reaches 0.879, 0.0138 above full fine-tuning (0.865), about three times the seed std of either (≤0.0046)."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rcParams
+from matplotlib.patches import Patch
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")  # the skill's style files
+sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height, darken, lighten, greys
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-with open("../data/error-bar-plot.json") as f:
-    runs = json.load(f)["accuracy_per_seed"]
-
+runs = json.load(open("../data/error-bar-plot.json"))["accuracy_per_seed"]
 methods = sorted(runs, key=lambda m: np.mean(runs[m]))
 
 fig, ax = plt.subplots(figsize=(2.75, 2))
-ax.axvline(np.mean(runs["Full fine-tuning"]), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"],
-           zorder=1, label="Full fine-tuning mean")
-for y, method in enumerate(methods):
+for x, method in enumerate(methods):
     color = colors["ours"] if method == "Ours" else colors["neutral"]
-    mean, std = np.mean(runs[method]), np.std(runs[method], ddof=1)
-    ax.errorbar(mean, y, xerr=std, fmt="o", color=color, capsize=2, elinewidth=0.75, capthick=0.75)
-    ax.annotate(f"{mean:#.3g}", (mean + std, y), xytext=(3, 0), textcoords="offset points",
-                ha="left", va="center", color=darken(color),
-                bbox=dict(facecolor="white", edgecolor="none", pad=1))
-ax.set_yticks(range(len(methods)), labels=methods)
-ax.invert_yaxis()
-ax.tick_params(axis="y", length=0)
-ax.grid(axis="y", visible=False)
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:g}".replace("-", "−"))
-ax.set_xlabel("GLUE accuracy")
-ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, frameon=False)
+    mean, err = np.mean(runs[method]), np.std(runs[method], ddof=1)
+    ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2,
+                elinewidth=rcParams["patch.linewidth"], capthick=rcParams["patch.linewidth"])
+    ax.annotate(f"{mean:#.3g}", (x, mean + err), xytext=(0, 3), textcoords="offset points",
+                ha="center", va="bottom", color=darken(color), gid="value-label")
+ax.set_xticks(range(len(methods)), labels=methods)
+ax.tick_params(axis="x", length=0)
+ax.grid(axis="x", visible=False)
+ax.set_ylabel("GLUE accuracy")
 
 fit_height(fig, ax, aspect=0.618)
 fig.savefig("../outputs/error-bar-plot.pdf")

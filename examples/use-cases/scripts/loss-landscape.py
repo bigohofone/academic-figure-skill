@@ -1,59 +1,60 @@
-"""Figure 5: Training-loss landscape of ResNet-56 (5.89% test error) on CIFAR-10 around its trained
-minimizer. Contours show L(θ* + αδ + βη) along two random filter-normalized directions δ (Direction
-1) and η (Direction 2), redrawn from Li et al. (2018), Figure 5(b); the star marks the minimizer θ*.
-With skip connections, the minimizer sits in a wide, nearly convex basin: the loss rises smoothly
-from 0.1 at the center through roughly elliptical contours to 9.6 at the edges.
-"""
+"""Figure 1: Loss landscape of ResNet-56 (5.89% test error) on CIFAR-10, redrawn from Li et al. (2018), Figure 5(b). Contour lines show the training loss L(θ* + αδ + βη) along two random filter-normalized directions; the star marks the trained minimizer θ* at the origin. Lines are drawn every 0.5 from 0.1 to 9.6. With skip connections, the minimizer sits in a wide, nearly convex basin: the contours around it are smooth, nested and roughly elliptical up to a loss of about 3."""
 
 import json
-import math
 import sys
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rcParams
 from matplotlib.colors import ListedColormap, Normalize
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")  # the skill's style files
+sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/loss-landscape.json") as f:
     data = json.load(f)
 levels = data["levels"]
+
 cmap = ListedColormap(plt.get_cmap("viridis")(np.linspace(0, 0.85, 256)))
-norm = Normalize(levels[0], levels[-1])
+norm = Normalize(min(levels), max(levels))
 
-fig, ax = plt.subplots(figsize=(2.75, 2.4))
+fig, ax = plt.subplots(figsize=(2.75, 2))
 for line in data["contour_lines"]:
-    xy = np.array(line["xy"])
-    ax.plot(xy[:, 0], xy[:, 1], color=cmap(norm(line["level"])), linewidth=plt.rcParams["contour.linewidth"])
+    x, y = np.array(line["xy"]).T
+    ax.plot(x, y, color=cmap(norm(line["level"])), linewidth=rcParams["contour.linewidth"])
+level_labels = []
+for label in data["level_labels"]:
+    x, y = label["xy"]
+    level_labels.append(ax.text(x, y, f"{label['level']:.2g}", ha="center", va="center", gid="contour-label"))
 ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"],
-        markersize=2 * plt.rcParams["lines.markersize"], linestyle="none", label="Trained minimizer")
-
-ticks = [-1, -0.5, 0, 0.5, 1]
-tick_labels = [f"{v:g}".replace("-", "−") for v in ticks]
+        markersize=paper.highlight_size, linestyle="none", label="Trained minimizer")
 ax.set_xlim(data["x_range"])
 ax.set_ylim(data["y_range"])
-ax.set_xticks(ticks, labels=tick_labels)
-ax.set_yticks(ticks, labels=["", *tick_labels[1:]])
+ax.set_xticks([-1, -0.5, 0, 0.5, 1], labels=["−1", "−0.5", "0", "0.5", "1"])
+ax.set_yticks([-1, -0.5, 0, 0.5, 1], labels=["", "−0.5", "0", "0.5", "1"])
 ax.grid(False)
 ax.set_xlabel("Direction 1")
 ax.set_ylabel("Direction 2")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=1, frameon=False)
 fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, label="Training loss")
 
-# keep the first of each group of level labels that would overlap at print size
+# measure the labels at the printed size, then drop each one that overlaps a kept label or leaves the panel
+with warnings.catch_warnings(action="ignore"):
+    fit_height(fig, ax, aspect=1.0)
 fig.canvas.draw()
+panel = ax.get_window_extent()
 kept = []
-for label in data["level_labels"]:
-    t = ax.text(*label["xy"], f"{label['level']:.2g}", ha="center", va="center")
-    box = t.get_window_extent().padded(fig.dpi / 72)  # the 1 pt gap fit_height asks for
-    if any(box.overlaps(other) for other in kept):
-        t.remove()
-    else:
+for t in level_labels:
+    box = t.get_window_extent().padded(fig.dpi / 72)
+    inside = panel.x0 <= box.x0 and box.x1 <= panel.x1 and panel.y0 <= box.y0 and box.y1 <= panel.y1
+    if inside and not any(box.overlaps(k) for k in kept):
         kept.append(box)
+    else:
+        t.remove()
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/loss-landscape.pdf")

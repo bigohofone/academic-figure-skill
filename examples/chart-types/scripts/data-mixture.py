@@ -1,55 +1,54 @@
-"""Figure 1: Pretraining data mixture over training under our three-stage curriculum. Dashed lines mark
-the stage switches at 30k and 70k steps. The share of web text falls from 62% to 40%, while code
-grows from 12% to 24% and math from 6% to 18%.
-"""
+"""Figure 1: Pretraining data mixture over training under the three-stage curriculum. Dashed lines mark the stage switches at 30k and 70k steps. The share of web text falls from 62% to 40% while code grows from 12% to 24% and math from 6% to 18%."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rcParams
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")  # the skill's style files
+sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height, text_color
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-data = json.load(open("../data/data-mixture.json"))
+with open("../data/data-mixture.json") as f:
+    data = json.load(f)
 steps = np.array(data["steps"]) / 1000
-names = ["Web", "Books", "Wikipedia", "Code", "Math"]
-shares = np.array([data["shares"][name] for name in names]) * 100
-band_colors = [colors[f"series-{i + 1}"] for i in range(len(names))]
-switches = [30, 70]
+shares = data["shares"]
+color_of = {name: colors[f"series-{i + 1}"] for i, name in enumerate(shares)}
+order = ["Wikipedia", "Web", "Books", "Code", "Math"]  # the flattest share at the bottom
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75))
-ax.stackplot(steps, shares, colors=band_colors, labels=names, step="post", edgecolor="white", linewidth=0.5)
-for step in switches:
-    ax.axvline(step, linestyle="--", linewidth=paper.dashed_width, color="white")
-
-bottoms = np.vstack([np.zeros(len(steps)), np.cumsum(shares, axis=0)[:-1]])
-stage_mids = [15, 50, 85]
-for name in ["Web", "Code", "Math"]:
-    i = names.index(name)
-    for mid in stage_mids:
-        k = np.searchsorted(steps, mid)
-        ax.text(mid, bottoms[i, k] + shares[i, k] / 2, f"{shares[i, k]:.0f}%",
-                ha="center", va="center", color=text_color(band_colors[i]))
-
-for i, name in enumerate(names):
-    ax.annotate(name, (1, bottoms[i, -1] + shares[i, -1] / 2), xycoords=("axes fraction", "data"),
-                xytext=(4, 0), textcoords="offset points", va="center")
+fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+ax.stackplot(steps, [shares[name] for name in order], colors=[color_of[name] for name in order],
+             step="post", edgecolor="white", linewidth=rcParams["grid.linewidth"])
+for switch in [30, 70]:
+    ax.axvline(switch, linestyle="--", linewidth=paper.dashed_width, color="white")
 
 ax.set_xlim(0, 100)
-ax.set_ylim(0, 100)
-ax.margins(x=0)
-ax.set_xticks([0, *switches, 100])
-ax.set_yticks([0, 25, 50, 75, 100], labels=["", "25", "50", "75", "100"])
+ax.set_ylim(0, 1)
+ax.set_xticks([0, 30, 70, 100])
+ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
+ax.set_xlabel("Training step (k)")
+ax.set_ylabel("Share of tokens")
 ax.set_axisbelow(False)
 ax.grid(axis="x", visible=False)
-ax.set_xlabel("Training step (K)")
-ax.set_ylabel("Share of tokens (%)")
+
+bottom = np.zeros(len(steps))
+for name in order:
+    top = bottom + np.array(shares[name])
+    ax.annotate(name, (1, (bottom[-1] + top[-1]) / 2), xycoords=("axes fraction", "data"),
+                xytext=(4, 0), textcoords="offset points", va="center")
+    if name in ["Web", "Code", "Math"]:
+        for start, end in [(0, 30), (30, 70), (70, 100)]:
+            if (name, start) == ("Math", 0):
+                continue  # the band is too thin for its label; the caption gives it
+            i = list(steps).index(start)
+            ax.text((start + end) / 2, (bottom[i] + top[i]) / 2, f"{shares[name][i]:.0%}", ha="center", va="center",
+                    color=text_color(color_of[name]))
+    bottom = top
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/data-mixture.pdf")

@@ -1,72 +1,60 @@
-"""Figure 1: ImageNet top-1 accuracy versus number of parameters for EfficientNet and other ConvNets.
-The solid line joins EfficientNet-B0 to B7; the dashed and dotted grey lines join the NAS and hand-
-designed baselines. EfficientNet-B7 reaches 84.4% top-1 accuracy with 66M parameters, above
-AmoebaNet-C's 83.5% with 155M.
-"""
+"""Figure 1: ImageNet top-1 accuracy versus number of parameters. The solid line joins EfficientNet-B0 to B7; the dashed line joins the NAS models and the dotted line the hand-designed models on their Pareto fronts. EfficientNet-B7 reaches 84.4% top-1 accuracy with 66M parameters, above AmoebaNet-C (83.5%) with 2.35× fewer parameters."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")  # the skill's style files
+sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height, darken
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 models = json.load(open("../data/accuracy-vs-parameters.json"))
+by_name = {m["model"]: m for m in models}
 
 fig, ax = plt.subplots(figsize=(2.75, 2))
 
-families = [
-    ("EfficientNet", "o-", colors["ours"], "EfficientNet"),
-    ("NAS (dashed blue front)", "o--", colors["neutral"], "NAS"),
-    ("hand-designed (dotted gray front)", "o:", colors["neutral"], "Hand-designed"),
-    ("other (no line)", "o", colors["neutral"], None),
-]
-handles = []
-for family, style, color, name in families:
-    points = sorted((m for m in models if m["family"] == family), key=lambda m: m["params_millions"])
-    x = [m["params_millions"] for m in points]
-    y = [m["top1_accuracy"] for m in points]
-    width = paper.dashed_width if style in ("o--", "o:") else None
-    (line,) = ax.plot(x, y, style, color=color, linewidth=width, zorder=3 if family == "EfficientNet" else 2)
-    if name:
-        handles.append((line, name))
+for family, linestyle in [("hand-designed (dotted gray front)", ":"), ("NAS (dashed blue front)", "--")]:
+    front = sorted((m for m in models if m["family"] == family), key=lambda m: m["params_millions"])
+    ax.plot([m["params_millions"] for m in front], [m["top1_accuracy"] for m in front],
+            linestyle=linestyle, linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
 
-label_text = {
-    "EfficientNet-B7": "EfficientNet-B7 (84.4%)",
-    "AmoebaNet-C": "AmoebaNet-C (83.5%)",
-}
-offsets = {
-    "EfficientNet-B0": (3, -3, "left", "top"),
-    "EfficientNet-B3": (-3, 2, "right", "bottom"),
-    "EfficientNet-B4": (-3, 2, "right", "bottom"),
-    "EfficientNet-B5": (-3, 2, "right", "bottom"),
-    "EfficientNet-B6": (-3, 2, "right", "bottom"),
-    "EfficientNet-B7": (3, 3, "left", "bottom"),
-    "AmoebaNet-C": (0, 1, "right", "bottom"),
-    "SENet": (-3, -3, "right", "top"),
-    "ResNeXt-101": (3, -3, "left", "top"),
-    "ResNet-152": (3, 0, "left", "center"),
-    "Xception": (3, 0, "left", "center"),
-    "ResNet-50": (3, 0, "left", "center"),
-    "NASNet-A (mobile)": (3, 0, "left", "center"),
-}
-for m in models:
-    if m["model"] not in offsets:
-        continue
-    dx, dy, ha, va = offsets[m["model"]]
+others = [m for m in models if m["family"] != "EfficientNet"]
+ax.plot([m["params_millions"] for m in others], [m["top1_accuracy"] for m in others], "o", color=colors["neutral"])
+ours = [m for m in models if m["family"] == "EfficientNet"]
+ax.plot([m["params_millions"] for m in ours], [m["top1_accuracy"] for m in ours], "o-", color=colors["ours"])
+
+# (model, label, offset in points, horizontal alignment, vertical alignment)
+labels = [
+    ("EfficientNet-B0", "B0", (2, -3), "right", "top"),
+    ("EfficientNet-B3", "B3", (-3, 0), "right", "center"),
+    ("EfficientNet-B4", "B4", (-3, 0), "right", "center"),
+    ("EfficientNet-B5", "B5", (-2, 1), "right", "bottom"),
+    ("EfficientNet-B6", "B6", (0, -3), "center", "top"),
+    ("EfficientNet-B7", "B7 (84.4%)", (3, 0), "left", "center"),
+    ("Inception-v2", "Inception-v2", (5, 3.7), "left", "center"),
+    ("DenseNet-201", "DenseNet-201", (3, -1), "left", "center"),
+    ("Xception", "Xception", (3, -3.5), "left", "center"),
+    ("Inception-ResNet-v2", "Inception-ResNet-v2", (3, -2.5), "left", "top"),
+    ("ResNeXt-101", "ResNeXt-101", (3, -0.2), "left", "top"),
+    ("SENet", "SENet", (0, -5), "center", "top"),
+    ("NASNet-A (mobile)", "NASNet-A", (3, 2), "left", "center"),
+    ("AmoebaNet-C", "AmoebaNet-C", (5, 1), "right", "bottom"),
+    ("NASNet-A (large)", "NASNet-A", (-3, 1), "right", "bottom"),
+    ("ResNet-34", "ResNet-34", (3, -0.5), "left", "center"),
+    ("ResNet-50", "ResNet-50", (3, 2.5), "left", "center"),
+    ("ResNet-152", "ResNet-152", (3, 4.5), "left", "center"),
+]
+for name, text, offset, ha, va in labels:
+    m = by_name[name]
     color = colors["ours"] if m["family"] == "EfficientNet" else colors["neutral"]
-    ax.annotate(label_text.get(m["model"], m["label_in_figure"]), (m["params_millions"], m["top1_accuracy"]),
-                xytext=(dx, dy), textcoords="offset points", ha=ha, va=va, fontsize=7, color=darken(color))
+    ax.annotate(text, (m["params_millions"], m["top1_accuracy"]), xytext=offset, textcoords="offset points",
+                ha=ha, va=va, color=darken(color))
 
 ax.set_xlabel("Parameters (millions)")
 ax.set_ylabel("Top-1 accuracy (%)")
-ax.legend(*zip(*handles), loc="lower right")
 
 fit_height(fig, ax, aspect=0.618)
 fig.savefig("../outputs/accuracy-vs-parameters.pdf")

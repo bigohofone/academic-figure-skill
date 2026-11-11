@@ -206,7 +206,7 @@ fig.savefig("outputs/{id}.pdf")
 ```
 
 - **Panels**: `ax` may be one Axes, an array, a list (also of panels from several sub-figures), or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
-- **Value labels**: `fit_height` keeps every `mark_value` label and bar label (`ax.bar_label`) inside its panel, by raising the y-limit (the x-limit for horizontal bars) and turning `mark_value` labels at a side edge inward. It never moves other text: it reports it instead.
+- **Labels inside**: `fit_height` keeps every `mark_value` label and bar label (`ax.bar_label`) inside its panel, by growing the limits and turning `mark_value` labels at a side edge inward. Point names (annotations in data coordinates) get at most a quarter more axis range; a name that needs more is reported as sticking out, to be moved. Other text is never moved.
 - **Errors**: on `ValueError` (fixed aspect), draw images with `imshow(..., aspect="auto")`; on the "different widths" warning, give all panels the same width.
 
 ### Axes
