@@ -90,8 +90,10 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 .block { background:#fff; border-radius:10px; padding:4% 0; }
 .block .row + .row { margin-top:3%; }
 .guide { position:absolute; top:0; bottom:0; border-left:1.5px dashed #d7344a; opacity:.45; pointer-events:none; z-index:2; }
-.bwtoggle { font:inherit; font-size:14px; font-weight:600; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); cursor:pointer; white-space:nowrap; }
-.bwtoggle[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.bwtoggle { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:20; display:inline-flex; align-items:center; gap:8px; font:inherit; font-size:15px; font-weight:600; padding:11px 18px; border:0; border-radius:999px; background:var(--ink); color:var(--bg); cursor:pointer; box-shadow:0 6px 24px rgba(0,0,0,.22); transition:transform .15s ease, box-shadow .15s ease; animation:bwpulse 2.4s ease-in-out 1.5s 2; }
+.bwtoggle:hover { transform:translateX(-50%) translateY(-2px); box-shadow:0 10px 30px rgba(0,0,0,.28); }
+.bwtoggle .bwicon { font-size:17px; line-height:1; }
+@keyframes bwpulse { 0%,100% { transform:translateX(-50%) scale(1); } 50% { transform:translateX(-50%) scale(1.06); } }
 html.bw main img, html.bw .paper img, html.bw .frame img, html.bw .block img { filter:grayscale(1); }
 .guide.text { border-left-color:#2f6fd6; }
 .compare .panes { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
@@ -137,7 +139,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <body>
 <nav><div class="wrap">
   <a class="logo" href="#">academic-figure</a>
-  <div class="links"><a class="opt" href="#lines">Why</a><a href="#gallery">Examples</a><a class="opt" href="#install">Install</a><button type="button" class="bwtoggle" aria-pressed="false" title="Show every figure in black and white">B&amp;W</button><a class="star" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star<span class="count" hidden></span></a></div>
+  <div class="links"><a class="opt" href="#lines">Why</a><a href="#gallery">Examples</a><a class="opt" href="#install">Install</a><a class="star" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star<span class="count" hidden></span></a></div>
 </div></nav>
 
 <header><div class="wrap">
@@ -152,7 +154,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <div class="cards six">
     <a class="card" href="#lines"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
     <a class="card" href="#lines"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
-    <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, still clear in black and white: try the B&amp;W switch at the top.</p></a>
+    <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, still clear in black and white: try the switch at the bottom of the page.</p></a>
     <a class="card" href="#lines"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></a>
     <a class="card" href="#gallery"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
     <a class="card" href="#install"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></a>
@@ -518,12 +520,14 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <p class="thanks">If it saves you an evening before a deadline, a star helps other researchers find it. <a class="star big" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star on GitHub<span class="count" hidden></span></a></p>
 </div></section>
 
+<button type="button" class="bwtoggle" aria-pressed="false"><span class="bwicon">◐</span><span class="bwtext">See it in black &amp; white</span></button>
 <footer><div class="wrap"><span>academic-figure · open source</span>
 <span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a> · <a href="https://github.com/bigohofone/academic-slides-skill">academic-slides-skill</a></span></div></footer>
 <script>
 document.querySelector(".bwtoggle").addEventListener("click", e => {
   const on = document.documentElement.classList.toggle("bw");
   e.currentTarget.setAttribute("aria-pressed", on);
+  e.currentTarget.querySelector(".bwtext").textContent = on ? "Back to color" : "See it in black & white";
 });
 fetch("https://api.github.com/repos/bigohofone/academic-figure-skill").then(r => r.ok ? r.json() : null).then(d => {
   if (!d || typeof d.stargazers_count !== "number") return;
