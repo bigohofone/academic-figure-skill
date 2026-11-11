@@ -205,8 +205,8 @@ When `fit_height` reports text overlapping, covering data, cut off at the figure
 
 1. **Move it**: to the next placement its chart file lists (another side of the point, below the value, the next legend spot).
 2. **Make room inside the panel**: share axes (Grid step 5), apply Typography's text-tick rule (swap axes, then turn 45°, then 90°), shorten the text.
-3. **Write less, alike**: label every m-th tick, keeping every tick and gridline; drop the labels the takeaway does not cite, whole kinds at a time (all point names of non-cited models, all bar values), and give the cited numbers in the caption.
-4. **Give it width**: the full width, at φ² : 1, only when no width is given.
+3. **Give it width**: the full width, at φ² : 1, only when no figure width is given.
+4. **Write less, alike**: label every m-th item of an ordered kind (ticks, contour levels), keeping every tick, gridline and line; or drop a kind whole (all point names of non-cited models, all bar values, all shares of a band) and give the cited numbers in the caption.
 
 Never resolve a collision by shrinking text, changing a token, or changing the aspect for room.
 
@@ -227,8 +227,8 @@ fig.savefig("outputs/{id}.pdf")
 
 ### Axes
 
-- **Limits**: matplotlib's defaults and margins, except an axis whose marks together fill a bounded whole, fixed to it: stacked shares and areas (0–1), the unit square of ROC and reliability diagrams, a radar's scale, a field given on a fixed range (a loss landscape's −1 to 1). Metrics such as accuracy and the per-bin fractions of a histogram keep the defaults. Limits never grow to values the quantity cannot take (`fit_height` keeps a non-negative axis at 0 or above).
-- **Order**: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom when horizontal), so ours, usually the best, ends at the right. A natural order stays: sizes, time, bins, swept values, a benchmark list the paper fixes. Legends of side-by-side series follow the same order.
+- **Limits**: matplotlib's defaults and margins, except an axis whose marks together fill a bounded whole, fixed to it: stacked shares and areas (0–1), the unit square of ROC and reliability diagrams, a radar's scale, a field given on a fixed range (a loss landscape's −1 to 1). Metrics such as accuracy and the per-bin fractions of a histogram keep the defaults. An axis of a quantity that is never negative starts at 0 or above: `fit_height` raises a negative lower limit to 0 when all the data is above 0, and never grows one below 0.
+- **Order**: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom when horizontal), so ours, usually the best, ends at the right. A natural order stays: sizes, time, bins, swept values, and any order the task or data gives explicitly (a benchmark list, a list of opponents). Legends of side-by-side series follow the same order.
 - **Category axes**: tick marks hidden on that axis on every panel, `ax.tick_params(axis="x", length=0)` (`axis="y"` when horizontal).
 - **Log axes**: an axis whose positive values span over 100× (max / min > 100) is log, `ax.set_xscale("log")` set before anything is drawn on it, named in the caption; a log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`), and in a chart with gridlines its gridlines follow them, `ax.grid(True, which="both")`.
 - **Colorbars** (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when `fit_height` reports the panel narrower than `min_width` with it on the right.
@@ -252,7 +252,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Box plot median | `median` | 1 pt, black | set by the style |
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
 
-- **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (a grey series takes its `greys(n)` shade as it is: those are already light).
+- **Opacity**: fills take the series color at full opacity, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable (grey series too: `lighten(greys(n)[i])`, so the median stays readable on every fill).
 - **Reference lines** (a baseline's score, a threshold, a diagonal): `ax.axhline(..., linestyle="--", linewidth=paper.dashed_width, zorder=1)` in `neutral`, white across a filled plot (stacked area, heatmap, contour gradient), where grey sinks into the fills. Several reference lines in one panel are told apart by line style, `"--"`, `":"`, `"-."`. A line with a value of its own (a baseline's score, a threshold) gets a legend entry; a line whose meaning the axes give (y = x, chance, zero) gets none, and the caption's reading guide names it.
 
 ## Components
@@ -307,12 +307,12 @@ Reported results the takeaway compares are written on the plot, so the reader re
 |---|---|
 | Copied from the source (a paper's table) | exactly as printed: `"0.82"` stays `"0.82"` |
 | A count or other whole number | an integer, `f"{round(v)}"`: `93`, `1024` (from 10,000, `f"{round(v):,}"`: `12,345`) |
-| A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a whole percent, `f"{v:.0%}"`: `38%` |
+| A share of a whole (pie, stacked bar, win rate, area; not a metric such as accuracy) | a percent: whole from 10% up, `f"{v:.0%}"`; below, two significant figures, `f"{100 * v:.2g}%"`, so small shares keep their size: `38%`, `1.8%`, `0.69%` |
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
 | Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: `85.0`, `0.912` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.
-- **Tag**: a value label written with `ax.annotate` or `ax.text` (not by `mark_value` or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs.
+- **Tag**: a value label written at a data point with `ax.annotate` or `ax.text` (not by `mark_value` or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs. Labels placed outside the panel on purpose (a histogram's means above it) and point names (even with a value joined) take no tag.
 
 ## Do's and Don'ts
 

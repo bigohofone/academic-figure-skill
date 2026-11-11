@@ -15,7 +15,7 @@ Shares of a whole along a continuous x: the data mixture over training, the toke
 ## Labels
 
 - **Band names**: at the right end beside the panel, in stacking order, instead of a legend, `ax.annotate(name, (1, y_mid), xycoords=("axes fraction", "data"), xytext=(4, 0), textcoords="offset points", va="center")`, `y_mid` the middle of the band at the last x; placements (for Collisions): at the band's middle, then moved apart along y.
-- **Shares**: a share the takeaway cites, inside its band at each stage, `f"{v:.0%}"` in `text_color(band_color)`; a label that spills out of its band is dropped, its value in the caption.
+- **Shares**: a share the takeaway cites, inside its band at each stage, `f"{v:.0%}"` in `text_color(band_color)`; when one share of a band spills out of it, all of that band's shares go to the caption (a band's shares are one kind).
 
 ## Caption
 

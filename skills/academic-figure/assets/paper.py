@@ -176,7 +176,7 @@ def _keep_value_labels_inside(fig, panels):
             label = t.get_window_extent(renderer)
             # a label's reach past its point is fixed in pixels, so solve for the limit
             # that leaves exactly that much room between the point and the box
-            x, y = t.xy
+            x, y = t.xy if isinstance(t, Annotation) else t.get_position()
             point_x, point_y = a.transData.transform((x, y))
             for axis, low_edge, high_edge, v, point, size, set_lim, get_lim in (
                     (a.xaxis, label.x0 < box.x0, label.x1 > box.x1, x, point_x, box.width, a.set_xlim, a.get_xlim),
@@ -316,6 +316,19 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
 
 
+def _start_at_zero(panels):
+    """A quantity that is never negative never shows negative values: raise a default margin below 0 to 0."""
+    for a in panels:
+        if _is_round(a):
+            continue
+        lim = a.dataLim
+        for get, set_, low, scale in ((a.get_xlim, a.set_xlim, lim.x0, a.get_xscale()),
+                                      (a.get_ylim, a.set_ylim, lim.y0, a.get_yscale())):
+            lo, hi = get()
+            if scale == "linear" and np.isfinite(low) and low > 0 and lo < 0 < hi:
+                set_(0, hi)
+
+
 def _plain_numbers(fig):
     """Write matplotlib's default numeric ticks as plain numbers (0, 0.5, 1; 1024), with a true minus sign."""
     for a in fig.axes:
@@ -384,6 +397,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     panels = [a for a in axes
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
     _plain_numbers(fig)
+    _start_at_zero(panels)
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
         _warn_layout_problems(fig, panels, min_width)

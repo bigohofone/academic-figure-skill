@@ -6,14 +6,14 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
 
 - **Panel**: aspect 1 : 1, no gridlines (`ax.grid(False)`), both axes labelled with their variables.
 - **Values**: when they span over 100×, contour their logarithm (DESIGN.md's log rule) and say "contours of log loss" in the caption.
-- **Gradient with lines**: the values as a continuous gradient in the design's colormap (`viridis`, low values dark; signed values `RdBu_r` centered at 0, as in `heatmap.md`), exact at each data point and blended smoothly between them, `mesh = ax.pcolormesh(X, Y, Z, shading="gouraud")`; on it, the contour lines of the data itself, never of a smoothed copy, so each line marks exactly where the values cross its level, `lines = ax.contour(X, Y, Z, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])`. 6 to 8 levels at half width, 10 at full width, at round values: `levels = np.arange(lo, hi + step / 2, step)`.
+- **Gradient with lines**: the values as a continuous gradient in the design's colormap (`viridis`, low values dark; signed values `RdBu_r` centered at 0, as in `heatmap.md`), exact at each data point and blended smoothly between them, `mesh = ax.pcolormesh(X, Y, Z, shading="gouraud")`; on it, the contour lines of the data itself, never of a smoothed copy, so each line marks exactly where the values cross its level, `lines = ax.contour(X, Y, Z, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])`. 6 to 8 levels at half width, 10 at full width, at round values inside the data's range: `levels = np.arange(lo, hi + step / 2, step)`.
 - **Colorbar**: always, labelled with the quantity, `fig.colorbar(mesh, ax=ax, label="Validation loss")`.
 
 ## Variants
 
 - **Contour lines only** (as many papers draw them): `lines = ax.contour(X, Y, Z, levels=levels, cmap=cmap)`, colored by level from the design's whole colormap, `cmap = plt.get_cmap("viridis")`, the same scale as everywhere else; a colorbar for the line colors, `fig.colorbar(plt.cm.ScalarMappable(norm=Normalize(lo, hi), cmap=cmap), ax=ax, label=...)`.
 - **Lines given as polylines** (each with its level, not a grid): each drawn with `ax.plot(x, y, color=cmap(norm(level)), linewidth=rcParams["contour.linewidth"])`.
-- **Loss landscape**: axes "Direction 1" and "Direction 2", the trained solution at (0, 0).
+- **Loss landscape**: axes named as the data names the two directions (α, β), else "Direction 1" and "Direction 2"; the trained solution at (0, 0).
 
 ## Labels
 

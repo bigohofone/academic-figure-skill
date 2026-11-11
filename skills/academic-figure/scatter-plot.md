@@ -10,7 +10,7 @@ Two quantities per item plotted against each other: accuracy against parameters,
 
 ## Variants
 
-- **Trend line** (the takeaway is a correlation): a data line in `darken(color)` over the points; the coefficient (Pearson r or Spearman ρ, with n) in the caption.
+- **Trend line** (the takeaway is a correlation): a data line in `darken(color)` over the points; Pearson r with n in the caption (Spearman ρ when the data are ranks or ordinal ratings).
 - **Model family** (sizes of one model, B0–B7): its points joined in size order with a solid data line in the family's color, `ax.plot(x, y, "o-", color=colors["ours"])` for ours.
 - **Pareto front**: the models on the front joined in x order with a dashed `neutral` line under the markers, `ax.plot(x, y, linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)`; several fronts take the grey line styles in order (DESIGN.md Colors). Dominated models stay as markers.
 - **Embedding** (t-SNE, UMAP): each point as the design's marker with a black edge and a translucent fill in its class color, `ax.plot(x, y, "o", markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width, markerfacecolor=(*to_rgb(color), 0.5), linestyle="none", label=name)`; one color per class (DESIGN.md Colors) with a legend; no ticks, tick labels, gridlines or axis labels (`ax.set_xticks([])`, `ax.set_yticks([])`, `ax.grid(False)`): the axes of an embedding mean nothing.
