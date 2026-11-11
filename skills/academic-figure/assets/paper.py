@@ -325,6 +325,61 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
 
 
+def _standard_margins(fig):
+    """The left and right margins, in inches, of a standard panel: on the left a y-axis label and
+    four-character tick labels, on the right half of a four-character tick label at the x axis' end."""
+    renderer = fig.canvas.get_renderer()
+    sample = fig.text(0, 0, "0000", fontsize=rcParams["ytick.labelsize"])
+    ticks = sample.get_window_extent(renderer).width / fig.dpi
+    sample.remove()
+    label = rcParams["axes.labelsize"] * 1.2 / 72  # one line of the axis label, rotated
+    pads = (rcParams["axes.labelpad"] + rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72
+    pad = rcParams["figure.constrained_layout.w_pad"]
+    return pad + label + pads + ticks, pad + ticks / 2
+
+
+def _standard_box(fig, panels, aspect):
+    """Panels whose outer decorations fit the standard margins start and end exactly there, so the
+    boxes of all figures at one width (and one number of columns) line up and match in size. The
+    gaps between columns and rows stay as the layout found them; the columns share what is left.
+    Returns whether the panels moved."""
+    if (fig.subfigs or any(getattr(a, "_colorbar", None) is not None for a in fig.axes)
+            or len(fig.axes) != len(panels) or _is_round(panels[0])):
+        return False
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    w, h = fig.get_size_inches()
+    boxes = {a: a.get_position() for a in panels}
+    columns = sorted({round(b.x0 * w, 2) for b in boxes.values()})
+    rows = sorted({round(b.y0 * h, 2) for b in boxes.values()}, reverse=True)
+    col_of = {a: columns.index(round(b.x0 * w, 2)) for a, b in boxes.items()}
+    row_of = {a: rows.index(round(b.y0 * h, 2)) for a, b in boxes.items()}
+    left, right = _standard_margins(fig)
+    pad = rcParams["figure.constrained_layout.w_pad"]
+    for a, b in boxes.items():
+        tight = a.get_tightbbox(renderer)
+        if col_of[a] == 0 and b.x0 * w - tight.x0 / fig.dpi + pad > left + 1e-3:
+            return False
+        if col_of[a] == len(columns) - 1 and tight.x1 / fig.dpi - b.x1 * w + pad > right + 1e-3:
+            return False
+    first = {c: next(b for a, b in boxes.items() if col_of[a] == c) for c in range(len(columns))}
+    col_gaps = [first[c + 1].x0 * w - first[c].x1 * w for c in range(len(columns) - 1)]
+    top_row = {r: next(b for a, b in boxes.items() if row_of[a] == r) for r in range(len(rows))}
+    row_gaps = [top_row[r].y0 * h - top_row[r + 1].y1 * h for r in range(len(rows) - 1)]
+    bottom, top = top_row[len(rows) - 1].y0 * h, h - top_row[0].y1 * h
+    panel_w = (w - left - right - sum(col_gaps)) / len(columns)
+    panel_h = aspect * panel_w
+    new_h = bottom + top + len(rows) * panel_h + sum(row_gaps)
+    fig.set_layout_engine("none")
+    fig.set_figheight(new_h)
+    for a in panels:
+        c, r = col_of[a], row_of[a]
+        x0 = left + c * panel_w + sum(col_gaps[:c])
+        y0 = bottom + (len(rows) - 1 - r) * panel_h + sum(row_gaps[r:])
+        a.set_position([x0 / w, y0 / new_h, panel_w / w, panel_h / new_h])
+    return True
+
+
 def _start_at_zero(panels):
     """A quantity that is never negative never shows negative values: raise a default margin below 0 to 0."""
     for a in panels:
@@ -431,6 +486,9 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     if max(widths) - min(widths) > tol * max(widths):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
+    if _standard_box(fig, panels, aspect):
+        _keep_value_labels_inside(fig, panels)
+        ratios = _panel_ratios(fig, panels)[0]
     _warn_layout_problems(fig, panels, min_width)
     return ratios
 
