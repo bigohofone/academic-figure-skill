@@ -66,6 +66,7 @@ def use_design(path="DESIGN.md"):
         "xtick.labelsize": tick_label, "ytick.labelsize": tick_label,
         "axes.titlesize": title, "axes.titleweight": t["title"].get("fontWeight", 400),
         "axes.titlepad": _number(s["title-pad"]), "axes.labelpad": _number(s["label-pad"]),
+        "axes.xmargin": _number(s["data-margin"]), "axes.ymargin": _number(s["data-margin"]),
         "xtick.major.pad": tick_pad, "xtick.minor.pad": tick_pad, "ytick.major.pad": tick_pad, "ytick.minor.pad": tick_pad,
         "xtick.major.width": tick_width, "xtick.minor.width": tick_width,
         "ytick.major.width": tick_width, "ytick.minor.width": tick_width,

@@ -37,6 +37,7 @@ spacing:
   title-pad: 6pt
   label-pad: 1pt
   tick-pad: 1.75pt
+  data-margin: 0.075
 components:
   axes:
     width: 0.5pt
@@ -231,7 +232,7 @@ fig.savefig("outputs/{id}.pdf")
 
 ### Axes
 
-- **Limits**: matplotlib's defaults and margins, except an axis whose marks together fill a bounded whole, fixed to it: stacked shares and areas (0–1), the unit square of ROC and reliability diagrams, a radar's scale, a field given on a fixed range (a loss landscape's −1 to 1). Metrics such as accuracy and the per-bin fractions of a histogram keep the defaults. An axis of a quantity that is never negative starts at 0 or above: `fit_height` raises a negative lower limit to 0 when all the data is above 0, and never grows one below 0.
+- **Limits**: matplotlib's defaults, with the `data-margin` token (7.5% of the data range) left at each end so marks at the edges clear the box, except an axis whose marks together fill a bounded whole, fixed to it: stacked shares and areas (0–1), the unit square of ROC and reliability diagrams, a radar's scale, a field given on a fixed range (a loss landscape's −1 to 1). Metrics such as accuracy and the per-bin fractions of a histogram keep the defaults. An axis of a quantity that is never negative starts at 0 or above: `fit_height` raises a negative lower limit to 0 when all the data is above 0, and never grows one below 0.
 - **Order**: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom when horizontal), so ours, usually the best, ends at the right. A natural order stays: sizes, time, bins, swept values, and any order the task or data gives explicitly (a benchmark list, a list of opponents). Legends of side-by-side series follow the same order.
 - **Category axes**: tick marks hidden on that axis on every panel, `ax.tick_params(axis="x", length=0)` (`axis="y"` when horizontal).
 - **Log axes**: an axis of a size, count or rate whose positive values span over 100× (max / min > 100) is log; positions along a process (training steps, epochs, time) stay linear. A log axis is `ax.set_xscale("log")` set before anything is drawn on it, named in the caption; a log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`), and in a chart with gridlines its gridlines follow them, `ax.grid(True, which="both")`.
