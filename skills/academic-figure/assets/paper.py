@@ -415,17 +415,18 @@ def _center_group_labels(fig):
 
 
 def _standard_gap(fig, column, column_gap):
-    """The standard gap before a grid column. A column that shows its own y axis starts a new slot, as
-    if a new figure began there: the right margin plus the left margin (more for a longer y label), so
-    its edges line up with figures of that width. Otherwise half a tick label, so the end labels of
-    neighbouring x axes clear each other. `column_gap` is the space between the page's text
-    columns, so in a double-column figure the slots line up with single-column figures."""
+    """The standard gap before a grid column. A column with its own y label shows a new quantity, so
+    it starts a new group, as if a new figure began there: the right margin plus the left margin (more
+    for a longer y label), plus `column_gap`, the space between the page's text columns, so in a
+    double-column figure the groups line up with single-column figures. A column with only its own
+    tick numbers (the same quantity over its own range) sits close: half a tick label, so the end
+    labels of neighbouring x axes clear each other, plus its tick labels. Otherwise half a tick label."""
     ticks, label, half = _standard_parts(fig)
     shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
     label_lines = max(_lines(a.yaxis.label) for a in column)
-    if not shows_ticks and not label_lines:
-        return half
-    return (canvas_pad + half) + column_gap + (canvas_pad + ticks + label * max(label_lines, 1))
+    if label_lines:
+        return (canvas_pad + half) + column_gap + (canvas_pad + ticks + label * label_lines)
+    return half + ticks * shows_ticks
 
 
 def _tick_height(fig):
