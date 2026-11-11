@@ -93,7 +93,7 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 |---|---|
 | "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
-| Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
+| Variants of ours compared together against other methods | all `ours` and solid (the dashes belong to grey series), told apart by marker shape, `"o"`, `"s"`, `"^"`; the full method first in the legend |
 | Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole (parts are not compared series, so all six colors are free here) |
 | Some series the takeaway names, among others it does not | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
 | Several series compared on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-3`, `series-4`, … in order, skipping the `ours` color, which means ours in every figure of the paper |
@@ -125,7 +125,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 
 - **Numeric tick labels**: horizontal plain numbers (`fit_height` writes matplotlib's default numeric ticks this way, so `0.0, 0.5, 1.0` print as `0, 0.5, 1`), written as short as they read, `0, 0.5, 1`, `1024`, never rotated, never `2³` or `1e+06`: `ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))` (keeping the minus sign). Values of 10,000 and up take SI suffixes (`10K`, `1M`, `1B`), or the unit is scaled in the axis label ("Training step (K)"); on log axes, powers of ten are plain from 0.001 to 1000, then `1e-4` below. An axis of shares is labelled in percent, `0%, 50%, 100%`, as its values are written (Value labels).
 - **Tick choice**: the x values a chart file names (stage switches), or else numbers the reader can name, evenly spaced (on a log axis, powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose what reads best. When `fit_height` reports tick labels overlapping, label fewer of them, but keep a tick and gridline at every step, so the grid stays as fine as the data: `ax.set_xticks(ticks, labels=[str(t) if i % m == 0 else "" for i, t in enumerate(ticks)])`. Panels that share an axis share its ticks.
-- **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])`.
+- **Corner labels**: when the first tick labels of both axes would overlap at the shared corner, `fit_height` drops the y axis's first label itself.
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.
   - **Names down the y axis** (a heatmap's rows, horizontal bars) that overlap: give the panel height, by widening it at its own aspect (Collisions step 3).
@@ -305,7 +305,7 @@ Pick the first row that fits:
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics carry none, and distributions only the summary statistics the takeaway cites (means), where their chart file places them. Each chart file says where (`mark_value` on curves, `ax.bar_label` on bars). Values are written by the first row that applies, in labels and caption alike:
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics carry none, and distributions only the summary statistics the takeaway cites (means), where their chart file places them, or in the caption when it gives no place. Each chart file says where (`mark_value` on curves, `ax.bar_label` on bars). Values are written by the first row that applies, in labels and caption alike:
 
 | Value | Written as |
 |---|---|
@@ -315,7 +315,7 @@ Reported results the takeaway compares are written on the plot, so the reader re
 | 1000 or more | a whole number, `f"{v:.0f}"`: `1234` (from 10,000, `f"{v:,.0f}"`) |
 | A difference of two values shown | the decimals of the shown values, so the reader's own subtraction agrees: 0.879 − 0.865 = `0.014` |
 | A ratio | three significant figures: `1.91×` |
-| Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: `85.0`, `0.912` |
+| Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}".rstrip(".")`: `85.0`, `0.912`, `439` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.
 - **Tag**: a value label written at a data point with `ax.annotate` or `ax.text` (not by `mark_value` or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs. Labels placed outside the panel on purpose (a histogram's means above it) and point names (even with a value joined) take no tag.

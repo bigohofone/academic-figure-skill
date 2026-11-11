@@ -224,9 +224,9 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     outline, since its upright bounding box also covers the empty corners around it."""
     a_rotated, b_rotated = a.get_rotation() % 180 != 0, b.get_rotation() % 180 != 0
     if not (a_rotated or b_rotated):
-        # side by side, upright texts need a word space between them (a quarter of the type size on each
+        # side by side, upright texts need a clear word space between them (0.35 of the type size on each
         # side), or neighbours read as one at print size ("2561024", "Prefix tuningAdapter")
-        gap = 0.25 * max(a.get_fontsize(), b.get_fontsize()) * a.figure.dpi / 72
+        gap = 0.35 * max(a.get_fontsize(), b.get_fontsize()) * a.figure.dpi / 72
         return Bbox.from_extents(box_a.x0 - gap, box_a.y0, box_a.x1 + gap, box_a.y1).overlaps(box_b)
     if a_rotated and b_rotated:
         outline_a, outline_b = _rotated_outline(a, box_a, renderer), _rotated_outline(b, box_b, renderer)
@@ -380,6 +380,25 @@ def _standard_box(fig, panels, aspect):
     return True
 
 
+def _clear_corners(fig, panels):
+    """Where the first tick labels of both axes would touch at the shared corner, blank the y one."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    for a in panels:
+        firsts = []
+        for axis in (a.xaxis, a.yaxis):
+            lo, hi = sorted(axis.get_view_interval())
+            shown = [(loc, t) for loc, t in zip(axis.get_majorticklocs(), axis.get_majorticklabels())
+                     if lo <= loc <= hi and t.get_visible() and t.get_text()]
+            firsts.append(min(shown, key=lambda p: p[0]) if shown else None)
+        if None in firsts:
+            continue
+        (_, tx), (loc, ty) = firsts
+        if _texts_overlap(tx, tx.get_window_extent(renderer), ty, ty.get_window_extent(renderer), renderer):
+            label = a.yaxis.get_major_formatter()
+            a.yaxis.set_major_formatter(FuncFormatter(lambda v, pos, first=loc, label=label: "" if np.isclose(v, first) else label(v, pos)))
+
+
 def _start_at_zero(panels):
     """A quantity that is never negative never shows negative values: raise a default margin below 0 to 0."""
     for a in panels:
@@ -486,6 +505,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     if max(widths) - min(widths) > tol * max(widths):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
+    _clear_corners(fig, panels)
     if _standard_box(fig, panels, aspect):
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]
