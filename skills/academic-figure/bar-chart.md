@@ -1,0 +1,9 @@
+# Bar chart
+
+Reported results compared across categories, one value each: methods, ablations or settings on one or more benchmarks. Grouped bar chart for several series per category, stacked bar chart for parts of a whole per category, horizontal bar chart for long category names. Read with `DESIGN.md`, whose rules all still apply.
+
+- **Bar chart** (one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, every bar labelled with its value, `ax.bar_label(bars, fmt="%.3g", fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. The y axis starts at 0 (matplotlib's default for bars): a bar's length is its value, so never cut the axis; when the differences are small next to the values, draw an error bar plot instead (`error-bar-plot.md`).
+- **Grouped bar chart**: the series of one category share 0.8 of its slot, `width = 0.8 / n_series`, each series offset by `(i - (n_series - 1) / 2) * width`; one legend entry per series. For several groups of categories (benchmarks, datasets) with different scales, one panel per group, titled with the group.
+- **Stacked bar chart** (parts of a whole per category): segments in series order from the bottom with white 0.5 pt seams, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=0.5)`; horizontal gridlines only; labels inside segments only when they fit (`ax.bar_label(bars, label_type="center", fontsize=7)`), otherwise none. Shares (each bar sums to 100%): `ax.set_ylim(0, 100)`.
+- **Horizontal bar chart**: only for unordered categories with long names. As bars, with `ax.barh`, categories top to bottom in reading order (`ax.invert_yaxis()`), and vertical gridlines only: `ax.grid(axis="y", visible=False)`.
+- Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.

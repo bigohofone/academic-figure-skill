@@ -1,5 +1,5 @@
+# Mechanics that are not design tokens; every size and color comes from DESIGN.md through paper.use_design().
 font.family: sans-serif
-font.sans-serif: Inter
 mathtext.fontset: custom
 # symbols Inter lacks (sqrt, sum, relations, \mathbb) use STIX Sans, which ships with matplotlib
 mathtext.fallback: stixsans
@@ -7,65 +7,23 @@ mathtext.cal: STIXNonUnicode:italic
 # no Inter Bold Italic is bundled; without this matplotlib warns on every math label
 mathtext.bfit: sans:bold
 
-font.size: 9
-axes.labelsize: 9
-# fig.supxlabel / fig.supylabel, one axis label for a row or column of panels
-figure.labelsize: 9
-xtick.labelsize: 7
-ytick.labelsize: 7
-legend.fontsize: 9
-axes.titlesize: 11
-axes.titleweight: normal
-axes.titlepad: 6
-axes.labelpad: 1
-
-# a full black box, with short thin ticks sticking out of it
+# a full box, with ticks sticking out of it
 axes.spines.top: True
 axes.spines.right: True
-axes.edgecolor: black
-axes.linewidth: 0.5
-xtick.major.width: 0.5
-xtick.minor.width: 0.5
-ytick.major.width: 0.5
-ytick.minor.width: 0.5
-xtick.major.size: 1.5
-xtick.minor.size: 1
-ytick.major.size: 1.5
-ytick.minor.size: 1
-xtick.major.pad: 1.75
-xtick.minor.pad: 1.75
-ytick.major.pad: 1.75
-ytick.minor.pad: 1.75
 axes.grid: True
 axes.grid.axis: both
 axes.axisbelow: True
-grid.color: black
-grid.alpha: 0.1
-grid.linewidth: 0.5
 
-lines.linewidth: 1
-lines.markersize: 2.25
-# hollow markers: white fill, 0.75 pt edge in the line's color
+# hollow markers: white fill, an edge in the line's color
 lines.markerfacecolor: FFFFFF
 lines.markeredgecolor: auto
-lines.markeredgewidth: 0.75
-# also sets the legend frame width (no legend.linewidth rcParam)
-patch.linewidth: 0.75
 
-# box plots: black 0.75 pt outline, whiskers and caps, a 1 pt median; the box is filled with its series color
+# box plots: black outline, whiskers, caps and median; the box is filled with its series color
 boxplot.patchartist: True
 boxplot.boxprops.color: black
 boxplot.whiskerprops.color: black
 boxplot.capprops.color: black
 boxplot.medianprops.color: black
-boxplot.boxprops.linewidth: 0.75
-boxplot.whiskerprops.linewidth: 0.75
-boxplot.capprops.linewidth: 0.75
-boxplot.medianprops.linewidth: 1
-
-# Paul Tol's bright set; tol.* colormaps are registered when paper.py imports tol_colors
-axes.prop_cycle: cycler('color', ['4477AA', 'EE6677', '228833', 'CCBB44', '66CCEE', 'AA3377', 'BBBBBB'])
-image.cmap: tol.iridescent
 
 legend.handlelength: 1.5
 legend.handletextpad: 0.5
@@ -79,10 +37,6 @@ legend.borderpad: 0.3
 legend.borderaxespad: 0.5
 
 figure.constrained_layout.use: True
-# padding in inches around each panel's labels and the outside legend: the gap between panels is
-# what their labels need plus 2 × 0.02 in of white space, the same in both directions
-figure.constrained_layout.w_pad: 0.02
-figure.constrained_layout.h_pad: 0.02
 figure.constrained_layout.hspace: 0
 figure.constrained_layout.wspace: 0
 

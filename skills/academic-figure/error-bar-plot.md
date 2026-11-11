@@ -1,0 +1,10 @@
+# Error bar plot
+
+Means with their uncertainty, one point per method or setting: when the differences are small next to the values (a bar chart from 0 would hide them), or when the uncertainty itself is the message (is the gain larger than the spread over seeds?). Also called a dot plot with error bars; the horizontal form with many methods is a forest plot. Read with `DESIGN.md`, whose rules all still apply.
+
+- `ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2, elinewidth=0.75, capthick=0.75)`: the design's hollow marker at the mean, the error bar in the series color. Methods are categories on the x-axis: hide their tick marks, horizontal gridlines only.
+- The axis does not start at 0: it spans the intervals with the default margins.
+- Value labels: write each mean beside its point, `ax.annotate(f"{m:.3g}", (x, m), xytext=(5, 0), textcoords="offset points", va="center", fontweight="bold", color=darken(color))`.
+- Several series per category (methods on several benchmarks): offset the points of one category like grouped bars, `x + (i - (n_series - 1) / 2) * 0.2`, one legend entry per series.
+- **Forest plot** (many methods, long names): horizontal, `ax.errorbar(mean, y, xerr=err, fmt="o", ...)`, methods top to bottom in reading order (`ax.invert_yaxis()`), vertical gridlines only, and a dashed reference line at the baseline's value or at 0 for differences.
+- The caption says what the bars are: "error bars show ±1 std over 5 seeds" or "95% confidence intervals over 3 seeds".

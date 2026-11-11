@@ -2,22 +2,90 @@ import warnings
 from pathlib import Path
 
 import matplotlib.path as mpath
+import matplotlib.style
 import numpy as np
-import tol_colors  # registers the tol.* colormaps that paper.mplstyle names
+import tol_colors  # registers the tol.* colormaps that DESIGN.md names
+import yaml
+from cycler import cycler
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
+from matplotlib.patches import Wedge
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator
 
-# Inter ships with the skill because no environment has it installed; paper.mplstyle names it.
+# Inter ships with the skill because no environment has it installed; DESIGN.md names it.
 for _font in Path(__file__).parent.glob("Inter-*.ttf"):
     font_manager.fontManager.addfont(str(_font))
 
 
+def _size(a, original=False):
+    """Panel width and height in inches; a panel's position is relative to its subfigure, if any."""
+    box = a.get_position(original=original).transformed(a.figure.transSubfigure)
+    return box.width / a.figure.dpi, box.height / a.figure.dpi
+
+_dashed_width = 0.75
+
+
+def _resolve(value, tokens):
+    """Replace token references such as "{colors.series-2}" with the value they point to."""
+    if isinstance(value, dict):
+        return {k: _resolve(v, tokens) for k, v in value.items()}
+    if isinstance(value, str) and value.startswith("{") and value.endswith("}"):
+        target = tokens
+        for key in value[1:-1].split("."):
+            target = target[key]
+        return _resolve(target, tokens)
+    return value
+
+
+def _number(value):
+    """A token dimension such as "0.5pt" or "0.02in" as a number in its unit."""
+    return float(str(value).rstrip("ptin"))
+
+
+def use_design(path=Path(__file__).parent / "DESIGN.md"):
+    """Set matplotlib's style from paper.mplstyle and the tokens in DESIGN.md's front matter.
+    Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
+    global _dashed_width
+    tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
+    tokens = _resolve(tokens, tokens)
+    c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
+    matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
+    label, tick_label, title = (_number(t[name]["fontSize"]) for name in ("label", "tick-label", "title"))
+    tick_pad, tick_width = _number(s["tick-pad"]), _number(k["tick"]["width"])
+    rcParams.update({
+        "font.sans-serif": [t["label"]["fontFamily"]],
+        "font.size": label, "axes.labelsize": label, "figure.labelsize": label, "legend.fontsize": label,
+        "xtick.labelsize": tick_label, "ytick.labelsize": tick_label,
+        "axes.titlesize": title, "axes.titleweight": t["title"].get("fontWeight", 400),
+        "axes.titlepad": _number(s["title-pad"]), "axes.labelpad": _number(s["label-pad"]),
+        "xtick.major.pad": tick_pad, "xtick.minor.pad": tick_pad, "ytick.major.pad": tick_pad, "ytick.minor.pad": tick_pad,
+        "xtick.major.width": tick_width, "xtick.minor.width": tick_width,
+        "ytick.major.width": tick_width, "ytick.minor.width": tick_width,
+        "xtick.major.size": _number(k["tick"]["size"]), "ytick.major.size": _number(k["tick"]["size"]),
+        "xtick.minor.size": _number(k["tick"]["minor-size"]), "ytick.minor.size": _number(k["tick"]["minor-size"]),
+        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": c["ink"], "ytick.color": c["ink"],
+        "axes.edgecolor": k["axes"]["textColor"], "axes.linewidth": _number(k["axes"]["width"]),
+        "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": _number(k["grid"]["width"]),
+        "lines.linewidth": _number(k["line"]["width"]),
+        "lines.markersize": _number(k["marker"]["size"]), "lines.markeredgewidth": _number(k["marker"]["edge-width"]),
+        "patch.linewidth": _number(k["outline"]["width"]),
+        "boxplot.boxprops.linewidth": _number(k["outline"]["width"]),
+        "boxplot.whiskerprops.linewidth": _number(k["outline"]["width"]),
+        "boxplot.capprops.linewidth": _number(k["outline"]["width"]),
+        "boxplot.medianprops.linewidth": _number(k["median"]["width"]),
+        "axes.prop_cycle": cycler(color=[v for name, v in c.items() if name.startswith("series-")] + [c["neutral"]]),
+        "image.cmap": k["heatmap"]["colormap"],
+        "figure.constrained_layout.w_pad": _number(s["layout-pad"]),
+        "figure.constrained_layout.h_pad": _number(s["layout-pad"]),
+    })
+    _dashed_width = _number(k["dashed-line"]["width"])
+    return c
+
+
 def _panel_ratios(fig, panels):
     fig.canvas.draw()
-    fw, fh = fig.get_size_inches()
-    sizes = [(p.width * fw, p.height * fh) for p in (a.get_position() for a in panels)]
+    sizes = [_size(a) for a in panels]
     return [h / w for w, h in sizes], [w for w, _ in sizes]
 
 
@@ -123,8 +191,9 @@ def _warn_layout_problems(fig, panels):
         if a.get_window_extent(renderer).width / fig.dpi < 1.2:
             warnings.warn(f"panel {a.get_title()!r} is narrower than 1.2 in; use one column fewer")
 
-    texts = list(fig.texts)
-    for legend in fig.legends + [a.get_legend() for a in fig.axes if a.get_legend()]:
+    figures = [fig, *fig.subfigs]
+    texts = [t for f in figures for t in f.texts]
+    for legend in [l for f in figures for l in f.legends] + [a.get_legend() for a in fig.axes if a.get_legend()]:
         texts += legend.get_texts()
     for a in fig.axes:
         if not (a.get_visible() and a.axison):
@@ -140,8 +209,8 @@ def _warn_layout_problems(fig, panels):
     for t, box in zip(texts, boxes):
         if box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:
             warnings.warn(f"text {t.get_text()!r} is cut off at the figure edge")
-        if t.get_fontname() != "Inter":
-            warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; import paper before plotting")
+        if t.get_fontname() != rcParams["font.sans-serif"][0]:
+            warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; call paper.use_design() before plotting")
     for i in range(len(texts)):
         for j in range(i + 1, len(texts)):
             if _texts_overlap(texts[i], boxes[i], texts[j], boxes[j], renderer):
@@ -164,6 +233,26 @@ def _warn_layout_problems(fig, panels):
                 warnings.warn(f"the legend covers a bar or box in panel {a.get_title()!r}; move it")
 
 
+def _is_round(a):
+    return a.name == "polar" or any(isinstance(p, Wedge) for p in a.patches)
+
+
+def _trim_height(fig, panels):
+    """A round panel (pie, polar) is always a circle, as large as its slot allows. Start tall so the
+    figure width sets its size, then cut the empty height of its slot above and below it."""
+    fig.set_figheight(3 * fig.get_figwidth())
+    for _ in range(10):
+        fig.canvas.draw()
+        rows = {}
+        for a in panels:
+            row = round(a.get_position(original=True).transformed(a.figure.transSubfigure).y0)
+            rows[row] = min(rows.get(row, np.inf), _size(a, original=True)[1] - _size(a)[1])
+        empty = sum(rows.values())
+        if empty < 0.005:
+            break
+        fig.set_figheight(fig.get_figheight() - empty)
+
+
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
@@ -184,12 +273,20 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005):
     the figure edge, overlapping text, a value label or legend covering a curve, a legend covering a bar or
     box, a font other than Inter.
 
+    Round panels (pie charts, polar axes such as radar charts) are always circles, so `aspect`
+    does not apply: the height is cut to the content once the circles are as large as the width
+    allows.
+
     Never save with `bbox_inches="tight"`: it changes the final size and breaks the width and
     the ratio this function set.
     """
     axes = list(ax.values()) if isinstance(ax, dict) else list(np.ravel(ax))
     panels = [a for a in axes
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
+    if any(_is_round(a) for a in panels):
+        _trim_height(fig, panels)
+        _warn_layout_problems(fig, panels)
+        return _panel_ratios(fig, panels)[0]
     for a in panels:
         if a.get_aspect() != "auto" or a.get_box_aspect() is not None:
             raise ValueError(
@@ -236,15 +333,9 @@ def mark_value(ax, x, y, text, color, below=False):
     """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
     a hollow circle at (x, y), and `text` in bold just above it (`below=True`: just below), in `darken(color)`.
     """
-    ax.axhline(y, linestyle="--", linewidth=0.75, color=darken(color), zorder=1)
+    ax.axhline(y, linestyle="--", linewidth=_dashed_width, color=darken(color), zorder=1)
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
                 va="top" if below else "bottom", fontweight="bold", color=darken(color), gid="value-label")
 
-
-def subcaption(ax, text):
-    """`text` ("(a) Accuracy on AIME") centered under the panel, below its tick labels and x-axis label."""
-    below_axis = lambda renderer: ax.xaxis.get_tightbbox(renderer)
-    return ax.annotate(text, xy=(0.5, 0), xycoords=("axes fraction", below_axis), xytext=(0, -4),
-                       textcoords="offset points", ha="center", va="top", fontsize=9)

@@ -11,15 +11,16 @@ import pytest
 
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
-from paper import fit_height, mark_value, smooth, darken, lighten, subcaption
+import paper
+from paper import fit_height, mark_value, smooth, darken, lighten
 
-STYLE = ASSETS / "paper.mplstyle"
 WIDTH = 3.25
 
 
 @pytest.fixture(autouse=True)
 def style():
-    with plt.style.context(STYLE):
+    with plt.rc_context():
+        paper.use_design()
         yield
     plt.close("all")
 
@@ -249,12 +250,30 @@ def test_fit_height_warns_legend_over_bar():
         fit_height(fig, ax)
 
 
-def test_subcaption_sits_below_x_label():
-    fig, ax = plt.subplots(figsize=(WIDTH, 3))
-    ax.plot([0, 1], [0, 1])
-    ax.set_xlabel("x")
-    text = subcaption(ax, "(a) Panel")
-    fit_height(fig, ax)
-    renderer = fig.canvas.get_renderer()
-    assert text.get_window_extent(renderer).y1 < ax.xaxis.label.get_window_extent(renderer).y0
-    assert text.get_window_extent(renderer).y0 >= 0
+def test_panels_in_subfigures_get_the_aspect():
+    fig = plt.figure(figsize=(6.75, 2))
+    left, right = fig.subfigures(1, 2, width_ratios=[2, 1])
+    axes = [*left.subplots(1, 2), right.subplots()]
+    for ax in axes:
+        ax.plot([0, 1], [0, 1])
+    left.supxlabel("(a) Left")
+    right.supxlabel("(b) Right")
+    ratios = fit_height(fig, axes, aspect=0.618)
+    assert all(abs(r - 0.618) / 0.618 < 0.02 for r in ratios)
+
+
+def test_round_panels_fill_the_width_with_no_empty_height():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 3))
+    for ax in axes:
+        ax.pie([3, 2, 1])
+    fit_height(fig, axes, aspect=1.0)
+    circle = axes[0].get_position()
+    assert fig.get_figheight() - circle.height * fig.get_figheight() < 0.1
+    assert circle.width * WIDTH > 0.45 * WIDTH
+
+
+def test_polar_panel_is_fitted_without_error():
+    fig, ax = plt.subplots(figsize=(WIDTH, 3), subplot_kw={"projection": "polar"})
+    ax.plot([0, 1, 2], [1, 2, 3])
+    fit_height(fig, ax, aspect=1.0)
+    assert fig.get_figheight() < WIDTH

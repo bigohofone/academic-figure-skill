@@ -1,0 +1,8 @@
+# Box plot
+
+The spread of many values per group, compared across groups: per-problem accuracies, per-sample perplexities, response lengths per model. The shape is the message, so no value labels; the caption gives the numbers and says what the box and whiskers show. Read with `DESIGN.md`, whose rules all still apply.
+
+- `box = ax.boxplot(values, positions=[x], widths=0.7, showfliers=False)` (the box fills 0.7 of its slot), filled with its series color lightened, `box["boxes"][0].set_facecolor(lighten(color))`, so the black median and the points on it stay readable; the design draws the black outline, whiskers, caps and median. Groups on the x-axis are categories: hide their tick marks, horizontal gridlines only (`ax.grid(axis="x", visible=False)`).
+- With under ~30 points per box, show every point on top, jittered within the box, as the design's markers in black on white: `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color="black", markerfacecolor="white", linestyle="none")`, with `rng = np.random.default_rng(0)` so the jitter is the same on every run. With more points, draw none; the box summarizes them.
+- **Grouped box plot** (several series per category): the boxes of one category share 0.8 of its slot like grouped bars, `width = 0.8 / n_series`, each box `widths=0.8 * width` at `x + (i - (n_series - 1) / 2) * width`, jitter within ±0.25 of the box width; one legend entry per series, `matplotlib.patches.Patch(facecolor=lighten(color), edgecolor="black", linewidth=0.75, label=name)`.
+- Caption: "boxes span the quartiles with the median as a line; whiskers reach 1.5× the interquartile range", and what each point is.

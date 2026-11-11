@@ -1,11 +1,15 @@
-# Heatmap: values over two categorical axes
+# Heatmap
 
-Heatmaps, confusion matrices, attention maps, grids of results over two swept settings. Read with `SKILL.md`, whose rules all still apply.
+Values over two categorical axes: confusion matrix, attention map, a grid of results over two swept hyperparameters, per-benchmark scores of many models. Read with `DESIGN.md`, whose rules all still apply.
 
-- `ax.imshow(..., aspect="auto")`, panel aspect 1 : 1, tick marks hidden, no gridlines (`ax.grid(False)`), a colorbar for continuous values; cell text 7 pt in `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"`.
-- Category axes carry no axis labels when the tick labels name them.
+- `im = ax.imshow(values, aspect="auto")`, panel aspect 1 : 1 (or the matrix's shape when it is far from square), tick marks hidden (`ax.tick_params(length=0)`), no gridlines (`ax.grid(False)`), categories as text tick labels on both axes.
+- **Cell text**, when the matrix is small enough to read (up to ~12 × 12) and the values matter: every cell's value, 7 pt, in `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"`. With cell text, no colorbar; without it, a colorbar, `fig.colorbar(im, ax=ax)`, labelled with the quantity.
+- **Axis labels**: name the quantity when the tick labels are values (learning rate, batch size); omit them when the tick labels are categories that name themselves (method names, tokens), except a confusion matrix, whose axes are always "Predicted label" (x) and "True label" (y).
+- **Confusion matrix**: normalized per row (each true class sums to 1, so the diagonal is per-class recall) unless the user asks for counts; the color scale fixed to `vmin=0, vmax=1`; say in the caption how it is normalized.
+- **Attention map**: tokens as tick labels (turned 45° on x when they don't fit), no cell text, a colorbar.
+- **Hyperparameter grid**: the swept values in order on each axis, cell text with the metric, and the best cell outlined: `ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor="black", linewidth=1))`.
 
 | Values | Colormap |
 |---|---|
-| Sequential | `cmap="tol.iridescent"`; few levels: `tol.YlOrBr_discrete` |
-| Signed | `cmap="tol.sunset"` centered at 0 (symmetric `vmin`/`vmax`); few levels: `tol.sunset_discrete` |
+| Sequential (counts, accuracies, attention) | the design's `heatmap.colormap` (the default; pass nothing); few levels: `tol.YlOrBr_discrete` |
+| Signed (differences, correlations) | `cmap="tol.sunset"` centered at 0 (symmetric `vmin`/`vmax`); few levels: `tol.sunset_discrete` |
