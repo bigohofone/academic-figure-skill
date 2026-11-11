@@ -468,3 +468,12 @@ def test_column_gap_lines_groups_up_with_single_columns():
     p, s = [a.get_position() for a in axes], single.axes[0].get_position()
     assert abs(p[0].x0 * 6.75 - s.x0 * 3.25) < 1e-3
     assert abs(p[3].x1 * 6.75 - (3.5 + s.x1 * 3.25)) < 1e-3
+
+
+def test_legend_sticking_out_of_its_panel_warns():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2), layout="constrained")
+    for a in axes:
+        a.plot([0, 1], [0, 0.2], label="Average confidence over all samples")
+    axes[0].legend(loc="upper left")
+    with pytest.warns(UserWarning, match="sticks out of panel"):
+        fit_height(fig, list(axes), min_width=0.9)

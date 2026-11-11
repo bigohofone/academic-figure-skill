@@ -341,6 +341,10 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
         if a.get_legend():
             box = a.get_legend().get_window_extent(renderer)
+            # an inside legend (one that overlaps its panel) must fit in it; a wider one goes above
+            if box.overlaps(panel) and (box.x0 < panel.x0 - 1 or box.x1 > panel.x1 + 1 or box.y1 > panel.y1 + 1):
+                warnings.warn(f"the legend sticks out of panel {a.get_title()!r}; put it above the panel "
+                              "(above its row in a grid, DESIGN.md Legend)")
             if any(t.get_visible() and t.get_text() and box.overlaps(t.get_window_extent(renderer)) for t in a.texts):
                 warnings.warn(f"the legend covers text in panel {a.get_title()!r}; move it")
             # the filled area under the legend, not the shapes' bounding boxes: a histogram is one wide polygon
