@@ -36,7 +36,7 @@ ax.set_ylabel("Training loss")
 ax.set_xlabel("Training step")
 ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
 
-twin.plot(steps, learning_rate * 1e4, color=colors["series-3"], label="Learning rate")
+twin.plot(steps, learning_rate * 1e4, color=colors["series-4"], linestyle="--", linewidth=paper.dashed_width, label="Learning rate")
 twin.set_ylabel("Learning rate (×10⁻⁴)")
 twin.grid(False)
 

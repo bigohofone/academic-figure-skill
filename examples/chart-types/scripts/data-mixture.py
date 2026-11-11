@@ -42,7 +42,7 @@ assert stage_values("Code")[0] < stage_values("Code")[-1] and stage_values("Math
 # The flattest part at the bottom, the rest in data order above it
 bottom = min(shares, key=lambda name: np.std(shares[name]))
 order = [bottom] + [name for name in shares if name != bottom]
-band_colors = [colors[k] for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")][:len(order)]  # light and dark alternate, so neighbours stay apart in grayscale
+band_colors = paper.parts(len(order))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 polys = ax.stackplot(steps, [shares[name] for name in order], colors=band_colors, labels=order, step="post",

@@ -36,6 +36,7 @@ canvas_pad = 0.1  # the canvas-pad token, in inches, set by use_design(): free s
 contour_label_size = 6.0  # the contour-label token, in points, set by use_design()
 bar_label_size = 6.0  # the bar-label token, in points, set by use_design()
 _ours = "#EE6677"  # the ours token, set by use_design()
+_palette = {}  # the colors tokens, set by use_design()
 colorbar_width, colorbar_gap = 0.1, 0.06  # the colorbar tokens, in inches, set by use_design()
 
 
@@ -59,7 +60,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, _greys, _ours
+    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, _greys, _ours, _palette
     # one renderer everywhere: screen backends measure text differently, so fit_height's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
@@ -68,6 +69,7 @@ def use_design(path="DESIGN.md"):
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     _greys = c["neutral"], c["neutral-light"], c["neutral-dark"]
     _ours = c["ours"]
+    _palette = c
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
     contour_label_size = _number(t["contour-label"]["fontSize"])
     bar_label_size = _number(t["bar-label"]["fontSize"])
@@ -383,7 +385,17 @@ def _warn_grayscale(a):
             groups.setdefault(key, []).append((line.get_label(), line.get_color()))
     for c in a.containers:
         if isinstance(c, BarContainer) and c.patches and not str(c.get_label()).startswith("_"):
-            groups.setdefault(("bar",), []).append((c.get_label(), c.patches[0].get_facecolor()))
+            groups.setdefault(("bar",), []).append((c.get_label(), _over_white(c.patches[0].get_facecolor())))
+    # histograms (step outlines or filled shapes) and labelled bands, translucent fills as seen over white
+    for p in a.patches:
+        label = p.get_label() or ""
+        if not isinstance(p, Rectangle) and label and not label.startswith("_"):
+            color = _over_white(p.get_facecolor()) if p.get_fill() else p.get_edgecolor()
+            groups.setdefault(("fill",), []).append((label, color))
+    for c in a.collections:
+        label = c.get_label() or ""
+        if isinstance(c, PolyCollection) and label and not label.startswith("_") and len(c.get_facecolor()):
+            groups.setdefault(("fill",), []).append((label, _over_white(c.get_facecolor()[0])))
     for series in groups.values():
         for i in range(len(series)):
             for j in range(i + 1, len(series)):
@@ -787,6 +799,12 @@ def _lightness(color):
     return 116 * y ** (1 / 3) - 16 if y > 0.008856 else 903.3 * y
 
 
+def _over_white(rgba):
+    """A translucent color as it looks over the white page."""
+    r, g, b, alpha = colors.to_rgba(rgba)
+    return tuple(alpha * c + (1 - alpha) for c in (r, g, b))
+
+
 def _grey(lightness):
     y = ((lightness + 16) / 116) ** 3
     c = 12.92 * y if y <= 0.0031308 else 1.055 * y ** (1 / 2.4) - 0.055
@@ -811,6 +829,27 @@ def greys(n):
                 out.append(_grey(a - t))
                 break
             t -= a - b
+    return out
+
+
+def parts(n):
+    """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
+    hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
+    two parts stay apart when printed in black and white."""
+    hues = [colors.to_rgb(_palette[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
+    levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
+    order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
+    out = []
+    for hue, target in zip(hues, order):
+        toward = np.ones(3) if _lightness(hue) < target else np.zeros(3)
+        lo, hi = 0.0, 1.0
+        for _ in range(30):  # mix with white or black until the lightness hits the target
+            mid = (lo + hi) / 2
+            if (_lightness(tuple(np.array(hue) * (1 - mid) + toward * mid)) < target) == (toward[0] == 1):
+                lo = mid
+            else:
+                hi = mid
+        out.append(tuple(np.array(hue) * (1 - lo) + toward * lo))
     return out
 
 

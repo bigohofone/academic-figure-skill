@@ -4,7 +4,7 @@ As a box plot (`box-plot.md`), when the shape of the spread matters: several mod
 
 ## Draw
 
-- **Body**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`, filled with its series color lightened at full opacity, with a black edge: `body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))` (a grey series: `lighten(greys(n)[i])`), `body.set_edgecolor(colors["ink"])`, `body.set_linewidth(rcParams["patch.linewidth"])`, `body.set_alpha(1)`.
+- **Body**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`, filled with its series color lightened at full opacity, with a black edge: `body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))` (a grey series: `lighten(greys(n)[i])`; ours at its full color, so it stays apart from the pale greys in grayscale), `body.set_edgecolor(colors["ink"])`, `body.set_linewidth(rcParams["patch.linewidth"])`, `body.set_alpha(1)`.
 - **Box inside** (as seaborn's `inner="box"`), so the quartiles stay readable next to the shape: the whiskers as a thin black line to the furthest values within 1.5 × IQR, the interquartile range as a thick black bar, the median as a white dot on it:
 
   ```python

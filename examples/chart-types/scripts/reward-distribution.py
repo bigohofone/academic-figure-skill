@@ -28,7 +28,7 @@ for x, name in enumerate(names):
     color = colors["ours"] if name == "Ours" else baseline_greys[x]
     parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)
     body = parts["bodies"][0]
-    body.set_facecolor(lighten(color))
+    body.set_facecolor(color if color == colors["ours"] else lighten(color))
     body.set_edgecolor(colors["ink"])
     body.set_linewidth(rcParams["patch.linewidth"])
     body.set_alpha(1)

@@ -35,7 +35,7 @@ print("takeaway:", {"total": f"{total / 1e6:.3g}M", f"{names[0]} + {names[1]}": 
                     **{n: share_text(v) for n, v in parts.items()}})
 assert top_two > 0.5, "the two largest sources are not a majority"
 
-part_colors = [colors[k] for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")][:len(names)]  # light and dark alternate, so neighbours stay apart in grayscale
+part_colors = paper.parts(len(names))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 wedges, _ = ax.pie(values, colors=part_colors, startangle=0, counterclock=False,

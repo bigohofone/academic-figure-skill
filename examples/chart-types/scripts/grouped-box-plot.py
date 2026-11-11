@@ -37,13 +37,13 @@ for i, model in enumerate(models):
     for x, dataset in enumerate(datasets):
         box = ax.boxplot(lengths[model][dataset], positions=[x + (i - (len(models) - 1) / 2) * width],
                          widths=0.8 * width, patch_artist=True)
-        box["boxes"][0].set_facecolor(lighten(model_colors[model]))
+        box["boxes"][0].set_facecolor(model_colors[model] if model_colors[model] == colors["ours"] else lighten(model_colors[model]))
 ax.set_xticks(range(len(datasets)), labels=datasets)
 ax.set_xlim(-0.5, len(datasets) - 0.5)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Length (tokens)")
-handles = [Patch(facecolor=lighten(model_colors[m]), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=m)
+handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] else lighten(model_colors[m]), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=m)
            for m in models]
 ax.legend(handles=handles, loc="upper left")
 
