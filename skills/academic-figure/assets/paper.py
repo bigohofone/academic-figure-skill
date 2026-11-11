@@ -343,8 +343,10 @@ def _standard_margins(fig):
 
 
 def _standard_box(fig, panels, aspect):
-    """Panels whose outer decorations fit the standard margins start and end exactly there, so the
-    boxes of all figures at one width (and one number of columns) line up and match in size. The
+    """Panels sit at the standard margins and take the standard size, so the boxes of all figures at
+    one width (and one number of columns) line up and match. The right margin is fixed; left labels
+    that need more room widen the left margin and narrow the panels, which keep the standard height
+    (the aspect gives way). The
     gaps between columns and rows stay as the layout found them; the columns share what is left.
     One colorbar is kept beside the panels (right) or under them (bottom), at the size and gap the
     layout gave it, its labels inside a standard margin of their own. Returns whether they moved."""
@@ -370,18 +372,16 @@ def _standard_box(fig, panels, aspect):
     panels_x1 = max(b.x1 for b in boxes.values()) * w
     cbar = cbars[0] if cbars else None
     vertical = cbar is not None and cbar._colorbar.orientation == "vertical"
+    # the right margin never moves, so every figure's right edge lines up; a left label that needs
+    # more room takes it from the panels' width, never their height, so one width keeps one height
     if vertical:
         cb = cbar.get_position()
         cb_gap, cb_w = colorbar_gap, colorbar_width
-        if cbar.get_tightbbox(renderer).x1 / fig.dpi - cb.x1 * w > side + 1e-3:
-            return False
         right = pad + side + cb_w + cb_gap
+    std_left = left
     for a, b in boxes.items():
-        tight = a.get_tightbbox(renderer)
-        if col_of[a] == 0 and b.x0 * w - tight.x0 / fig.dpi + pad > left + 1e-3:
-            return False
-        if not vertical and col_of[a] == len(columns) - 1 and tight.x1 / fig.dpi - b.x1 * w + pad > right + 1e-3:
-            return False
+        if col_of[a] == 0:
+            left = max(left, b.x0 * w - a.get_tightbbox(renderer).x0 / fig.dpi + pad)
     first = {c: next(b for a, b in boxes.items() if col_of[a] == c) for c in range(len(columns))}
     col_gaps = [first[c + 1].x0 * w - first[c].x1 * w for c in range(len(columns) - 1)]
     top_row = {r: next(b for a, b in boxes.items() if row_of[a] == r) for r in range(len(rows))}
@@ -392,7 +392,7 @@ def _standard_box(fig, panels, aspect):
         cb_below = bottom - cb.y1 * h  # the gap between the panels and the colorbar under them
         cb_h, cb_bottom = cb.height * h, cb.y0 * h
     panel_w = (w - left - right - sum(col_gaps)) / len(columns)
-    panel_h = aspect * panel_w
+    panel_h = aspect * (w - std_left - right - sum(col_gaps)) / len(columns)
     new_h = bottom + top + len(rows) * panel_h + sum(row_gaps)
     fig.set_layout_engine("none")
     fig.set_figheight(new_h)

@@ -85,7 +85,14 @@ def test_long_labels_converge():
     ax.plot([0, 1], [0, 1_000_000])
     ax.set_yticks([0, 500_000, 1_000_000], ["0", "500,000", "1,000,000"], fontsize=12)
     ax.set_ylabel("A very long y-axis label\nthat spans two lines")
-    check(fig, fit_height(fig, ax), 0.618)
+    fit_height(fig, ax)
+    short, sax = plt.subplots(figsize=(WIDTH, 3))
+    sax.plot([0, 1], [0, 1])
+    sax.set_ylabel("y")
+    fit_height(short, sax)
+    w, h = fig.get_size_inches()
+    assert abs(ax.get_position().height * h - sax.get_position().height * short.get_figheight()) < 0.01
+    assert abs((1 - ax.get_position().x1) - (1 - sax.get_position().x1)) * w < 0.01
 
 
 def test_aspect_options():
