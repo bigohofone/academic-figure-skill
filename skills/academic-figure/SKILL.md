@@ -10,7 +10,7 @@ Goal: a figure that reads well printed in the paper, where the reader gets its o
 ## Steps
 
 1. **Set up** the figures folder (Files), then read its `DESIGN.md`: the project's copy is the design, and the user may have changed it.
-2. **Takeaway**: work out what the paper uses this figure to show (the user's request, the paper text or caption, the figure's role), then write it as one sentence with a number from the data. It decides the value labels and becomes the caption's takeaway.
+2. **Takeaway**: work out what the paper uses this figure to show (the user's request, the paper text or caption, the figure's role), then write it as one sentence, with a number from the data when the data gives one. It decides the value labels and becomes the caption's takeaway.
 3. **Kind of data**: decide for every plotted quantity whether it is a reported result or a diagnostic (below).
 4. **Chart type**: pick it from DESIGN.md's Components table and read its file (`{skill-dir}/line-chart.md`, …), every one the figure uses.
 5. **Draw** by DESIGN.md (width, grid, aspect, colors, legend, value labels) and the chart type's file.
@@ -42,7 +42,7 @@ figures/
 - **Script**: `figures/{id}.py` (kebab-case id) runs on its own: the caption as its docstring, the setup below, then everything for that figure: load data, plot, `fit_height`, save PDF and PNG.
 
   ```python
-  """Figure 1: Test accuracy versus training steps on CIFAR-10. Shaded bands show ±1 std over 3 seeds; ..."""
+  """Test accuracy versus training steps on CIFAR-10. Shaded bands show ±1 std over 3 seeds; ..."""
 
   import json
   import math
@@ -70,7 +70,7 @@ figures/
 
 - **Files**: `fig.savefig("outputs/{id}.pdf")` and `fig.savefig("outputs/{id}.png")`. The design embeds fonts as TrueType, which venues accept; text stays text.
 - **LaTeX line** for the reply: single-column venue (ICLR, NeurIPS): `figure`, `width=\textwidth` at full width, `width=0.5\textwidth` at half; two-column venue: single column `figure`, `width=\columnwidth`; 1.5 column `figure*`, `width=0.75\textwidth`; double `figure*`, `width=\textwidth`.
-- **Caption**: as it appears under the figure in the paper, in the paper's language (default English), standing alone; one sentence per part, present tense, plain text with Unicode (±, ×, α); unknown details become `[TODO: …]` and go in the reply.
+- **Caption**: the text of `\caption{}` (LaTeX adds the "Figure N:" number), as it appears under the figure in the paper, in the paper's language (default English), standing alone; one sentence per part, present tense, plain text with Unicode (±, ×, α); unknown details become `[TODO: …]` and go in the reply.
 
   | Part | Content |
   |---|---|
@@ -78,7 +78,7 @@ figures/
   | Reading guide | what the axes and legend don't explain: bands, dashed lines, outlines, sub-figure letters, log axes (skip when there is nothing) |
   | Takeaway | the takeaway from step 2, with its number, written by DESIGN.md's value table |
 
-  > **Figure 1: Test accuracy versus training steps on CIFAR-10.** Shaded bands show ±1 std over 3 seeds; the dashed line marks the best baseline's final accuracy. Ours reaches it after 12k steps, 2.1× faster.
+  > **Test accuracy versus training steps on CIFAR-10.** Shaded bands show ±1 std over 3 seeds; the dashed line marks the best baseline's final accuracy. Ours reaches it after 12k steps, 2.1× faster.
 
 - **Reply**: what changed, the LaTeX line, any `[TODO]`.
 

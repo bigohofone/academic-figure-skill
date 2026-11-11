@@ -1,4 +1,4 @@
-"""Figure 1: GLUE accuracy of five fine-tuning methods. Error bars show ±1 std over 5 seeds. Ours reaches 0.879, 0.0138 above full fine-tuning (0.865), about three times the seed std of either (≤0.0046)."""
+"""Figure 2: GLUE accuracy of five fine-tuning methods. Points mark the mean and error bars show ±1 std over 5 seeds. Ours reaches 0.879, 0.0138 above the best baseline, full fine-tuning (0.865), a gap three times the std of either."""
 
 import json
 import sys
@@ -6,21 +6,21 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
-from matplotlib.patches import Patch
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, darken, lighten, greys
+from paper import fit_height, darken
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-runs = json.load(open("../data/error-bar-plot.json"))["accuracy_per_seed"]
-methods = sorted(runs, key=lambda m: np.mean(runs[m]))
+with open("../data/error-bar-plot.json") as f:
+    runs = json.load(f)["accuracy_per_seed"]
+methods = sorted(runs, key=lambda m: np.mean(runs[m]))  # ascending, so Ours ends at the right
 
-fig, ax = plt.subplots(figsize=(2.75, 2))
+fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
 for x, method in enumerate(methods):
-    color = colors["ours"] if method == "Ours" else colors["neutral"]
     mean, err = np.mean(runs[method]), np.std(runs[method], ddof=1)
+    color = colors["ours"] if method == "Ours" else colors["neutral"]
     ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2,
                 elinewidth=rcParams["patch.linewidth"], capthick=rcParams["patch.linewidth"])
     ax.annotate(f"{mean:#.3g}", (x, mean + err), xytext=(0, 3), textcoords="offset points",

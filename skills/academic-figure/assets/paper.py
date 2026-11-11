@@ -14,7 +14,7 @@ from matplotlib.transforms import Bbox
 from matplotlib.patches import Rectangle, Wedge
 from matplotlib.lines import AxLine
 from matplotlib.text import Annotation
-from matplotlib.ticker import FixedLocator
+from matplotlib.ticker import FixedLocator, FuncFormatter, ScalarFormatter
 
 # Inter ships with the skill because no environment has it installed; DESIGN.md names it.
 for _font in Path(__file__).parent.glob("Inter-*.ttf"):
@@ -193,6 +193,9 @@ def _keep_value_labels_inside(fig, panels):
                 else:
                     reach = point - (label.x0 if axis is a.xaxis else label.y0) + 1
                     new = (_limit_for_reach(axis, lo, hi, v, reach, size, False), hi)
+                if lo >= 0 and new[0] < 0:
+                    # a non-negative quantity never shows negative values to make room
+                    new = (0, new[1])
                 scale = axis.get_transform()
                 old_span = np.ptp(scale.transform([lo, hi]))
                 if point_name and np.ptp(scale.transform(list(new))) > 1.25 * old_span:
@@ -313,6 +316,14 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
 
 
+def _plain_numbers(fig):
+    """Write matplotlib's default numeric ticks as plain numbers (0, 0.5, 1; 1024), with a true minus sign."""
+    for a in fig.axes:
+        for axis in (a.xaxis, a.yaxis):
+            if type(axis.get_major_formatter()) is ScalarFormatter:
+                axis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:.10g}".replace("-", "\u2212")))
+
+
 def _polygon_area(xy):
     x, y = xy[:, 0], xy[:, 1]
     return abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1))) / 2
@@ -372,6 +383,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     axes = list(ax.values()) if isinstance(ax, dict) else list(np.ravel(ax))
     panels = [a for a in axes
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
+    _plain_numbers(fig)
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
         _warn_layout_problems(fig, panels, min_width)

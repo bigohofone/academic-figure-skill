@@ -1,4 +1,4 @@
-"""Figure 1: Soft alignment found by RNNsearch-50 when translating an English sentence (columns) into French (rows). Each cell is the attention weight αᵢⱼ of target word i on source word j; each row sums to 1. The alignment is mostly monotonic along the diagonal, but the model aligns "zone" with "Area" (0.97), jumping over "European" and "Economic", and then looks one word back at a time to finish "zone économique européenne"."""
+"""Figure 1: Attention weights of the French translation (rows) on the English source sentence (columns). Each row is the attention distribution of one generated word and sums to 1. The alignment is mostly monotonic but reverses for the noun phrase: “zone économique européenne” attends to “European Economic Area” in reverse order, with “européenne” putting 0.97 of its weight on “European”."""
 
 import json
 import sys
@@ -14,19 +14,21 @@ colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/attention-map.json") as f:
     data = json.load(f)
-source = data["source_tokens"]
-target = data["target_tokens"]
-weights = np.array(data["weights"])
+source_tokens = data["source_tokens"]
+target_tokens = data["target_tokens"]
+weights = np.array(data["weights"])  # weights[i][j]: target word i on source word j
 
-fig, ax = plt.subplots(figsize=(2.75, 2))
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
 im = ax.imshow(weights, aspect="auto", vmin=0, vmax=1)
 ax.xaxis.tick_top()
-ax.set_xticks(range(len(source)), labels=source, rotation=90, ha="center")
-ax.set_yticks(range(len(target)), labels=target)
+ax.set_xticks(range(len(source_tokens)), labels=source_tokens, rotation=90, ha="center")
+ax.set_yticks(range(len(target_tokens)), labels=target_tokens)
 ax.tick_params(length=0)
 ax.grid(False)
-fig.colorbar(im, ax=ax, label="Attention weight", location="bottom")
 
-fit_height(fig, ax, aspect=len(target) / len(source))
+cbar = fig.colorbar(im, ax=ax, label="Attention weight", location="bottom")
+cbar.set_ticks([0, 0.5, 1], labels=["0", "0.5", "1"])
+
+fit_height(fig, ax, aspect=weights.shape[0] / weights.shape[1])
 fig.savefig("../outputs/attention-map.pdf")
 fig.savefig("../outputs/attention-map.png")

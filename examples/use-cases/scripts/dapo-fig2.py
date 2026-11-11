@@ -1,4 +1,4 @@
-"""Figure 2: AIME accuracy (avg@32) over training with and without Clip-Higher. With Clip-Higher, accuracy keeps rising to a best of 0.406, while without it, it plateaus at 0.269."""
+"""Figure 2: AIME accuracy (avg@32) over training steps with and without Clip-Higher. Dashed lines mark each run's best accuracy. With Clip-Higher, accuracy peaks at 0.406, against 0.269 without it."""
 
 import json
 import sys
@@ -11,25 +11,20 @@ from paper import fit_height, mark_value
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-data = json.load(open("../data/dapo.json"))["fig2a"]
+with open("../data/dapo.json") as f:
+    data = json.load(f)["fig2a"]
 
-fig, ax = plt.subplots(figsize=(2.75, 2))
-series = [
-    ("w/ Clip-Higher", colors["ours"]),
-    ("w/o Clip-Higher", colors["neutral"]),
-]
-for name, color in series:
-    curve = data[name]
-    ax.plot(curve["step"], curve["value"], color=color, label=name)
-for name, color in series:
-    curve = data[name]
-    best = max(curve["value"])
-    mark_value(ax, curve["step"][curve["value"].index(best)], best, f"{best:#.3g}", color)
+fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
 
-ax.set_xlabel("Training steps")
+# ours first (legend order), the ablation in neutral
+for name, color in [("w/ Clip-Higher", colors["ours"]), ("w/o Clip-Higher", colors["neutral"])]:
+    step, value = data[name]["step"], data[name]["value"]
+    ax.plot(step, value, color=color, label=name)
+    best = max(range(len(value)), key=lambda i: value[i])
+    mark_value(ax, step[best], value[best], f"{value[best]:#.3g}", color)
+
+ax.set_xlabel("Training step")
 ax.set_ylabel("AIME avg@32")
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.legend(loc="lower right")
 
 fit_height(fig, ax, aspect=0.618)

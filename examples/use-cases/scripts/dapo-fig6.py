@@ -1,4 +1,4 @@
-"""Figure 6: AIME accuracy (avg@32) over training of a baseline setting with and without dynamic sampling. With dynamic sampling, accuracy peaks at 0.438 after 2,320 steps, above the 0.421 that the run without it reaches only after 6,080 steps."""
+"""Figure 6: AIME accuracy (avg@32) over training steps with and without Dynamic Sampling. Dashed lines mark each run's best accuracy. With Dynamic Sampling, accuracy peaks at 0.438 after 2320 steps; without it, the best is 0.421, reached only after 6080 steps."""
 
 import json
 import sys
@@ -11,25 +11,21 @@ from paper import fit_height, mark_value
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-data = json.load(open("../data/dapo.json"))["fig6"]
+with open("../data/dapo.json") as f:
+    data = json.load(f)["fig6"]
 
-fig, ax = plt.subplots(figsize=(2.75, 2))
-series = [
-    ("w/ Dynamic Sampling", colors["ours"]),
-    ("w/o Dynamic Sampling", colors["neutral"]),
-]
-for name, color in series:
-    curve = data[name]
-    ax.plot(curve["step"], curve["value"], color=color, label=name)
-for name, color in series:
-    curve = data[name]
-    best = max(curve["value"])
-    mark_value(ax, curve["step"][curve["value"].index(best)], best, f"{best:#.3g}", color)
+fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
 
-ax.set_xlabel("Training steps")
+# ours first (legend order), the ablation in neutral
+for name, color, below in [("w/ Dynamic Sampling", colors["ours"], False),
+                           ("w/o Dynamic Sampling", colors["neutral"], False)]:
+    step, value = data[name]["step"], data[name]["value"]
+    ax.plot(step, value, color=color, label=name)
+    best = max(range(len(value)), key=lambda i: value[i])
+    mark_value(ax, step[best], value[best], f"{value[best]:#.3g}", color, below=below)
+
+ax.set_xlabel("Training step")
 ax.set_ylabel("AIME avg@32")
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.legend(loc="lower right")
 
 fit_height(fig, ax, aspect=0.618)

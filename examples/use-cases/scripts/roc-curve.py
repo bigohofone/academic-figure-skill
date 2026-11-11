@@ -1,42 +1,52 @@
-"""Figure 8: ROC curves for detecting GPT-3.5-turbo text completed by humans on Reddit, with DNA-GPT scoring a sliding window (each half of a text) and the baselines scoring the whole text. The dashed diagonal marks chance; AUC values are computed from the curves with the trapezoidal rule. DNA-GPT reaches an AUC of 0.987 with the golden prompt and 0.905 without it, against 0.647 for GPTZero and 0.565 for OpenAI's classifier."""
+"""Figure [TODO: number]: ROC curves of AI-text detectors. W/ P and W/o P are our detector with and without the golden prompt; the dashed grey diagonal marks chance, and AUC is computed from each curve with the trapezoidal rule. Ours with the golden prompt reaches an AUC of 0.987, against 0.905 without it and 0.647 for GPTZero, the best baseline."""
 
 import json
+import math
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rcParams
+from matplotlib.colors import Normalize, to_rgb
+from matplotlib.patches import Patch
+from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
 
-methods = {m["name"]: m for m in json.load(open("../data/roc-curve.json"))["methods"]}
+with open("../data/roc-curve.json") as f:
+    methods = {m["name"]: m for m in json.load(f)["methods"]}
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75))
-ax.axline((0, 0), (1, 1), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
-handles = []
-for name, label, color, linestyle, marker in [
-        ("Ours: W/ P", "Ours", colors["ours"], "-", "o"),
-        ("Ours: W/o P", "Ours w/o prompt", colors["ours"], "--", "s"),
-        ("OpenAI", "OpenAI", colors["neutral"], "-", "^"),
-        ("GPTZero", "GPTZero", colors["neutral"], "--", "D")]:
-    fpr, tpr = methods[name]["fpr"], methods[name]["tpr"]
+# ICLR, one panel: half the text width
+fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+
+# variants of ours in the ours color (full method solid, reduced variant dashed);
+# the baselines grey, told apart by line style in ascending order of AUC
+series = [
+    ("Ours: W/ P", "Ours W/ P", colors["ours"], "-", "o"),
+    ("Ours: W/o P", "Ours W/o P", colors["ours"], "--", "s"),
+    ("OpenAI", "OpenAI", colors["neutral"], "-", "^"),
+    ("GPTZero", "GPTZero", colors["neutral"], "--", "D"),
+]
+for key, name, color, style, marker in series:
+    fpr, tpr = np.array(methods[key]["fpr"]), np.array(methods[key]["tpr"])
     auc = np.trapezoid(tpr, fpr)
-    linewidth = paper.dashed_width if linestyle != "-" else None
-    (h,) = ax.plot(fpr, tpr, linestyle=linestyle, linewidth=linewidth, marker=marker, color=color,
-                   markevery=max(1, len(fpr) // 10), label=f"{label} (AUC {auc:#.3g})")
-    handles.append(h)
+    width = rcParams["lines.linewidth"] if style == "-" else paper.dashed_width
+    ax.plot(fpr, tpr, linestyle=style, linewidth=width, marker=marker, markevery=max(1, len(fpr) // 10),
+            color=color, label=f"{name} (AUC {auc:#.3g})")
 
+ax.axline((0, 0), (1, 1), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
-ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
-ax.set_xticks(ticks, labels=[f"{t:.10g}" for t in ticks])
-ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])
+ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
 ax.set_xlabel("False positive rate")
 ax.set_ylabel("True positive rate")
-ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=1, frameon=False)
+ax.grid(True)
+ax.legend(loc="lower right")
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/roc-curve.pdf")

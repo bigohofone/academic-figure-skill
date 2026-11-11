@@ -17,7 +17,7 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
 
 ## Labels
 
-- **Level labels**: one label per level, black or white for the color at its level. Place them along the path from the minimum toward the farthest corner, where the lines are farthest apart: `positions` holds, for each level, the point on that path where Z crosses it.
+- **Level labels**: one label per level, black or white for the color at its level (black on a lines-only plot). Place them along the path from the minimum toward the farthest corner, where the lines are farthest apart: `positions` holds, for each level, the point on that path where Z crosses it.
 
   ```python
   labels = ax.clabel(lines, fmt="%.2g", manual=positions)
@@ -25,7 +25,7 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
       t.set_color(text_color(mesh.cmap(mesh.norm(float(t.get_text())))))
   ```
 
-  For polylines, write each level at its given label position, `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label")`. Labels that collide are dropped, the later of two (Collisions step 3; given positions cannot move).
+  For polylines, write each level once, at the first of its given label positions that does not collide (Collisions step 1), on a white box since no gap is cut for it: `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label", bbox=dict(facecolor="white", edgecolor="none", pad=1))`; a level with no free position goes unlabelled.
 - **Points of interest**: a minimum or the trained solution as a filled star in `colors["ours"]` at the design's highlight size, `ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size, linestyle="none", label=...)`; a training trajectory as a data line with markers at its ends; named in a legend when there are two or more of them, else in the caption (DESIGN.md Legend).
 
 ## Caption

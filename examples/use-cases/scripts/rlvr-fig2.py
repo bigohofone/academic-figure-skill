@@ -1,4 +1,4 @@
-"""Figure 2: Pass@k of base models and their RLVR-trained counterparts across mathematical benchmarks. The x axis is logarithmic. At small k the RL-trained models are ahead (Qwen2.5-7B on AIME24: 0.154 vs 0.074 pass@1), but as k grows to the tens or hundreds the base models catch up and surpass them (0.767 vs 0.633 pass@1024)."""
+"""Figure 2: Pass@k of base models and their RL-trained versions on four math benchmarks. The x axis (number of samples k) is logarithmic. RL leads at small k, but the base model overtakes it at large k in every panel: on AIME24, Qwen2.5-32B reaches 0.900 pass@1024 as a base model against 0.833 after RL."""
 
 import json
 import math
@@ -13,38 +13,44 @@ from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
-data = json.load(open("../data/rlvr.json"))
+with open("../data/rlvr.json") as f:
+    data = json.load(f)
+
 benchmarks = ["AIME24", "MATH500", "Minerva", "Olympiad"]
 models = ["Qwen2.5-7B", "Qwen2.5-14B", "Qwen2.5-32B", "LLaMA-3.1-8B"]
-series = [("Base", colors["series-1"], "o"), ("RL", colors["series-2"], "s")]
 
-fig, axes = plt.subplots(4, 4, figsize=(5.5, 5.5), sharex=True, sharey=True)
+fig, axes = plt.subplots(4, 4, figsize=(5.5, 5.5), sharex=True, sharey=True, layout="constrained")
+
+# log2 x axis: one tick and gridline per power of 2 from 1 to 1024, every fifth labelled
+ticks = [2**i for i in range(11)]
+top = ticks[-1]
+margin = 2 ** (0.05 * math.log2(top / 1))
+
 for r, model in enumerate(models):
-    for c, benchmark in enumerate(benchmarks):
+    for c, bench in enumerate(benchmarks):
         ax = axes[r, c]
-        for name, color, marker in series:
-            curve = data[benchmark][model][name]
-            style = "-" if len(curve["k"]) > 30 else marker + "-"
-            ax.plot(curve["k"], curve["pass"], style, color=color, label=name)
+        ax.set_xscale("log", base=2)
+        for name, color in [("Base", colors["series-1"]), ("RL", colors["series-2"])]:
+            curve = data[bench][model][name]
+            ax.plot(curve["k"], curve["pass"], color=color, label=name)
+        ax.set_xticks([], minor=True)
+        ax.set_xticks(ticks, labels=[str(t) if i % 5 == 0 else "" for i, t in enumerate(ticks)])
+        ax.set_xlim(1 / margin, top * margin)
+        ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
+        if r == 0:
+            ax.set_title(bench)
+        if r == 3:
+            ax.set_xlabel("k")
+        if c == 0:
+            ax.set_ylabel("Pass@k")
 
-ks = [2 ** e for e in range(11)]
-margin = 2 ** (0.05 * math.log2(ks[-1] / ks[0]))
-ax.set_xscale("log", base=2)
-ax.set_xticks(ks, labels=[str(k) if i % 5 == 0 else "" for i, k in enumerate(ks)])
-ax.set_xticks([], minor=True)
-ax.set_xlim(ks[0] / margin, ks[-1] * margin)
-ax.set_ylim(0, 1)
-ax.set_yticks([0, 0.5, 1], labels=["0", "0.5", "1"])
-
-for c, benchmark in enumerate(benchmarks):
-    axes[0, c].set_title(benchmark)
 for r, model in enumerate(models):
-    axes[r, 0].set_ylabel("Pass@k")
     axes[r, 0].annotate(model, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0),
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
-fig.supxlabel("Number of samples k")
-fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", ncol=2, frameon=False, borderaxespad=0)
+
+fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=2, frameon=False,
+           borderaxespad=0)
 
 fit_height(fig, axes, aspect=1.0, min_width=1.0)
 fig.savefig("../outputs/rlvr-fig2.pdf")

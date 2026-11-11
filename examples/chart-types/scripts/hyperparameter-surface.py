@@ -1,7 +1,6 @@
-"""Figure 1: Validation loss over learning rate and weight decay. Both axes are log scale; colors blend between the 13 × 13 runs, and the star marks the lowest loss. The loss is lowest, 1.91, at learning rate 3e-4 and weight decay 6e-3, and rises to 3.76–4.55 at the largest learning rate, 1e-2, where training diverges."""
+"""Figure 1: Validation loss of our model over learning rate and weight decay. Both axes are log scale; colors blend between the 13 × 13 runs, and the star marks the lowest loss. The loss is lowest, 1.91, at learning rate 3.2e-4 and weight decay 5.6e-3, and stays below 2.0 in a narrow band around it."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
@@ -20,47 +19,47 @@ with open("../data/hyperparameter-surface.json") as f:
     data = json.load(f)
 learning_rate = np.array(data["learning_rate"])
 weight_decay = np.array(data["weight_decay"])
-val_loss = np.array(data["val_loss"])
-X, Y = np.meshgrid(learning_rate, weight_decay)
-levels = np.arange(2.0, 4.5 + 0.25, 0.5)
+val_loss = np.array(data["val_loss"])  # val_loss[i][j]: weight decay i, learning rate j
 
-# label positions: where the loss crosses each level on the straight path (in log space)
-# from the minimum to the farthest corner, where the lines are farthest apart
-i_min, j_min = np.unravel_index(val_loss.argmin(), val_loss.shape)
-n = len(weight_decay) - 1
-corners = [(0, 0), (0, n), (n, 0), (n, n)]
-i_far, j_far = max(corners, key=lambda c: math.hypot(c[0] - i_min, c[1] - j_min))
-t = np.linspace(0, 1, 1000)
-path_i, path_j = i_min + t * (i_far - i_min), j_min + t * (j_far - j_min)
-loss_on_path = RegularGridInterpolator((np.arange(n + 1), np.arange(n + 1)), val_loss)(np.column_stack([path_i, path_j]))
-positions = []
-for level in levels:
-    k = np.argmax(loss_on_path >= level)
-    lr = np.interp(path_j[k], np.arange(n + 1), np.log10(learning_rate))
-    wd = np.interp(path_i[k], np.arange(n + 1), np.log10(weight_decay))
-    positions.append((10**lr, 10**wd))
-
-fig, ax = plt.subplots(figsize=(2.75, 2))
+fig, ax = plt.subplots(figsize=(2.75, 2.5))
 ax.set_xscale("log")
 ax.set_yscale("log")
+X, Y = np.meshgrid(learning_rate, weight_decay)
 mesh = ax.pcolormesh(X, Y, val_loss, shading="gouraud")
+levels = np.arange(2.0, 5.0 + 0.25, 0.5)
 lines = ax.contour(X, Y, val_loss, levels=levels, colors=colors["ink"], linewidths=rcParams["contour.linewidth"])
+ax.grid(False)
+
+# level labels along the path from the minimum toward the farthest corner (lowest learning rate and weight decay)
+i, j = np.unravel_index(val_loss.argmin(), val_loss.shape)
+loss_at = RegularGridInterpolator((np.log10(weight_decay), np.log10(learning_rate)), val_loss)
+t = np.linspace(0, 1, 2001)
+path_lr = np.log10(learning_rate[j]) + t * (np.log10(learning_rate[0]) - np.log10(learning_rate[j]))
+path_wd = np.log10(weight_decay[i]) + t * (np.log10(weight_decay[0]) - np.log10(weight_decay[i]))
+path_loss = loss_at(np.column_stack([path_wd, path_lr]))
+positions = []
+for level in levels[:-1]:  # the label of 5 collides with 4.5 and is dropped
+    k = np.argmax(path_loss >= level)  # first point past the level, walking out from the minimum
+    positions.append((10 ** path_lr[k], 10 ** path_wd[k]))
 labels = ax.clabel(lines, fmt="%.2g", manual=positions)
 for label in labels:
     label.set_color(text_color(mesh.cmap(mesh.norm(float(label.get_text())))))
-ax.plot(learning_rate[j_min], weight_decay[i_min], "*", color=colors["ours"], markerfacecolor=colors["ours"],
-        markersize=paper.highlight_size, linestyle="none", label="Lowest loss")
+
+# the lowest loss
+ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markerfacecolor=colors["ours"],
+        markersize=paper.highlight_size, linestyle="none")
+
 for axis in (ax.xaxis, ax.yaxis):
-    axis.set_major_formatter(lambda v, _: f"{v:g}" if v >= 1e-3 else f"1e{round(math.log10(v))}")
+    axis.set_major_formatter(lambda v, _: f"{v:.10g}" if v >= 0.001 else f"1e{round(np.log10(v))}".replace("-", "−"))
     axis.set_minor_formatter(NullFormatter())
-ax.grid(False)
+# the first y label collides with the first x label at the corner
+ticks = [t for t in ax.get_yticks() if weight_decay[0] <= t <= weight_decay[-1]]
+ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])
 ax.set_xlabel("Learning rate")
 ax.set_ylabel("Weight decay")
-lo, hi = ax.get_ylim()
-ticks = [t for t in ax.get_yticks() if lo <= t <= hi]
-ax.set_yticks(ticks, labels=["", *[f"{t:g}" if t >= 1e-3 else f"1e{round(math.log10(t))}" for t in ticks[1:]]])
-ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=1, frameon=False)
-fig.colorbar(mesh, ax=ax, label="Validation loss")
+
+cbar = fig.colorbar(mesh, ax=ax, label="Validation loss")
+cbar.ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/hyperparameter-surface.pdf")
