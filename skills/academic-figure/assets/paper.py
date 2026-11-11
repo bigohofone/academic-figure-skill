@@ -10,6 +10,7 @@ from cycler import cycler
 from matplotlib import colors, font_manager, rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.collections import FillBetweenPolyCollection, LineCollection, PathCollection, PolyCollection
+from matplotlib.container import BarContainer
 from matplotlib.contour import ContourSet
 from matplotlib.transforms import Bbox
 from matplotlib.patches import Rectangle, Wedge
@@ -337,6 +338,21 @@ def _warn_layout_problems(fig, panels, min_width):
             covered = sum(_polygon_area(poly) for shape in fills for poly in shape.clip_to_bbox(box).to_polygons())
             if covered > box.width * box.height / 10:
                 warnings.warn(f"the legend covers filled marks (bars, boxes, bands, areas) in panel {a.get_title()!r}; move it")
+            # a bar's value is its end: covering even a sliver of it hides the number the bar shows
+            if any(_bar_end(bar, c.orientation, renderer).overlaps(box)
+                   for c in a.containers if isinstance(c, BarContainer) for bar in c.patches):
+                warnings.warn(f"the legend covers the end of a bar in panel {a.get_title()!r}; move it")
+
+
+def _bar_end(bar, orientation, renderer):
+    """The edge of a bar at its value, as a thin box: the top (bottom when negative) of a vertical
+    bar, the right (left) end of a horizontal one."""
+    box, value = bar.get_window_extent(renderer), (bar.get_height() if orientation == "vertical" else bar.get_width())
+    if orientation == "vertical":
+        y = box.y1 if value >= 0 else box.y0
+        return Bbox([[box.x0, y - 0.5], [box.x1, y + 0.5]])
+    x = box.x1 if value >= 0 else box.x0
+    return Bbox([[x - 0.5, box.y0], [x + 0.5, box.y1]])
 
 
 def _standard_parts(fig):

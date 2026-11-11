@@ -436,3 +436,12 @@ def test_right_axis_mirrors_left():
     p = ax.get_position()
     assert abs(p.x0 - (1 - p.x1)) < 1e-6
     assert np.allclose(twin.get_position().bounds, p.bounds)
+
+
+def test_legend_over_bar_ends_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.bar([0, 1, 2, 3], [0.2, 0.5, 0.9, 0.95], label="Accuracy")
+    ax.bar([0], [0.1], bottom=[0.2], label="Gap")
+    ax.legend(loc="upper right")
+    with pytest.warns(UserWarning, match="end of a bar"):
+        fit_height(fig, ax)
