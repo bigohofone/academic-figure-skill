@@ -11,7 +11,7 @@ import pytest
 
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
-from paper import fit_height, mark_value, smooth, darken, lighten
+from paper import fit_height, mark_value, smooth, darken, lighten, subcaption
 
 STYLE = ASSETS / "paper.mplstyle"
 WIDTH = 3.25
@@ -247,3 +247,14 @@ def test_fit_height_warns_legend_over_bar():
     ax.legend(loc="center")
     with pytest.warns(UserWarning, match="the legend covers a bar or box"):
         fit_height(fig, ax)
+
+
+def test_subcaption_sits_below_x_label():
+    fig, ax = plt.subplots(figsize=(WIDTH, 3))
+    ax.plot([0, 1], [0, 1])
+    ax.set_xlabel("x")
+    text = subcaption(ax, "(a) Panel")
+    fit_height(fig, ax)
+    renderer = fig.canvas.get_renderer()
+    assert text.get_window_extent(renderer).y1 < ax.xaxis.label.get_window_extent(renderer).y0
+    assert text.get_window_extent(renderer).y0 >= 0

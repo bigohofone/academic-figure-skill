@@ -241,3 +241,10 @@ def mark_value(ax, x, y, text, color, below=False):
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
                 va="top" if below else "bottom", fontweight="bold", color=darken(color), gid="value-label")
+
+
+def subcaption(ax, text):
+    """`text` ("(a) Accuracy on AIME") centered under the panel, below its tick labels and x-axis label."""
+    below_axis = lambda renderer: ax.xaxis.get_tightbbox(renderer)
+    return ax.annotate(text, xy=(0.5, 0), xycoords=("axes fraction", below_axis), xytext=(0, -4),
+                       textcoords="offset points", ha="center", va="top", fontsize=9)

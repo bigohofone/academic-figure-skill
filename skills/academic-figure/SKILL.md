@@ -38,7 +38,7 @@ Steps, in order:
 | Double column | 4 |
 
 1. Start with every panel in one row, up to the width's column limit: a single column holds two panels side by side, and panels the reader compares (two problems, two settings) stay side by side, as in the paper being redrawn.
-2. Render. `fit_height` warns when a panel's data area (inside the box) is narrower than 1.2 in, or when tick labels, titles or axis labels are cut off or overlap.
+2. Render. `fit_height` warns when a panel's data area (inside the box) is narrower than 1.2 in, or when tick labels, titles, subcaptions or axis labels are cut off or overlap.
 3. On such a warning, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), turn long text tick labels 45° (§2), shorten labels. Only when a panel is still narrower than 1.2 in, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 1 × 4 → 2 × 3), then render again. Rows have no limit.
 4. Turn off unused cells (5 panels in 2 × 3: the last cell).
 5. When panels plot the same quantity over the same range on an axis, share it (`plt.subplots(..., sharex=True, sharey=True)`). Every panel keeps its tick numbers, since sharing hides them on inner panels: `ax.tick_params(labelleft=True, labelbottom=True)` on each panel.
@@ -79,7 +79,7 @@ Start every figure with the bundled style, copied into the project's `figures/` 
 
 ```python
 import tol_colors as tc
-from paper import fit_height, mark_value, smooth, darken, lighten  # importing paper registers the bundled Inter font
+from paper import fit_height, mark_value, smooth, darken, lighten, subcaption  # importing paper registers the bundled Inter font
 plt.style.use("paper.mplstyle")
 ```
 
@@ -87,7 +87,7 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 
 | The style sets | |
 |---|---|
-| Text | Inter for all text and math; titles and row/column headers 11 pt, tick labels 7 pt, everything else (axis labels, legends, value labels) 9 pt |
+| Text | Inter for all text and math; row/column headers 11 pt, tick labels 7 pt, everything else (axis labels, subcaptions, legends, value labels) 9 pt |
 | Axes | a full box, black, 0.5 pt; ticks 0.5 pt, 1.5 pt long (minor 1 pt); tick labels 1.75 pt from the ticks, axis labels 1 pt from the tick labels |
 | Grid | both directions, black at 10% opacity, 0.5 pt, behind the data |
 | Lines, markers | lines 1 pt, dashed lines 0.75 pt; hollow markers, size 2.25 with a 0.75 pt edge |
@@ -96,8 +96,8 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 | Output | 300 dpi; `pdf.fonttype: 42` (text stays text, Inter embedded) |
 
 - Keep these values as they are; the style is tuned for print.
-- Name panels with axes titles: in reading order, prefix each with its letter, `"(a) Accuracy on AIME"`, `"(b) …"`. A single panel has no title unless it needs one (dataset, setting). The figure itself has no title; the caption names it.
-- Grids of two factors (models × benchmarks, methods × datasets): name each row and column once instead of each panel, and either factor may be the rows. Headers are 11 pt, like panel titles. Column headers are the top row's axes titles (`ax.set_title(col_name)`); row headers go left of the first column's y-label: `axes[r, 0].annotate(row_name, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0), textcoords="offset points", ha="right", va="center", rotation=90, fontsize=11)`. Such panels carry no letters; the caption names a panel by its row and column.
+- Name panels with subcaptions below them, as papers do, not with titles above: in reading order, prefix each with its letter, `subcaption(ax, "(a) Accuracy on AIME")`, `"(b) …"`, 9 pt text under the panel's tick labels and x-axis label. A single panel has no subcaption unless it needs one (dataset, setting), then without a letter. The figure itself has no title; the caption names it.
+- Grids of two factors (models × benchmarks, methods × datasets): name each row and column once instead of each panel, and either factor may be the rows. Headers are 11 pt. Column headers are the top row's axes titles (`ax.set_title(col_name)`); row headers go left of the first column's y-label: `axes[r, 0].annotate(row_name, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0), textcoords="offset points", ha="right", va="center", rotation=90, fontsize=11)`. Such panels carry no letters; the caption names a panel by its row and column.
 - Keep matplotlib's default axis limits and margins; `fit_height` makes room for value labels (§1, Height).
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
@@ -140,7 +140,7 @@ When the takeaway compares reported results across series, write them on the plo
 Every plot type uses the same parts as lines: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt (box plots get theirs from the style), dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity, except bands and scatter clouds, and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
 
 - **Line**: `ax.plot(x, y, color=color)`; markers only on request (§3). Gridlines in both directions (style).
-- **Bar** (reported results, one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, grouped bars sharing 0.8 of each slot (`width = 0.8 / n_series`), every bar labelled with `ax.bar_label(bars, fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. For several groups (benchmarks, datasets), one panel per group, titled with the group. Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.
+- **Bar** (reported results, one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, grouped bars sharing 0.8 of each slot (`width = 0.8 / n_series`), every bar labelled with `ax.bar_label(bars, fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. For several groups (benchmarks, datasets), one panel per group, named by its subcaption. Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.
 - **Horizontal bar**: only for unordered categories with long names. As bars, with `ax.barh` and vertical gridlines only: `ax.grid(axis="y", visible=False)`.
 - **Stacked bar**: segments in series order from the bottom with white 0.5 pt seams, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=0.5)`; horizontal gridlines only.
 - **Histogram**: raw values as touching bars, `ax.hist(values, bins=bins, color=color, linewidth=0)`; several series on one axis as outlines, `histtype="step", linewidth=1`. Counts per bin (e.g. accuracy intervals) as grouped bars with the bins in order on the x-axis, never horizontal bars. No value labels (§3); horizontal gridlines only.
@@ -178,9 +178,9 @@ Paul Tol's color-blind-safe `bright` set, from `tol_colors` (`tc`): `cset = tc.c
 |---|---|
 | One panel | placed by the first of these that covers no data: (1) a corner, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`; (2) another free spot inside the panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panel, as below |
 | Several panels with the same series | one legend for the figure, outside above the panels, never tucked into one panel where the reader has to hunt for it: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)`, with fewer columns (more rows) when one row of entries is wider than the figure |
-| Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel's title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
+| Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
 | Grouped series | rows = groups, columns = variants |
-| One series per panel | none; the title names it |
+| One series per panel | none; the subcaption names it |
 
 - Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, a bar or a box; on that warning, try the next spot.
 - Entry order: "ours" first, then the other series in color order, reference lines last.
