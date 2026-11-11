@@ -2,9 +2,18 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/bigohofone/academic-figure-skill?style=social)](https://github.com/bigohofone/academic-figure-skill/stargazers) [![Project site](https://img.shields.io/badge/site-wonjunoh.com-d7344a)](https://wonjunoh.com/academic-figure-skill/)
 
+![academic-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style](docs/hero.png)
+
 A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as one script per figure, `{id}.py`, in the folder you name or else `figures/`.
 
 **[See the project site](https://wonjunoh.com/academic-figure-skill/)**: the same figures on a paper page, without and with the skill.
+
+- **Sized for your venue**: NeurIPS, ICML, ICLR, CVPR, ACL; one column, both columns or half the text width, exactly.
+- **Readable at print size**: labels and ticks just under the body text, in one font, in every figure.
+- **Color-blind safe**: your method in one color, baselines in grey, the same meaning in every figure.
+- **Every panel lines up**: single panels, grids and full-width figures start and end on the same edges.
+- **Clean, modern style**: nothing overlaps, nothing is cut off, no legend on top of the data.
+- **Nice and easy**: just ask; you get the figure, a caption ready to paste, and one short script to rerun.
 
 ## Design
 

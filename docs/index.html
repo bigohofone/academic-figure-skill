@@ -7,10 +7,10 @@
 <meta name="description" content="A Claude Code skill that makes every figure of a paper publication-ready and consistent: sized for your venue, one clean style, nothing overlapping, a caption included.">
 <meta property="og:title" content="academic-figure: paper figures that belong together">
 <meta property="og:description" content="Claude Code alone vs with the academic-figure skill: same data, same tasks, printed size.">
-<meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
+<meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/hero.png">
 <meta property="og:url" content="https://wonjunoh.com/academic-figure-skill/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
+<meta name="twitter:image" content="https://wonjunoh.com/academic-figure-skill/hero.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -46,6 +46,8 @@ h2 { font-size:clamp(28px,4vw,40px); letter-spacing:-.025em; line-height:1.15; m
 .intro { color:var(--ink2); max-width:720px; margin:0 0 28px; }
 .note { font-size:14px; color:var(--ink3); text-align:center; margin-top:16px; }
 .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.hero { display:block; width:100%; max-width:1000px; margin:40px auto 0; border-radius:16px; }
+#features { border-top:0; padding-top:24px; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
 .card .num { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:10px; }
 .card h3 { margin:0 0 8px; font-size:18px; } .card p { margin:0; color:var(--ink2); font-size:15.5px; }
@@ -123,9 +125,21 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <header><div class="wrap">
   <span class="eyebrow">A Claude Code skill</span>
   <h1>Paper figures that <em>belong together</em></h1>
-  <p class="lead">Ask an AI agent for one plot and you get a decent plot. Ask it for the six plots of a paper and you get six fonts, six text sizes and six margins. academic-figure gives the agent a design system and checks its work, so every figure is publication-ready and they all match.</p>
+  <p class="lead">Nice and easy: ask Claude Code for a figure as usual, and get one sized for your venue, readable at print size, color-blind safe, lined up with every other figure in the paper, in a clean, modern style.</p>
   <div class="cta"><a class="btn primary" href="#install">Install in Claude Code</a><a class="star big" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star on GitHub<span class="count" hidden></span></a></div>
+  <img class="hero" src="hero.png" alt="academic-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style">
 </div></header>
+
+<section id="features"><div class="wrap">
+  <div class="cards six">
+    <div class="card"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></div>
+    <div class="card"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></div>
+    <div class="card"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, the same meaning in every figure.</p></div>
+    <div class="card"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></div>
+    <div class="card"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></div>
+    <div class="card"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></div>
+  </div>
+</div></section>
 
 <section class="soft" id="page"><div class="wrap">
   <div class="kicker">One paper page, printed size</div>
@@ -143,9 +157,9 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
 </div>
   <ul class="ticks">
-    <li><strong>One type scale</strong>8 pt labels, 7 pt ticks and values, one font, in every figure.</li>
-    <li><strong>One palette with meaning</strong>Color-blind safe. Your method in one color, baselines in grey, everywhere.</li>
-    <li><strong>Everything lines up</strong>Dashed lines: where panels start and end. With the skill, every figure on the page sits on them.</li>
+    <li><strong>Readable at print size</strong>8 pt labels and 7 pt ticks next to 10 pt text, one font, in every figure.</li>
+    <li><strong>Color-blind safe</strong>Your method in one color, baselines in grey, everywhere.</li>
+    <li><strong>Every panel lines up</strong>Dashed lines: where panels start and end. With the skill, every figure on the page sits on them.</li>
   </ul>
 </div></section>
 
