@@ -34,7 +34,7 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
   ax.annotate(f"{v:#.3g}", (angle, v), xytext=(4 * np.sign(side), 4 * np.sign(up)), textcoords="offset points",
               ha="left" if side > 0 else "right" if side < 0 else "center",
               va=("top" if np.cos(angle) > 0 else "bottom") if side else ("bottom" if up > 0 else "top"),
-              color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1))
+              color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
   ```
 
   Placements (for Collisions): as above, then the spoke names pushed out, `ax.tick_params(axis="x", pad=8)`, then 10, 12, ….

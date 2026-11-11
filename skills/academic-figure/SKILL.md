@@ -63,7 +63,7 @@ figures/
   ```
 
 - **Data**: loaded from the project's result files, wherever they are (paths relative to `figures/`, such as `../results/run.json`); numbers inline only when there is no file.
-- **Numbers from the data**: every number on the plot and in the caption is computed in the script from the loaded data, never typed in by hand, and every data point given is drawn (nothing dropped, smoothed or rounded away for looks). The script prints the takeaway's numbers and asserts its claim, and the caption (its docstring) is written from that printout, so a reader can rerun the script and see the figure and caption are true:
+- **Numbers from the data**: every number on the plot and in the caption is computed in the script from the loaded data, never typed in by hand, and every data point given is drawn (nothing dropped, smoothed or rounded away for looks). The script prints the takeaway's numbers and asserts its claim, and the caption (its docstring) is written from that printout, each number in the form DESIGN.md's Value labels table gives (the example's accuracies are "anything else"), so a reader can rerun the script and see the figure and caption are true:
 
   ```python
   best = {name: max(curve) for name, curve in runs.items()}
