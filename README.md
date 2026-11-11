@@ -107,15 +107,15 @@ The basic chart types of matplotlib and seaborn, one realistic experiment each. 
 **Example 1.13** · Small multiples: One panel per dataset, ICML double column. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
 <table>
-<tr><th>Without the skill</th><th>With the skill</th></tr>
-<tr><td valign="top"><a href="examples/chart-types/without-skill/small-multiples.png"><img src="examples/chart-types/without-skill/small-multiples.png" width="648"></a></td><td valign="top"><a href="examples/chart-types/outputs/small-multiples.png"><img src="examples/chart-types/outputs/small-multiples.png" width="648"></a></td></tr>
+<tr><th>Without the skill</th></tr><tr><td><a href="examples/chart-types/without-skill/small-multiples.png"><img src="examples/chart-types/without-skill/small-multiples.png" width="648"></a></td></tr>
+<tr><th>With the skill</th></tr><tr><td><a href="examples/chart-types/outputs/small-multiples.png"><img src="examples/chart-types/outputs/small-multiples.png" width="648"></a></td></tr>
 </table>
 
 **Example 1.14** · Grouped axes: Accuracy and loss per dataset in one row, one label per group. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
 <table>
-<tr><th>Without the skill</th><th>With the skill</th></tr>
-<tr><td valign="top"><a href="examples/chart-types/without-skill/accuracy-and-loss.png"><img src="examples/chart-types/without-skill/accuracy-and-loss.png" width="528"></a></td><td valign="top"><a href="examples/chart-types/outputs/accuracy-and-loss.png"><img src="examples/chart-types/outputs/accuracy-and-loss.png" width="528"></a></td></tr>
+<tr><th>Without the skill</th></tr><tr><td><a href="examples/chart-types/without-skill/accuracy-and-loss.png"><img src="examples/chart-types/without-skill/accuracy-and-loss.png" width="528"></a></td></tr>
+<tr><th>With the skill</th></tr><tr><td><a href="examples/chart-types/outputs/accuracy-and-loss.png"><img src="examples/chart-types/outputs/accuracy-and-loss.png" width="528"></a></td></tr>
 </table>
 
 **Example 1.15** · Right y axis: Training loss with its learning-rate schedule. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
@@ -146,15 +146,15 @@ Figures from published papers, redrawn without any skill and following this skil
 **Example 2.3** · Line chart: Does RL Really Incentivize Reasoning Capacity?, Figure 2: pass@k grid (double column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
 
 <table>
-<tr><th>Without the skill</th><th>With the skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig2.png"><img src="examples/use-cases/without-skill/rlvr-fig2.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig2.png"><img src="examples/use-cases/outputs/rlvr-fig2.png" width="528"></a></td></tr>
+<tr><th>Without the skill</th></tr><tr><td><a href="examples/use-cases/without-skill/rlvr-fig2.png"><img src="examples/use-cases/without-skill/rlvr-fig2.png" width="528"></a></td></tr>
+<tr><th>With the skill</th></tr><tr><td><a href="examples/use-cases/outputs/rlvr-fig2.png"><img src="examples/use-cases/outputs/rlvr-fig2.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.4** · Histogram: Does RL Really Incentivize Reasoning Capacity?, Figure 5 (single column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
 
 <table>
-<tr><th>Without the skill</th><th>With the skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="528"></a></td></tr>
+<tr><th>Without the skill</th></tr><tr><td><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="528"></a></td></tr>
+<tr><th>With the skill</th></tr><tr><td><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.5** · Box plot: Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only (single column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
@@ -209,8 +209,8 @@ Figures from published papers, redrawn without any skill and following this skil
 **Example 2.12** · Heatmap: Attention map (alignment). [Bahdanau et al. (2015), Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473), Figure 3(a). Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
 
 <table>
-<tr><th>Without the skill</th><th>With the skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="528"></a></td></tr>
+<tr><th>Without the skill</th></tr><tr><td><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="528"></a></td></tr>
+<tr><th>With the skill</th></tr><tr><td><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.13** · Contour plot: Loss landscape. [Li et al. (2018), Visualizing the Loss Landscape of Neural Nets](https://arxiv.org/abs/1712.09913), Figure 5(b). Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
