@@ -96,8 +96,13 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 | Output | 300 dpi; `pdf.fonttype: 42` (text stays text, Inter embedded) |
 
 - Keep these values as they are; the style is tuned for print.
-- Name panels with subcaptions below them, as papers do, not with titles above: in reading order, prefix each with its letter, `subcaption(ax, "(a) Accuracy on AIME")`, `"(b) …"`, 9 pt text under the panel's tick labels and x-axis label. A single panel has no subcaption unless it needs one (dataset, setting), then without a letter. The figure itself has no title; the caption names it.
-- Grids of two factors (models × benchmarks, methods × datasets): name each row and column once instead of each panel, and either factor may be the rows. Headers are 11 pt. Column headers are the top row's axes titles (`ax.set_title(col_name)`); row headers go left of the first column's y-label: `axes[r, 0].annotate(row_name, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0), textcoords="offset points", ha="right", va="center", rotation=90, fontsize=11)`. Such panels carry no letters; the caption names a panel by its row and column.
+- Panel names: by default none. The figure never has a title; the caption names it. Pick the first row that fits:
+
+  | Panels | Names |
+  |---|---|
+  | A grid of two factors (models × benchmarks, methods × datasets) | headers, never subcaptions or letters: each column named once above the top row, `ax.set_title(col_name)`, and each row once left of the first column's y-label, `axes[r, 0].annotate(row_name, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0), textcoords="offset points", ha="right", va="center", rotation=90, fontsize=11)`; 11 pt, either factor may be the rows; the caption names a panel by its row and column |
+  | Several panels the reader must tell apart (different metrics, problems, settings) | a subcaption below each, never a title above: lettered in reading order, `subcaption(ax, "(a) Accuracy on AIME")`, `"(b) …"`, 9 pt text under the panel's tick labels and x-axis label |
+  | One panel | none |
 - Keep matplotlib's default axis limits and margins; `fit_height` makes room for value labels (§1, Height).
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
