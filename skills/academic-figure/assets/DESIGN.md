@@ -127,17 +127,19 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | ICML | 3.25 in | 5.0625 in | 6.75 in |
 | CVPR | 3.25 in | 5.15625 in | 6.875 in |
 | ACL (ARR) | 3 in | 4.6875 in | 6.25 in |
-| NeurIPS | – | – | 5.5 in |
-| ICLR | – | – | 5.5 in |
+| NeurIPS, ICLR (one column of text) | – | – | 5.5 in (full text width) |
 
-- Use the width the user names. Otherwise: the venue's single column (NeurIPS/ICLR: 5.5 in); with no venue, ICML single column.
+- Use the venue and width the user names. With no venue, ICLR.
+- Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels, or one wide panel, takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width.
 - 1.5 column (0.75 × double) is a `figure*` narrower than the text: use it when the user asks, or when single column is too narrow and double column leaves the content sparse.
 
 ### Grid
 
 | Width | Max cols |
 |---|---|
-| Single column | 2 |
+| Half text width (2.75 in) | 1 |
+| Single column (3–3.25 in) | 2 |
+| Full text width of a single-column venue (5.5 in) | 3 |
 | 1.5 column | 3 |
 | Double column | 4 |
 

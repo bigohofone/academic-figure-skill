@@ -25,7 +25,7 @@ Every plotted quantity is one of two kinds; decide which before drawing:
 ## Save and caption
 
 - Save `{id}.pdf` and `{id}.png` (kebab-case id) into `figures/` with relative paths. The design embeds fonts as TrueType, which venues accept; keep text as text.
-- LaTeX line for the reply: single column → `figure`, `width=\columnwidth`; 1.5 column → `figure*`, `width=0.75\textwidth`; double → `figure*`, `width=\textwidth`.
+- LaTeX line for the reply: single-column venue (ICLR, NeurIPS) → `figure`, `width=\textwidth` at full width, `width=0.5\textwidth` at half; two-column venue: single column → `figure`, `width=\columnwidth`; 1.5 column → `figure*`, `width=0.75\textwidth`; double → `figure*`, `width=\textwidth`.
 
 The caption is written as it appears under the figure in the paper, in the paper's language (default English), and stands alone:
 
