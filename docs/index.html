@@ -90,7 +90,9 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 .block { background:#fff; border-radius:10px; padding:4% 0; }
 .block .row + .row { margin-top:3%; }
 .guide { position:absolute; top:0; bottom:0; border-left:1.5px dashed #d7344a; opacity:.45; pointer-events:none; z-index:2; }
-.gray .pane img { filter:grayscale(1); }
+.bwtoggle { font:inherit; font-size:14px; font-weight:600; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); cursor:pointer; white-space:nowrap; }
+.bwtoggle[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+html.bw main img, html.bw .paper img, html.bw .frame img, html.bw .block img { filter:grayscale(1); }
 .guide.text { border-left-color:#2f6fd6; }
 .compare .panes { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
 .compare .tag { font-weight:700; font-size:15px; margin:0 0 10px; color:var(--grey); }
@@ -135,7 +137,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <body>
 <nav><div class="wrap">
   <a class="logo" href="#">academic-figure</a>
-  <div class="links"><a class="opt" href="#lines">Why</a><a href="#gallery">Examples</a><a class="opt" href="#install">Install</a><a class="star" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star<span class="count" hidden></span></a></div>
+  <div class="links"><a class="opt" href="#lines">Why</a><a href="#gallery">Examples</a><a class="opt" href="#install">Install</a><button type="button" class="bwtoggle" aria-pressed="false" title="Show every figure in black and white">B&amp;W</button><a class="star" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star<span class="count" hidden></span></a></div>
 </div></nav>
 
 <header><div class="wrap">
@@ -150,7 +152,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <div class="cards six">
     <a class="card" href="#lines"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
     <a class="card" href="#lines"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
-    <a class="card" href="#gray"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, still clear when printed in black and white.</p></a>
+    <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, still clear in black and white: try the B&amp;W switch at the top.</p></a>
     <a class="card" href="#lines"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></a>
     <a class="card" href="#gallery"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
     <a class="card" href="#install"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></a>
@@ -189,23 +191,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </div>
 </div></section>
 
-<section class="soft" id="gray"><div class="wrap">
-  <h2>Still clear in black and white.</h2>
-  <p class="intro">Printed in grayscale or read by someone color-blind, your method still stands apart and every series stays readable. Below: the same figures, shown in grayscale.</p>
-  <div class="gray">
-<div class="compare" data-show="with" data-name="gray">
-  <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
-    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
-  </div>
-  <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/grouped-bar-chart.svg?v=189ec6d2dc" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/without/error-bar-plot.svg?v=4b192f0e9b" alt="error-bar-plot" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/learning-curve.svg?v=2f1a9aa5ef" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/without/data-mixture.svg?v=fb55ba1830" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/grouped-bar-chart.svg?v=b2391649f9" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/with/error-bar-plot.svg?v=aca0954262" alt="error-bar-plot" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/learning-curve.svg?v=c9d83a9d95" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/with/data-mixture.svg?v=79d9389d38" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
-  </div>
-</div></div>
-</div></section>
-
-<section id="gallery"><div class="wrap">
+<section class="soft" id="gallery"><div class="wrap">
   <h2>Supports every matplotlib and seaborn chart.</h2>
   <p class="intro">28 real examples, from learning curves to confusion matrices. Flip any of them to see the before and after.</p>
   <div class="gallery-tabs" role="tablist">
@@ -524,7 +510,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </figure></div>
 </div></section>
 
-<section class="soft" id="install"><div class="wrap">
+<section id="install"><div class="wrap">
   <h2>Easy to use.</h2>
   <p class="intro">Two commands, then just ask: "plot results.json for my ICLR paper." You get the figure, a caption to paste, and a script to rerun.</p>
   <pre>/plugin marketplace add bigohofone/academic-figure-skill
@@ -535,6 +521,10 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <footer><div class="wrap"><span>academic-figure · open source</span>
 <span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a> · <a href="https://github.com/bigohofone/academic-slides-skill">academic-slides-skill</a></span></div></footer>
 <script>
+document.querySelector(".bwtoggle").addEventListener("click", e => {
+  const on = document.documentElement.classList.toggle("bw");
+  e.currentTarget.setAttribute("aria-pressed", on);
+});
 fetch("https://api.github.com/repos/bigohofone/academic-figure-skill").then(r => r.ok ? r.json() : null).then(d => {
   if (!d || typeof d.stargazers_count !== "number") return;
   const n = d.stargazers_count >= 1000 ? (d.stargazers_count / 1000).toFixed(1) + "k" : String(d.stargazers_count);
