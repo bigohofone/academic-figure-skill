@@ -1,13 +1,13 @@
 {
-  "name": "academic-skill",
+  "name": "academic-figure-skill",
   "owner": {
     "name": "bigohofone"
   },
   "plugins": [
     {
-      "name": "academic-skill",
+      "name": "academic-figure",
       "source": "./",
-      "description": "Skills for academic papers: figures and slides."
+      "description": "Publication-ready academic paper figures with matplotlib or seaborn."
     }
   ]
 }

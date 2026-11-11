@@ -1,10 +1,10 @@
 {
-  "name": "academic-skill",
+  "name": "academic-figure",
   "version": "0.1.0",
-  "description": "Skills for academic papers: figures and slides.",
+  "description": "Publication-ready academic paper figures with matplotlib or seaborn.",
   "author": {
     "name": "bigohofone"
   },
-  "repository": "https://github.com/bigohofone/academic-skill",
+  "repository": "https://github.com/bigohofone/academic-figure-skill",
   "license": "MIT"
 }

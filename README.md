@@ -1,27 +1,29 @@
-# academic-skill
+# academic-figure-skill
 
-A Claude Code plugin of skills for academic papers.
+A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as cells in a `figures/figures.ipynb` notebook in your project.
 
-- `academic-figure`: style rules for academic paper figures made with matplotlib or seaborn, delivered as cells in a `figures/figures.ipynb` notebook.
-- `academic-slides`: argument, structure and design rules for research talks, built with python-pptx from a ready-made theme (`skills/academic-slides/assets/theme.pptx`) as .pptx files that open cleanly in Google Slides. Preview: `docs/academic-slides-theme.pdf`.
+Examples, original figures from published papers next to the same figures redrawn with the skill: [`examples/academic-figure.md`](examples/academic-figure.md).
 
 ## Install
 
-```
-/plugin install academic-skill --marketplace bigohofone/academic-skill
-```
-
-On older Claude Code versions:
+In Claude Code:
 
 ```
-/plugin marketplace add bigohofone/academic-skill
-/plugin install academic-skill@academic-skill
+/plugin marketplace add bigohofone/academic-figure-skill
+/plugin install academic-figure@academic-figure-skill
 ```
 
-Update with `/plugin marketplace update academic-skill`.
+Update with `/plugin marketplace update academic-figure-skill`.
+
+Without the plugin system, copy the skill folder into your skills directory:
+
+```
+git clone https://github.com/bigohofone/academic-figure-skill
+cp -r academic-figure-skill/skills/academic-figure ~/.claude/skills/
+```
+
+For slides in the same style, see [academic-slides-skill](https://github.com/bigohofone/academic-slides-skill).
 
 ## License
 
-MIT, except the bundled Inter fonts (SIL Open Font License, see `skills/academic-figure/assets/Inter-LICENSE.txt` and `skills/academic-slides/assets/Inter-LICENSE.txt`).
-
-`academic-slides` was inspired by [academic-pptx-skill](https://github.com/Gabberflast/academic-pptx-skill). Its argument guidelines draw on David Hirshleifer's "Best Practices for Academic Presentations" (2026), itself prompted by [David Kasten's post](https://x.com/David_Kasten/status/2027063865742442521), and on Naegle (2021), "Ten simple rules for effective presentation slides", *PLOS Computational Biology*.
+MIT, except the bundled Inter fonts (SIL Open Font License, see `skills/academic-figure/assets/Inter-LICENSE.txt`).
