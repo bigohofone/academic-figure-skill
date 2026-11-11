@@ -15,7 +15,7 @@ How one quantity's values are spread: scores, confidences, lengths, per-problem 
 
 ## Labels
 
-- **Means** (when the takeaway compares the series' centers): each mean as a dashed vertical line in `darken(color)`, `ax.axvline(mean, linestyle="--", linewidth=paper.dashed_width, color=darken(color))`, its value just above the panel at the line, `ax.annotate(f"{mean:#.3g}", (mean, 1), xycoords=("data", "axes fraction"), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom", color=darken(color))`.
+- **Means** (when the takeaway compares the series' centers): each mean as a thin solid vertical line in `darken(color)` (a reference line), `ax.axvline(mean, linewidth=rcParams["grid.linewidth"], color=darken(color))`, its value just above the panel at the line, `ax.annotate(f"{mean:#.3g}", (mean, 1), xycoords=("data", "axes fraction"), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom", color=darken(color))`.
 
 ## Caption
 

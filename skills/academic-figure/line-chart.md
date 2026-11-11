@@ -23,8 +23,8 @@ Values along a continuous x: learning curves, scaling curves, pass@k, a metric o
 When the takeaway compares reported results across series, mark the compared values (never in a two-factor grid, DESIGN.md Layout):
 
 - **Comparison point**: the claim decides it. "Reaches a higher score": each series' best. "Ends higher": the final values, at the last x all series share. "Ahead at the same budget": the values at that x. If the request and the paper don't settle it, ask the user; when you can't ask, compare each series' best and say so in the reply.
-- **Mark**: `mark_value(ax, x, y, f"{y:#.3g}", color)` at each compared point, one per compared series: a dashed line in `darken(color)` across the panel at that value, a circle on the point, and the value above it.
-- **Placements** (for Collisions): above the point, then below it (`below=True`); then mark ours and its closest competitor only, the other values in the caption.
+- **Mark**: `mark_value(ax, x, y, f"{y:#.3g}", color)` at each compared point, one per compared series: a thin solid line in `darken(color)` across the panel at that value (a reference line), a circle on the point, and the value above it.
+- **Placements** (for Collisions): above the point, then below it (`below=True`); then mark ours and its closest competitor only, then ours only, the other values in the caption (Collisions step 4).
 
 ## Caption
 

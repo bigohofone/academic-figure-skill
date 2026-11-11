@@ -153,7 +153,7 @@ def test_mark_value_line_point_and_label():
     fig, ax = plt.subplots(figsize=(WIDTH, 2))
     mark_value(ax, 1, 1, "1.0", "#4477AA")
     line, circle = ax.lines
-    assert line.get_linestyle() == "--"
+    assert line.get_linestyle() == "-"
     assert circle.get_marker() == "o"
     assert line.get_zorder() < circle.get_zorder()
     assert [t.get_text() for t in ax.texts] == ["1.0"]
@@ -367,4 +367,13 @@ def test_fit_height_warns_text_spilling_out_of_its_fill():
     ax.set_xlim(-1, 1)
     ax.text(0, 0.5, "a long label", ha="center", va="center")
     with pytest.warns(UserWarning, match="spills out of its fill"):
+        fit_height(fig, ax)
+
+
+def test_wide_legend_warns():
+    fig, ax = plt.subplots(figsize=(WIDTH, 3), layout="constrained")
+    for i in range(8):
+        ax.plot([0, 1], [i, i + 1], label=f"A long series name {i}")
+    fig.legend(loc="outside upper center", ncol=8)
+    with pytest.warns(UserWarning, match="wider than the figure"):
         fit_height(fig, ax)

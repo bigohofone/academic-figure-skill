@@ -515,6 +515,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
         # free space at the left and right edges of the canvas, for text that reaches past the panels
         side = canvas_pad_x / fig.get_figwidth()
         fig.get_layout_engine().set(rect=(side, 0, 1 - 2 * side, 1))
+    _warn_wide_legends(fig)
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
         _warn_layout_problems(fig, panels, min_width)
@@ -579,11 +580,22 @@ def smooth(values):
     return [np.mean(values[max(0, i - half):i + half + 1]) for i in range(len(values))]
 
 
+def _warn_wide_legends(fig):
+    fig.draw_without_rendering()
+    room = fig.bbox.width - 2 * canvas_pad_x * fig.dpi
+    for legend in fig.legends + [a.get_legend() for a in fig.axes if a.get_legend()]:
+        if legend.get_window_extent().width > room:
+            n = len(legend.get_texts())
+            warnings.warn(f"a legend of {n} entries is wider than the figure; set ncol to "
+                          f"ceil({n} / 2), then ceil({n} / 3), ...")
+
+
 def mark_value(ax, x, y, text, color, below=False):
-    """Mark a compared value: a dashed line in `darken(color)` across the panel at y, under the curves,
+    """Mark a compared value: a thin solid line in `darken(color)` across the panel at y, under the curves
+    (a reference line, so it is never taken for a dashed grey series),
     a hollow circle at (x, y), and `text` just above it (`below=True`: just below), in `darken(color)`.
     """
-    ax.axhline(y, linestyle="--", linewidth=dashed_width, color=darken(color), zorder=1)
+    ax.axhline(y, linewidth=rcParams["grid.linewidth"], color=darken(color), zorder=1)
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
