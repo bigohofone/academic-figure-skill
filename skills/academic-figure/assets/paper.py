@@ -154,7 +154,7 @@ def _bar_ends(a):
 
 def _is_value_label(a, t):
     """A `mark_value` label or a bar label (`ax.bar_label`), the labels fit_height keeps inside the panel."""
-    if t.get_gid() == "value-label":
+    if t.get_gid() in ("value-label", "value-mark"):
         return True
     ends = _bar_ends(a)
     return (isinstance(t, Annotation) and t.xycoords == "data" and len(ends) > 0
@@ -174,7 +174,7 @@ def _keep_value_labels_inside(fig, panels):
             continue
         box = a.get_window_extent(renderer)
         for t in a.texts:
-            value_label = t.get_gid() == "value-label"
+            value_label = t.get_gid() == "value-mark"  # mark_value labels turn inward at a side edge
             point_name = not _is_value_label(a, t) and isinstance(t, Annotation) and t.xycoords == "data"
             if not (_is_value_label(a, t) or point_name):
                 continue
@@ -531,7 +531,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
     if _keep_value_labels_inside(fig, panels):
         ratios, widths = _solve(fig, panels, aspect, iters, tol)
     if abs(ratios[0] - aspect) / aspect >= tol:
-        _freeze_ticks(panels)
+        _freeze_ticks(fig.axes)  # colorbars too: their auto ticks change width with the height
         ratios, widths = _solve(fig, panels, aspect, iters, tol)
     if abs(ratios[0] - aspect) / aspect >= tol:
         warnings.warn(f"fit_height did not converge in {iters} iterations: ratio {ratios[0]:.3f}; "
@@ -587,5 +587,5 @@ def mark_value(ax, x, y, text, color, below=False):
     ax.plot(x, y, "o", color=color)
     offset = rcParams["lines.markersize"] / 2 + 2
     ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
-                va="top" if below else "bottom", color=darken(color), gid="value-label")
+                va="top" if below else "bottom", color=darken(color), gid="value-mark")
 
