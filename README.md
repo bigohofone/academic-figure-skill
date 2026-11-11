@@ -2,7 +2,7 @@
 
 A Claude Code skill for academic paper figures made with matplotlib or seaborn: sized to the venue's column width, print typography, color-blind-safe colors, value labels where the paper makes its claim, and a paper-style caption, delivered as one script per figure, `{id}.py`, in the folder you name or else `figures/`.
 
-**[See the project site](https://bigohofone.github.io/academic-figure-skill/)**: the same figures on a paper page, without and with the skill.
+**[See the project site](https://wonjunoh.com/academic-figure-skill/)**: the same figures on a paper page, without and with the skill.
 
 ## Design
 
@@ -10,7 +10,7 @@ How figures look is defined in [`DESIGN.md`](skills/academic-figure/assets/DESIG
 
 ## Examples
 
-Every example shows the same figure drawn by fresh Claude Code sessions that load no project instructions and no memory, once without any skill and once following this skill, from the same data and task and at the same width, for an ICLR paper (ICML for small multiples). For why this matters across a whole paper, see the [project site](https://bigohofone.github.io/academic-figure-skill/). Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
+Every example shows the same figure drawn by fresh Claude Code sessions that load no project instructions and no memory, once without any skill and once following this skill, from the same data and task and at the same width, for an ICLR paper (ICML for small multiples). For why this matters across a whole paper, see the [project site](https://wonjunoh.com/academic-figure-skill/). Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
 
 Each group in [`examples/`](examples) holds `data/` (the input), `tasks/` (the request the subagent got), `scripts/` (one script per figure written with the skill, runnable in place: `cd examples/use-cases/scripts && python roc-curve.py`), `outputs/` (the figures with the skill) and `without-skill/` (the same tasks drawn without it); use cases also hold `originals/` (the papers' figures).
 
