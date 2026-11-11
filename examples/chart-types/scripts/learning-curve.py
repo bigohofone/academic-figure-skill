@@ -1,4 +1,4 @@
-"""Validation accuracy on CIFAR-100 over training epochs. Lines show the mean over 5 seeds and shaded bands ±1 std; Ours peaks at 0.915, 0.018 above Mixup (0.897) and above Baseline (0.882)."""
+"""Validation accuracy on CIFAR-100 over training epochs. Lines show the mean over 5 seeds and shaded bands ±1 std. Ours peaks at 0.915, 0.018 above Mixup (0.897) and above Baseline (0.882)."""
 
 import json
 import sys
