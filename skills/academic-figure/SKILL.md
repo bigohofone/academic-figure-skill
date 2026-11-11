@@ -11,7 +11,7 @@ Steps, in order:
 
 1. **Takeaway**: work out what the paper uses this figure to show (from the user's request, the paper text or caption, the figure's role), then write it as one sentence with a number from the data. It sets the value labels (§3) and becomes the caption's takeaway (§7).
 2. **Size**: width, grid and aspect (§1).
-3. **Draw**: base style (§2), lines and text (§3), plot type (§4), color (§5), legend (§6).
+3. **Draw**: base style (§2), what is plotted (§3), the plot type's file (§4), color (§5), legend (§6).
 4. **Save, caption, notebook** (§7, §8), then **check** (§9).
 
 ## 1. Size
@@ -106,55 +106,32 @@ It needs `tol-colors` (Python 3.10+). If it is missing, tell the user and ask be
 - Keep matplotlib's default axis limits and margins; `fit_height` makes room for value labels (§1, Height).
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`). When `fit_height` reports overlapping numeric tick labels, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
-- Log₂ axes (number of samples, batch size, model size): `ax.set_xscale("log", base=2)`, a tick at every power of 2 up to the first one at or above the largest x (`top`) with `ax.set_xticks(ks, labels=[str(k) for k in ks])`, and no minor ticks (`ax.set_xticks([], minor=True)`). The axis ends at `top` with the usual 5% margin, so every panel ends on a labelled tick: `margin = 2 ** (0.05 * math.log2(top))`, `ax.set_xlim(1 / margin, top * margin)`. Where those labels overlap, step by 4 (`1, 4, 16, 64`).
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
 
-## 3. Lines and text
+## 3. What is plotted
 
 Every plotted quantity is one of two kinds; decide which before drawing:
 
-- **Reported results**: the numbers the paper claims, measured once per setting (accuracy, F1, latency, throughput, error rate, a score per method). Readers compare them exactly.
-- **Diagnostics**: quantities logged along a process to show its behavior (loss, gradient norm, entropy, temperature, queue length per iteration). Readers read their trend and shape.
+- **Reported results**: the numbers the paper claims, measured once per setting (accuracy, F1, latency, throughput, error rate, a score per method). Readers compare them exactly, so when the takeaway compares them, their values are written on the plot (the plot type's file says how).
+- **Diagnostics**: quantities logged along a process to show its behavior (loss, gradient norm, entropy, temperature, queue length per iteration). Readers read their trend and shape, so they carry no value labels.
 
-### Lines
-
-- Curves are plain lines; add markers (the style's hollow markers) only when the user asks. Then each series gets its own marker shape, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`, the same shape for a series in every panel.
-- Diagnostics, however often they were logged: draw the raw values in the series color at `alpha=0.25` without a label, then `smooth(values)` on top with the label, and add to the caption: "smoothed with a moving average over 5% of the steps; faint lines show raw values".
-- Reported results are drawn raw.
-- Several runs per setting (seeds, folds, trials): draw the mean as the line and a band of ±1 std with `ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)`, and say in the caption what the band is and over how many runs.
-- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=0.75, zorder=1)` in #BBBBBB, fully opaque, named by a legend entry. Compared values get their lines from `mark_value` (Value labels below).
+- Reference lines (a baseline's score, a threshold): `ax.axhline(..., linestyle="--", linewidth=0.75, zorder=1)` in #BBBBBB, fully opaque, named by a legend entry.
 - Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
-
-### Value labels
-
-When the takeaway compares reported results across series, write them on the plot so the reader can read them exactly. Diagnostics carry no value labels; their curves already show the trend. Neither do distributions (histograms, box plots): their shape is the message, and the caption gives the numbers.
-
-- Find the point where the paper makes the comparison: the claim decides it. "Ours reaches a higher score" compares each series' best; "ours ends higher" compares final values (at the last x all series share, when they end at different x); "ours is ahead at the same budget" compares values at that shared x. The value is the plotted metric at that point.
-- If the request and the paper don't settle the comparison point, ask the user. When you can't ask, compare each series' best and say so in the reply.
-- Write each value with three significant figures.
-- Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a 0.75 pt dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value in bold just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
-- If a label above the point covers a curve, put it below with `below=True`.
-- Bar charts of reported results: label every bar (§4).
-
-### Other text
-
-- Text that belongs to one series (labels, annotations) uses `darken(series_color)`. Titles, axis labels, ticks and legend text are black.
+- Text that belongs to one series (labels, annotations) uses `darken(series_color)`. Headers, subcaptions, axis labels, ticks and legend text are black.
 
 ## 4. Plot type
 
-Every plot type uses the same parts as lines: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt (box plots get theirs from the style), dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity, except bands and scatter clouds, and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
+Before drawing, read the file for the figure's purpose, in this skill's directory. A figure that combines purposes (bars with a trend line, box plots over training checkpoints) reads each file it uses.
 
-- **Line**: `ax.plot(x, y, color=color)`; markers only on request (§3). Gridlines in both directions (style).
-- **Bar** (reported results, one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, grouped bars sharing 0.8 of each slot (`width = 0.8 / n_series`), every bar labelled with `ax.bar_label(bars, fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. For several groups (benchmarks, datasets), one panel per group, named by its subcaption. Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.
-- **Horizontal bar**: only for unordered categories with long names. As bars, with `ax.barh` and vertical gridlines only: `ax.grid(axis="y", visible=False)`.
-- **Stacked bar**: segments in series order from the bottom with white 0.5 pt seams, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=0.5)`; horizontal gridlines only.
-- **Histogram**: raw values as touching bars, `ax.hist(values, bins=bins, color=color, linewidth=0)`; several series on one axis as outlines, `histtype="step", linewidth=1`. Counts per bin (e.g. accuracy intervals) as grouped bars with the bins in order on the x-axis, never horizontal bars. No value labels (§3); horizontal gridlines only.
-- **Box plot**: `box = ax.boxplot(values, positions=[x], widths=0.7, showfliers=False)` (the box fills 0.7 of its slot), filled with its series color lightened, `box["boxes"][0].set_facecolor(lighten(color))`; the style draws the black outline, whiskers, caps and median. With under ~30 points per box, show every point on top, jittered within the box, as the style's markers in black on white: `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color="black", markerfacecolor="white", linestyle="none")`. Horizontal gridlines only.
-- **Violin**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`; fill the body with its series color lightened, at full opacity, with a black 0.75 pt edge (`body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))`, `body.set_edgecolor("black")`, `body.set_linewidth(0.75)`, `body.set_alpha(1)`), and draw the median as a black 1 pt line across it; points as in box plots. Horizontal gridlines only.
-- **Scatter**: `ax.scatter(x, y, s=5, color=color, edgecolors="none", alpha=0.5)`, dots the size of the style's markers, translucent so dense regions read darker. Gridlines in both directions.
-- **Embedding** (t-SNE, UMAP): as scatter, with ticks hidden and no gridlines (`ax.grid(False)`).
-- **Heatmap, confusion matrix**: `ax.imshow(..., aspect="auto")`, tick marks hidden, no gridlines (`ax.grid(False)`), a colorbar for continuous values; cell text 7 pt in `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"`.
-- **Pie chart**: draw a bar chart instead.
+| The figure shows | Read | Covers |
+|---|---|---|
+| values along a continuous x: training curves, scaling, pass@k, a sweep | `trend.md` | lines, smoothing, ±std bands, log₂ axes, `mark_value` |
+| reported results compared across methods, ablations or benchmarks | `comparison.md` | bar, grouped, horizontal, stacked bars |
+| how values are spread: per-sample scores, accuracies, lengths | `distribution.md` | histogram, box plot, violin |
+| two quantities against each other, or an embedding | `scatter.md` | scatter, t-SNE, UMAP |
+| values over two categorical axes | `heatmap.md` | heatmap, confusion matrix, attention map, colormaps |
+
+- Every plot type uses the same parts: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt, dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity unless the plot type's file says otherwise.
 - Many exact numbers with no trend or comparison to see (e.g. every method on every dataset): suggest a table to the user instead of a figure.
 
 ## 5. Color
@@ -168,8 +145,7 @@ Paul Tol's color-blind-safe `bright` set, from `tol_colors` (`tc`): `cset = tc.c
 | "Ours" (the proposed method among baselines or ablations) | `cset.red`; the others take the categorical order without red. Without such a series, use the categorical order. |
 | Neutral, baselines, reference lines | `cset.grey` (#BBBBBB) |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
-| Sequential (heatmap) | `cmap="tol.iridescent"`; few levels: `tol.YlOrBr_discrete` |
-| Signed (heatmap) | `cmap="tol.sunset"` centered at 0 (symmetric `vmin`/`vmax`); few levels: `tol.sunset_discrete` |
+| Colormaps | `heatmap.md` |
 
 - More than six series: group them (one color per group, shades within) or split them into panels.
 - Series are told apart by color with solid fills. When color alone can't separate them (grayscale printing, close shades), also vary line style.

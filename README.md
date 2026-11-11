@@ -4,21 +4,82 @@ A Claude Code skill for academic paper figures made with matplotlib or seaborn: 
 
 ## Examples
 
-Figures from published papers, redrawn by Claude Code subagents with a clean context: without any skill (left) and following this skill (right). Both get only the figure's data, read from the paper's vector paths, and the same task file describing the figure. Click a figure to see it full size.
+Figures from published papers, redrawn by Claude Code subagents with a clean context: once without any skill and once following this skill. Both get only the figure's data, read from the paper's vector paths, and the same task file describing the figure. Each figure is shown at its printed size (1 in = 96 px), so at 100% browser zoom it appears as it would on the page. Open an example to see both versions; click a figure to open it full size.
 
-<table>
-<tr><th width="50%">Without skill</th><th width="50%">With skill</th></tr>
-<tr><td colspan="2"><a href="https://arxiv.org/abs/2503.14476">DAPO</a> (Yu et al., 2025), Figure 2 (left panel, single column)</td></tr>
-<tr><td><a href="examples/dapo-fig2-without-skill.png"><img src="examples/dapo-fig2-without-skill.png" width="100%"></a></td><td><a href="examples/dapo-fig2-with-skill.png"><img src="examples/dapo-fig2-with-skill.png" width="100%"></a></td></tr>
-<tr><td colspan="2"><a href="https://arxiv.org/abs/2503.14476">DAPO</a> (Yu et al., 2025), Figure 6 (1.5 column)</td></tr>
-<tr><td><a href="examples/dapo-fig6-without-skill.png"><img src="examples/dapo-fig6-without-skill.png" width="100%"></a></td><td><a href="examples/dapo-fig6-with-skill.png"><img src="examples/dapo-fig6-with-skill.png" width="100%"></a></td></tr>
-<tr><td colspan="2"><a href="https://arxiv.org/abs/2504.13837">Does RL Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?</a> (Yue et al., 2025), Figure 2 (double column)</td></tr>
-<tr><td><a href="examples/rlvr-fig2-without-skill.png"><img src="examples/rlvr-fig2-without-skill.png" width="100%"></a></td><td><a href="examples/rlvr-fig2-with-skill.png"><img src="examples/rlvr-fig2-with-skill.png" width="100%"></a></td></tr>
-<tr><td colspan="2"><a href="https://arxiv.org/abs/2504.13837">Does RL Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?</a> (Yue et al., 2025), Figure 5 (single column)</td></tr>
-<tr><td><a href="examples/rlvr-fig5-without-skill.png"><img src="examples/rlvr-fig5-without-skill.png" width="100%"></a></td><td><a href="examples/rlvr-fig5-with-skill.png"><img src="examples/rlvr-fig5-with-skill.png" width="100%"></a></td></tr>
-<tr><td colspan="2"><a href="https://arxiv.org/abs/2504.13837">Does RL Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?</a> (Yue et al., 2025), Figure 6 (single column)</td></tr>
-<tr><td><a href="examples/rlvr-fig6-without-skill.png"><img src="examples/rlvr-fig6-without-skill.png" width="100%"></a></td><td><a href="examples/rlvr-fig6-with-skill.png"><img src="examples/rlvr-fig6-with-skill.png" width="100%"></a></td></tr>
-</table>
+<details>
+<summary><b>Trend</b> (line plot): DAPO, Figure 2 (left panel, single column)</summary>
+
+[DAPO: An Open-Source LLM Reinforcement Learning System at Scale](https://arxiv.org/abs/2503.14476) (Yu et al., 2025)
+
+**Without skill**
+
+<a href="examples/dapo-fig2-without-skill.png"><img src="examples/dapo-fig2-without-skill.png" width="310"></a>
+
+**With skill**
+
+<a href="examples/dapo-fig2-with-skill.png"><img src="examples/dapo-fig2-with-skill.png" width="312"></a>
+
+</details>
+
+<details>
+<summary><b>Trend</b> (line plot): DAPO, Figure 6 (1.5 column)</summary>
+
+[DAPO: An Open-Source LLM Reinforcement Learning System at Scale](https://arxiv.org/abs/2503.14476) (Yu et al., 2025)
+
+**Without skill**
+
+<a href="examples/dapo-fig6-without-skill.png"><img src="examples/dapo-fig6-without-skill.png" width="437"></a>
+
+**With skill**
+
+<a href="examples/dapo-fig6-with-skill.png"><img src="examples/dapo-fig6-with-skill.png" width="486"></a>
+
+</details>
+
+<details>
+<summary><b>Trend</b> (4 × 4 grid of line plots, log₂ x axis): Does RL Really Incentivize Reasoning Capacity?, Figure 2 (double column)</summary>
+
+[Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
+
+**Without skill**
+
+<a href="examples/rlvr-fig2-without-skill.png"><img src="examples/rlvr-fig2-without-skill.png" width="647"></a>
+
+**With skill**
+
+<a href="examples/rlvr-fig2-with-skill.png"><img src="examples/rlvr-fig2-with-skill.png" width="648"></a>
+
+</details>
+
+<details>
+<summary><b>Distribution</b> (histogram of counts per bin): Does RL Really Incentivize Reasoning Capacity?, Figure 5 (single column)</summary>
+
+[Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
+
+**Without skill**
+
+<a href="examples/rlvr-fig5-without-skill.png"><img src="examples/rlvr-fig5-without-skill.png" width="308"></a>
+
+**With skill**
+
+<a href="examples/rlvr-fig5-with-skill.png"><img src="examples/rlvr-fig5-with-skill.png" width="312"></a>
+
+</details>
+
+<details>
+<summary><b>Distribution</b> (box plot with points): Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only (single column)</summary>
+
+[Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
+
+**Without skill**
+
+<a href="examples/rlvr-fig6-without-skill.png"><img src="examples/rlvr-fig6-without-skill.png" width="312"></a>
+
+**With skill**
+
+<a href="examples/rlvr-fig6-with-skill.png"><img src="examples/rlvr-fig6-with-skill.png" width="312"></a>
+
+</details>
 
 ## Install
 
