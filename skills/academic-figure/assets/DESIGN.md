@@ -82,7 +82,7 @@ Every rule below follows from these principles; when a case is not covered, appl
 2. **One message, one emphasis**: color goes to what the takeaway is about (ours, or the series it names); everything it is compared against or that gives context (baselines, ablations, fronts, reference lines, grids) is `neutral` grey or `ink`. Several colors only when the takeaway compares series on equal terms.
 3. **Alike looks alike**: one treatment for every item of a kind, or for none. A kind is the items that play one role: the bars of one series, the levels of one contour plot, the shares of one band, the models the takeaway cites (and, separately, the ones it does not). A series keeps its color, marker and name in every panel and figure; a kind is labelled throughout or not at all, though each label may sit where it fits (inside or outside its mark); a style that tells two series apart is used the same way throughout.
 4. **Nothing hides data**: text, legends and marks never cover data, each other, or leave their panel or fill. Context (grid, reference lines) sits behind the data and never decides placement.
-5. **Exact where it is claimed**: a number the takeaway cites is written on the plot, in the format of the value table, or in the caption when it cannot fit.
+5. **Exact and verifiable**: a number the takeaway cites is written on the plot, in the format of the value table, or in the caption when it cannot fit; every number is computed from the data in the script, and the drawing shows all the data it was given (nothing hidden by limits, dropped, or smoothed away when it is a reported result).
 6. **Tested, not judged**: whether text collides is what `fit_height` reports, not a judgment; on a report, resolve it by Collisions (Layout).
 
 ## Colors
