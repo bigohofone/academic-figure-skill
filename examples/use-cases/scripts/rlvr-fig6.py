@@ -1,4 +1,4 @@
-"""Figure 6: Perplexity of individual responses to Problem 1 under the base and RL models. Boxes span the quartiles with the median as a line; whiskers reach 1.5× the interquartile range; points show every response. The base model finds the RL model's responses likely (median perplexity 1.06), within the range of its own responses (median 1.09)."""
+"""Perplexity of individual responses to Problem 1 under the base and RL models. Boxes span the quartiles with the median as a line; whiskers reach 1.5× the interquartile range; points show every response. The base model finds the RL model's responses as likely as its own (median perplexity 1.06 against 1.08), well below the ground-truth responses (1.21)."""
 
 import json
 import sys
@@ -13,28 +13,26 @@ from paper import fit_height, lighten
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/rlvr-fig6.json") as f:
-    data = json.load(f)["Problem 1"]
+    groups = json.load(f)["Problem 1"]
+names = ["PPL_Base(Y_Base)", "PPL_Base(Y_RL)", "PPL_RL(Y_RL)", "PPL_Base(Y_GT)"]
+labels = [r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{Base}})$", r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{RL}})$",
+          r"$\mathrm{PPL}_{\mathrm{RL}}(Y_{\mathrm{RL}})$", r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{GT}})$"]
 
-# ascending median, top to bottom
-groups = [
-    ("PPL_RL(Y_RL)", r"$\mathrm{PPL}_{\mathrm{RL}}(Y_{\mathrm{RL}})$"),
-    ("PPL_Base(Y_RL)", r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{RL}})$"),
-    ("PPL_Base(Y_Base)", r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{Base}})$"),
-    ("PPL_Base(Y_GT)", r"$\mathrm{PPL}_{\mathrm{Base}}(Y_{\mathrm{GT}})$"),
-]
+median = {name: float(np.median(groups[name])) for name in names}
+print("takeaway:", {name: f"{v:#.3g}" for name, v in median.items()})
+assert median["PPL_Base(Y_RL)"] <= median["PPL_Base(Y_Base)"] < median["PPL_Base(Y_GT)"], "the takeaway does not hold"
+
 rng = np.random.default_rng(0)
-
-fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
-
-for y, (key, _) in enumerate(groups):
-    values = data[key]
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
+for y, name in enumerate(names):
+    values = groups[name]
     box = ax.boxplot(values, positions=[y], widths=0.7, orientation="horizontal", patch_artist=True,
                      showfliers=False)
     box["boxes"][0].set_facecolor(lighten(colors["series-1"]))
     ax.plot(values, y + rng.uniform(-0.2, 0.2, len(values)), "o", color=colors["ink"], markerfacecolor="white",
             linestyle="none")
 
-ax.set_yticks(range(len(groups)), labels=[label for _, label in groups])
+ax.set_yticks(range(len(names)), labels=labels)
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)

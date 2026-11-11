@@ -8,7 +8,7 @@ How figures look is defined in [`DESIGN.md`](skills/academic-figure/assets/DESIG
 
 ## Examples
 
-Every example shows the same figure drawn by Claude Code subagents with a clean context, without any skill and following this skill, from the same data and task, for an ICLR paper. Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
+Every example shows the same figure drawn by fresh Claude Code sessions that load no project instructions and no memory, once without any skill and once following this skill, from the same data and task and at the same width, for an ICLR paper (ICML for small multiples). For why this matters across a whole paper, see [SHOWCASE.md](SHOWCASE.md). Figures are shown at their printed size (1 in = 96 px), so at 100% browser zoom they appear as on the page; click a figure to open it full size.
 
 Each group in [`examples/`](examples) holds `data/` (the input), `tasks/` (the request the subagent got), `scripts/` (one script per figure written with the skill, runnable in place: `cd examples/use-cases/scripts && python roc-curve.py`), `outputs/` (the figures with the skill) and `without-skill/` (the same tasks drawn without it); use cases also hold `originals/` (the papers' figures).
 
@@ -100,6 +100,27 @@ The basic chart types of matplotlib and seaborn, one realistic experiment each. 
 <tr><td valign="top"><a href="examples/chart-types/without-skill/reward-distribution.png"><img src="examples/chart-types/without-skill/reward-distribution.png" width="264"></a></td><td valign="top"><a href="examples/chart-types/outputs/reward-distribution.png"><img src="examples/chart-types/outputs/reward-distribution.png" width="264"></a></td></tr>
 </table>
 
+**Example 1.13** · Small multiples: One panel per dataset, ICML double column. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
+
+<table>
+<tr><th>Without skill</th><th>With skill</th></tr>
+<tr><td valign="top"><a href="examples/chart-types/without-skill/small-multiples.png"><img src="examples/chart-types/without-skill/small-multiples.png" width="648"></a></td><td valign="top"><a href="examples/chart-types/outputs/small-multiples.png"><img src="examples/chart-types/outputs/small-multiples.png" width="648"></a></td></tr>
+</table>
+
+**Example 1.14** · Grouped axes: Accuracy and loss per dataset in one row, one label per group. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
+
+<table>
+<tr><th>Without skill</th><th>With skill</th></tr>
+<tr><td valign="top"><a href="examples/chart-types/without-skill/accuracy-and-loss.png"><img src="examples/chart-types/without-skill/accuracy-and-loss.png" width="528"></a></td><td valign="top"><a href="examples/chart-types/outputs/accuracy-and-loss.png"><img src="examples/chart-types/outputs/accuracy-and-loss.png" width="528"></a></td></tr>
+</table>
+
+**Example 1.15** · Right y axis: Training loss with its learning-rate schedule. Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
+
+<table>
+<tr><th>Without skill</th><th>With skill</th></tr>
+<tr><td valign="top"><a href="examples/chart-types/without-skill/loss-and-learning-rate.png"><img src="examples/chart-types/without-skill/loss-and-learning-rate.png" width="264"></a></td><td valign="top"><a href="examples/chart-types/outputs/loss-and-learning-rate.png"><img src="examples/chart-types/outputs/loss-and-learning-rate.png" width="264"></a></td></tr>
+</table>
+
 ### 2. Use cases from ML papers
 
 Figures from published papers, redrawn without any skill and following this skill (2.1–2.5, from the figures' data read from the papers' vector paths), then plots that recur across ML papers, each redrawn from a published figure with the paper's own values, recovered from the PDF (2.6–2.14), each shown with its original.
@@ -129,7 +150,7 @@ Figures from published papers, redrawn without any skill and following this skil
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="264"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.5** · Box plot: Does RL Really Incentivize Reasoning Capacity?, Figure 6, Problem 1 only (single column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
@@ -213,7 +234,7 @@ Original:
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="264"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.13** · Contour plot: Loss landscape. [Li et al. (2018), Visualizing the Loss Landscape of Neural Nets](https://arxiv.org/abs/1712.09913), Figure 5(b). Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)

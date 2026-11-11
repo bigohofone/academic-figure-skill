@@ -1,4 +1,4 @@
-"""Figure 1: Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100. In the histograms, the dashed line marks the overall accuracy and the dotted line the average confidence; in the reliability diagrams, the dashed diagonal marks perfect calibration and the light bars show the gap to each bin's mean confidence. The ResNet has lower test error than LeNet (30.6% vs. 44.9%) but is overconfident: its average confidence of 0.884 exceeds its accuracy of 0.705, raising the expected calibration error (ECE) from 0.0492 for LeNet to 0.182 (computed from the 10 binned values)."""
+"""Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100. In the histograms, the solid line marks the accuracy and the dotted line the average confidence over all samples; in the reliability diagrams, the diagonal marks perfect calibration and the light bars show the gap to the mean confidence. The ResNet has the lower test error (30.6% vs. 44.9%) but is overconfident, with an average confidence of 0.884 against an accuracy of 0.705 and an expected calibration error (ECE, computed from the binned data) of 0.182 against 0.0492 for LeNet."""
 
 import json
 import sys
@@ -19,46 +19,57 @@ hist_edges = np.array(data["histogram_bin_edges"])
 rel_edges = np.array(data["reliability_bin_edges"])
 models = [data["models"]["lenet"], data["models"]["resnet"]]
 
-fig, axes = plt.subplots(2, 2, figsize=(5.5, 5), layout="constrained", sharex=True, sharey="row")
-for col, model in enumerate(models):
-    # Top row: share of samples per confidence bin, with the overall accuracy and average confidence.
+# ECE = sum over reliability bins of (share of samples) * |accuracy - confidence|; each reliability
+# bin (width 0.1) holds two histogram bins (width 0.05), so its share is the sum of their fractions
+for m in models:
+    weights = np.add.reduceat(np.array(m["fraction_of_samples_per_bin"]),
+                              np.searchsorted(hist_edges, rel_edges[:-1]))
+    gaps = np.abs(np.array(m["avg_confidence_per_bin"]) - np.array(m["accuracy_per_bin"]))
+    m["ece"] = np.sum(weights * gaps) / np.sum(weights)
+print("takeaway:", {m["label"]: dict(error=m["error_percent"], conf=f"{m['avg_confidence_line']:#.3g}",
+                                     acc=f"{m['accuracy_line']:#.3g}", ece=f"{m['ece']:#.3g}") for m in models})
+lenet, resnet = models
+assert resnet["error_percent"] < lenet["error_percent"], "the takeaway does not hold"
+assert resnet["avg_confidence_line"] - resnet["accuracy_line"] > lenet["avg_confidence_line"] - lenet["accuracy_line"]
+assert resnet["ece"] > lenet["ece"], "the takeaway does not hold"
+
+fig, axes = plt.subplots(2, 2, figsize=(2.75, 2.75), layout="constrained", sharex=True, sharey="row")
+for col, m in enumerate(models):
+    # top row: confidence histogram, with the accuracy and the average confidence over all samples
     ax = axes[0, col]
-    fractions = np.array(model["fraction_of_samples_per_bin"])
-    ax.bar(hist_edges[:-1], fractions, width=np.diff(hist_edges), align="edge", color=colors["series-1"], linewidth=0)
-    ax.axvline(model["accuracy_line"], linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"],
+    ax.bar(hist_edges[:-1], m["fraction_of_samples_per_bin"], width=np.diff(hist_edges), align="edge",
+           color=colors["series-1"], linewidth=0)
+    ax.axvline(m["accuracy_line"], color=colors["neutral"], linewidth=rcParams["grid.linewidth"],
                label="Accuracy")
-    ax.axvline(model["avg_confidence_line"], linestyle=":", linewidth=paper.dashed_width, color=colors["neutral"],
-               label="Avg. confidence")
+    ax.axvline(m["avg_confidence_line"], color=colors["neutral"], linewidth=rcParams["grid.linewidth"],
+               linestyle=":", label="Avg. confidence")
     ax.grid(axis="x", visible=False)
-    ax.set_title(model["label"])
+    ax.set_title(m["label"])
 
-    # Bottom row: accuracy per confidence bin, the gap to its mean confidence, and the diagonal.
+    # bottom row: reliability diagram
     ax = axes[1, col]
-    accuracy = np.array(model["accuracy_per_bin"])
-    confidence = np.array(model["avg_confidence_per_bin"])
-    filled = (accuracy > 0) | (confidence > 0)  # an empty bin is stored as 0 and drawn as nothing
-    ax.bar(rel_edges[:-1][filled], accuracy[filled], width=np.diff(rel_edges)[filled], align="edge",
-           color=colors["series-1"], edgecolor="white", linewidth=rcParams["grid.linewidth"], label="Outputs")
-    ax.bar(rel_edges[:-1][filled], np.abs(confidence - accuracy)[filled],
-           bottom=np.minimum(accuracy, confidence)[filled], width=np.diff(rel_edges)[filled], align="edge",
-           color=lighten(colors["series-2"]), edgecolor=colors["series-2"], linewidth=rcParams["grid.linewidth"],
-           label="Gap")
-    ax.axline((0, 0), (1, 1), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
-    ax.grid(axis="x", visible=False)
-    ax.set_xlabel("Confidence")
-
-for ax in axes.flat:
+    accuracy = np.array(m["accuracy_per_bin"])
+    confidence = np.array(m["avg_confidence_per_bin"])
+    ax.bar(rel_edges[:-1], accuracy, width=np.diff(rel_edges), align="edge", color=colors["series-1"],
+           edgecolor="white", linewidth=rcParams["grid.linewidth"], label="Accuracy")
+    ax.bar(rel_edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
+           width=np.diff(rel_edges), align="edge", color=lighten(colors["series-3"]),
+           edgecolor=colors["series-3"], linewidth=rcParams["grid.linewidth"], label="Gap")
+    ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    ax.set_xticks([0, 0.25, 0.5, 0.75, 1], labels=["0", "0.25", "0.5", "0.75", "1"])
-axes[0, 0].set_yticks([0, 0.25, 0.5, 0.75, 1], labels=["0%", "25%", "50%", "75%", "100%"])
-axes[1, 0].set_yticks([0, 0.25, 0.5, 0.75, 1], labels=["0", "0.25", "0.5", "0.75", "1"])
-axes[0, 0].set_ylabel("Share of samples")
+
+percent = lambda v, _: f"{v:.0%}"
+axes[0, 0].yaxis.set_major_formatter(percent)
+axes[0, 0].set_ylabel("Samples")
 axes[1, 0].set_ylabel("Accuracy")
-
+fig.supxlabel("Confidence")
+for ax in axes[1]:
+    ax.set_xticks([0, 0.5, 1])
 axes[0, 0].legend(loc="upper left")
-axes[1, 0].legend(loc="upper left")
+# no inside spot of the bottom row clears the bars, so its legend goes above its first panel
+axes[1, 0].legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=2, frameon=False)
 
-fit_height(fig, axes, aspect=1.0, min_width=1.0)
+fit_height(fig, axes, aspect=1.0, min_width=0.9)
 fig.savefig("../outputs/reliability-diagram.pdf")
 fig.savefig("../outputs/reliability-diagram.png")

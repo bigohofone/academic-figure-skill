@@ -1,4 +1,4 @@
-"""Figure 2: AIME accuracy (avg@32) over training steps with and without Clip-Higher. Dashed lines mark each run's best accuracy. With Clip-Higher, accuracy peaks at 0.406, against 0.269 without it."""
+"""AIME accuracy (avg@32, 0–1) over training steps with and without Clip-Higher. Thin horizontal lines mark each run's best accuracy. With Clip-Higher, accuracy peaks at 0.406, against 0.269 without it."""
 
 import json
 import sys
@@ -12,19 +12,25 @@ from paper import fit_height, mark_value
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/dapo.json") as f:
-    data = json.load(f)["fig2a"]
+    runs = json.load(f)["fig2a"]
+ours = runs["w/ Clip-Higher"]
+ablation = runs["w/o Clip-Higher"]
 
-fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
+best = {name: max(run["value"]) for name, run in runs.items()}
+print("takeaway:", {name: f"{v:#.3g}" for name, v in best.items()})
+assert best["w/ Clip-Higher"] > best["w/o Clip-Higher"], "the takeaway does not hold"
 
-# ours first (legend order), the ablation in neutral
-for name, color in [("w/ Clip-Higher", colors["ours"]), ("w/o Clip-Higher", colors["neutral"])]:
-    step, value = data[name]["step"], data[name]["value"]
-    ax.plot(step, value, color=color, label=name)
-    best = max(range(len(value)), key=lambda i: value[i])
-    mark_value(ax, step[best], value[best], f"{value[best]:#.3g}", color)
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
+ax.plot(ours["step"], ours["value"], color=colors["ours"], label="w/ Clip-Higher")
+ax.plot(ablation["step"], ablation["value"], linestyle="--", linewidth=paper.dashed_width,
+        color=colors["neutral"], label="w/o Clip-Higher")
+
+for run, color in [(ours, colors["ours"]), (ablation, colors["neutral"])]:
+    i = run["value"].index(max(run["value"]))
+    mark_value(ax, run["step"][i], run["value"][i], f"{run['value'][i]:#.3g}", color)
 
 ax.set_xlabel("Training step")
-ax.set_ylabel("AIME avg@32")
+ax.set_ylabel("AIME accuracy")
 ax.legend(loc="lower right")
 
 fit_height(fig, ax, aspect=0.618)

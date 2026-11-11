@@ -1,52 +1,50 @@
-"""Figure [TODO: number]: ROC curves of AI-text detectors. W/ P and W/o P are our detector with and without the golden prompt; the dashed grey diagonal marks chance, and AUC is computed from each curve with the trapezoidal rule. Ours with the golden prompt reaches an AUC of 0.987, against 0.905 without it and 0.647 for GPTZero, the best baseline."""
+"""ROC curves of AI-generated-text detectors. The thin diagonal marks chance; AUC is computed from each curve with the trapezoidal rule. Ours with the golden prompt reaches an AUC of 0.987 and without it 0.905, against 0.647 for GPTZero and 0.565 for OpenAI."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
-from matplotlib.colors import Normalize, to_rgb
-from matplotlib.patches import Patch
-from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
+colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/roc-curve.json") as f:
-    methods = {m["name"]: m for m in json.load(f)["methods"]}
+    data = json.load(f)
+curves = {m["name"]: (np.array(m["fpr"]), np.array(m["tpr"])) for m in data["methods"]}
+auc = {name: np.trapezoid(tpr, fpr) for name, (fpr, tpr) in curves.items()}
 
-# ICLR, one panel: half the text width
+# Takeaway: both variants of ours have a higher AUC than either baseline.
+print("takeaway (AUC):", {name: f"{v:#.3g}" for name, v in auc.items()})
+assert min(auc["Ours: W/ P"], auc["Ours: W/o P"]) > max(auc["OpenAI"], auc["GPTZero"]), "the takeaway does not hold"
+
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
 
-# variants of ours in the ours color (full method solid, reduced variant dashed);
-# the baselines grey, told apart by line style in ascending order of AUC
-series = [
-    ("Ours: W/ P", "Ours W/ P", colors["ours"], "-", "o"),
-    ("Ours: W/o P", "Ours W/o P", colors["ours"], "--", "s"),
-    ("OpenAI", "OpenAI", colors["neutral"], "-", "^"),
-    ("GPTZero", "GPTZero", colors["neutral"], "--", "D"),
-]
-for key, name, color, style, marker in series:
-    fpr, tpr = np.array(methods[key]["fpr"]), np.array(methods[key]["tpr"])
-    auc = np.trapezoid(tpr, fpr)
-    width = rcParams["lines.linewidth"] if style == "-" else paper.dashed_width
-    ax.plot(fpr, tpr, linestyle=style, linewidth=width, marker=marker, markevery=max(1, len(fpr) // 10),
-            color=color, label=f"{name} (AUC {auc:#.3g})")
+# Variants of ours: solid, in the ours color, told apart by marker; baselines grey, by line style,
+# in ascending order of AUC (OpenAI, then GPTZero). Legend: the full method first.
+style = {
+    "Ours: W/ P": dict(color=colors["ours"], linestyle="-", marker="o"),
+    "Ours: W/o P": dict(color=colors["ours"], linestyle="-", marker="s"),
+    "OpenAI": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_width, marker="^"),
+    "GPTZero": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_width, marker="D"),
+}
+handles = []
+for name in ["Ours: W/ P", "Ours: W/o P", "OpenAI", "GPTZero"]:
+    fpr, tpr = curves[name]
+    (h,) = ax.plot(fpr, tpr, markevery=max(1, len(fpr) // 10), label=f"{name} (AUC {auc[name]:#.3g})", **style[name])
+    handles.append(h)
 
-ax.axline((0, 0), (1, 1), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
 ax.set_xlabel("False positive rate")
 ax.set_ylabel("True positive rate")
 ax.grid(True)
-ax.legend(loc="lower right")
+ax.legend(handles=handles, loc="lower right")
 
 fit_height(fig, ax, aspect=1.0)
 fig.savefig("../outputs/roc-curve.pdf")

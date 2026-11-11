@@ -1,4 +1,4 @@
-"""Figure 1: Training loss landscape around a ResNet-56 trained on CIFAR-10. Contour lines are colored by training loss in steps of 0.5; the star marks the trained minimizer at (0, 0). The minimizer sits in one wide, nearly convex basin: the training loss stays below 2.1 within about 0.4 of it along both directions."""
+"""Training-loss landscape of a ResNet-56 trained on CIFAR-10, along two directions α and β around the trained minimizer. Lines are contours of training loss from 0.1 to 9.6 in steps of 0.5, colored by level, with every third level labelled; the star marks the trained minimizer at (0, 0). The minimizer sits in a single basin, with loss rising from 0.1 near the center to 9.6 toward the edges."""
 
 import json
 import sys
@@ -17,55 +17,41 @@ colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 with open("../data/loss-landscape.json") as f:
     data = json.load(f)
 levels = data["levels"]
+contour_lines = data["contour_lines"]
+level_labels = data["level_labels"]
 
-fig, ax = plt.subplots(figsize=(2.75, 2.5))
+lo, hi = min(levels), max(levels)
+print("takeaway:", f"levels {lo:.2g} to {hi:.2g}, {len(levels)} levels, step {levels[1] - levels[0]:.2g}")
+drawn = {line["level"] for line in contour_lines}
+assert drawn == set(levels), "the takeaway does not hold"
+
 cmap = plt.get_cmap("viridis")
-norm = Normalize(min(levels), max(levels))
-lines = []  # to cut the gaps for the labels
-for line in data["contour_lines"]:
+norm = Normalize(lo, hi)
+
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
+for line in contour_lines:
     xy = np.array(line["xy"])
-    # the same polyline with extra points every 0.005 along it, so a label's gap can be cut cleanly
-    along = np.r_[0, np.cumsum(np.hypot(*np.diff(xy, axis=0).T))]
-    s = np.union1d(along, np.arange(0, along[-1], 0.005))
-    x, y = np.interp(s, along, xy[:, 0]), np.interp(s, along, xy[:, 1])
-    (handle,) = ax.plot(x, y, color=cmap(norm(line["level"])), linewidth=rcParams["contour.linewidth"])
-    lines.append(handle)
-ax.set_xlim(data["x_range"])
-ax.set_ylim(data["y_range"])
+    ax.plot(xy[:, 0], xy[:, 1], color=cmap(norm(line["level"])), linewidth=rcParams["contour.linewidth"])
+ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"],
+        markersize=paper.highlight_size, linestyle="none")
+
+# One label per level, at its first given position; every third level, as every second
+# has no set of given positions that clear each other.
+LABEL_EVERY = 3
+POSITION = {9.1: 1, 7.6: 1}  # level -> index of the given position to use, when the first one collides
+for level in levels[::LABEL_EVERY]:
+    options = [p["xy"] for p in level_labels if p["level"] == level]
+    x, y = options[POSITION.get(level, 0)]
+    ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label",
+            bbox=dict(facecolor="white", edgecolor="none", pad=1))
+
+ax.set_xlim(*data["x_range"])
+ax.set_ylim(*data["y_range"])
 ax.grid(False)
-
-# one label per level, at the first given position that does not collide with an earlier label
-# (5.6 to 9.1 take a later position; 9.6 collides at every position and is dropped)
-position = {5.6: 1, 6.6: 1, 7.6: 3, 8.1: 3, 8.6: 1, 9.1: 1}
-for level in levels:
-    if level == 9.6:
-        continue
-    x, y = [label["xy"] for label in data["level_labels"] if label["level"] == level][position.get(level, 0)]
-    ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label")
-
-# the trained minimizer
-ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size,
-        linestyle="none")
-
-ax.set_xlabel("Direction 1")
-ax.set_ylabel("Direction 2")
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
-ticks = [t for t in ax.get_yticks() if -1 <= t <= 1]
-ax.set_yticks(ticks, labels=["", *[f"{t:.10g}".replace("-", "−") for t in ticks[1:]]])
-
+ax.set_xlabel("α")
+ax.set_ylabel("β")
 fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, label="Training loss")
 
 fit_height(fig, ax, aspect=1.0)
-
-# cut a gap in the lines under each label, as ax.clabel does (the given positions are not always on their own level's line)
-fig.canvas.draw()
-for text in ax.texts:
-    box = text.get_window_extent().padded(fig.dpi / 72).transformed(ax.transData.inverted())
-    for line in lines:
-        x, y = line.get_data()
-        inside = (box.x0 < x) & (x < box.x1) & (box.y0 < y) & (y < box.y1)
-        line.set_data(np.where(inside, np.nan, x), np.where(inside, np.nan, y))
-
 fig.savefig("../outputs/loss-landscape.pdf")
 fig.savefig("../outputs/loss-landscape.png")

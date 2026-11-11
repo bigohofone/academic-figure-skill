@@ -1,53 +1,53 @@
-"""Figure [TODO: number]: Validation accuracy on CIFAR-100 versus training epoch. Lines show the mean and shaded bands ±1 std over 5 seeds; dashed horizontal lines and circles mark the best mean accuracy of Ours and Mixup. Ours reaches a best accuracy of 0.915, above Mixup (0.897) and the Baseline (0.882)."""
+"""Validation accuracy on CIFAR-100 versus training epochs. Lines show the mean and shaded bands ±1 std over 5 seeds; thin horizontal lines and circles mark the best mean accuracy of Ours and Mixup. Ours reaches the highest best mean accuracy, 0.915, ahead of Mixup (0.897) and Baseline (0.882)."""
 
 import json
-import math
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
-from matplotlib.colors import Normalize, to_rgb
-from matplotlib.patches import Patch
-from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
+from paper import fit_height, mark_value
 
-colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
+colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
 with open("../data/learning-curve.json") as f:
     data = json.load(f)
 epochs = np.array(data["epochs"])
+runs = {name: np.array(seeds) for name, seeds in data["accuracy"].items()}
+mean = {name: r.mean(axis=0) for name, r in runs.items()}
+std = {name: r.std(axis=0) for name, r in runs.items()}
 
-# ICLR, one panel: half the text width
-fig, ax = plt.subplots(figsize=(2.75, 2), layout="constrained")
+# Takeaway: ours reaches the highest best mean validation accuracy.
+best = {name: m.max() for name, m in mean.items()}
+best_epoch = {name: epochs[m.argmax()] for name, m in mean.items()}
+print("takeaway:", {name: f"{v:#.3g}" for name, v in best.items()}, "at epochs", best_epoch)
+assert best["Ours"] > max(v for name, v in best.items() if name != "Ours"), "the takeaway does not hold"
 
-# ours in color; the baselines grey, told apart by line style in ascending order of best accuracy
-series = [
-    ("Ours", colors["ours"], "-"),
-    ("Baseline", colors["neutral"], "-"),
-    ("Mixup", colors["neutral"], "--"),
-]
-for name, color, style in series:
-    runs = np.array(data["accuracy"][name])
-    mean, std = runs.mean(axis=0), runs.std(axis=0)
-    width = rcParams["lines.linewidth"] if style == "-" else paper.dashed_width
-    ax.plot(epochs, mean, linestyle=style, linewidth=width, color=color, label=name)
-    ax.fill_between(epochs, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)
+fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 
-# the comparison is not settled by the task: mark the best mean accuracy of ours and its closest
-# competitor (the Baseline's label collides with theirs; its value is in the caption)
-for (name, color, style), below in zip([series[0], series[2]], [False, True]):
-    mean = np.array(data["accuracy"][name]).mean(axis=0)
-    best = mean.argmax()
-    mark_value(ax, epochs[best], mean[best], f"{mean[best]:#.3g}", color, below=below)
+# Baselines in ascending order of best accuracy, told apart by line style; ours solid in color.
+style = {
+    "Baseline": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_width),
+    "Mixup": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_width),
+    "Ours": dict(color=colors["ours"], linestyle="-"),
+}
+handles = {}
+for name in ["Baseline", "Mixup", "Ours"]:
+    s = style[name]
+    ax.fill_between(epochs, mean[name] - std[name], mean[name] + std[name], color=s["color"], alpha=0.2, linewidth=0)
+    (handles[name],) = ax.plot(epochs, mean[name], label=name, **s)
+
+# Three marks do not fit apart, so ours and its closest competitor are marked; Baseline's value is in the caption.
+for name in ["Mixup", "Ours"]:
+    mark_value(ax, best_epoch[name], best[name], f"{best[name]:#.3g}", style[name]["color"], below=(name != "Ours"))
 
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Validation accuracy")
 ax.grid(True)
-ax.legend(loc="lower right")
+ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Baseline", "Mixup"], loc="lower right")
 
 fit_height(fig, ax, aspect=0.618)
 fig.savefig("../outputs/learning-curve.pdf")
