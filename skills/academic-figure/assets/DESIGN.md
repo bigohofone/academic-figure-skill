@@ -94,7 +94,8 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
 | Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
-| Some parts or series the takeaway names, among others it does not (two sources in a dataset's makeup) | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
+| Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole |
+| Some series the takeaway names, among others it does not | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
 | Several series compared on equal terms, no "ours" (models in a survey, data sources, error types) | `series-1` to `series-6`, in order |
 | More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20) |
 | Groups with sizes or sweeps inside (model sizes per family) | one color per group; within a group, blended with white at 40 / 70 / 100%, light to dark |
