@@ -1,4 +1,4 @@
-"""Training loss and learning rate over training steps. The loss is smoothed with a moving average over 5% of the steps; the faint line shows raw values. The learning rate warms up linearly to its peak at step 1000, then decays along a cosine; the loss falls from 11.3 to 2.01 and covers 90% of that drop by step 3200."""
+"""Training loss and learning rate versus training steps. The loss is smoothed with a moving average over 5% of the steps; the faint line shows raw values. The learning rate warms up linearly for 1000 steps, then decays with a cosine schedule. 63% of the loss decrease happens during warmup."""
 
 import json
 import sys
@@ -16,30 +16,29 @@ with open("../data/loss-and-learning-rate.json") as f:
     data = json.load(f)
 steps = np.array(data["steps"])
 loss = np.array(data["training_loss"])
-lr = np.array(data["learning_rate"])
+learning_rate = np.array(data["learning_rate"])
 
-# Takeaway: the loss drops early, around warmup, and flattens as the learning rate decays.
+# takeaway: most of the loss decrease happens during the warmup
 smoothed = np.array(smooth(loss))
-peak_step = steps[np.argmax(lr)]
-drop = smoothed[0] - smoothed[-1]
-step_90 = steps[np.argmax(smoothed <= smoothed[0] - 0.9 * drop)]
-print("takeaway:", {"first loss": f"{loss[0]:#.3g}", "last loss": f"{loss[-1]:#.3g}",
-                    "lr peak step": int(peak_step), "90% of drop by step": int(step_90)})
-assert step_90 < steps[-1] / 4, "the takeaway does not hold"
+warmup_end = int(np.argmax(learning_rate))
+share = (loss[0] - loss[warmup_end]) / (loss[0] - smoothed[-1])
+print("takeaway:", "warmup steps", steps[warmup_end], "loss start", f"{loss[0]:#.3g}",
+      "loss at warmup end", f"{loss[warmup_end]:#.3g}", "final smoothed", f"{smoothed[-1]:#.3g}",
+      "share of decrease in warmup", f"{share:.0%}")
+assert share > 0.5, "the takeaway does not hold"
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
+fig, ax = plt.subplots(figsize=(2.75, 2.75))
 twin = ax.twinx()
 
 ax.plot(steps, loss, color=colors["series-1"], alpha=0.25)
 ax.plot(steps, smoothed, color=colors["series-1"], label="Training loss")
-twin.plot(steps, lr * 1e4, color=colors["series-3"], label="Learning rate")
-
-ax.grid(True)
-twin.grid(False)
-ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
-ax.set_xlabel("Training step")
 ax.set_ylabel("Training loss")
+ax.set_xlabel("Training step")
+ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
+
+twin.plot(steps, learning_rate * 1e4, color=colors["series-3"], label="Learning rate")
 twin.set_ylabel("Learning rate (×10⁻⁴)")
+twin.grid(False)
 
 ax.set_zorder(twin.get_zorder() + 1)
 ax.patch.set_visible(False)
