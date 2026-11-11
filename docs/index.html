@@ -46,6 +46,14 @@ h2 { font-size:clamp(28px,4vw,40px); letter-spacing:-.025em; line-height:1.15; m
 .intro { color:var(--ink2); max-width:720px; margin:0 0 28px; }
 .note { font-size:14px; color:var(--ink3); text-align:center; margin-top:16px; }
 .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.paper.narrow { padding:6%; max-width:420px; margin:0 auto; }
+.paper.narrow p { font-size:calc(100cqw * 10 / 72 / 3.25); }
+.venue .row { gap:2%; align-items:flex-end; margin-bottom:18px; }
+.vitem { display:flex; flex-direction:column; align-items:center; }
+.vitem img { width:100%; display:block; }
+.vlabel { font-size:13px; color:var(--ink3); margin-top:6px; }
+a.card { text-decoration:none; color:inherit; display:block; }
+a.card:hover { border-color:var(--accent); }
 .hero { display:block; width:100%; max-width:1000px; margin:40px auto 0; border-radius:16px; }
 #features .hero { margin:0 auto 36px; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
@@ -65,7 +73,7 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 .paper { background:#fff; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,.06), 0 10px 30px rgba(0,0,0,.08); padding:7% 9%; }
 .paper p { font:calc(100cqw * 10 / 72 / 5.5)/1.2 "Times New Roman", Times, serif; color:#222; text-align:justify; margin:0 0 .9em; hyphens:auto; }
 .paper .row { margin:0 0 .9em; }
-.paper.two { padding:6% 6%; }
+.paper.two { padding:12% 9.19% 0; aspect-ratio:210 / 297; overflow:hidden; }
 .paper.two .cols { display:grid; grid-template-columns:1fr 1fr; column-gap:calc(100% * 0.25 / 6.75); }
 .paper.two .pcol { container-type:inline-size; }
 .paper.two p { font-size:calc(100cqw * 10 / 72 / 3.25); }
@@ -141,8 +149,8 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
     <button type="button" data-v="with" aria-pressed="true">With the skill</button>
   </div>
   <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/without/small-multiples.svg?v=1fda2f92d1" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/without/icml-learning-curve.svg?v=d394b0cf88" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/without/icml-scaling-law.svg?v=8b40aafd50" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
+    <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/without/small-multiples.svg?v=1fda2f92d1" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/without/icml-learning-curve.svg?v=d394b0cf88" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/without/icml-scaling-law.svg?v=8b40aafd50" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide" style="left:7.763%"></span><span class="guide" style="left:45.452%"></span><span class="guide" style="left:59.615%"></span><span class="guide" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy versus epochs on three datasets.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds; the circle marks the best mean accuracy of ours.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
   </div>
 </div>
   <ul class="ticks">
@@ -155,19 +163,58 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 <section id="features" class="feat"><div class="wrap">
   <img class="hero" src="hero.png" alt="academic-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style">
   <div class="cards six">
-    <div class="card"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></div>
-    <div class="card"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></div>
-    <div class="card"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, the same meaning in every figure.</p></div>
-    <div class="card"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></div>
-    <div class="card"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></div>
-    <div class="card"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></div>
+    <a class="card" href="#venue"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
+    <a class="card" href="#readable"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
+    <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, the same meaning in every figure.</p></a>
+    <a class="card" href="#lines"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></a>
+    <a class="card" href="#clean"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
+    <a class="card" href="#install"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></a>
   </div>
 </div></section>
 
+<section class="soft" id="venue"><div class="wrap">
+  <div class="kicker">Sized for your venue</div>
+  <h2>The right width, every time</h2>
+  <p class="intro">Name the venue and you get its exact sizes: half the text width, one column, or both columns. Shown here at print size.</p>
+  <div class="col block venue"><div class="row"><div class="vitem" style="width:40.741%"><img src="figures/with/learning-curve.svg?v=e49b6ee67e" alt="learning-curve" loading="lazy"><div class="vlabel">ICLR · half text width · 2.75 in</div></div><div class="vitem" style="width:48.148%"><img src="figures/with/icml-learning-curve.svg?v=ae6bffb386" alt="icml-learning-curve" loading="lazy"><div class="vlabel">ICML · one column · 3.25 in</div></div></div><div class="row"><div class="vitem" style="width:100.000%"><img src="figures/with/small-multiples.svg?v=696052da2a" alt="small-multiples" loading="lazy"><div class="vlabel">ICML · both columns · 6.75 in</div></div></div></div>
+</div></section>
 
+<section id="readable"><div class="wrap">
+  <div class="kicker">Readable at print size</div>
+  <h2>Text that matches the paper</h2>
+  <p class="intro">At print size, labels sit just under the 10 pt body text, in one font across the paper. No squinting, no oversized ticks.</p>
+  
+<div class="compare" data-show="with" data-name="readable">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="paper narrow"><div class="col"><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type. We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/without/icml-reliability-diagram.svg?v=fcf2817055" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="paper narrow"><div class="col"><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type. We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="row"><img src="figures/with/icml-reliability-diagram.svg?v=f55d15d700" alt="reliability-diagram" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet and a 110-layer ResNet on CIFAR-100.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div>
+  </div>
+</div>
+</div></section>
 
-<section><div class="wrap">
-  <div class="kicker">Multi-panel layouts</div>
+<section class="soft" id="color"><div class="wrap">
+  <div class="kicker">Color-blind safe</div>
+  <h2>Colors that mean something</h2>
+  <p class="intro">Your method stands out in one color and the baselines step back in grey. Parts of a whole get the full color-blind-safe palette.</p>
+  
+<div class="compare" data-show="with" data-name="color">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/grouped-bar-chart.svg?v=189ec6d2dc" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/without/data-mixture.svg?v=fb55ba1830" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/grouped-bar-chart.svg?v=fdea3e5fb6" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/with/data-mixture.svg?v=79d9389d38" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
+  </div>
+</div>
+</div></section>
+
+<section id="lines"><div class="wrap">
+  <div class="kicker">Every panel lines up</div>
   <h2>Multi-panel figures, done right</h2>
   <p class="intro">Grids, grouped panels and a second y axis come out tidy without asking: related panels sit together, every label fits, and the figure keeps the size of the rest of the paper.</p>
   
@@ -195,10 +242,10 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </div>
 </div></section>
 
-<section class="soft"><div class="wrap">
-  <div class="kicker">No fixing by hand</div>
+<section class="soft" id="clean"><div class="wrap">
+  <div class="kicker">Clean, modern style</div>
   <h2>Nothing overlaps, nothing is cut off</h2>
-  <p class="intro">Long method names, crowded values and legends that would sit on the data are handled before you see the figure. Every number on it comes from your data, and the caption comes with it.</p>
+  <p class="intro">Long method names, crowded values and legends that would sit on the data are handled before you see the figure.</p>
   
 <div class="compare" data-show="with" data-name="checks">
   <div class="switch" role="group" aria-label="Version">
@@ -546,7 +593,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </div></section>
 
 <section class="soft" id="install"><div class="wrap">
-  <div class="kicker">Install</div>
+  <div class="kicker">Nice and easy</div>
   <h2>Two commands, then just ask</h2>
   <p class="intro">Then ask as usual: "plot the learning curves in results.json for my ICLR paper." You get the figure sized for your venue, a caption ready to paste, and one short script per figure, <code>figures/&lt;id&gt;.py</code>, to rerun or tweak later.</p>
   <pre>/plugin marketplace add bigohofone/academic-figure-skill
