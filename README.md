@@ -8,7 +8,9 @@ How figures look is defined in [`DESIGN.md`](skills/academic-figure/assets/DESIG
 
 ## Examples
 
-Every figure below was drawn by a Claude Code subagent with a clean context following the skill, from a data file and a task file (in [`examples/`](examples)), and is shown at its printed size (1 in = 96 px): at 100% browser zoom it appears as on the page. Open an example to see it; click a figure to open it full size.
+Every figure below was drawn by a Claude Code subagent with a clean context following the skill, for an ICLR paper, and is shown at its printed size (1 in = 96 px): at 100% browser zoom it appears as on the page. Open an example to see it; click a figure to open it full size.
+
+Each group in [`examples/`](examples) holds `data/` (the input), `tasks/` (the request the subagent got), `notebooks/` (the code it wrote, runnable in place), and `outputs/` (the figures); use cases also hold `originals/` (the papers' figures) and `without-skill/`.
 
 ### 1. Chart types
 
@@ -19,7 +21,7 @@ The basic chart types of matplotlib and seaborn, one realistic experiment each. 
 
 Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
-<a href="examples/chart-types/learning-curve.png"><img src="examples/chart-types/learning-curve.png" width="312"></a>
+<a href="examples/chart-types/outputs/learning-curve.png"><img src="examples/chart-types/outputs/learning-curve.png" width="264"></a>
 
 </details>
 
@@ -28,7 +30,7 @@ Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
 Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
 
-<a href="examples/chart-types/grouped-bar-chart.png"><img src="examples/chart-types/grouped-bar-chart.png" width="312"></a>
+<a href="examples/chart-types/outputs/grouped-bar-chart.png"><img src="examples/chart-types/outputs/grouped-bar-chart.png" width="264"></a>
 
 </details>
 
@@ -37,7 +39,7 @@ Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
 
 Guidelines: [`scatter-plot.md`](skills/academic-figure/scatter-plot.md)
 
-<a href="examples/chart-types/correlation.png"><img src="examples/chart-types/correlation.png" width="312"></a>
+<a href="examples/chart-types/outputs/correlation.png"><img src="examples/chart-types/outputs/correlation.png" width="264"></a>
 
 </details>
 
@@ -46,7 +48,7 @@ Guidelines: [`scatter-plot.md`](skills/academic-figure/scatter-plot.md)
 
 Guidelines: [`box-plot.md`](skills/academic-figure/box-plot.md)
 
-<a href="examples/chart-types/grouped-box-plot.png"><img src="examples/chart-types/grouped-box-plot.png" width="312"></a>
+<a href="examples/chart-types/outputs/grouped-box-plot.png"><img src="examples/chart-types/outputs/grouped-box-plot.png" width="264"></a>
 
 </details>
 
@@ -55,7 +57,7 @@ Guidelines: [`box-plot.md`](skills/academic-figure/box-plot.md)
 
 Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
 
-<a href="examples/chart-types/hyperparameter-grid.png"><img src="examples/chart-types/hyperparameter-grid.png" width="312"></a>
+<a href="examples/chart-types/outputs/hyperparameter-grid.png"><img src="examples/chart-types/outputs/hyperparameter-grid.png" width="264"></a>
 
 </details>
 
@@ -64,7 +66,7 @@ Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
 
 Guidelines: [`histogram.md`](skills/academic-figure/histogram.md)
 
-<a href="examples/chart-types/confidence-histogram.png"><img src="examples/chart-types/confidence-histogram.png" width="312"></a>
+<a href="examples/chart-types/outputs/confidence-histogram.png"><img src="examples/chart-types/outputs/confidence-histogram.png" width="264"></a>
 
 </details>
 
@@ -73,7 +75,7 @@ Guidelines: [`histogram.md`](skills/academic-figure/histogram.md)
 
 Guidelines: [`error-bar-plot.md`](skills/academic-figure/error-bar-plot.md)
 
-<a href="examples/chart-types/error-bar-plot.png"><img src="examples/chart-types/error-bar-plot.png" width="312"></a>
+<a href="examples/chart-types/outputs/error-bar-plot.png"><img src="examples/chart-types/outputs/error-bar-plot.png" width="264"></a>
 
 </details>
 
@@ -82,7 +84,7 @@ Guidelines: [`error-bar-plot.md`](skills/academic-figure/error-bar-plot.md)
 
 Guidelines: [`area-chart.md`](skills/academic-figure/area-chart.md)
 
-<a href="examples/chart-types/data-mixture.png"><img src="examples/chart-types/data-mixture.png" width="312"></a>
+<a href="examples/chart-types/outputs/data-mixture.png"><img src="examples/chart-types/outputs/data-mixture.png" width="264"></a>
 
 </details>
 
@@ -91,7 +93,7 @@ Guidelines: [`area-chart.md`](skills/academic-figure/area-chart.md)
 
 Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
 
-<a href="examples/chart-types/hyperparameter-surface.png"><img src="examples/chart-types/hyperparameter-surface.png" width="312"></a>
+<a href="examples/chart-types/outputs/hyperparameter-surface.png"><img src="examples/chart-types/outputs/hyperparameter-surface.png" width="264"></a>
 
 </details>
 
@@ -100,7 +102,7 @@ Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
 
 Guidelines: [`radar-chart.md`](skills/academic-figure/radar-chart.md)
 
-<a href="examples/chart-types/radar-chart.png"><img src="examples/chart-types/radar-chart.png" width="312"></a>
+<a href="examples/chart-types/outputs/radar-chart.png"><img src="examples/chart-types/outputs/radar-chart.png" width="264"></a>
 
 </details>
 
@@ -109,7 +111,7 @@ Guidelines: [`radar-chart.md`](skills/academic-figure/radar-chart.md)
 
 Guidelines: [`pie-chart.md`](skills/academic-figure/pie-chart.md)
 
-<a href="examples/chart-types/dataset-composition.png"><img src="examples/chart-types/dataset-composition.png" width="312"></a>
+<a href="examples/chart-types/outputs/dataset-composition.png"><img src="examples/chart-types/outputs/dataset-composition.png" width="264"></a>
 
 </details>
 
@@ -118,7 +120,7 @@ Guidelines: [`pie-chart.md`](skills/academic-figure/pie-chart.md)
 
 Guidelines: [`violin-plot.md`](skills/academic-figure/violin-plot.md)
 
-<a href="examples/chart-types/reward-distribution.png"><img src="examples/chart-types/reward-distribution.png" width="312"></a>
+<a href="examples/chart-types/outputs/reward-distribution.png"><img src="examples/chart-types/outputs/reward-distribution.png" width="264"></a>
 
 </details>
 
@@ -133,11 +135,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Without skill**
 
-<a href="examples/use-cases/dapo-fig2-without-skill.png"><img src="examples/use-cases/dapo-fig2-without-skill.png" width="310"></a>
+<a href="examples/use-cases/without-skill/dapo-fig2.png"><img src="examples/use-cases/without-skill/dapo-fig2.png" width="452"></a>
 
 **With skill**
 
-<a href="examples/use-cases/dapo-fig2-with-skill.png"><img src="examples/use-cases/dapo-fig2-with-skill.png" width="312"></a>
+<a href="examples/use-cases/outputs/dapo-fig2.png"><img src="examples/use-cases/outputs/dapo-fig2.png" width="264"></a>
 
 </details>
 
@@ -148,11 +150,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Without skill**
 
-<a href="examples/use-cases/dapo-fig6-without-skill.png"><img src="examples/use-cases/dapo-fig6-without-skill.png" width="437"></a>
+<a href="examples/use-cases/without-skill/dapo-fig6.png"><img src="examples/use-cases/without-skill/dapo-fig6.png" width="452"></a>
 
 **With skill**
 
-<a href="examples/use-cases/dapo-fig6-with-skill.png"><img src="examples/use-cases/dapo-fig6-with-skill.png" width="486"></a>
+<a href="examples/use-cases/outputs/dapo-fig6.png"><img src="examples/use-cases/outputs/dapo-fig6.png" width="264"></a>
 
 </details>
 
@@ -163,11 +165,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Without skill**
 
-<a href="examples/use-cases/rlvr-fig2-without-skill.png"><img src="examples/use-cases/rlvr-fig2-without-skill.png" width="647"></a>
+<a href="examples/use-cases/without-skill/rlvr-fig2.png"><img src="examples/use-cases/without-skill/rlvr-fig2.png" width="509"></a>
 
 **With skill**
 
-<a href="examples/use-cases/rlvr-fig2-with-skill.png"><img src="examples/use-cases/rlvr-fig2-with-skill.png" width="648"></a>
+<a href="examples/use-cases/outputs/rlvr-fig2.png"><img src="examples/use-cases/outputs/rlvr-fig2.png" width="528"></a>
 
 </details>
 
@@ -178,11 +180,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Without skill**
 
-<a href="examples/use-cases/rlvr-fig5-without-skill.png"><img src="examples/use-cases/rlvr-fig5-without-skill.png" width="308"></a>
+<a href="examples/use-cases/without-skill/rlvr-fig5.png"><img src="examples/use-cases/without-skill/rlvr-fig5.png" width="455"></a>
 
 **With skill**
 
-<a href="examples/use-cases/rlvr-fig5-with-skill.png"><img src="examples/use-cases/rlvr-fig5-with-skill.png" width="312"></a>
+<a href="examples/use-cases/outputs/rlvr-fig5.png"><img src="examples/use-cases/outputs/rlvr-fig5.png" width="528"></a>
 
 </details>
 
@@ -193,11 +195,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Without skill**
 
-<a href="examples/use-cases/rlvr-fig6-without-skill.png"><img src="examples/use-cases/rlvr-fig6-without-skill.png" width="312"></a>
+<a href="examples/use-cases/without-skill/rlvr-fig6.png"><img src="examples/use-cases/without-skill/rlvr-fig6.png" width="458"></a>
 
 **With skill**
 
-<a href="examples/use-cases/rlvr-fig6-with-skill.png"><img src="examples/use-cases/rlvr-fig6-with-skill.png" width="312"></a>
+<a href="examples/use-cases/outputs/rlvr-fig6.png"><img src="examples/use-cases/outputs/rlvr-fig6.png" width="528"></a>
 
 </details>
 
@@ -208,11 +210,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/roc-pr-curves-original.png"><img src="examples/use-cases/roc-pr-curves-original.png" width="369"></a>
+<a href="examples/use-cases/originals/roc-pr-curves.png"><img src="examples/use-cases/originals/roc-pr-curves.png" width="369"></a>
 
 **With skill**
 
-<a href="examples/use-cases/roc-pr-curves.png"><img src="examples/use-cases/roc-pr-curves.png" width="312"></a>
+<a href="examples/use-cases/outputs/roc-pr-curves.png"><img src="examples/use-cases/outputs/roc-pr-curves.png" width="264"></a>
 
 </details>
 
@@ -223,11 +225,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/reliability-diagram-original.png"><img src="examples/use-cases/reliability-diagram-original.png" width="339"></a>
+<a href="examples/use-cases/originals/reliability-diagram.png"><img src="examples/use-cases/originals/reliability-diagram.png" width="339"></a>
 
 **With skill**
 
-<a href="examples/use-cases/reliability-diagram.png"><img src="examples/use-cases/reliability-diagram.png" width="312"></a>
+<a href="examples/use-cases/outputs/reliability-diagram.png"><img src="examples/use-cases/outputs/reliability-diagram.png" width="528"></a>
 
 </details>
 
@@ -238,11 +240,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/scaling-law-original.png"><img src="examples/use-cases/scaling-law-original.png" width="190"></a>
+<a href="examples/use-cases/originals/scaling-law.png"><img src="examples/use-cases/originals/scaling-law.png" width="190"></a>
 
 **With skill**
 
-<a href="examples/use-cases/scaling-law.png"><img src="examples/use-cases/scaling-law.png" width="312"></a>
+<a href="examples/use-cases/outputs/scaling-law.png"><img src="examples/use-cases/outputs/scaling-law.png" width="264"></a>
 
 </details>
 
@@ -253,11 +255,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/accuracy-vs-parameters-original.png"><img src="examples/use-cases/accuracy-vs-parameters-original.png" width="316"></a>
+<a href="examples/use-cases/originals/accuracy-vs-parameters.png"><img src="examples/use-cases/originals/accuracy-vs-parameters.png" width="316"></a>
 
 **With skill**
 
-<a href="examples/use-cases/accuracy-vs-parameters.png"><img src="examples/use-cases/accuracy-vs-parameters.png" width="312"></a>
+<a href="examples/use-cases/outputs/accuracy-vs-parameters.png"><img src="examples/use-cases/outputs/accuracy-vs-parameters.png" width="528"></a>
 
 </details>
 
@@ -268,11 +270,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/t-sne-original.png"><img src="examples/use-cases/t-sne-original.png" width="160"></a>
+<a href="examples/use-cases/originals/t-sne.png"><img src="examples/use-cases/originals/t-sne.png" width="160"></a>
 
 **With skill**
 
-<a href="examples/use-cases/t-sne.png"><img src="examples/use-cases/t-sne.png" width="176"></a>
+<a href="examples/use-cases/outputs/t-sne.png"><img src="examples/use-cases/outputs/t-sne.png" width="264"></a>
 
 </details>
 
@@ -283,11 +285,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/confusion-matrix-original.png"><img src="examples/use-cases/confusion-matrix-original.png" width="240"></a>
+<a href="examples/use-cases/originals/confusion-matrix.png"><img src="examples/use-cases/originals/confusion-matrix.png" width="240"></a>
 
 **With skill**
 
-<a href="examples/use-cases/confusion-matrix.png"><img src="examples/use-cases/confusion-matrix.png" width="312"></a>
+<a href="examples/use-cases/outputs/confusion-matrix.png"><img src="examples/use-cases/outputs/confusion-matrix.png" width="264"></a>
 
 </details>
 
@@ -298,11 +300,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/attention-map-original.png"><img src="examples/use-cases/attention-map-original.png" width="261"></a>
+<a href="examples/use-cases/originals/attention-map.png"><img src="examples/use-cases/originals/attention-map.png" width="261"></a>
 
 **With skill**
 
-<a href="examples/use-cases/attention-map.png"><img src="examples/use-cases/attention-map.png" width="264"></a>
+<a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="264"></a>
 
 </details>
 
@@ -313,11 +315,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/loss-landscape-original.png"><img src="examples/use-cases/loss-landscape-original.png" width="134"></a>
+<a href="examples/use-cases/originals/loss-landscape.png"><img src="examples/use-cases/originals/loss-landscape.png" width="134"></a>
 
 **With skill**
 
-<a href="examples/use-cases/loss-landscape.png"><img src="examples/use-cases/loss-landscape.png" width="528"></a>
+<a href="examples/use-cases/outputs/loss-landscape.png"><img src="examples/use-cases/outputs/loss-landscape.png" width="264"></a>
 
 </details>
 
@@ -328,11 +330,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/win-rate-original.png"><img src="examples/use-cases/win-rate-original.png" width="256"></a>
+<a href="examples/use-cases/originals/win-rate.png"><img src="examples/use-cases/originals/win-rate.png" width="256"></a>
 
 **With skill**
 
-<a href="examples/use-cases/win-rate.png"><img src="examples/use-cases/win-rate.png" width="264"></a>
+<a href="examples/use-cases/outputs/win-rate.png"><img src="examples/use-cases/outputs/win-rate.png" width="264"></a>
 
 </details>
 
@@ -343,11 +345,11 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Original**
 
-<a href="examples/use-cases/stacked-bar-chart-original.png"><img src="examples/use-cases/stacked-bar-chart-original.png" width="517"></a>
+<a href="examples/use-cases/originals/stacked-bar-chart.png"><img src="examples/use-cases/originals/stacked-bar-chart.png" width="517"></a>
 
 **With skill**
 
-<a href="examples/use-cases/stacked-bar-chart.png"><img src="examples/use-cases/stacked-bar-chart.png" width="528"></a>
+<a href="examples/use-cases/outputs/stacked-bar-chart.png"><img src="examples/use-cases/outputs/stacked-bar-chart.png" width="528"></a>
 
 </details>
 

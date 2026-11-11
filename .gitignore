@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
 .pytest_cache/
+
+# example notebooks also write PDFs; the README shows the PNGs
+examples/*/outputs/*.pdf
