@@ -12,4 +12,5 @@ Values over two categorical axes: confusion matrix, attention map, a grid of res
 | Values | Colormap |
 |---|---|
 | Sequential (counts, accuracies, attention) | the design's `heatmap.colormap`, `viridis` (the default; pass nothing); few levels: `cmap=plt.get_cmap("viridis", n_levels)` |
+| Sequential, lower is better (loss, error, perplexity) | reversed, `cmap="viridis_r"`, so the best values are bright; few levels: `cmap=plt.get_cmap("viridis_r", n_levels)` |
 | Signed (differences, correlations) | `cmap="RdBu_r"` centered at 0 (symmetric `vmin`/`vmax`: negative blue, positive red); few levels: `cmap=plt.get_cmap("RdBu_r", n_levels)` |

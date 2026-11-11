@@ -92,7 +92,7 @@ Pick the first row that fits:
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
 | Text, axes, ticks | `ink` |
-| Continuous values | the `heatmap.colormap` component, matplotlib's `viridis` (the default colormap: perceptually uniform, color-blind safe, readable in grayscale); signed values `RdBu_r`, in heatmap.md |
+| Continuous values | the `heatmap.colormap` component, matplotlib's `viridis` (the default colormap: perceptually uniform, color-blind safe, readable in grayscale), with the best values bright: lower-is-better values (loss, error, perplexity) take it reversed, `viridis_r`; signed values `RdBu_r`, in heatmap.md |
 
 - Several variants of ours (with and without a component): all in `ours`, told apart by line style on lines and by shade on fills, as grey series are.
 - More compared series than grey line styles (four): add the design's markers, a different shape per series; more than eight: draw the series the takeaway names, and the rest as one grey group named "Other baselines" in the legend.
@@ -122,6 +122,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 - Text tick labels (categories, bins, method names) that don't fit side by side turn 45°: `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, and 90° (`rotation=90, ha="center"`) when they still overlap at 45°. Keep the panels side by side and the bins on the x-axis rather than switching to horizontal bars or stacked panels to avoid the rotation.
 - Math in labels uses mathtext (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); it is set in Inter like the rest. Symbols Inter lacks (∝, ≈ in some weights) go in mathtext too (`$\propto$`).
 - Text written on a fill (a bar segment, a wedge, a heatmap cell, an area) is black or white, whichever reads on that fill: `color=text_color(fill)`; it is never `darken(fill)` on its own fill.
+- Text that sits over mixed content, where no single fill sets its contrast (a note such as "ECE = 4.9" over bars, gridlines and a reference line), sits on a white box so it reads at full contrast: `bbox=dict(facecolor="white", edgecolor="none", pad=1)`. Contour labels take none: they sit in the gap cut for them.
 
 ## Layout
 
@@ -205,7 +206,7 @@ fig.savefig("outputs/{id}.pdf")
 - Order: categories and series with no natural order (methods, models, ablation variants) run in ascending order of the value the takeaway compares, left to right (top to bottom for horizontal bars), so the eye reads a rise and ours, usually the best, ends at the right. A natural order stays as it is: sizes, time, bins, swept values, and a benchmark list the paper fixes. Legends of side-by-side series (grouped bars, boxes) follow the same left-to-right order.
 - Category axes (bar charts, text tick labels): hide the tick marks on that axis with `ax.tick_params(axis="x", length=0)` (`axis="y"` for horizontal bars), on every panel.
 - Colorbars (heatmaps, contour plots, colored lines): always, labelled with the quantity, on the right, `fig.colorbar(mappable, ax=ax, label="Validation loss")`; below the panel (`location="bottom"`) when on the right it would leave the panel narrower than the minimum width.
-- Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis.
+- Log axis (`ax.set_yscale("log")`, named in the caption) when values span more than two orders of magnitude and the message is about differences among the small values. When the message is the change in size itself, keep the linear axis. A log₁₀ axis that spans at least one power of ten keeps its minor ticks at 2–9 × each power, unlabelled (`ax.xaxis.set_minor_formatter(NullFormatter())`, from `matplotlib.ticker`), and its gridlines follow them, `ax.grid(True, which="both")`, so the reader sees the log spacing.
 
 ## Shapes
 

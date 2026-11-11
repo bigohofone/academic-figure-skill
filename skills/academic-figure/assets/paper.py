@@ -75,6 +75,7 @@ def use_design(path="DESIGN.md"):
         "boxplot.whiskerprops.linewidth": _number(k["outline"]["width"]),
         "boxplot.capprops.linewidth": _number(k["outline"]["width"]),
         "boxplot.medianprops.linewidth": _number(k["median"]["width"]),
+        "boxplot.flierprops.markersize": _number(k["marker"]["size"]), "boxplot.flierprops.markeredgewidth": _number(k["marker"]["edge-width"]),
         "contour.linewidth": _number(k["contour"]["width"]),
         "axes.prop_cycle": cycler(color=[v for name, v in c.items() if name.startswith("series-")] + [c["neutral"]]),
         "image.cmap": k["heatmap"]["colormap"],

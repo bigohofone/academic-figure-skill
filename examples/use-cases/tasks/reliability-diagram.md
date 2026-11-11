@@ -17,7 +17,7 @@ Both rows share the x axis "Confidence" from 0 to 1. Both y axes run from 0 to 1
 
 The paper's point: modern neural networks are no longer well calibrated. LeNet's average confidence closely matches its accuracy, and its bars line up roughly along the diagonal, so it is well calibrated. The ResNet is more accurate, but its average confidence is much higher than its accuracy, and its bars fall well below the diagonal, so it is overconfident.
 
-Column width: single column (the figure sits in one column of the two-column ICML layout).
+Column width: one column. The original sits in one column of a two-column layout; in ICLR this is half the text width (2.75 in).
 
 Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
 

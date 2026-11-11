@@ -115,7 +115,7 @@ Figures from published papers, redrawn without any skill and following this skil
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/dapo-fig6.png"><img src="examples/use-cases/without-skill/dapo-fig6.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/dapo-fig6.png"><img src="examples/use-cases/outputs/dapo-fig6.png" width="264"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/dapo-fig6.png"><img src="examples/use-cases/without-skill/dapo-fig6.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/dapo-fig6.png"><img src="examples/use-cases/outputs/dapo-fig6.png" width="528"></a></td></tr>
 </table>
 
 **Example 2.3** · Line chart: Does RL Really Incentivize Reasoning Capacity?, Figure 2: pass@k grid (double column). [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837) (Yue et al., 2025)
@@ -136,7 +136,7 @@ Figures from published papers, redrawn without any skill and following this skil
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig6.png"><img src="examples/use-cases/without-skill/rlvr-fig6.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig6.png"><img src="examples/use-cases/outputs/rlvr-fig6.png" width="264"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/rlvr-fig6.png"><img src="examples/use-cases/without-skill/rlvr-fig6.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/rlvr-fig6.png"><img src="examples/use-cases/outputs/rlvr-fig6.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.6** · Line chart: ROC curves of AI-text detectors. [Yang et al. (2024), DNA-GPT: Divergent N-Gram Analysis for Training-Free Detection of GPT-Generated Text](https://arxiv.org/abs/2305.17359), Figure 8 (left). Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
@@ -158,7 +158,7 @@ Original:
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/reliability-diagram.png"><img src="examples/use-cases/without-skill/reliability-diagram.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/reliability-diagram.png"><img src="examples/use-cases/outputs/reliability-diagram.png" width="528"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/reliability-diagram.png"><img src="examples/use-cases/without-skill/reliability-diagram.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/reliability-diagram.png"><img src="examples/use-cases/outputs/reliability-diagram.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.8** · Line chart: Scaling law with a power-law fit. [Kaplan et al. (2020), Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361), Figure 1 (right). Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
@@ -180,7 +180,7 @@ Original:
 
 <table>
 <tr><th>Without skill</th><th>With skill</th></tr>
-<tr><td valign="top"><a href="examples/use-cases/without-skill/accuracy-vs-parameters.png"><img src="examples/use-cases/without-skill/accuracy-vs-parameters.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/accuracy-vs-parameters.png"><img src="examples/use-cases/outputs/accuracy-vs-parameters.png" width="528"></a></td></tr>
+<tr><td valign="top"><a href="examples/use-cases/without-skill/accuracy-vs-parameters.png"><img src="examples/use-cases/without-skill/accuracy-vs-parameters.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/accuracy-vs-parameters.png"><img src="examples/use-cases/outputs/accuracy-vs-parameters.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.10** · Scatter plot: t-SNE embedding of learned features. [Lee et al. (2018), A Simple Unified Framework for Detecting Out-of-Distribution Samples and Adversarial Attacks](https://arxiv.org/abs/1807.03888), Figure 1(a). Guidelines: [`scatter-plot.md`](skills/academic-figure/scatter-plot.md)

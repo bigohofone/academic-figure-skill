@@ -24,6 +24,9 @@ boxplot.boxprops.color: black
 boxplot.whiskerprops.color: black
 boxplot.capprops.color: black
 boxplot.medianprops.color: black
+boxplot.flierprops.marker: o
+boxplot.flierprops.markeredgecolor: black
+boxplot.flierprops.markerfacecolor: FFFFFF
 
 legend.handlelength: 1.5
 legend.handletextpad: 0.5
