@@ -1,19 +1,19 @@
 ---
 name: academic-figure
-description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (print sizes, typography, color-blind-safe colors, chart-type rules for line, bar, scatter, box, heatmap, histogram, error bar, area, contour, radar, pie and violin charts) - delivered as cells in `figures/figures.ipynb` in the user's project, with a paper-style caption. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
+description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (print sizes, typography, color-blind-safe colors, chart-type rules for line, bar, scatter, box, heatmap, histogram, error bar, area, contour, radar, pie and violin charts) - delivered as one script per figure, `figures/{id}.py` in the user's project, with a paper-style caption. Use it whenever creating or editing any figure, plot, graph, chart, heatmap or visualization for a paper, even if no venue (ICML, CVPR, ACL, NeurIPS, ICLR) is mentioned and even if the user asks only for the plotting code.
 ---
 
 # Paper Figures
 
-Goal: a figure that reads well printed in the paper, where the reader gets its one message at a glance. How figures look is set by the design system, `DESIGN.md`: its tokens (colors, type sizes, line widths) and its rules (layout, legends, chart types). This file is the workflow. Apply every rule unless the user says otherwise. A figure is delivered when its cell is in the notebook with its caption and has run.
+Goal: a figure that reads well printed in the paper, where the reader gets its one message at a glance. How figures look is set by the design system, `DESIGN.md`: its tokens (colors, type sizes, line widths) and its rules (layout, legends, chart types). This file is the workflow. Apply every rule unless the user says otherwise. A figure is delivered when its script, with its caption, is in `figures/` and has run.
 
 Steps, in order:
 
-1. **Set up** `figures/` (Notebook below), then read `figures/DESIGN.md`: the project's copy is the design, and the user may have changed it.
+1. **Set up** `figures/` (Files below), then read `figures/DESIGN.md`: the project's copy is the design, and the user may have changed it.
 2. **Takeaway**: work out what the paper uses this figure to show (from the user's request, the paper text or caption, the figure's role), then write it as one sentence with a number from the data. It decides the value labels and becomes the caption's takeaway.
 3. **Chart type**: pick it from DESIGN.md's Components table and read its file (`{skill-dir}/line-chart.md`, …), every one the figure uses.
 4. **Draw** by DESIGN.md: width, grid, aspect and height (Layout), colors, legend, value labels, and the chart type's file.
-5. **Save, caption, notebook**, then **check**.
+5. **Save, caption, script**, then **check**.
 
 ## What is plotted
 
@@ -40,28 +40,25 @@ The caption is written as it appears under the figure in the paper, in the paper
 
 > **Figure 1: Test accuracy versus training steps on CIFAR-10.** Shaded bands show ±1 std over 3 seeds; the dashed line marks the best baseline's final accuracy. Ours reaches it after 12k steps, 2.1× faster.
 
-## Notebook (required)
+## Files (required)
 
-All figure work happens in `figures/` at the root of the user's project, even for one figure or a script-only request. The user runs, edits and re-exports figures there, without this skill, so each cell is plain, readable code.
+All figure work happens in `figures/` at the root of the user's project, even for one figure or a code-only request. The user runs, edits and re-exports figures there, without this skill, so each script is plain, readable code.
 
 ```
 figures/
-├── figures.ipynb     # one cell per figure, with its caption
+├── {id}.py           # one script per figure, its caption on top
 ├── DESIGN.md         # the design system; edit it to restyle every figure
 ├── style/            # paper.py, paper.mplstyle, Inter fonts, copied from the skill; not edited by hand
 └── outputs/          # {id}.pdf and {id}.png
 ```
 
-- `{skill-dir}` is this skill's base directory. Set up with `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/` and `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays. The notebook uses only these copies.
-- It needs `pyyaml` (Python 3.10+), and `scipy` for the charts whose files call it (interpolated contours, density curves). If one is missing, tell the user and ask before installing it.
-
-| Cell | Content |
-|---|---|
-| First (code, once) | `%matplotlib inline`, `%config InlineBackend.print_figure_kwargs = {"bbox_inches": None}`, `%config InlineBackend.figure_formats = ["retina"]`, then the setup below |
-| Per figure (markdown) | `## {id}`, then the caption |
-| Per figure (code) | everything for that figure: load data, plot, `fit_height`, save PDF + PNG, `plt.show()` |
+- `{skill-dir}` is this skill's base directory. Set up with `mkdir -p figures/style figures/outputs`, `cp -n {skill-dir}/assets/DESIGN.md figures/` and `cp -n {skill-dir}/assets/{paper.py,paper.mplstyle,Inter-*} figures/style/`; `-n` keeps copies already there, so a design the user changed stays. The scripts use only these copies.
+- It needs `matplotlib`, `numpy` and `pyyaml` (Python 3.10+), and `scipy` for the charts whose files call it (interpolated contours, density curves). If one is missing, tell the user and ask before installing it.
+- Each figure is one script, `figures/{id}.py`, that runs on its own: the caption as its docstring, the setup below, then everything for that figure: load data, plot, `fit_height`, save PDF + PNG.
 
 ```python
+"""Figure 1: Test accuracy versus training steps on CIFAR-10. Shaded bands show ±1 std over 3 seeds; ..."""
+
 import json
 import math
 import sys
@@ -71,27 +68,20 @@ import numpy as np
 
 sys.path.insert(0, "style")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value, smooth, darken, lighten, text_color
+from paper import fit_height, mark_value, smooth, darken, lighten, text_color, greys
 
 colors = paper.use_design("DESIGN.md")  # the style from DESIGN.md's tokens; colors["series-1"], colors["ours"], …
 ```
 
-- Each figure cell runs on its own after the setup cell.
 - Load data from the project's result files (paths relative to `figures/`); write numbers inline only when there is no file.
-- Write the notebook yourself, top to bottom, the way a person would: create `figures/figures.ipynb` with `Write` as an empty notebook, then add each cell with `NotebookEdit`, one at a time, each inserted after the cell added just before it (its id is in the previous edit's result; the first cell goes in with no id), and fix a cell by replacing it with `NotebookEdit`. The same `id` replaces its two cells; a new id appends two cells. If `NotebookEdit` is a deferred tool, load it first.
-
-  ```json
-  {"cells": [], "metadata": {"kernelspec": {"name": "python3", "display_name": "Python 3", "language": "python"}}, "nbformat": 4, "nbformat_minor": 5}
-  ```
-
-- Write each code cell as a person would write it by hand: top to bottom, plain matplotlib calls, data and labels spelled out where they are used. Use the `paper` helpers and write everything else inline in the cell; a loop over the series being plotted is as far as abstraction goes.
-- Run it with the project's Python: `jupyter nbconvert --to notebook --execute --inplace figures/figures.ipynb`. If jupyter is missing, tell the user and ask before installing it.
+- Write each script as a person would write it by hand: top to bottom, plain matplotlib calls, data and labels spelled out where they are used. Use the `paper` helpers and write everything else inline; a loop over the series being plotted is as far as abstraction goes.
+- Run it from `figures/` with the project's Python: `cd figures && python {id}.py`.
 - **Reply**: changes, LaTeX line, any `[TODO]`.
 
 ## Check
 
-After the notebook has run:
+After each script has run:
 
-1. Read each cell's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend over text or with more than a tenth of its area over bars or boxes, and a font other than the design's. Fix the cell until it runs without warnings.
+1. Read each script's output. `fit_height` warns about a panel narrower than 1.2 in, text cut off or overlapping (rotated labels included), a value label or legend covering a curve, a legend over text or with more than a tenth of its area over bars or boxes, and a font other than the design's. Fix the script until it runs without warnings.
 2. Look at each PNG for what code can't see: the takeaway reads at a glance; value marks sit on reported results at the comparison points; legend entries follow DESIGN.md's order; colors follow its roles; the chart type's file is followed; the caption matches the figure.
 3. PDF fonts are embedded TrueType: `pdffonts outputs/{id}.pdf` shows `CID TrueType`, emb `yes` (without pdffonts: `grep -ac /Type3 outputs/{id}.pdf` prints 0).

@@ -11,6 +11,8 @@ colors:
   series-6: "#AA3377"
   ours: "{colors.series-2}"
   neutral: "#8C8C8C"
+  neutral-light: "#D1D1D1"
+  neutral-dark: "#707070"
   ink: "#000000"
 typography:
   tick-label:
@@ -86,7 +88,7 @@ Pick the first row that fits:
 
 | Case | Color |
 |---|---|
-| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Variants of ours (with and without a component) all take `ours`: the full method solid, each reduced variant in the next line style, the full method first in the legend. Several grey series are told apart, taken in the order of Layout's Order rule, by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas): `lighten(colors["neutral"])`, `colors["neutral"]`, `darken(colors["neutral"])`, running light to dark in the order the series are drawn, so a sorted row of bars also darkens toward ours |
+| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Variants of ours (with and without a component) all take `ours`: the full method solid, each reduced variant in the next line style, the full method first in the legend. Several grey series are told apart, taken in the order of Layout's Order rule, by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."` (dashed and dotted at `linewidth=paper.dashed_width`), and by shade on fills (bars, boxes, violins, areas): `paper.greys(n)` for n grey series, evenly spaced from `neutral-light` to `neutral-dark` (one grey series takes `neutral`), light to dark in that order, so a sorted row of bars also darkens toward ours |
 | Several series compared on equal terms, with no "ours" (models in a survey, classes, data sources, error types) | `series-1` to `series-6`, in this order |
 | Single series | `series-1` |
 | Reference lines (a baseline's score, a threshold, chance) | `neutral` |
@@ -98,10 +100,10 @@ Pick the first row that fits:
 - More compared series than grey line styles (four): add the design's markers, a different shape per series; more than eight: draw the series the takeaway names, and the rest as one grey group named "Other baselines" in the legend.
 - More than six series with no "ours": group them (one color per group, shades within) or split them into panels. Classes in an embedding (ten or more, unordered) are the exception: one color each from matplotlib's `tab10` (`tab20` beyond ten), defined in the cell.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
-- Grey must stay readable on white: lines, markers and reference lines are `neutral` (#8C8C8C, 3.4:1 contrast, above the 3:1 that graphics need) at full opacity, and grey text is `darken(colors["neutral"])` (4.9:1, above the 4.5:1 that text needs). Lighter greys, such as `lighten(colors["neutral"])`, only as fills that have an outline or sit next to darker fills; never for lines, markers or text.
+- Grey must stay readable on white: lines, markers and reference lines are `neutral` (#8C8C8C, 3.4:1 contrast, above the 3:1 that graphics need) at full opacity, and grey text is `darken(colors["neutral"])` (4.9:1, above the 4.5:1 that text needs). Lighter greys, such as `colors["neutral-light"]`, only as fills that have an outline or sit next to darker fills; never for lines, markers or text.
 - Text that belongs to one series (labels, annotations) uses `darken(series_color)`; for any grey series, whatever its shade, `darken(colors["neutral"])`, so light grey bars still get readable labels.
 - Emphasis, when the user names a series to emphasize: color it as ours, and every other series as the series ours is compared against.
-- A paper-wide palette (a lab's or a brand's): change the `colors` tokens in `figures/DESIGN.md`. A one-off palette for a single figure ("match the original"): a dict in that figure's cell, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`; everything else keeps the design. If some colors are very light (cyan, yellow), tell the user they read weakly on white.
+- A paper-wide palette (a lab's or a brand's): change the `colors` tokens in `figures/DESIGN.md`. A one-off palette for a single figure ("match the original"): a dict in that figure's script, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`; everything else keeps the design. If some colors are very light (cyan, yellow), tell the user they read weakly on white.
 
 ## Typography
 
@@ -119,7 +121,7 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 - Numeric tick labels are horizontal plain numbers (`1, 2, 4, 8`, never rotated, never `2³`), written as short as they read: `0, 0.5, 1`, not `0.0, 0.5, 1.0` (`ax.yaxis.set_major_formatter(lambda v, _: f"{v:g}".replace("-", "\u2212"))`, keeping the minus sign). When `fit_height` reports overlapping numeric tick labels along an axis, use fewer ticks in that panel (every other one), not smaller text or rotation.
 - Where both axes start at the same corner (0 and 0, −1 and −1), their first tick labels touch: keep the tick and drop only the y axis's corner label, `ax.set_yticks(ticks, labels=["", *labels[1:]])`.
 - Log axes: powers of ten as plain numbers from 0.001 up to 1000 (`0.01, 0.1, 1, 10`), and beyond that `1e-4, 1e-5` below and SI suffixes above (`10K, 1M, 1B`), never `10⁻⁵`.
-- Ticks on a log axis are powers of its base `b` (2 or 10), evenly spaced in exponent, from the first power at or below the data (`b ** e0`) to the first at or above it (`b ** e1`), so both ends carry a label: every power, `ks = [b ** e for e in range(e0, e1 + 1, m)]` with `m = 1`; when `fit_height` reports their labels overlapping, the next larger divisor `m` of `e1 - e0`, until they clear. For 1 to 1024 (`e1 - e0 = 10`, divisors 1, 2, 5, 10) that is `1, 2, 4, …, 1024`, then `1, 4, 16, 64, 256, 1024`, then `1, 32, 1024`. A step that does not divide the span is never used, since it leaves an end unlabelled. Panels that share the axis use the same ticks.
+- Ticks are numbers the reader can name, evenly spaced (in exponent on a log axis: powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose freely what reads best. When `fit_height` reports tick labels overlapping, take fewer ticks. Panels that share an axis share its ticks.
 - Text tick labels that don't fit side by side, by what they name:
   - Categories with no natural order and one value each (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), since rotated names are hard to read; order top to bottom as under Order.
   - Everything that keeps the x axis (bins, swept values, sizes, time, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")`, and 90° (`rotation=90, ha="center"`) when they still overlap at 45°. Keep the panels side by side rather than stacking them to avoid the rotation.
@@ -271,7 +273,16 @@ Each chart type has its own file next to this one, with its marks, variants and 
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values have three significant figures, trailing zeros kept (`f"{v:#.3g}"`: 85.0, not 85), or the precision the source gives when it has fewer (a paper's printed 0.82 stays 0.82); 7 pt (`value-label`), in `darken(series_color)` beside a mark, or `text_color(fill)` on a fill.
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics and distributions carry none. Each chart type's file says how (`mark_value` on curves, `ax.bar_label` on bars). Values are written by what they are, the first row that applies:
+
+| Value | Written as |
+|---|---|
+| copied from the source (a paper's table, a reported number) | exactly as the source prints it: 0.82 stays 0.82 |
+| a count or any other whole number | an integer, `f"{v:d}"`: 93, not 93.0 |
+| a share of a whole (pie, stacked bar, win rate) | a whole percent, `f"{v:.0%}"` (or `f"{v:d}"` with % in the axis label) |
+| anything else measured or computed | three significant figures, trailing zeros kept, `f"{v:#.3g}"`: 85.0, not 85 |
+
+The caption writes them the same way. They are 7 pt (`value-label`), in `darken(series_color)` beside a mark, or `text_color(fill)` on a fill.
 
 ## Do's and Don'ts
 

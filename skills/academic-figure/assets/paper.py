@@ -47,10 +47,11 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width
+    global dashed_width, _greys
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
+    _greys = c["neutral"], c["neutral-light"], c["neutral-dark"]
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
     label, tick_label, legend, value_label, title = (
         _number(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "value-label", "title"))
@@ -342,6 +343,14 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     _warn_layout_problems(fig, panels, min_width)
     return ratios
+
+
+def greys(n):
+    """n grey fills, evenly spaced from the design's neutral-light to neutral-dark; one series takes neutral."""
+    neutral, light, dark = (np.array(colors.to_rgb(g)) for g in _greys)
+    if n == 1:
+        return [tuple(neutral)]
+    return [tuple(light + (dark - light) * i / (n - 1)) for i in range(n)]
 
 
 def darken(color):
