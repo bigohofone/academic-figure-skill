@@ -224,8 +224,9 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     outline, since its upright bounding box also covers the empty corners around it."""
     a_rotated, b_rotated = a.get_rotation() % 180 != 0, b.get_rotation() % 180 != 0
     if not (a_rotated or b_rotated):
-        # side by side, upright texts need a gap (1 pt each side), or neighbouring numbers read as one ("2561024")
-        gap = a.figure.dpi / 72
+        # side by side, upright texts need a word space between them (a quarter of the type size on each
+        # side), or neighbours read as one at print size ("2561024", "Prefix tuningAdapter")
+        gap = 0.25 * max(a.get_fontsize(), b.get_fontsize()) * a.figure.dpi / 72
         return Bbox.from_extents(box_a.x0 - gap, box_a.y0, box_a.x1 + gap, box_a.y1).overlaps(box_b)
     if a_rotated and b_rotated:
         outline_a, outline_b = _rotated_outline(a, box_a, renderer), _rotated_outline(b, box_b, renderer)
