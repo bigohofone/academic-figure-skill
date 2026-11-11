@@ -35,6 +35,7 @@ filled_edge_width = 0.25  # the marker filled-edge-width token, set by use_desig
 canvas_pad = 0.1  # the canvas-pad token, in inches, set by use_design(): free space at the left and right edges
 contour_label_size = 6.0  # the contour-label token, in points, set by use_design()
 bar_label_size = 6.0  # the bar-label token, in points, set by use_design()
+_ours = "#EE6677"  # the ours token, set by use_design()
 colorbar_width, colorbar_gap = 0.1, 0.06  # the colorbar tokens, in inches, set by use_design()
 
 
@@ -58,7 +59,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, _greys
+    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, _greys, _ours
     # one renderer everywhere: screen backends measure text differently, so fit_height's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
@@ -66,6 +67,7 @@ def use_design(path="DESIGN.md"):
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     _greys = c["neutral"], c["neutral-light"], c["neutral-dark"]
+    _ours = c["ours"]
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
     contour_label_size = _number(t["contour-label"]["fontSize"])
     bar_label_size = _number(t["bar-label"]["fontSize"])
@@ -197,13 +199,14 @@ def _keep_value_labels_inside(fig, panels):
             if not (_is_value_label(a, t) or point_name):
                 continue
             label = t.get_window_extent(renderer)
+            gap = 0.35 * t.get_fontsize() * fig.dpi / 72  # clear space between a label and the panel edge
             # a label's reach past its point is fixed in pixels, so solve for the limit
             # that leaves exactly that much room between the point and the box
             x, y = t.xy if isinstance(t, Annotation) else t.get_position()
             point_x, point_y = a.transData.transform((x, y))
             for axis, low_edge, high_edge, v, point, size, set_lim, get_lim in (
-                    (a.xaxis, label.x0 < box.x0, label.x1 > box.x1, x, point_x, box.width, a.set_xlim, a.get_xlim),
-                    (a.yaxis, label.y0 < box.y0, label.y1 > box.y1, y, point_y, box.height, a.set_ylim, a.get_ylim)):
+                    (a.xaxis, label.x0 < box.x0 + gap, label.x1 > box.x1 - gap, x, point_x, box.width, a.set_xlim, a.get_xlim),
+                    (a.yaxis, label.y0 < box.y0 + gap, label.y1 > box.y1 - gap, y, point_y, box.height, a.set_ylim, a.get_ylim)):
                 if not (low_edge or high_edge):
                     continue
                 if value_label and axis is a.xaxis:
@@ -211,10 +214,10 @@ def _keep_value_labels_inside(fig, panels):
                     continue
                 lo, hi = get_lim()
                 if high_edge:
-                    reach = (label.x1 if axis is a.xaxis else label.y1) - point + 1
+                    reach = (label.x1 if axis is a.xaxis else label.y1) - point + gap
                     new = (lo, _limit_for_reach(axis, lo, hi, v, reach, size, True))
                 else:
-                    reach = point - (label.x0 if axis is a.xaxis else label.y0) + 1
+                    reach = point - (label.x0 if axis is a.xaxis else label.y0) + gap
                     new = (_limit_for_reach(axis, lo, hi, v, reach, size, False), hi)
                 if lo >= 0 and new[0] < 0:
                     # a non-negative quantity never shows negative values to make room
@@ -351,6 +354,7 @@ def _warn_layout_problems(fig, panels, min_width):
                 warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
             elif any(box.contains(x, y) for xy in points for x, y in xy):
                 warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
+        _warn_grayscale(a)
         if a.get_legend():
             box = a.get_legend().get_window_extent(renderer)
             # an inside legend (one that overlaps its panel) must fit in it; a wider one goes above
@@ -367,6 +371,27 @@ def _warn_layout_problems(fig, panels, min_width):
             if any(_bar_end(bar, c.orientation, renderer).overlaps(box)
                    for c in a.containers if isinstance(c, BarContainer) for bar in c.patches):
                 warnings.warn(f"the legend covers the end of a bar in panel {a.get_title()!r}; move it")
+
+
+def _warn_grayscale(a):
+    """Series told apart by color alone (lines of one style and marker, or bars) must differ in lightness,
+    or they merge when printed in black and white."""
+    groups = {}
+    for line in a.get_lines():
+        if not line.get_label().startswith("_"):
+            key = ("line", str(line.get_linestyle()), str(line.get_marker()))
+            groups.setdefault(key, []).append((line.get_label(), line.get_color()))
+    for c in a.containers:
+        if isinstance(c, BarContainer) and c.patches and not str(c.get_label()).startswith("_"):
+            groups.setdefault(("bar",), []).append((c.get_label(), c.patches[0].get_facecolor()))
+    for series in groups.values():
+        for i in range(len(series)):
+            for j in range(i + 1, len(series)):
+                (n1, c1), (n2, c2) = series[i], series[j]
+                if abs(_lightness(c1) - _lightness(c2)) < 10:
+                    warnings.warn(f"series {n1!r} and {n2!r} look alike in grayscale in panel {a.get_title()!r} "
+                                  f"(L* {_lightness(c1):.0f} vs {_lightness(c2):.0f}); use greys(n), or tell them "
+                                  "apart by line style or marker (DESIGN.md Colors)")
 
 
 def _bar_end(bar, orientation, renderer):
@@ -752,12 +777,41 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column
     return ratios
 
 
+GREY_GAP = 12  # L* kept clear on each side of ours, so ours stays apart in grayscale
+
+
+def _lightness(color):
+    """CIE L* (0 black to 100 white): how light a color prints in grayscale."""
+    linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in colors.to_rgb(color)]
+    y = 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+    return 116 * y ** (1 / 3) - 16 if y > 0.008856 else 903.3 * y
+
+
+def _grey(lightness):
+    y = ((lightness + 16) / 116) ** 3
+    c = 12.92 * y if y <= 0.0031308 else 1.055 * y ** (1 / 2.4) - 0.055
+    return (c, c, c)
+
+
 def greys(n):
-    """n grey fills, evenly spaced from the design's neutral-light to neutral-dark; one series takes neutral."""
-    neutral, light, dark = (np.array(colors.to_rgb(g)) for g in _greys)
+    """n grey fills, evenly spaced in lightness from the design's neutral-light to neutral-dark, light to
+    dark, skipping the band around ours' lightness; one series takes neutral."""
+    neutral, light, dark = _greys
     if n == 1:
-        return [tuple(neutral)]
-    return [tuple(light + (dark - light) * i / (n - 1)) for i in range(n)]
+        return [tuple(colors.to_rgb(neutral))]
+    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(_ours)
+    segments = [(top, min(top, ours + GREY_GAP)), (max(bottom, ours - GREY_GAP), bottom)]
+    segments = [(a, b) for a, b in segments if a > b]
+    total = sum(a - b for a, b in segments)
+    out = []
+    for i in range(n):
+        t = total * i / (n - 1)
+        for a, b in segments:
+            if t <= a - b + 1e-9:
+                out.append(_grey(a - t))
+                break
+            t -= a - b
+    return out
 
 
 def darken(color):

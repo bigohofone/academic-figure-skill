@@ -90,6 +90,7 @@ ul.ticks strong { display:block; color:var(--ink); font-size:16px; margin-bottom
 .block { background:#fff; border-radius:10px; padding:4% 0; }
 .block .row + .row { margin-top:3%; }
 .guide { position:absolute; top:0; bottom:0; border-left:1.5px dashed #d7344a; opacity:.45; pointer-events:none; z-index:2; }
+.gray .pane img { filter:grayscale(1); }
 .guide.text { border-left-color:#2f6fd6; }
 .compare .panes { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
 .compare .tag { font-weight:700; font-size:15px; margin:0 0 10px; color:var(--grey); }
@@ -149,7 +150,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <div class="cards six">
     <a class="card" href="#lines"><h3>Sized for your venue</h3><p>NeurIPS, ICML, ICLR, CVPR, ACL: one column, both columns or half the text width, exactly.</p></a>
     <a class="card" href="#lines"><h3>Readable at print size</h3><p>Labels and ticks just under the body text, in one font, in every figure of the paper.</p></a>
-    <a class="card" href="#color"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, the same meaning in every figure.</p></a>
+    <a class="card" href="#gray"><h3>Color-blind safe</h3><p>Your method in one color, baselines in grey, still clear when printed in black and white.</p></a>
     <a class="card" href="#lines"><h3>Every panel lines up</h3><p>Single panels, grids and full-width figures start and end on the same edges.</p></a>
     <a class="card" href="#gallery"><h3>Clean, modern style</h3><p>Nothing overlaps, nothing is cut off, no legend on top of the data.</p></a>
     <a class="card" href="#install"><h3>Nice and easy</h3><p>Just ask. You get the figure, a caption ready to paste, and one short script to rerun.</p></a>
@@ -167,7 +168,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="panes">
     <div class="pane without"><div class="tag">Without the skill</div><div class="paper two"><div class="col page"><span class="guide text" style="left:0.000%"></span><span class="guide text" style="left:48.148%"></span><span class="guide text" style="left:51.852%"></span><span class="guide text" style="left:100.000%"></span><span class="guide panel" style="left:7.763%"></span><span class="guide panel" style="left:45.452%"></span><span class="guide panel" style="left:59.615%"></span><span class="guide panel" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/without/icml-accuracy-and-loss.svg?v=e36932e939" alt="icml-accuracy-and-loss" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy and training loss over 60 epochs on CIFAR-10 and CIFAR-100.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/without/icml-learning-curve.svg?v=d394b0cf88" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds.</p><div class="row"><img src="figures/without/icml-grouped-bar-chart.svg?v=86876ff066" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Accuracy of four training methods on three benchmarks. Ours scores highest on all three, ahead of DPO by 0.036 on GSM8K, 0.043 on MATH and 0.029 on HumanEval.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/without/icml-scaling-law.svg?v=8b40aafd50" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 4.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><div class="row"><img src="figures/without/icml-confusion-matrix.svg?v=cb51ee5897" alt="confusion-matrix" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 5.</b> Confusion matrix of a Random Forest predicting Yelp review star ratings (1 = worst, 5 = best).</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide text" style="left:0.000%"></span><span class="guide text" style="left:48.148%"></span><span class="guide text" style="left:51.852%"></span><span class="guide text" style="left:100.000%"></span><span class="guide panel" style="left:7.763%"></span><span class="guide panel" style="left:45.452%"></span><span class="guide panel" style="left:59.615%"></span><span class="guide panel" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/icml-accuracy-and-loss.svg?v=0b3e3e3c6a" alt="icml-accuracy-and-loss" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy and training loss over 60 epochs on CIFAR-10 and CIFAR-100.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=2281f44695" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds.</p><div class="row"><img src="figures/with/icml-grouped-bar-chart.svg?v=5ea5a7a498" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Accuracy of four training methods on three benchmarks. Ours scores highest on all three, ahead of DPO by 0.036 on GSM8K, 0.043 on MATH and 0.029 on HumanEval.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 4.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><div class="row"><img src="figures/with/icml-confusion-matrix.svg?v=ed5e349769" alt="confusion-matrix" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 5.</b> Confusion matrix of a Random Forest predicting Yelp review star ratings (1 = worst, 5 = best).</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="paper two"><div class="col page"><span class="guide text" style="left:0.000%"></span><span class="guide text" style="left:48.148%"></span><span class="guide text" style="left:51.852%"></span><span class="guide text" style="left:100.000%"></span><span class="guide panel" style="left:7.763%"></span><span class="guide panel" style="left:45.452%"></span><span class="guide panel" style="left:59.615%"></span><span class="guide panel" style="left:97.304%"></span><p class="lede">We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><div class="fullfig"><div class="row"><img src="figures/with/icml-accuracy-and-loss.svg?v=dc3ae35325" alt="icml-accuracy-and-loss" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 1.</b> Validation accuracy and training loss over 60 epochs on CIFAR-10 and CIFAR-100.</p></div><div class="cols"><div class="pcol"><div class="row"><img src="figures/with/icml-learning-curve.svg?v=0d0276e086" alt="learning-curve" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 2.</b> Validation accuracy on CIFAR-100 over training. Lines show the mean and shaded bands ±1 std over 5 seeds.</p><div class="row"><img src="figures/with/icml-grouped-bar-chart.svg?v=682c7221e4" alt="grouped-bar-chart" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 3.</b> Accuracy of four training methods on three benchmarks. Ours scores highest on all three, ahead of DPO by 0.036 on GSM8K, 0.043 on MATH and 0.029 on HumanEval.</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div><div class="pcol"><div class="row"><img src="figures/with/icml-scaling-law.svg?v=c294377fb6" alt="scaling-law" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 4.</b> Test loss of Transformer language models versus non-embedding parameters. Both axes are logarithmic; the dashed line is the fitted power law L = (N / 8.8×10¹³)^−0.076.</p><div class="row"><img src="figures/with/icml-confusion-matrix.svg?v=ed5e349769" alt="confusion-matrix" loading="lazy" style="width:100.000%"></div><p class="cap"><b>Figure 5.</b> Confusion matrix of a Random Forest predicting Yelp review star ratings (1 = worst, 5 = best).</p><p>We report results averaged over five seeds; every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p><p>We study how the training recipe changes the final model and report results on standard benchmarks. Unless stated otherwise, numbers are averaged over five seeds, and every figure is printed at the size shown here, next to this paragraph set in ten-point type.</p></div></div></div></div></div>
   </div>
 </div>
 </div></section>
@@ -183,12 +184,28 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="panes">
     <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/grouped-bar-chart.svg?v=189ec6d2dc" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/without/learning-curve.svg?v=2f1a9aa5ef" alt="learning-curve" loading="lazy" style="width:50.000%"></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/grouped-bar-chart.svg?v=142bd533d1" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/with/learning-curve.svg?v=62f26aa796" alt="learning-curve" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/grouped-bar-chart.svg?v=b2391649f9" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/with/learning-curve.svg?v=c9d83a9d95" alt="learning-curve" loading="lazy" style="width:50.000%"></div></div></div>
   </div>
 </div>
 </div></section>
 
-<section class="soft" id="gallery"><div class="wrap">
+<section class="soft" id="gray"><div class="wrap">
+  <h2>Still clear in black and white.</h2>
+  <p class="intro">Printed in grayscale or read by someone color-blind, your method still stands apart and every series stays readable. Below: the same figures, shown in grayscale.</p>
+  <div class="gray">
+<div class="compare" data-show="with" data-name="gray">
+  <div class="switch" role="group" aria-label="Version">
+    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
+    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
+  </div>
+  <div class="panes">
+    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><div class="row"><img src="figures/without/grouped-bar-chart.svg?v=189ec6d2dc" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/without/error-bar-plot.svg?v=4b192f0e9b" alt="error-bar-plot" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/learning-curve.svg?v=2f1a9aa5ef" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/without/data-mixture.svg?v=fb55ba1830" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
+    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><div class="row"><img src="figures/with/grouped-bar-chart.svg?v=b2391649f9" alt="grouped-bar-chart" loading="lazy" style="width:50.000%"><img src="figures/with/error-bar-plot.svg?v=aca0954262" alt="error-bar-plot" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/learning-curve.svg?v=c9d83a9d95" alt="learning-curve" loading="lazy" style="width:50.000%"><img src="figures/with/data-mixture.svg?v=79d9389d38" alt="data-mixture" loading="lazy" style="width:50.000%"></div></div></div>
+  </div>
+</div></div>
+</div></section>
+
+<section id="gallery"><div class="wrap">
   <h2>Supports every matplotlib and seaborn chart.</h2>
   <p class="intro">28 real examples, from learning curves to confusion matrices. Flip any of them to see the before and after.</p>
   <div class="gallery-tabs" role="tablist">
@@ -204,7 +221,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/learning-curve.svg?v=2f1a9aa5ef" alt="Line chart, without the skill" loading="lazy">
-    <img class="with" src="figures/with/learning-curve.svg?v=62f26aa796" alt="Line chart, with the skill" loading="lazy">
+    <img class="with" src="figures/with/learning-curve.svg?v=c9d83a9d95" alt="Line chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -215,7 +232,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/grouped-bar-chart.svg?v=189ec6d2dc" alt="Bar chart, without the skill" loading="lazy">
-    <img class="with" src="figures/with/grouped-bar-chart.svg?v=142bd533d1" alt="Bar chart, with the skill" loading="lazy">
+    <img class="with" src="figures/with/grouped-bar-chart.svg?v=b2391649f9" alt="Bar chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -237,7 +254,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/grouped-box-plot.svg?v=cbac9d6a19" alt="Box plot, without the skill" loading="lazy">
-    <img class="with" src="figures/with/grouped-box-plot.svg?v=6ec7dfdfc7" alt="Box plot, with the skill" loading="lazy">
+    <img class="with" src="figures/with/grouped-box-plot.svg?v=1d4986bd27" alt="Box plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -270,7 +287,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/error-bar-plot.svg?v=4b192f0e9b" alt="Error bar plot, without the skill" loading="lazy">
-    <img class="with" src="figures/with/error-bar-plot.svg?v=dbeb010751" alt="Error bar plot, with the skill" loading="lazy">
+    <img class="with" src="figures/with/error-bar-plot.svg?v=aca0954262" alt="Error bar plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -303,7 +320,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/radar-chart.svg?v=7d05719ba9" alt="Radar chart, without the skill" loading="lazy">
-    <img class="with" src="figures/with/radar-chart.svg?v=c3ebaf9916" alt="Radar chart, with the skill" loading="lazy">
+    <img class="with" src="figures/with/radar-chart.svg?v=f53f28798a" alt="Radar chart, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -325,7 +342,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/reward-distribution.svg?v=3db170f145" alt="Violin plot, without the skill" loading="lazy">
-    <img class="with" src="figures/with/reward-distribution.svg?v=7803d023c6" alt="Violin plot, with the skill" loading="lazy">
+    <img class="with" src="figures/with/reward-distribution.svg?v=6feeb7b7fa" alt="Violin plot, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -336,7 +353,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/small-multiples.svg?v=1fda2f92d1" alt="Small multiples, without the skill" loading="lazy">
-    <img class="with" src="figures/with/small-multiples.svg?v=43cb4d48e7" alt="Small multiples, with the skill" loading="lazy">
+    <img class="with" src="figures/with/small-multiples.svg?v=c97d46f9a6" alt="Small multiples, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -347,7 +364,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/accuracy-and-loss.svg?v=7c8d05f722" alt="Grouped axes, without the skill" loading="lazy">
-    <img class="with" src="figures/with/accuracy-and-loss.svg?v=c17df9966a" alt="Grouped axes, with the skill" loading="lazy">
+    <img class="with" src="figures/with/accuracy-and-loss.svg?v=8d31a3d9aa" alt="Grouped axes, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -370,7 +387,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/dapo-fig2.svg?v=d50d61b52b" alt="DAPO, without the skill" loading="lazy">
-    <img class="with" src="figures/with/dapo-fig2.svg?v=30a03a9845" alt="DAPO, with the skill" loading="lazy">
+    <img class="with" src="figures/with/dapo-fig2.svg?v=7407409649" alt="DAPO, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -381,7 +398,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/dapo-fig6.svg?v=792ec0f7fe" alt="DAPO, without the skill" loading="lazy">
-    <img class="with" src="figures/with/dapo-fig6.svg?v=7ae1439d5c" alt="DAPO, with the skill" loading="lazy">
+    <img class="with" src="figures/with/dapo-fig6.svg?v=520a99c727" alt="DAPO, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -392,7 +409,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/rlvr-fig2.svg?v=e7cecd3f2c" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
-    <img class="with" src="figures/with/rlvr-fig2.svg?v=298a30b17c" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
+    <img class="with" src="figures/with/rlvr-fig2.svg?v=aa9fa56d4c" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -403,7 +420,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/rlvr-fig5.svg?v=09559db4a8" alt="Does RL Really Incentivize Reasoning Capacity?, without the skill" loading="lazy">
-    <img class="with" src="figures/with/rlvr-fig5.svg?v=e1d772b489" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
+    <img class="with" src="figures/with/rlvr-fig5.svg?v=29e0ecc1c8" alt="Does RL Really Incentivize Reasoning Capacity?, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -425,7 +442,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/roc-curve.svg?v=941482e3c5" alt="ROC curves of AI-text detectors, without the skill" loading="lazy">
-    <img class="with" src="figures/with/roc-curve.svg?v=f6a20dda29" alt="ROC curves of AI-text detectors, with the skill" loading="lazy">
+    <img class="with" src="figures/with/roc-curve.svg?v=39283205a6" alt="ROC curves of AI-text detectors, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -436,7 +453,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/reliability-diagram.svg?v=65ef2cc9ad" alt="Confidence histograms and reliability diagrams, without the skill" loading="lazy">
-    <img class="with" src="figures/with/reliability-diagram.svg?v=8ce4fda729" alt="Confidence histograms and reliability diagrams, with the skill" loading="lazy">
+    <img class="with" src="figures/with/reliability-diagram.svg?v=bc7c8cb4c7" alt="Confidence histograms and reliability diagrams, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -458,7 +475,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/accuracy-vs-parameters.svg?v=2325cc7351" alt="Accuracy against model size, without the skill" loading="lazy">
-    <img class="with" src="figures/with/accuracy-vs-parameters.svg?v=fb328cfca1" alt="Accuracy against model size, with the skill" loading="lazy">
+    <img class="with" src="figures/with/accuracy-vs-parameters.svg?v=71c942d6df" alt="Accuracy against model size, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -469,7 +486,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/t-sne.svg?v=1746024004" alt="t-SNE embedding of learned features, without the skill" loading="lazy">
-    <img class="with" src="figures/with/t-sne.svg?v=1c1976ab4d" alt="t-SNE embedding of learned features, with the skill" loading="lazy">
+    <img class="with" src="figures/with/t-sne.svg?v=79a620a47c" alt="t-SNE embedding of learned features, with the skill" loading="lazy">
   </div>
 </figure>
 <figure class="ex" data-show="with">
@@ -502,12 +519,12 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   </div>
   <div class="frame">
     <img class="without" src="figures/without/win-rate.svg?v=9ea0536caa" alt="Win / tie / loss rates, without the skill" loading="lazy">
-    <img class="with" src="figures/with/win-rate.svg?v=0a97ef3c36" alt="Win / tie / loss rates, with the skill" loading="lazy">
+    <img class="with" src="figures/with/win-rate.svg?v=0824697bdf" alt="Win / tie / loss rates, with the skill" loading="lazy">
   </div>
 </figure></div>
 </div></section>
 
-<section id="install"><div class="wrap">
+<section class="soft" id="install"><div class="wrap">
   <h2>Easy to use.</h2>
   <p class="intro">Two commands, then just ask: "plot results.json for my ICLR paper." You get the figure, a caption to paste, and a script to rerun.</p>
   <pre>/plugin marketplace add bigohofone/academic-figure-skill

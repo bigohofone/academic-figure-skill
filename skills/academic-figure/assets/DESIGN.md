@@ -10,9 +10,9 @@ colors:
   series-5: "#66CCEE"
   series-6: "#AA3377"
   ours: "{colors.series-2}"
-  neutral: "#8C8C8C"
+  neutral: "#BBBBBB"
   neutral-light: "#D1D1D1"
-  neutral-dark: "#707070"
+  neutral-dark: "#555555"
   ink: "#000000"
 typography:
   tick-label:
@@ -105,20 +105,21 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | "Ours" among baselines or ablations: the authors' method, or else the series the takeaway is about (an RL-trained model against its base) | `ours` for ours; every series it is compared against in `neutral` |
 | Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
 | Variants of ours compared together against other methods | all `ours`, told apart by marker shape, `"o"`, `"s"`, `"^"`, on solid lines (the dashes belong to grey series); on curves drawn without markers (ROC and PR staircases, smoothed logs), by line style instead, the full method solid and the others `"--"`, `":"`; the full method first in the legend |
-| Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, `series-1` to `series-6` in order: each part must be told from its neighbours, and all of them make the whole (parts are not compared series, so all six colors are free here) |
+| Parts of one whole (a pie's wedges, a stacked area's bands, a stacked bar's segments) | every part its own color, in the order `series-1`, `series-4`, `series-6`, `series-5`, `series-3`, `series-2`, which alternates light and dark so neighbouring parts stay apart in grayscale too: each part must be told from its neighbours, and all of them make the whole (parts are not compared series, so all six colors are free here) |
 | Some series the takeaway names, among others it does not | the named ones `series-1`, `series-2`, …; the rest `greys(n)` |
 | Several series compared on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-3`, `series-4`, … in order, skipping the `ours` color, which means ours in every figure of the paper |
-| More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20) |
+| More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20), and each class its own marker shape, `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"`, since that many colors cannot all differ in lightness |
 | Groups with sizes or sweeps inside (model sizes per family) | one color per group; within a group, blended with white at 40 / 70 / 100%, light to dark |
 | Single series, or one quantity over categories (groups in one box plot) | `series-1` |
 | Reference lines | `neutral` (white over filled plots, Shapes) |
 | Text, axes, ticks | `ink` |
 | Continuous values | the `heatmap.colormap` token, `viridis`, low values dark; signed values `RdBu_r` (`heatmap.md`) |
 
-- **Grey series**: told apart in the Order rule's order (Layout), on lines by line style, `"--"`, `":"`, `"-."` (a solid line is ours' alone) (dashed and dotted at `linewidth=paper.dashed_width`), and on fills (bars, boxes, violins, areas) by shade, `greys(n)` for n grey series, evenly spaced from `neutral-light` to `neutral-dark`, light to dark (one grey series takes `neutral`).
+- **Grey series**: told apart in the Order rule's order (Layout), on lines by line style, `"--"`, `":"`, `"-."` (a solid line is ours' alone) (dashed and dotted at `linewidth=paper.dashed_width`), and on fills (bars, boxes, violins, areas) by shade, `greys(n)` for n grey series, evenly spaced from `neutral-light` to `neutral-dark`, light to dark, skipping the lightness of `ours` so ours stays apart in grayscale (one grey series takes `neutral`).
 - **Many grey series**: more than four lines: add markers, one shape per series (`line-chart.md`); more than six: draw the series the takeaway names, and group the rest as one grey series, "Other baselines".
 - **Same color, several series**: whenever two or more drawn series share a color (ours and its variants, greys), they differ by line style or shade as above.
 - **Readable on white**: grey lines, markers and reference lines are `neutral` at full opacity; `neutral-light` only as a fill. Text that belongs to a series is `darken(series_color)` (any grey series: `darken(colors["neutral"])`), so light series still get readable labels; text on a fill follows Typography.
+- **Readable in grayscale and for color-blind readers**: the palette is color-blind safe, and every series told apart by color alone must also differ in lightness, by at least 10 L*, so the figure survives black-and-white printing: ours (`series-2`, L* 61) against `neutral` (L* 76) and greys that skip its lightness. Lines also differ by style or marker, bars by shade. `fit_height` warns when two such series look alike in grayscale.
 - **Emphasis**: when the user names a series to emphasize, it is colored as ours and every other series as compared ones.
 - **Other palettes**: a paper-wide palette (a lab's or a brand's) changes the `colors` tokens in the design copy; a one-off palette for one figure ("match the original") is a dict in that figure's script, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`.
 

@@ -497,3 +497,17 @@ def test_point_name_may_touch_its_own_curve():
         warnings.simplefilter("always")
         fit_height(fig, ax)
     assert not any("covers a curve" in str(w.message) for w in caught)
+
+
+def test_greys_skip_ours_lightness():
+    ours = paper._lightness(paper._ours)
+    for n in (2, 3, 4):
+        assert all(abs(paper._lightness(g) - ours) >= 12 - 1e-6 for g in paper.greys(n))
+
+
+def test_bars_alike_in_grayscale_warn():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.bar([0], [1], color="#4477AA", label="A")
+    ax.bar([1], [2], color="#228833", label="B")
+    with pytest.warns(UserWarning, match="look alike in grayscale"):
+        fit_height(fig, ax)

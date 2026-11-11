@@ -30,8 +30,9 @@ assert knn_accuracy > 90, "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 tab10 = plt.get_cmap("tab10").colors
+shapes = ["o", "s", "^", "D", "v", "<", ">", "P", "X", "*"]  # with the color, each class keeps apart in grayscale
 for i, (name, c) in enumerate(classes.items()):
-    ax.plot(c["x"], c["y"], "o", markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width,
+    ax.plot(c["x"], c["y"], shapes[i], markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width,
             markerfacecolor=(*to_rgb(tab10[i]), 0.5), linestyle="none", label=name.replace("class_", "Class "))
 
 ax.set_xticks([])
