@@ -335,11 +335,15 @@ def _warn_layout_problems(fig, panels, min_width):
                 if fill.contains_point(((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2)) and not fill.contains_points(corners).all():
                     warnings.warn(f"text {t.get_text()!r} spills out of its fill in panel {a.get_title()!r}; drop or move it")
                     break
-        covers = [(t.get_text(), t.get_window_extent(renderer)) for t in plain]
+        # a label anchored on a data point may touch the curve through that point (its own series)
+        anchors = [a.transData.transform(t.xy) if isinstance(t, Annotation) and t.xycoords == "data" else None
+                   for t in plain]
+        covers = [(t.get_text(), t.get_window_extent(renderer), anchor) for t, anchor in zip(plain, anchors)]
         if a.get_legend():
-            covers.append(("the legend", a.get_legend().get_window_extent(renderer)))
-        for name, box in covers:
-            if any(curve.intersects_bbox(box, filled=False) for curve in curves):
+            covers.append(("the legend", a.get_legend().get_window_extent(renderer), None))
+        for name, box, anchor in covers:
+            others = [c for c in curves if anchor is None or np.hypot(*(c.vertices - anchor).T).min() > 2]
+            if any(curve.intersects_bbox(box, filled=False) for curve in others):
                 warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
             elif any(box.contains(x, y) for xy in points for x, y in xy):
                 warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")

@@ -488,3 +488,14 @@ def test_legend_above_a_row_is_centred_over_it():
     box = axes[0].get_legend().get_window_extent()
     row = (axes[0].get_window_extent().x0 + axes[1].get_window_extent().x1) / 2
     assert abs((box.x0 + box.x1) / 2 - row) < 1
+
+
+def test_point_name_may_touch_its_own_curve():
+    import warnings
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.plot([0, 1, 2], [0, 1, 2], "o-")
+    ax.annotate("B1", (1, 1), xytext=(-3, 3), textcoords="offset points", ha="right")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        fit_height(fig, ax)
+    assert not any("covers a curve" in str(w.message) for w in caught)
