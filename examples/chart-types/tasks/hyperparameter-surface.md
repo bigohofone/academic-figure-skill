@@ -1,6 +1,6 @@
 # Task: hyperparameter-surface
 
-Draw a contour plot from `hyperparameter-surface.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw a contour plot from `hyperparameter-surface.json`, for an ICLR paper.
 
 Data: `learning_rate` and `weight_decay` (13 log-spaced values each), and `val_loss[i][j]`: our model's validation loss at weight decay i and learning rate j.
 

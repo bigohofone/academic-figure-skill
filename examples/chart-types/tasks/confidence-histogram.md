@@ -1,6 +1,6 @@
 # Task: confidence-histogram
 
-Draw a histogram from `confidence-histogram.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw a histogram from `confidence-histogram.json`, for an ICLR paper.
 
 Data: `correct` and `incorrect`: our model's confidence (0–1) on each answer that was correct or incorrect.
 

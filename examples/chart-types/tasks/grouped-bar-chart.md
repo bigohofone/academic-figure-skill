@@ -1,6 +1,6 @@
 # Task: grouped-bar-chart
 
-Draw a grouped bar chart from `grouped-bar-chart.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw a grouped bar chart from `grouped-bar-chart.json`, for an ICLR paper.
 
 Data: `benchmarks` (three benchmarks), and `scores[method]` for four training methods, one of them Ours: accuracy (0–1) per benchmark, in the same order.
 

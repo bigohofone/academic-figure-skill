@@ -1,6 +1,6 @@
 # Task: dapo
 
-Draw two line charts from `dapo.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw two line charts from `dapo.json`, for an ICLR paper.
 
 Data: every curve is `{"step": [...], "value": [...]}`: AIME accuracy (avg@32, 0–1) over training steps.
 - `fig2a`: "w/ Clip-Higher" (ours) and "w/o Clip-Higher" (ablation), one chart, `dapo-fig2`.

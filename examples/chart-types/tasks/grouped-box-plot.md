@@ -1,6 +1,6 @@
 # Task: grouped-box-plot
 
-Draw a grouped box plot from `grouped-box-plot.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw a grouped box plot from `grouped-box-plot.json`, for an ICLR paper.
 
 Data: `datasets` (three datasets), and `lengths[model][dataset]`: response lengths in tokens of 60 responses, for the base model and our RL-trained model.
 

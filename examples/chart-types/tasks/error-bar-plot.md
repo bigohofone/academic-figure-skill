@@ -1,6 +1,6 @@
 # Task: error-bar-plot
 
-Draw a error bar plot from `error-bar-plot.json`, for an ICLR paper (single-column layout, 5.5 in text width).
+Draw a error bar plot from `error-bar-plot.json`, for an ICLR paper.
 
 Data: `accuracy_per_seed[method]`: GLUE accuracy of 5 seeds for each of five fine-tuning methods, one of them Ours.
 
