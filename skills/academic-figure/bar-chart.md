@@ -17,7 +17,7 @@ Reported results compared across categories, one value each: methods, ablations 
 
 ## Labels
 
-- **Bar values**: every bar of a reported result, `ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values])`, written by DESIGN.md's value table. Placements (for Collisions): horizontal, then turned to read upward, `rotation=90, padding=2`.
+- **Bar values**: every bar of a reported result, `ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values], color=darken(color))`, written by DESIGN.md's value table. Placements (for Collisions): horizontal, then turned to read upward, `rotation=90, padding=2`.
 - **Values on segments** (stacked, win rate): each segment's value inside it, `ax.bar_label(bars, labels=[f"{v:.0%}" for v in shares], label_type="center", color=text_color(color))`; a label that spills out of its segment is dropped (Collisions step 3; for segments, each segment is its own kind).
 
 ## Caption

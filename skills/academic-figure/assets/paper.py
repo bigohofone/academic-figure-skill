@@ -29,6 +29,7 @@ def _size(a, original=False):
 dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to dashed and dotted lines
 highlight_size = 5  # the marker highlight-size token, set by use_design(); for a point of interest
 filled_edge_width = 0.25  # the marker filled-edge-width token, set by use_design(); for filled markers
+canvas_pad_x = 0.1  # the canvas-pad-x token, in inches, set by use_design(): free space at the left and right edges
 
 
 def _resolve(value, tokens):
@@ -51,7 +52,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, filled_edge_width, _greys
+    global dashed_width, highlight_size, filled_edge_width, canvas_pad_x, _greys
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
@@ -91,6 +92,7 @@ def use_design(path="DESIGN.md"):
     })
     dashed_width = _number(k["dashed-line"]["width"])
     highlight_size = _number(k["marker"]["highlight-size"])
+    canvas_pad_x = _number(s["canvas-pad-x"])
     filled_edge_width = _number(k["marker"]["filled-edge-width"])
     return c
 
@@ -335,8 +337,7 @@ def _standard_margins(fig):
     sample.remove()
     label = rcParams["axes.labelsize"] * 1.2 / 72  # one line of the axis label, rotated
     pads = (rcParams["axes.labelpad"] + rcParams["ytick.major.pad"] + rcParams["ytick.major.size"]) / 72
-    pad = rcParams["figure.constrained_layout.w_pad"]
-    return pad + label + pads + ticks, pad + ticks / 2
+    return canvas_pad_x + label + pads + ticks, canvas_pad_x + ticks / 2
 
 
 def _standard_box(fig, panels, aspect):
@@ -355,8 +356,12 @@ def _standard_box(fig, panels, aspect):
     rows = sorted({round(b.y0 * h, 2) for b in boxes.values()}, reverse=True)
     col_of = {a: columns.index(round(b.x0 * w, 2)) for a, b in boxes.items()}
     row_of = {a: rows.index(round(b.y0 * h, 2)) for a, b in boxes.items()}
+    first_column = [a for a in panels if col_of[a] == 0]
+    if not any(a.yaxis.label.get_text() or any(t.get_visible() and t.get_text() for t in a.get_yticklabels())
+               for a in first_column):
+        return False  # no y labels to align (an embedding): the layout centres the panel
     left, right = _standard_margins(fig)
-    pad = rcParams["figure.constrained_layout.w_pad"]
+    pad = canvas_pad_x
     for a, b in boxes.items():
         tight = a.get_tightbbox(renderer)
         if col_of[a] == 0 and b.x0 * w - tight.x0 / fig.dpi + pad > left + 1e-3:
@@ -482,6 +487,10 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
     _plain_numbers(fig)
     _start_at_zero(panels)
+    if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
+        # free space at the left and right edges of the canvas, for text that reaches past the panels
+        side = canvas_pad_x / fig.get_figwidth()
+        fig.get_layout_engine().set(rect=(side, 0, 1 - 2 * side, 1))
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
         _warn_layout_problems(fig, panels, min_width)
@@ -508,6 +517,7 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     _clear_corners(fig, panels)
     if _standard_box(fig, panels, aspect):
+        _freeze_ticks(panels)  # growing limits for labels now must not add ticks the layout has no room for
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]
     _warn_layout_problems(fig, panels, min_width)

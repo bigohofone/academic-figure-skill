@@ -20,7 +20,7 @@ A few models' profiles across 5 to 10 benchmarks or capabilities, when the shape
   ax.set_ylim(0, rings[-1])
   ```
 
-- **Models**: each a closed polygon, filled lightly so overlaps stay visible, `ax.plot(loop, np.r_[values, values[:1]], color=color, label=name)`, `ax.fill(angles, values, color=color, alpha=0.1)`; ours in `colors["ours"]`, drawn last so it is on top, the compared models in `neutral` told apart by line style (DESIGN.md Colors).
+- **Models**: each a closed polygon, filled lightly so overlaps stay visible, `ax.plot(loop, np.r_[values, values[:1]], color=color, linestyle=style, linewidth=1 if style == "-" else paper.dashed_width, label=name)`, `ax.fill(angles, values, color=color, alpha=0.1)`; ours in `colors["ours"]`, drawn last so it is on top, the compared models in `neutral` told apart by line style (DESIGN.md Colors).
 - **Spoke names**: `ax.set_xticks(angles, labels=names)`, off the outer polygon, `ax.tick_params(axis="x", pad=6)`.
 - **Ring values**: between two spokes so they sit on no line, where a polygon ring is at r·cos(π/n), not r: `ax.set_yticks([r * np.cos(np.pi / n) for r in rings[:-1]], labels=[str(r) for r in rings[:-1]])`, `ax.set_rlabel_position(180 / n)`.
 

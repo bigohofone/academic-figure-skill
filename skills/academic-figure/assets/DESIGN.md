@@ -34,6 +34,7 @@ typography:
     fontWeight: 400
 spacing:
   layout-pad: 0.02in
+  canvas-pad-x: 0.1in
   title-pad: 6pt
   label-pad: 1pt
   tick-pad: 1.75pt
@@ -130,7 +131,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.
   - **Names down the y axis** (a heatmap's rows, horizontal bars) that overlap: give the panel height, by widening it at its own aspect (Collisions step 3).
-  - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")` (`ha="left"` on a top axis), then 90° (`rotation=90, ha="center"`) if they still overlap; if they overlap at 90°, give the panel the width a colorbar takes (colorbar below), then label every second category.
+  - **Everything that keeps the x axis** (named bins, the categories of grouped series, benchmarks shared across panels): turn them 45°, `ax.set_xticks(x, labels=names, rotation=45, ha="right", rotation_mode="anchor")` (`ha="left"` on a top axis), then 90° (`rotation=90, ha="center"`) if they still overlap; if they overlap at 90°, Collisions steps 3 and 4 (a colorbar beside the panel moves below it first, giving its width to the panel).
 - **Math**: mathtext, set in Inter like the rest (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`); symbols Inter lacks (∝, ≈) go in mathtext too (`$\propto$`).
 - **Text on a fill** (a bar segment, a wedge, a heatmap cell, an area band): black or white, whichever reads on it, `color=text_color(fill)`.
 - **Text over mixed content** (a note over bars, gridlines and a reference line, where no single fill sets its contrast): on a white box, `bbox=dict(facecolor="white", edgecolor="none", pad=1)`. Contour labels take none: they sit in the gap cut for them.
@@ -226,7 +227,7 @@ fig.savefig("outputs/{id}.pdf")
 ```
 
 - **Panels**: `ax` may be one Axes, an array, a list (also of panels from several sub-figures), or the `subplot_mosaic` dict; hidden cells and colorbars are skipped.
-- **Standard box**: panels start and end at standard margins (left: an axis label plus four-character tick labels; right: half a tick label), so every figure of one width and one number of columns has panels of the same size, in the same place; `fit_height` sets this whenever the outer labels fit those margins, and longer outer labels (category names) take the room they need.
+- **Standard box**: panels start and end at standard margins (left: the `canvas-pad-x` token plus an axis label and four-character tick labels; right: `canvas-pad-x` plus half a tick label), so every figure of one width and one number of columns has panels of the same size, in the same place; `fit_height` sets this whenever the outer labels fit those margins, and longer outer labels (category names) take the room they need.
 - **Labels inside**: `fit_height` keeps every `mark_value` label and bar label (`ax.bar_label`) inside its panel, by growing the limits and turning `mark_value` labels at a side edge inward. Point names (annotations in data coordinates) get at most a quarter more axis range; a name that needs more is reported as sticking out, to be moved. Other text is never moved.
 - **Errors**: on `ValueError` (fixed aspect), draw images with `imshow(..., aspect="auto")`; on the "different widths" warning, give all panels the same width.
 
