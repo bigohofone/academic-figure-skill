@@ -260,6 +260,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Points of interest (a minimum, the trained solution) | `marker.highlight-size` | a filled star, 5 pt | `markersize=paper.highlight_size` |
 | Outlines and edges (boxes, whiskers, error bars, outlined cells) | `outline` | 0.75 pt, black | `rcParams["patch.linewidth"]` |
 | Seams between fills (stacked segments, wedges, area bands) | `grid` | white, 0.5 pt | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
+| Outline of bars of one color that touch, each bar its own value (reliability bins) | `grid` | a darker shade of the fill, 0.5 pt, never white | `edgecolor=darken(color), linewidth=rcParams["grid.linewidth"]` |
 | Box plot median | `median` | 1 pt, black | set by the style |
 | Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
 | Colorbar | `colorbar` | a bar 0.1 in wide, 0.06 in from the panels, its labels in a standard margin beside it | placed by `fit_height` |
