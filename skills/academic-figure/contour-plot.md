@@ -11,7 +11,7 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
 
 ## Variants
 
-- **Contour lines only** (as many papers draw them): `lines = ax.contour(X, Y, Z, levels=levels, cmap=cmap)`, colored by level from the design's colormap without its lightest end, so no line vanishes on white, `cmap = ListedColormap(plt.get_cmap("viridis")(np.linspace(0, 0.85, 256)))`; a colorbar for the line colors, `fig.colorbar(plt.cm.ScalarMappable(norm=Normalize(lo, hi), cmap=cmap), ax=ax, label=...)`.
+- **Contour lines only** (as many papers draw them): `lines = ax.contour(X, Y, Z, levels=levels, cmap=cmap)`, colored by level from the design's whole colormap, `cmap = plt.get_cmap("viridis")`, the same scale as everywhere else; a colorbar for the line colors, `fig.colorbar(plt.cm.ScalarMappable(norm=Normalize(lo, hi), cmap=cmap), ax=ax, label=...)`.
 - **Lines given as polylines** (each with its level, not a grid): each drawn with `ax.plot(x, y, color=cmap(norm(level)), linewidth=rcParams["contour.linewidth"])`.
 - **Loss landscape**: axes "Direction 1" and "Direction 2", the trained solution at (0, 0).
 

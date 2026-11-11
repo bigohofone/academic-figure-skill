@@ -27,6 +27,7 @@ def _size(a, original=False):
 
 dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to dashed and dotted lines
 highlight_size = 5  # the marker highlight-size token, set by use_design(); for a point of interest
+filled_edge_width = 0.25  # the marker filled-edge-width token, set by use_design(); for filled markers
 
 
 def _resolve(value, tokens):
@@ -49,7 +50,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, _greys
+    global dashed_width, highlight_size, filled_edge_width, _greys
     tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
@@ -88,6 +89,7 @@ def use_design(path="DESIGN.md"):
     })
     dashed_width = _number(k["dashed-line"]["width"])
     highlight_size = _number(k["marker"]["highlight-size"])
+    filled_edge_width = _number(k["marker"]["filled-edge-width"])
     return c
 
 

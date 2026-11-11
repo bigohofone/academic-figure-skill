@@ -57,6 +57,7 @@ components:
     size: 2.5pt
     edge-width: 0.5pt
     highlight-size: 5pt
+    filled-edge-width: 0.25pt
   outline:
     width: 0.75pt
   median:
@@ -229,6 +230,7 @@ The marks every chart type is built from, sized by the `components` tokens. Matp
 | Data lines | `line` | 1 pt, solid | set by the style |
 | Dashed and dotted lines (reference lines, value marks, fits, fronts, series told apart by line style) | `dashed-line` | 0.75 pt | `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
 | Markers | `marker` | hollow: white fill, a 0.5 pt edge in the series color, 2.5 pt | `rcParams["lines.markersize"]` |
+| Filled markers (embedding points) | `marker.filled-edge-width` | a black edge, 0.25 pt, around a translucent fill | `markeredgewidth=paper.filled_edge_width` |
 | Points of interest (a minimum, the trained solution) | `marker.highlight-size` | a filled star, 5 pt | `markersize=paper.highlight_size` |
 | Outlines and edges (boxes, whiskers, error bars, outlined cells) | `outline` | 0.75 pt, black | `rcParams["patch.linewidth"]` |
 | Seams between fills (stacked segments, wedges, area bands) | `grid` | white, 0.5 pt | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |

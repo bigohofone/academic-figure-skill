@@ -51,7 +51,7 @@ figures/
   import matplotlib.pyplot as plt
   import numpy as np
   from matplotlib import rcParams
-  from matplotlib.colors import ListedColormap, Normalize, to_rgb
+  from matplotlib.colors import Normalize, to_rgb
   from matplotlib.patches import Patch
   from matplotlib.ticker import NullFormatter
 

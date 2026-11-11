@@ -7,7 +7,7 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
-from matplotlib.colors import ListedColormap, Normalize
+from matplotlib.colors import Normalize
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
@@ -19,7 +19,7 @@ with open("../data/loss-landscape.json") as f:
     data = json.load(f)
 levels = data["levels"]
 
-cmap = ListedColormap(plt.get_cmap("viridis")(np.linspace(0, 0.85, 256)))
+cmap = plt.get_cmap("viridis")
 norm = Normalize(min(levels), max(levels))
 
 fig, ax = plt.subplots(figsize=(2.75, 2))

@@ -17,7 +17,7 @@ data = json.load(open("../data/t-sne.json"))
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 for i, color in enumerate(plt.get_cmap("tab10").colors, start=1):
     points = data[f"class_{i}"]
-    ax.plot(points["x"], points["y"], "o", markeredgecolor=colors["ink"], markerfacecolor=(*to_rgb(color), 0.5),
+    ax.plot(points["x"], points["y"], "o", markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width, markerfacecolor=(*to_rgb(color), 0.5),
             linestyle="none", label=f"Class {i}")
 ax.set_xticks([])
 ax.set_yticks([])
