@@ -325,7 +325,7 @@ Reported results the takeaway compares are written on the plot, so the reader re
 | Anything else | three significant figures, trailing zeros kept, `f"{v:#.3g}".rstrip(".")`: `85.0`, `0.912`, `439` |
 
 - **Look**: 7 pt (`value-label`), in `darken(series_color)` beside a mark, `text_color(fill)` on a fill.
-- **Tag**: a value label written at a data point with `ax.annotate` or `ax.text` (not by `mark_value` or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs. Labels placed outside the panel on purpose (a histogram's means above it) and point names (even with a value joined) take no tag.
+- **Tag**: a value label written at a data point with `ax.annotate` or `ax.text` (not by `mark_value`, which tags its own `gid="value-mark"`, or `ax.bar_label`) passes `gid="value-label"`, so `fit_height` keeps it inside its panel like theirs. Labels placed outside the panel on purpose (a histogram's means above it) and point names (even with a value joined) take no tag.
 
 ## Do's and Don'ts
 

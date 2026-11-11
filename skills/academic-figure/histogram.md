@@ -19,4 +19,4 @@ How one quantity's values are spread: scores, confidences, lengths, per-problem 
 
 ## Caption
 
-- **Reading guide**: "dashed lines mark the means"; "a kernel density estimate" for a density curve; "density" when the series are normalized.
+- **Reading guide**: "vertical lines mark the means"; "a kernel density estimate" for a density curve; "density" when the series are normalized.

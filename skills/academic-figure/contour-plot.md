@@ -25,7 +25,7 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
       t.set_color(text_color(mesh.cmap(mesh.norm(float(t.get_text())))))
   ```
 
-  For polylines, write each level once, at its first given label position, on a white box since no gap is cut for it; when `fit_height` reports it colliding, move it to the level's next given position and render again (Collisions step 1): `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label", bbox=dict(facecolor="white", edgecolor="none", pad=1))`; a level with no free position goes unlabelled.
+  For polylines, write each level once, at its first given label position, on a white box since no gap is cut for it; when `fit_height` reports it colliding, move it to the level's next given position and render again (Collisions step 1): `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label", bbox=dict(facecolor="white", edgecolor="none", pad=1))`; when a level has no free position, label every second level, then every third, … (Collisions step 4), so the labelled levels stay evenly spaced.
 - **Points of interest**: a minimum or the trained solution as a filled star in `colors["ours"]` at the design's highlight size, `ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size, linestyle="none", label=...)`; a training trajectory as a data line with markers at its ends; named in a legend when there are two or more of them, else in the caption (DESIGN.md Legend).
 
 ## Caption

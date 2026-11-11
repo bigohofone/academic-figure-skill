@@ -1,3 +1,4 @@
+import math
 import warnings
 from pathlib import Path
 
@@ -585,9 +586,10 @@ def _warn_wide_legends(fig):
     room = fig.bbox.width - 2 * canvas_pad_x * fig.dpi
     for legend in fig.legends + [a.get_legend() for a in fig.axes if a.get_legend()]:
         if legend.get_window_extent().width > room:
-            n = len(legend.get_texts())
-            warnings.warn(f"a legend of {n} entries is wider than the figure; set ncol to "
-                          f"ceil({n} / 2), then ceil({n} / 3), ...")
+            n, ncol = len(legend.get_texts()), legend._ncols
+            fewer = [math.ceil(n / k) for k in range(2, n + 1) if math.ceil(n / k) < ncol]
+            fix = f"use ncol={fewer[0]}" if fewer else "shorten its entries"
+            warnings.warn(f"a legend of {n} entries in {ncol} columns is wider than the figure; {fix}")
 
 
 def mark_value(ax, x, y, text, color, below=False):
