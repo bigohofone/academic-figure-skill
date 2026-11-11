@@ -33,7 +33,7 @@ ax.set_yticks(range(len(groups)), labels=[label for _, label in groups])
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.set_xlabel("Perplexity")
 
 fit_height(fig, ax, aspect=0.618)

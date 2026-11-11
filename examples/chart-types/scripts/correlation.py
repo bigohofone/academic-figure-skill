@@ -24,7 +24,7 @@ slope, intercept = np.polyfit(human, reward, 1)
 xs = np.array([1, 7])
 ax.plot(xs, slope * xs + intercept, color=darken(color))
 ax.set_xticks(range(1, 8))
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.set_xlabel("Human rating")
 ax.set_ylabel("Reward score")
 

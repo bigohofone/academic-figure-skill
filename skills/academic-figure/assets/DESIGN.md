@@ -89,7 +89,8 @@ The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role; `color
 | Case | Color |
 |---|---|
 | "Ours" among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` |
-| Variants of ours (with and without a component) | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
+| Ours against its own ablation (with vs. without a component, the takeaway is the component) | the full method `ours`, the ablated variants `neutral`, as compared series |
+| Variants of ours compared together against other methods | all `ours`; the full method solid and first in the legend, each reduced variant in the next line style |
 | Several series compared on equal terms, no "ours" (models in a survey, data sources, error types) | `series-1` to `series-6`, in order |
 | More than six unordered classes (an embedding) | matplotlib's `tab10` (up to 10), `tab20` (up to 20) |
 | Groups with sizes or sweeps inside (model sizes per family) | one color per group; within a group, blended with white at 40 / 70 / 100%, light to dark |
@@ -118,7 +119,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 | `title` | 11 pt | panel titles, row and column headers |
 
 - **Numeric tick labels**: horizontal plain numbers, written as short as they read, `0, 0.5, 1`, `1024`, never rotated, never `2³` or `1e+06`: `ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))` (keeping the minus sign). Values of 10,000 and up take SI suffixes (`10K`, `1M`, `1B`), or the unit is scaled in the axis label ("Training step (K)"); on log axes, powers of ten are plain from 0.001 to 1000, then `1e-4` below. An axis of shares is labelled in percent, `0%, 50%, 100%`, as its values are written (Value labels).
-- **Tick choice**: numbers the reader can name, evenly spaced (on a log axis, powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose what reads best. When `fit_height` reports tick labels overlapping, take fewer ticks. Panels that share an axis share its ticks.
+- **Tick choice**: numbers the reader can name, evenly spaced (on a log axis, powers of the base, every one or every second, fifth, …), with the ends of the data range labelled where the axis allows; within that, choose what reads best. When `fit_height` reports tick labels overlapping, label fewer of them, but keep a tick and gridline at every step, so the grid stays as fine as the data: `ax.set_xticks(ticks, labels=[str(t) if i % m == 0 else "" for i, t in enumerate(ticks)])`. Panels that share an axis share its ticks.
 - **Corner labels**: when `fit_height` reports the first tick labels of both axes overlapping at the shared corner, drop the y axis's first label: `ticks = [t for t in ax.get_yticks() if lo <= t <= hi]` (`lo, hi = ax.get_ylim()`), `ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])`.
 - **Text tick labels** (non-numeric names) that `fit_height` reports overlapping, by what they name:
   - **Unordered categories, one value each** (methods, models, groups in one bar, error bar or box chart): swap the axes so the names read horizontally down the y axis (horizontal bars, a forest plot, horizontal boxes), ordered top to bottom as under Order.

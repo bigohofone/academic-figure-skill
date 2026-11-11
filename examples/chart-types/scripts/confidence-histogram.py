@@ -23,10 +23,10 @@ for name, values, color in series:
     ax.hist(values, bins=bins, density=True, histtype="stepfilled", color=color, alpha=0.2, linewidth=0)
     ax.hist(values, bins=bins, density=True, histtype="step", color=color, label=name)
 ax.set_xlim(0, 1)
-ax.xaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 lo, hi = ax.get_ylim()
 ticks = [t for t in ax.get_yticks() if lo <= t <= hi]
-ax.set_yticks(ticks, labels=["", *[f"{t:,.10g}" for t in ticks[1:]]])
+ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])
 ax.grid(axis="x", visible=False)
 ax.set_xlabel("Confidence")
 ax.set_ylabel("Density")

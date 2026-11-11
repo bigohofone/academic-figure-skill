@@ -27,10 +27,10 @@ for r, model in enumerate(models):
             style = "-" if len(curve["k"]) > 30 else marker + "-"
             ax.plot(curve["k"], curve["pass"], style, color=color, label=name)
 
-ks = [1, 32, 1024]
+ks = [2 ** e for e in range(11)]
 margin = 2 ** (0.05 * math.log2(ks[-1] / ks[0]))
 ax.set_xscale("log", base=2)
-ax.set_xticks(ks, labels=[str(k) for k in ks])
+ax.set_xticks(ks, labels=[str(k) if i % 5 == 0 else "" for i, k in enumerate(ks)])
 ax.set_xticks([], minor=True)
 ax.set_xlim(ks[0] / margin, ks[-1] * margin)
 ax.set_ylim(0, 1)

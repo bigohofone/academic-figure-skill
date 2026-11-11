@@ -32,8 +32,8 @@ for name, label, color, linestyle, marker in [
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
 ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
-ax.set_xticks(ticks, labels=[f"{t:,.10g}" for t in ticks])
-ax.set_yticks(ticks, labels=["", *[f"{t:,.10g}" for t in ticks[1:]]])
+ax.set_xticks(ticks, labels=[f"{t:.10g}" for t in ticks])
+ax.set_yticks(ticks, labels=["", *[f"{t:.10g}" for t in ticks[1:]]])
 ax.set_xlabel("False positive rate")
 ax.set_ylabel("True positive rate")
 ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=1, frameon=False)

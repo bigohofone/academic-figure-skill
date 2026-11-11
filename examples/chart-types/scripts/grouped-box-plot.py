@@ -28,7 +28,7 @@ for i, (name, color) in enumerate(series):
 ax.set_xticks(range(len(datasets)), labels=datasets)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.set_ylabel("Length (tokens)")
 ax.legend(handles=[Patch(facecolor=lighten(color), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=name)
                    for name, color in series], loc="upper left")

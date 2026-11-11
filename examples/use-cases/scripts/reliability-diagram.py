@@ -1,4 +1,4 @@
-"""Figure 1: Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet (left) and a 110-layer ResNet (right) on CIFAR-100. In the histograms, dashed and dotted lines mark the average confidence and the accuracy; in the reliability diagrams, the dashed diagonal marks perfect calibration and outlines show the gap to the mean confidence. LeNet is well calibrated (ECE 4.92%), while the more accurate ResNet is overconfident: its average confidence of 0.884 exceeds its accuracy of 0.705 (ECE 18.2%)."""
+"""Figure 1: Confidence histograms (top) and reliability diagrams (bottom) for a 5-layer LeNet (left) and a 110-layer ResNet (right) on CIFAR-100. In the histograms, dashed and dotted lines mark the average confidence and the accuracy; in the reliability diagrams, the dashed diagonal marks perfect calibration and light red bars show the gap to the mean confidence. LeNet is well calibrated (ECE 4.92%), while the more accurate ResNet is overconfident: its average confidence of 0.884 exceeds its accuracy of 0.705 (ECE 18.2%)."""
 
 import json
 import sys
@@ -9,7 +9,7 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height
+from paper import fit_height, lighten
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
@@ -35,8 +35,8 @@ for col, model in enumerate(data["models"].values()):
     bottom.bar(rel_edges[:-1], accuracy, width=np.diff(rel_edges), align="edge", color=colors["series-1"],
                edgecolor="white", linewidth=rcParams["grid.linewidth"], label="Outputs")
     bottom.bar(rel_edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
-               width=np.diff(rel_edges), align="edge", fill=False, edgecolor=colors["ink"],
-               linewidth=rcParams["patch.linewidth"], label="Gap")
+               width=np.diff(rel_edges), align="edge", color=lighten(colors["series-2"]), edgecolor=colors["series-2"],
+               linewidth=rcParams["grid.linewidth"], label="Gap")
     bottom.axline((0, 0), (1, 1), linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
     bottom.text(0.96, 0.04, f"Error={model['error_percent']}", transform=bottom.transAxes, ha="right", va="bottom",
                 bbox=dict(facecolor="white", edgecolor="none", pad=1))
@@ -48,8 +48,8 @@ for ax in axes.flat:
     ax.set_ylim(0, 1)
     ax.set_xticks([0, 0.5, 1])
     ax.set_yticks([0, 0.5, 1])
-    ax.xaxis.set_major_formatter(lambda v, _: f"{v:,.10g}")
-    ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}")
+    ax.xaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
+    ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}")
 axes[0, 0].set_ylabel("% of Samples")
 axes[1, 0].set_ylabel("Accuracy")
 axes[0, 0].legend(loc="upper left")

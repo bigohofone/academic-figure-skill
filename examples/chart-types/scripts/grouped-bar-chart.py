@@ -29,7 +29,7 @@ ax.set_xticks(x, labels=benchmarks)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Accuracy")
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(methods), frameon=False)
 
 fit_height(fig, ax, aspect=0.618)

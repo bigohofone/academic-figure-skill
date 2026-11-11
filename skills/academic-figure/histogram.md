@@ -10,7 +10,7 @@ How one quantity's values are spread: scores, confidences, lengths, per-problem 
 ## Variants
 
 - **Overlaid histograms** (two or three series on one axis): each as a translucent fill with its outline on top, so every series stays visible where they overlap, `ax.hist(values, bins=bins, histtype="stepfilled", color=color, alpha=0.2, linewidth=0)`, then `ax.hist(values, bins=bins, histtype="step", color=color, label=name)` (the outline carries the legend entry). More than three series: one panel each, sharing both axes.
-- **Counts per bin** (already computed): bins of a continuous quantity as touching bars on a numeric axis, `ax.bar(edges[:-1], counts, width=np.diff(edges), align="edge", linewidth=0)`; named bins (intervals, length buckets) as grouped bars (`bar-chart.md`), in order on x with text tick labels, bar labels only on the bins the takeaway cites.
+- **Counts per bin** (already computed): bins of a continuous quantity as touching bars on a numeric axis, `ax.bar(edges[:-1], counts, width=np.diff(edges), align="edge", linewidth=0)`; named bins (intervals, length buckets) as grouped bars (`bar-chart.md`), in order on x with text tick labels, labelled as bar-chart.md labels bars: every bar or none.
 - **Density curve** (KDE), only when the user asks: `scipy.stats.gaussian_kde(values)(xs)` as a data line in the series color, filled under at `alpha=0.2`.
 
 ## Labels

@@ -35,7 +35,7 @@ for x, (name, color) in enumerate(series):
 ax.set_xticks(range(len(series)), labels=[name for name, _ in series])
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
-ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.10g}".replace("-", "−"))
+ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
 ax.set_ylabel("Reward")
 
 fit_height(fig, ax, aspect=0.618)
