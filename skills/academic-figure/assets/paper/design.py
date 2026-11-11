@@ -1,8 +1,8 @@
+"""The design: reads DESIGN.md's tokens into matplotlib's style and holds the values the other modules use."""
 from pathlib import Path
 
 import matplotlib
 import matplotlib.style
-import numpy as np
 import yaml
 from cycler import cycler
 from matplotlib import font_manager, rcParams
@@ -94,26 +94,3 @@ def use_design(path="DESIGN.md"):
     colorbar_width, colorbar_gap = _number(k["colorbar"]["width"]), _number(k["colorbar"]["gap"])
     filled_edge_width = _number(k["marker"]["filled-edge-width"])
     return c
-
-
-def smooth(values):
-    """Centered moving average over 5% of the points (2.5% each side), shrinking at the ends.
-    Centered, not EMA, so the smoothed curve does not lag the raw one."""
-    half = max(1, len(values) // 40)
-    return [np.mean(values[max(0, i - half):i + half + 1]) for i in range(len(values))]
-
-
-def mark_value(ax, x, y, text, color, below=False):
-    """Mark a compared value: a hollow circle at (x, y) and `text` just above it (`below=True`: just
-    below), in `darken(color)`.
-    """
-    ax.plot(x, y, "o", color=color)
-    offset = rcParams["lines.markersize"] / 2 + 2
-    ax.annotate(text, (x, y), xytext=(0, -offset if below else offset), textcoords="offset points", ha="center",
-                va="top" if below else "bottom", color=darken(color), gid="value-mark")
-
-
-# the tools live in their own files, by kind; scripts keep importing them from paper
-from paper_layout import fit_height as fit_height, group_label as group_label  # noqa: E402  sizes
-from paper_color import (  # noqa: E402  color-blind and grayscale safety
-    darken as darken, greys as greys, lighten as lighten, parts as parts, text_color as text_color)

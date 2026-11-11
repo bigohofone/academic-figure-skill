@@ -10,8 +10,7 @@ from matplotlib.patches import Rectangle, Wedge
 from matplotlib.text import Annotation
 from matplotlib.ticker import FixedLocator, FuncFormatter, ScalarFormatter
 
-import paper
-import paper_checks
+from . import design, checks
 
 
 def _size(a, original=False):
@@ -51,8 +50,8 @@ def _set_canvas_pad(fig):
     """Free space on all four sides of the canvas, for text that reaches past the panels."""
     if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         # left and right as a rect; top and bottom as the layout's edge pad, which outside legends obey too
-        x = paper.canvas_pad / fig.get_figwidth()
-        fig.get_layout_engine().set(rect=(x, 0, 1 - 2 * x, 1), h_pad=paper.canvas_pad)
+        x = design.canvas_pad / fig.get_figwidth()
+        fig.get_layout_engine().set(rect=(x, 0, 1 - 2 * x, 1), h_pad=design.canvas_pad)
 
 
 def _freeze_ticks(panels):
@@ -95,8 +94,8 @@ def _keep_value_labels_inside(fig, panels):
         box = a.get_window_extent(renderer)
         for t in a.texts:
             value_label = t.get_gid() == "value-mark"  # mark_value labels turn inward at a side edge
-            point_name = not paper_checks._is_value_label(a, t) and isinstance(t, Annotation) and t.xycoords == "data"
-            if not (paper_checks._is_value_label(a, t) or point_name):
+            point_name = not checks._is_value_label(a, t) and isinstance(t, Annotation) and t.xycoords == "data"
+            if not (checks._is_value_label(a, t) or point_name):
                 continue
             label = t.get_window_extent(renderer)
             gap = 0.35 * t.get_fontsize() * fig.dpi / 72  # clear space between a label and the panel edge
@@ -148,7 +147,7 @@ def _standard_margins(fig):
     """The left and right margins, in inches, of a standard panel: on the left a y-axis label and
     four-character tick labels with a sign, on the right half of one at the x axis' end."""
     ticks, label, half = _standard_parts(fig)
-    return paper.canvas_pad + label + ticks, paper.canvas_pad + half
+    return design.canvas_pad + label + ticks, design.canvas_pad + half
 
 
 def group_label(axes, text, axis="x"):
@@ -198,7 +197,7 @@ def _standard_gap(fig, column, column_gap):
     shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
     label_lines = max(_lines(a.yaxis.label) for a in column)
     if label_lines:
-        return (paper.canvas_pad + half) + column_gap + (paper.canvas_pad + ticks + label * label_lines)
+        return (design.canvas_pad + half) + column_gap + (design.canvas_pad + ticks + label * label_lines)
     return half + ticks * shows_ticks
 
 
@@ -251,8 +250,8 @@ def _standard_box(fig, panels, aspect, column_gap):
                for a in first_column):
         return False  # no y labels to align (an embedding): the layout centres the panel
     left, right = _standard_margins(fig)
-    side = left - paper.canvas_pad  # an axis label and four-character tick labels
-    pad = paper.canvas_pad
+    side = left - design.canvas_pad  # an axis label and four-character tick labels
+    pad = design.canvas_pad
     panels_x1 = max(b.x1 for b in boxes.values()) * w
     cbar = cbars[0] if cbars else None
     vertical = cbar is not None and cbar._colorbar.orientation == "vertical"
@@ -260,7 +259,7 @@ def _standard_box(fig, panels, aspect, column_gap):
     # more room takes it from the panels' width, never their height, so one width keeps one height
     if vertical:
         cb = cbar.get_position()
-        cb_gap, cb_w = paper.colorbar_gap, paper.colorbar_width
+        cb_gap, cb_w = design.colorbar_gap, design.colorbar_width
         right = pad + side + cb_w + cb_gap
     std_left, std_right = left, right
     ticks, label, half = _standard_parts(fig)
@@ -351,7 +350,7 @@ def _clear_corners(fig, panels):
         if None in firsts:
             continue
         (_, tx), (loc, ty) = firsts
-        if paper_checks._texts_overlap(tx, tx.get_window_extent(renderer), ty, ty.get_window_extent(renderer), renderer):
+        if checks._texts_overlap(tx, tx.get_window_extent(renderer), ty, ty.get_window_extent(renderer), renderer):
             label = a.yaxis.get_major_formatter()
             a.yaxis.set_major_formatter(FuncFormatter(lambda v, pos, first=loc, label=label: "" if np.isclose(v, first) else label(v, pos)))
 
@@ -386,10 +385,10 @@ def _pad_outside_legends(fig):
     canvas pad like everything else, keeping every panel where it is in inches."""
     fig.canvas.draw()
     h = fig.get_figheight()
-    tops = [lg for lg in fig.legends if lg.get_window_extent().y1 / fig.dpi > h - paper.canvas_pad]
+    tops = [lg for lg in fig.legends if lg.get_window_extent().y1 / fig.dpi > h - design.canvas_pad]
     if not tops:
         return
-    need = max(paper.canvas_pad - (h - lg.get_window_extent().y1 / fig.dpi) for lg in tops)
+    need = max(design.canvas_pad - (h - lg.get_window_extent().y1 / fig.dpi) for lg in tops)
     boxes = {a: a.get_position() for a in fig.axes}
     centers = {lg: (lg.get_window_extent().x0 + lg.get_window_extent().x1) / 2 / fig.bbox.width for lg in tops}
     fig.set_layout_engine("none")
@@ -398,7 +397,7 @@ def _pad_outside_legends(fig):
         a.set_position([b.x0, b.y0 * h / (h + need), b.width, b.height * h / (h + need)])
     for lg in tops:
         lg.set_loc("upper center")
-        lg.set_bbox_to_anchor((centers[lg], 1 - paper.canvas_pad / (h + need)), transform=fig.transFigure)
+        lg.set_bbox_to_anchor((centers[lg], 1 - design.canvas_pad / (h + need)), transform=fig.transFigure)
 
 
 def _trim_height(fig, panels):
@@ -459,11 +458,11 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column
     _start_at_zero(panels)
     if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         _set_canvas_pad(fig)
-    paper_checks._warn_wide_legends(fig)
+    checks._warn_wide_legends(fig)
     if any(_is_round(a) for a in panels):
         _trim_height(fig, panels)
         _pad_outside_legends(fig)
-        paper_checks._warn_layout_problems(fig, panels, min_width)
+        checks._warn_layout_problems(fig, panels, min_width)
         return _panel_ratios(fig, panels)[0]
     for a in panels:
         if a.get_aspect() != "auto" or a.get_box_aspect() is not None:
@@ -494,5 +493,5 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column
     _center_row_legends(fig, panels)
     if max(ratios) - min(ratios) > tol * max(ratios):
         warnings.warn("panels have different shapes; one figure takes one aspect (no height_ratios or width_ratios)")
-    paper_checks._warn_layout_problems(fig, panels, min_width)
+    checks._warn_layout_problems(fig, panels, min_width)
     return ratios

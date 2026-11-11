@@ -8,7 +8,7 @@ from matplotlib.collections import PolyCollection
 from matplotlib.container import BarContainer
 from matplotlib.patches import Rectangle
 
-import paper
+from . import design
 
 
 GREY_GAP = 12  # L* kept clear on each side of ours, so ours stays apart in grayscale
@@ -36,10 +36,10 @@ def _grey(lightness):
 def greys(n):
     """n grey fills, evenly spaced in lightness from the design's neutral-light to neutral-dark, light to
     dark, skipping the band around ours' lightness; one series takes neutral."""
-    neutral, light, dark = paper._greys
+    neutral, light, dark = design._greys
     if n == 1:
         return [tuple(colors.to_rgb(neutral))]
-    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(paper._ours)
+    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(design._ours)
     segments = [(top, min(top, ours + GREY_GAP)), (max(bottom, ours - GREY_GAP), bottom)]
     segments = [(a, b) for a, b in segments if a > b]
     total = sum(a - b for a, b in segments)
@@ -58,7 +58,7 @@ def parts(n):
     """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
     hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
     two parts stay apart when printed in black and white."""
-    hues = [colors.to_rgb(paper._palette[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
+    hues = [colors.to_rgb(design._palette[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
     levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
     order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
     out = []

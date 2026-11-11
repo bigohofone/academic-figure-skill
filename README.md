@@ -51,4 +51,4 @@ For slides in the same style, see [academic-slides-skill](https://github.com/big
 
 ## License
 
-MIT, except the bundled Inter fonts (SIL Open Font License, see `skills/academic-figure/assets/Inter-LICENSE.txt`).
+MIT, except the bundled Inter fonts (SIL Open Font License, see `skills/academic-figure/assets/paper/Inter-LICENSE.txt`).
