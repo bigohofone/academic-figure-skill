@@ -72,21 +72,23 @@ A figure is read printed in a paper, at the column width it is set at, by a read
 
 The `colors` tokens are Paul Tol's color-blind-safe `bright` set by role. `colors = paper.use_design()` returns them by name, references resolved: `colors["series-1"]`, `colors["ours"]`.
 
+Pick the first row that fits:
+
 | Case | Color |
 |---|---|
+| "Ours" (the proposed method) among baselines or ablations | `ours` for ours; every series it is compared against in `neutral` grey. Several grey series are told apart by line style on lines, in order `"-"`, `"--"`, `":"`, `"-."`, and by shade on fills (bars, boxes, violins, areas), in order `colors["neutral"]`, `darken(colors["neutral"])`, `lighten(colors["neutral"])` |
+| Several series compared on equal terms, with no "ours" (models in a survey, classes, data sources, error types) | `series-1` to `series-6`, in this order |
 | Single series | `series-1` |
-| Categorical | `series-1` to `series-6`, in this order |
-| "Ours" (the proposed method among baselines or ablations) | `ours`; the others take the series order without it. Without such a series, use the series order |
-| Neutral, baselines, reference lines | `neutral` |
+| Reference lines (a baseline's score, a threshold, chance) | `neutral` |
 | Grouped (sizes, sweeps) | one color per group; within a group blend with white at 40 / 70 / 100 %, light → dark |
 | Text, axes, ticks | `ink` |
 | Continuous values | the `heatmap.colormap` component (the default colormap); signed values in heatmap.md |
 
-- More than six series: group them (one color per group, shades within) or split them into panels.
+- More than six series with no "ours": group them (one color per group, shades within) or split them into panels.
 - Series are told apart by color. When color alone can't separate them (grayscale printing, close shades), also vary line style.
 - Grey lines, series and bands are `neutral` at full opacity; grey text is `darken(colors["neutral"])`.
 - Text that belongs to one series (labels, annotations) uses `darken(series_color)`.
-- Emphasis, when the user names a series to emphasize: that series is `ours`, every other series `neutral` (bands too), told apart by line style.
+- Emphasis, when the user names a series to emphasize: color it as ours, and every other series as the series ours is compared against.
 - A paper-wide palette (a lab's or a brand's): change the `colors` tokens in `figures/DESIGN.md`. A one-off palette for a single figure ("match the original"): a dict in that figure's cell, `PALETTE = {"ours": "#5F16A7", "base": "#63C9D2"}`; everything else keeps the design. If some colors are very light (cyan, yellow), tell the user they read weakly on white.
 
 ## Typography
@@ -233,7 +235,7 @@ Each chart type has its own file next to this one, with its marks, variants and 
 | One series per panel | none; the title names it |
 
 - Always pass an explicit `loc`, never `"best"`. `fit_height` warns when a legend covers a curve, a bar or a box; on that warning, try the next spot.
-- Entry order: "ours" first, then the other series in color order, reference lines last.
+- Entry order: "ours" first, then the other series in their color, line style or shade order, reference lines last.
 
 ### Value labels
 
