@@ -16,15 +16,13 @@ Values along a continuous x: learning curves, scaling curves, pass@k, a metric o
 - **Scaling law fit**: both axes log, where a power law is a straight line. The measured points as markers without a line; the fitted law as a dashed line in the same color over the fitted range, `ax.plot(x_fit, a * x_fit ** -b, linestyle="--", linewidth=paper.dashed_width, color=color)`, its exponent in the legend entry, written by DESIGN.md's value table, `label=f"Fit: $L \\propto N^{{-{b_text}}}$"` (N, C or D for the quantity on x) (mathtext, since Inter has no ∝ glyph).
 - **ROC curve**: one panel, aspect 1 : 1, both axes fixed to 0–1 (`ax.set_xlim(0, 1)`, `ax.set_ylim(0, 1)`); x "False positive rate", y "True positive rate"; the chance diagonal always, `ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)`, named in the caption. When the message is the low false-positive regime (detection at 0.1% FPR), both axes log from the smallest rate shown to 1.
 - **Precision-recall curve**: as ROC, with x "Recall", y "Precision", `drawstyle="steps-post"`, and the positive rate as a horizontal reference line.
-- **ROC and PR curves**: drawn as computed (a staircase through the thresholds), never smoothed; no markers, since a dense staircase has no measured points to show, except at operating points the paper reports; variants of ours are told apart by line style, the full method solid and the others dashed in the ours color (DESIGN.md Colors). The area under each curve in its legend entry, `label=f"Ours (AUC {auc:#.3g})"`; when the data gives none, compute it, `np.trapezoid(tpr, fpr)`, and say so in the caption. No `mark_value`.
+- **ROC and PR curves**: drawn as computed (a staircase through the thresholds), never smoothed; no markers, since a dense staircase has no measured points to show, except at operating points the paper reports; variants of ours are told apart by line style, the full method solid and the others dashed in the ours color (DESIGN.md Colors). The area under each curve in its legend entry, `label=f"Ours (AUC {auc:#.3g})"`; when the data gives none, compute it, `np.trapezoid(tpr, fpr)`, and say so in the caption.
 
 ## Labels
 
-When the takeaway compares reported results across series, mark the compared values (never in a two-factor grid, DESIGN.md Layout):
+Curves carry no value marks: the lines already show where each series stands, and circles and numbers on them crowd the data. When the takeaway compares reported results across series, the compared values go in the caption:
 
 - **Comparison point**: the claim decides it. "Reaches a higher score": each series' best. "Ends higher": the final values, at the last x all series share. "Ahead at the same budget": the values at that x. If the request and the paper don't settle it, ask the user; when you can't ask, compare each series' best and say so in the reply.
-- **Mark**: `mark_value(ax, x, y, f"{y:#.3g}", color)` at each compared point, one per compared series: a circle on the point, and the value above it.
-- **Placements** (for Collisions): above the point, then below it (`below=True`); then mark ours and its closest competitor only, then ours only, the other values in the caption (Collisions step 4).
 
 ## Caption
 

@@ -1,4 +1,4 @@
-"""Validation accuracy versus epochs on three datasets. Lines show the mean and shaded bands ±1 std over 3 seeds; circles and thin lines mark the best mean accuracy of Ours and Mixup. Ours reaches the highest best accuracy on every dataset: 0.953 vs. 0.932 for Mixup on CIFAR-10, 0.784 vs. 0.742 on CIFAR-100 and 0.664 vs. 0.612 on Tiny-ImageNet; the baseline peaks at 0.917, 0.717 and 0.599."""
+"""Validation accuracy versus epochs on three datasets. Lines show the mean and shaded bands ±1 std over 3 seeds. Ours reaches the highest best accuracy on every dataset: 0.953 vs. 0.932 for Mixup on CIFAR-10, 0.784 vs. 0.742 on CIFAR-100 and 0.664 vs. 0.612 on Tiny-ImageNet; the baseline peaks at 0.917, 0.717 and 0.599."""
 
 import json
 import sys
@@ -9,7 +9,7 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import fit_height, mark_value
+from paper import fit_height
 
 colors = paper.use_design("../../../skills/academic-figure/assets/DESIGN.md")
 
@@ -40,11 +40,6 @@ for ax, name in zip(axes, datasets):
         width = paper.dashed_width if style != "-" else rcParams["lines.linewidth"]
         ax.fill_between(epochs, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)
         ax.plot(epochs, mean, color=color, linestyle=style, linewidth=width, label=method)
-    # ours and its closest competitor, Mixup, are marked; the three labels together collide
-    for method, color, below in [("Ours", colors["ours"], False), ("Mixup", colors["neutral"], True)]:
-        mean = runs[name][method].mean(axis=0)
-        i = int(np.argmax(mean))
-        mark_value(ax, epochs[i], mean[i], f"{mean[i]:#.3g}", color, below=below)
     ax.set_title(name)
 axes[0].set_ylabel("Validation accuracy")
 fig.supxlabel("Epoch")

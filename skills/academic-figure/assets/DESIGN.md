@@ -322,7 +322,7 @@ Pick the first row that fits:
 
 ### Value labels
 
-Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics carry none, and distributions only the summary statistics the takeaway cites (means), where their chart file places them, or in the caption when it gives no place. Each chart file says where (`mark_value` on curves, `ax.bar_label` on bars). Values are written by the first row that applies, in labels and caption alike:
+Reported results the takeaway compares are written on the plot, so the reader reads them exactly; diagnostics carry none, and distributions only the summary statistics the takeaway cites (means), where their chart file places them, or in the caption when it gives no place. Each chart file says where (`ax.bar_label` on bars, cell text in heatmaps); curves carry none, their compared values go in the caption (`line-chart.md`). Values are written by the first row that applies, in labels and caption alike:
 
 | Value | Written as |
 |---|---|
