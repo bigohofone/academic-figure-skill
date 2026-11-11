@@ -176,7 +176,8 @@ Paul Tol's color-blind-safe `bright` set, from `tol_colors` (`tc`): `cset = tc.c
 
 | Case | Legend |
 |---|---|
-| One panel, or several panels with the same series | one legend for the figure, placed by the first of these that covers no data: (1) a corner of a panel, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`, in the first panel that has one free; (2) another free spot inside a panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panels: `fig.legend(loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)`, with fewer columns (more rows) when one row of entries is wider than the figure |
+| One panel | placed by the first of these that covers no data: (1) a corner, tried in the order `loc="upper left"`, `"upper right"`, `"lower left"`, `"lower right"`; (2) another free spot inside the panel (`"upper center"`, `"lower center"`, `"center left"`, `"center right"`); (3) outside, above the panel, as below |
+| Several panels with the same series | one legend for the figure, outside above the panels, never tucked into one panel where the reader has to hunt for it: `fig.legend(*axes.flat[0].get_legend_handles_labels(), loc="outside upper center", ncol=<entries>, frameon=False, borderaxespad=0)`, with fewer columns (more rows) when one row of entries is wider than the figure |
 | Panels with different series | one per panel, placed inside that panel in the same order; outside, it goes above the panel's title: `ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=2, frameon=False)` |
 | Grouped series | rows = groups, columns = variants |
 | One series per panel | none; the title names it |
