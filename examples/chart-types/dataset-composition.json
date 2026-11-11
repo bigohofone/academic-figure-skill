@@ -1,0 +1,10 @@
+{
+ "total_examples": 1240000,
+ "sources": {
+  "Web forums": 0.38,
+  "Textbooks": 0.24,
+  "Code repositories": 0.17,
+  "Competition problems": 0.13,
+  "Synthetic": 0.08
+ }
+}

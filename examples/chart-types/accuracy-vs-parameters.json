@@ -1,0 +1,48 @@
+{
+ "models": {
+  "Llama-3-8B": {
+   "params_b": 8,
+   "mmlu": 0.664
+  },
+  "Llama-3-70B": {
+   "params_b": 70,
+   "mmlu": 0.795
+  },
+  "Qwen2-7B": {
+   "params_b": 7,
+   "mmlu": 0.703
+  },
+  "Qwen2-72B": {
+   "params_b": 72,
+   "mmlu": 0.823
+  },
+  "Mistral-7B": {
+   "params_b": 7.2,
+   "mmlu": 0.625
+  },
+  "Mixtral-8x7B": {
+   "params_b": 47,
+   "mmlu": 0.706
+  },
+  "Gemma-2-9B": {
+   "params_b": 9,
+   "mmlu": 0.713
+  },
+  "Gemma-2-27B": {
+   "params_b": 27,
+   "mmlu": 0.752
+  },
+  "Phi-3-mini": {
+   "params_b": 3.8,
+   "mmlu": 0.688
+  },
+  "Ours-3B": {
+   "params_b": 3.0,
+   "mmlu": 0.731
+  },
+  "Ours-8B": {
+   "params_b": 8.0,
+   "mmlu": 0.774
+  }
+ }
+}
