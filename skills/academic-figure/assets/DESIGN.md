@@ -306,7 +306,7 @@ Pick the first row that fits:
 
 - **Inside is worth a small overlap**: the legend's opaque frame keeps it readable, and it costs no height. It must not hide values: `fit_height` warns when it covers a curve, data points or text, or when more than a tenth of its area lies over filled marks (bars, boxes, bands, violins, areas).
 - **Columns**: an outside legend starts with all entries in one row; when `fit_height` reports text cut off or matplotlib reports the layout collapsing, `ncol = ceil(n / 2)`, then `ceil(n / 3)`, and so on, skipping a count that repeats, down to one column.
-- **Entry order**: curves: ours first, then the other series in color, line-style or shade order; side-by-side series (grouped bars, boxes): left to right; stacked bars and areas: the order of the segments as the reader meets them (top to bottom for vertical stacks, left to right for horizontal ones). When the drawing order differs, pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], loc=...)`.
+- **Entry order**: curves: ours first, then the other series in color, line-style or shade order; side-by-side series (grouped bars, boxes): left to right; stacked bars and areas: the order of the segments as the reader meets them (top to bottom for vertical stacks, left to right for horizontal ones). When the drawing order differs, pass the handles in entry order: `ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"], loc=...)`. A legend of several rows reads across each row, left to right, but matplotlib fills it column by column, so pass the entries reordered: `order = [i for c in range(ncol) for i in range(c, n, ncol)]`, `handles = [handles[i] for i in order]`, likewise the labels.
 - **`loc`**: always explicit, never `"best"`.
 
 ### Value labels
