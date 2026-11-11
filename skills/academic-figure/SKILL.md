@@ -79,7 +79,7 @@ Start every figure with the bundled style, copied into the project's `figures/` 
 
 ```python
 import tol_colors as tc
-from paper import fit_height, mark_value, smooth, darken  # importing paper registers the bundled Inter font
+from paper import fit_height, mark_value, smooth, darken, lighten  # importing paper registers the bundled Inter font
 plt.style.use("paper.mplstyle")
 ```
 
@@ -137,15 +137,15 @@ When the takeaway compares reported results across series, write them on the plo
 
 ## 4. Plot type
 
-Every plot type uses the same parts as lines: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt (box plots get theirs from the style), dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity, except bands and scatter clouds.
+Every plot type uses the same parts as lines: the style's full black box, data lines 1 pt, black outlines and edges 0.75 pt (box plots get theirs from the style), dashed lines 0.75 pt, and points as the style's markers (2.25 pt, 0.75 pt edge). Fills take the series color at full opacity, except bands and scatter clouds, and box plots and violins, which take `lighten(color)` so the black median and the points on them stay readable.
 
 - **Line**: `ax.plot(x, y, color=color)`; markers only on request (§3). Gridlines in both directions (style).
 - **Bar** (reported results, one bar per category on the x-axis): `bars = ax.bar(x, values, width, color=color, linewidth=0)`, grouped bars sharing 0.8 of each slot (`width = 0.8 / n_series`), every bar labelled with `ax.bar_label(bars, fontweight="bold")`. Horizontal gridlines only: `ax.grid(axis="x", visible=False)`. For several groups (benchmarks, datasets), one panel per group, titled with the group. Over several runs, error bars of ±1 std, named in the caption: `ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=0.75, capthick=0.75, ecolor="black"))`.
 - **Horizontal bar**: only for unordered categories with long names. As bars, with `ax.barh` and vertical gridlines only: `ax.grid(axis="y", visible=False)`.
 - **Stacked bar**: segments in series order from the bottom with white 0.5 pt seams, `ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=0.5)`; horizontal gridlines only.
 - **Histogram**: raw values as touching bars, `ax.hist(values, bins=bins, color=color, linewidth=0)`; several series on one axis as outlines, `histtype="step", linewidth=1`. Counts per bin (e.g. accuracy intervals) as grouped bars with the bins in order on the x-axis, never horizontal bars. No value labels (§3); horizontal gridlines only.
-- **Box plot**: `box = ax.boxplot(values, positions=[x], widths=0.7, showfliers=False)` (the box fills 0.7 of its slot), filled with its series color, `box["boxes"][0].set_facecolor(color)`; the style draws the black outline, whiskers, caps and median. With under ~30 points per box, show every point on top, jittered within the box, as the style's markers in black on white: `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color="black", markerfacecolor="white", linestyle="none")`. Horizontal gridlines only.
-- **Violin**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`; fill the body with its series color at full opacity with a black 0.75 pt edge (`body = parts["bodies"][0]`, `body.set_facecolor(color)`, `body.set_edgecolor("black")`, `body.set_linewidth(0.75)`, `body.set_alpha(1)`), and draw the median as a black 1 pt line across it; points as in box plots. Horizontal gridlines only.
+- **Box plot**: `box = ax.boxplot(values, positions=[x], widths=0.7, showfliers=False)` (the box fills 0.7 of its slot), filled with its series color lightened, `box["boxes"][0].set_facecolor(lighten(color))`; the style draws the black outline, whiskers, caps and median. With under ~30 points per box, show every point on top, jittered within the box, as the style's markers in black on white: `ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color="black", markerfacecolor="white", linestyle="none")`. Horizontal gridlines only.
+- **Violin**: `parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)`; fill the body with its series color lightened, at full opacity, with a black 0.75 pt edge (`body = parts["bodies"][0]`, `body.set_facecolor(lighten(color))`, `body.set_edgecolor("black")`, `body.set_linewidth(0.75)`, `body.set_alpha(1)`), and draw the median as a black 1 pt line across it; points as in box plots. Horizontal gridlines only.
 - **Scatter**: `ax.scatter(x, y, s=5, color=color, edgecolors="none", alpha=0.5)`, dots the size of the style's markers, translucent so dense regions read darker. Gridlines in both directions.
 - **Embedding** (t-SNE, UMAP): as scatter, with ticks hidden and no gridlines (`ax.grid(False)`).
 - **Heatmap, confusion matrix**: `ax.imshow(..., aspect="auto")`, tick marks hidden, no gridlines (`ax.grid(False)`), a colorbar for continuous values; cell text 7 pt in `"white" if np.dot(im.cmap(im.norm(v))[:3], [0.299, 0.587, 0.114]) < 0.5 else "black"`.

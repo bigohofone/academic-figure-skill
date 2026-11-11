@@ -219,6 +219,12 @@ def darken(color):
     return [c * 0.8 for c in colors.to_rgb(color)]
 
 
+
+def lighten(color):
+    """`color` mixed with white, 40% color: a box or violin fill, so the black median and points on it stay readable."""
+    return [0.4 * c + 0.6 for c in colors.to_rgb(color)]
+
+
 def smooth(values):
     """Centered moving average over 5% of the points (2.5% each side), shrinking at the ends.
     Centered, not EMA, so the smoothed curve does not lag the raw one."""

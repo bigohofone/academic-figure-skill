@@ -11,7 +11,7 @@ import pytest
 
 ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
 sys.path.insert(0, str(ASSETS))
-from paper import fit_height, mark_value, smooth, darken
+from paper import fit_height, mark_value, smooth, darken, lighten
 
 STYLE = ASSETS / "paper.mplstyle"
 WIDTH = 3.25
@@ -135,6 +135,10 @@ def test_smooth_is_centered():
 
 def test_darken_darkens():
     assert darken("#FFFFFF") == [0.8, 0.8, 0.8]
+
+
+def test_lighten_mixes_with_white():
+    assert lighten("#000000") == [0.6, 0.6, 0.6]
 
 
 def test_mark_value_line_point_and_label():
