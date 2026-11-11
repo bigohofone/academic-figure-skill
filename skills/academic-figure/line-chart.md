@@ -32,4 +32,4 @@ When the takeaway compares reported results across series, mark the compared val
 - Mark each value there with `mark_value(ax, x, y, "0.438", color)`: a dashed line in `darken(color)` across the whole panel at that value, under the curves; a circle on the point; and the value just above it. One per compared series, in the panels the takeaway is about. The lines let the reader compare heights anywhere in the panel.
 - If a label above the point covers a curve, put it below with `below=True`.
 - When the compared values sit too close for every label to stand clear (curves a few points apart at the comparison point), mark ours and its closest competitor only, and give the other values in the caption.
-- In a grid of panels, mark values in the one panel the caption's takeaway cites, not in every panel.
+- A two-factor grid (models × benchmarks) carries no value marks: it shows a pattern across many panels, and a mark in one panel singles it out. The compared numbers go in the caption.
