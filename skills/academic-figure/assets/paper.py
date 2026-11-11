@@ -33,6 +33,7 @@ dashed_width = 0.75  # the dashed-line token, set by use_design(); pass it to da
 highlight_size = 5  # the marker highlight-size token, set by use_design(); for a point of interest
 filled_edge_width = 0.25  # the marker filled-edge-width token, set by use_design(); for filled markers
 canvas_pad = 0.1  # the canvas-pad token, in inches, set by use_design(): free space at the left and right edges
+contour_label_size = 6.0  # the contour-label token, in points, set by use_design()
 colorbar_width, colorbar_gap = 0.1, 0.06  # the colorbar tokens, in inches, set by use_design()
 
 
@@ -56,7 +57,7 @@ def _number(value):
 def use_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, _greys
+    global dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, _greys
     # one renderer everywhere: screen backends measure text differently, so fit_height's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
@@ -65,6 +66,7 @@ def use_design(path="DESIGN.md"):
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     _greys = c["neutral"], c["neutral-light"], c["neutral-dark"]
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
+    contour_label_size = _number(t["contour-label"]["fontSize"])
     label, tick_label, legend, value_label, title = (
         _number(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "value-label", "title"))
     tick_pad, tick_width = _number(s["tick-pad"]), _number(k["tick"]["width"])

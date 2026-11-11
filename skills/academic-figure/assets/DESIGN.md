@@ -32,6 +32,9 @@ typography:
     fontFamily: Inter
     fontSize: 9pt
     fontWeight: 400
+  contour-label:
+    fontFamily: Inter
+    fontSize: 6pt
 spacing:
   layout-pad: 0.02in
   canvas-pad: 0.05in
@@ -124,6 +127,7 @@ One family, `Inter` (bundled), for all text and math, regular weight everywhere 
 |---|---|---|
 | `tick-label` | 7 pt | tick labels |
 | `value-label` | 7 pt | everything written inside the chart (value labels, cell text, point names, pie labels); the default for `ax.text` and `ax.annotate` |
+| `contour-label` | 6 pt | contour level labels, which sit on the lines and must not crowd them: `fontsize=paper.contour_label_size` |
 | `label` | 8 pt | axis labels, subcaptions |
 | `legend` | 7 pt | legend entries |
 | `title` | 9 pt | panel titles, row and column headers |
