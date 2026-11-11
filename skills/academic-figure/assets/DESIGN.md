@@ -127,10 +127,13 @@ One family, `Inter` (bundled), for all text and math. Sizes by role:
 | ICML | 3.25 in | 5.0625 in | 6.75 in |
 | CVPR | 3.25 in | 5.15625 in | 6.875 in |
 | ACL (ARR) | 3 in | 4.6875 in | 6.25 in |
-| NeurIPS, ICLR (one column of text) | – | – | 5.5 in (full text width) |
+
+| Single-column venue | Half text width | Full text width |
+|---|---|---|
+| ICLR, NeurIPS | 2.75 in | 5.5 in |
 
 - Use the venue and width the user names. With no venue, ICLR.
-- Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels, or one wide panel, takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width.
+- Single-column venues (ICLR, NeurIPS) have one text width, 5.5 in. A figure with several panels takes the full width; a single panel takes half of it, 2.75 in, so it is not blown up to the page width, unless it needs width (many x categories, a long time axis read in detail), then the full width at φ² : 1.
 - 1.5 column (0.75 × double) is a `figure*` narrower than the text: use it when the user asks, or when single column is too narrow and double column leaves the content sparse.
 
 ### Grid
@@ -167,7 +170,7 @@ The aspect (width : height) is per panel. Use one of these, golden ratio φ : 1 
 
 | Aspect | `aspect=` | Fit |
 |---|---|---|
-| φ² : 1 | 0.382 | a single panel at 1.5- or double-column width |
+| φ² : 1 | 0.382 | a single panel at 1.5-column, double-column or full text width |
 | φ : 1 | 0.618 | curves, bars, histograms (default) |
 | 1 : 1 | 1.0 | heatmap, confusion matrix, embedding, contour plot |
 | 1 : φ | 1.618 | content taller than wide (box plots, panels side by side in one column) |
