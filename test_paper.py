@@ -379,20 +379,6 @@ def test_wide_legend_warns():
         fit_height(fig, ax)
 
 
-def test_supporting_row_is_half_as_tall():
-    fig, axes = plt.subplots(2, 2, figsize=(2.75, 3), layout="constrained", sharex=True, sharey="row",
-                             height_ratios=[1, 2])
-    for a in axes.ravel():
-        a.plot([0, 1], [0, 1])
-    axes[0, 0].set_ylabel("Share")
-    axes[1, 0].set_ylabel("Accuracy")
-    fit_height(fig, axes, aspect=1, min_width=0.9)
-    w, h = fig.get_size_inches()
-    top, bottom = axes[0, 0].get_position(), axes[1, 0].get_position()
-    assert abs(bottom.height * h - bottom.width * w) < 0.01
-    assert abs(top.height * h - bottom.height * h / 2) < 0.01
-
-
 def test_column_gaps_are_standard():
     sizes = []
     for label in ("Accuracy", "A much longer label"):

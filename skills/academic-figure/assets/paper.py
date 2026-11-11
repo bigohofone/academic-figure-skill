@@ -101,17 +101,10 @@ def use_design(path="DESIGN.md"):
     return c
 
 
-def _row_scale(a):
-    """A panel's height relative to the tallest row of its grid (`height_ratios`), 1 without them."""
-    spec = a.get_subplotspec()
-    ratios = spec.get_gridspec().get_height_ratios() if spec else None
-    return sum(ratios[i] for i in spec.rowspan) / max(ratios) if ratios else 1
-
-
 def _panel_ratios(fig, panels):
     fig.canvas.draw()
     sizes = [_size(a) for a in panels]
-    return [h / w / _row_scale(a) for a, (w, h) in zip(panels, sizes)], [w for w, _ in sizes]
+    return [h / w for w, h in sizes], [w for w, _ in sizes]
 
 
 def _solve(fig, panels, aspect, iters, tol):
@@ -473,7 +466,7 @@ def _standard_box(fig, panels, aspect):
         cb_h, cb_bottom = cb.height * h, cb.y0 * h
     panel_w = (w - left - right - sum(col_gaps)) / len(columns)
     panel_h = aspect * (w - std_left - std_right - sum(col_gaps)) / len(columns)
-    row_h = [panel_h * _row_scale(next(a for a in panels if row_of[a] == r)) for r in range(len(rows))]
+    row_h = [panel_h] * len(rows)
     new_h = bottom + top + sum(row_h) + sum(row_gaps)
     fig.set_layout_engine("none")
     fig.set_figheight(new_h)
@@ -567,8 +560,7 @@ def _trim_height(fig, panels):
 
 
 def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
-    """Change only the figure height so each panel's height / width equals `aspect` (in a grid with
-    `height_ratios`, the tallest row's; the other rows take their share of it).
+    """Change only the figure height so each panel's height / width equals `aspect`.
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
     outside legends and colorbars are not measured. Call it last, after everything is drawn,
@@ -638,6 +630,8 @@ def fit_height(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2):
         _keep_value_labels_inside(fig, panels)
         ratios = _panel_ratios(fig, panels)[0]
     _center_group_labels(fig)
+    if max(ratios) - min(ratios) > tol * max(ratios):
+        warnings.warn("panels have different shapes; one figure takes one aspect (no height_ratios or width_ratios)")
     _warn_layout_problems(fig, panels, min_width)
     return ratios
 
