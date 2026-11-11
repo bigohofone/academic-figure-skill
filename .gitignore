@@ -4,3 +4,5 @@ __pycache__/
 
 # example notebooks also write PDFs; the README shows the PNGs
 examples/*/outputs/*.pdf
+docs/og.html
+docs/page_shot.html
