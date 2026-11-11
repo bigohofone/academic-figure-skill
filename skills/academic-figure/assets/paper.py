@@ -51,11 +51,11 @@ def use_design(path=Path(__file__).parent / "DESIGN.md"):
     tokens = _resolve(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
-    label, tick_label, title = (_number(t[name]["fontSize"]) for name in ("label", "tick-label", "title"))
+    label, tick_label, legend, title = (_number(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "title"))
     tick_pad, tick_width = _number(s["tick-pad"]), _number(k["tick"]["width"])
     rcParams.update({
         "font.sans-serif": [t["label"]["fontFamily"]],
-        "font.size": label, "axes.labelsize": label, "figure.labelsize": label, "legend.fontsize": label,
+        "font.size": label, "axes.labelsize": label, "figure.labelsize": label, "legend.fontsize": legend,
         "xtick.labelsize": tick_label, "ytick.labelsize": tick_label,
         "axes.titlesize": title, "axes.titleweight": t["title"].get("fontWeight", 400),
         "axes.titlepad": _number(s["title-pad"]), "axes.labelpad": _number(s["label-pad"]),

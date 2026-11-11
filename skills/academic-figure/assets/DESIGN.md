@@ -19,6 +19,9 @@ typography:
   label:
     fontFamily: Inter
     fontSize: 9pt
+  legend:
+    fontFamily: Inter
+    fontSize: 7pt
   title:
     fontFamily: Inter
     fontSize: 11pt
@@ -93,12 +96,13 @@ Pick the first row that fits:
 
 ## Typography
 
-One family, `Inter` (bundled), for all text and math. Three sizes by role:
+One family, `Inter` (bundled), for all text and math. Sizes by role:
 
 | Token | Size | Used for |
 |---|---|---|
 | `tick-label` | 7 pt | tick labels, heatmap cell text, labels next to points |
-| `label` | 9 pt | axis labels, legends, value labels, subcaptions |
+| `label` | 9 pt | axis labels, value labels, subcaptions |
+| `legend` | 7 pt | legend entries |
 | `title` | 11 pt | panel titles, row and column headers |
 
 - Value labels are bold; everything else is regular. Text is black (`ink`) unless it belongs to one series.
