@@ -45,7 +45,7 @@ ax.set_xticks(x, labels=benchmarks)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Accuracy")
-ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(methods), frameon=False)
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(methods))
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/grouped-bar-chart.pdf")

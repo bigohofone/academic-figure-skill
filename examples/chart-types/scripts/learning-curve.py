@@ -47,7 +47,7 @@ for name in ["Baseline", "Mixup", "Ours"]:
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Validation accuracy")
 ax.grid(True)
-ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Baseline", "Mixup"], loc="lower right")
+ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Baseline", "Mixup"])
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/learning-curve.pdf")

@@ -46,9 +46,8 @@ fig.supxlabel("Epoch")
 
 handles, labels = axes[0].get_legend_handles_labels()
 order = [2, 0, 1]  # ours first, then the grey series in line-style order
-fig.legend([handles[i] for i in order], [labels[i] for i in order], loc="outside upper center", ncol=3,
-           frameon=False, borderaxespad=0)
+fig.legend([handles[i] for i in order], [labels[i] for i in order], loc="outside upper center", ncol=3, borderaxespad=0)
 
-finalize_figure(fig, axes)
+finalize_figure(fig, axes, aspect=0.618, min_width=0.7)
 fig.savefig("../outputs/small-multiples.pdf")
 fig.savefig("../outputs/small-multiples.png")

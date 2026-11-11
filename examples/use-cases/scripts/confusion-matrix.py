@@ -29,7 +29,6 @@ ax.set_xlabel("Predicted label")
 ax.set_ylabel("True label")
 ax.tick_params(length=0)
 ax.grid(False)
-fig.colorbar(im, ax=ax, label="Fraction of true rating")
 for i in range(matrix.shape[0]):
     for j in range(matrix.shape[1]):
         v = matrix[i, j]

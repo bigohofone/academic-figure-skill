@@ -43,7 +43,7 @@ ax.set_ylabel("True positive rate")
 ax.grid(True)
 handles, labels = ax.get_legend_handles_labels()
 order = [3, 2, 0, 1]  # the full method first, then its variant, then the baselines
-ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower right")
+ax.legend([handles[i] for i in order], [labels[i] for i in order])
 
 finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/roc-curve.pdf")

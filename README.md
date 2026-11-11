@@ -8,11 +8,19 @@ A Claude Code skill for paper figures. Ask for a plot as usual and get one that 
 
 ![academic-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style](docs/hero.png)
 
+## A whole paper, redrawn
+
+Every data plot in the main text of a NeurIPS 2025 Best Paper, redrawn from the values in the original figures, then the paper recompiled from its arXiv source. Same text, same captions.
+
+![Page 6 of "1000 Layer Networks for Self-Supervised RL", original vs redrawn with academic-figure](docs/paper.png)
+
+<sub>Wang et al., "1000 Layer Networks for Self-Supervised RL: Scaling Depth Can Enable New Goal-Reaching Capabilities", NeurIPS 2025, [arXiv:2503.14858](https://arxiv.org/abs/2503.14858), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). More pages and a second paper on the [project site](https://wonjunoh.com/academic-figure-skill/).</sub>
+
 ## Same request, with and without
 
-The same data and the same request, on an ICML page at print size. Nothing was touched by hand.
+The same data and the same request, on an ICML page at print size: Claude Code on its own, and with academic-figure. Nothing was touched by hand. The dashed lines mark the text columns (blue) and the standard panel edges (red).
 
-![Claude Code alone vs with academic-figure, on an A4 ICML page](docs/page.png)
+![Claude Code alone vs with academic-figure, on an ICML page](docs/page.png)
 
 ## What you get
 

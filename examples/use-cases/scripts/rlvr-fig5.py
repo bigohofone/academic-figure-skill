@@ -32,7 +32,7 @@ ax.tick_params(axis="x", length=0)
 ax.set_xticks(x, labels=bins, rotation=45, ha="right", rotation_mode="anchor")
 ax.set_xlabel("Per-problem accuracy")
 ax.set_ylabel("Problems")
-ax.legend(loc="upper right")
+ax.legend()
 
 finalize_figure(fig, ax, aspect=0.382)
 fig.savefig("../outputs/rlvr-fig5.pdf")

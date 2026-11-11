@@ -44,7 +44,7 @@ ax.yaxis.set_minor_formatter(NullFormatter())
 ax.set_xlabel("Non-embedding parameters")
 ax.set_ylabel("Test loss (nats/token)")
 ax.grid(True, which="both")
-ax.legend(loc="upper right")
+ax.legend()
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/scaling-law.pdf")

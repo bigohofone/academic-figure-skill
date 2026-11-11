@@ -44,8 +44,7 @@ ncol = 4
 order = [i for c in range(ncol) for i in range(c, len(handles), ncol)]
 # a figure legend: with no tick labels, finalize_figure leaves this panel to the constrained layout, which
 # moves an ax.legend anchored above the panel a little further on every draw
-fig.legend([handles[i] for i in order], [names[i] for i in order], loc="outside upper center", ncol=ncol,
-           frameon=False, borderaxespad=0)
+fig.legend([handles[i] for i in order], [names[i] for i in order], loc="outside upper center", ncol=ncol, borderaxespad=0)
 
 finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/t-sne.pdf")

@@ -35,7 +35,7 @@ for name, values in series.items():
 ax.grid(axis="x", visible=False)
 ax.set_xlabel("Confidence")
 ax.set_ylabel("Density")
-ax.legend(loc="upper left")
+ax.legend()
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/confidence-histogram.pdf")

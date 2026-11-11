@@ -70,5 +70,5 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
 - Legend: outside, above chart; ours first though drawn last.
 
   ```python
-  fig.legend(handles, labels, loc="outside upper center", ncol=len(labels), frameon=False, borderaxespad=0)
+  fig.legend(handles, labels, loc="outside upper center", ncol=len(labels), borderaxespad=0)
   ```

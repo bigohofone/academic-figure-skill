@@ -8,7 +8,7 @@ from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.legend import Legend
 from matplotlib.transforms import Bbox
 from matplotlib.text import Annotation
-from matplotlib.ticker import FixedLocator, FuncFormatter, ScalarFormatter
+from matplotlib.ticker import AutoLocator, FixedLocator, FuncFormatter, MaxNLocator, ScalarFormatter
 
 from . import design, checks
 
@@ -36,10 +36,16 @@ def _measure_panels(fig, panels):
 def _fit_height_to_aspect(fig, panels, aspect, iters, tol):
     h0 = fig.get_figheight()
     ratios, widths = _measure_panels(fig, panels)
-    while not np.isfinite(ratios[0]):  # the start is too short for the decorations: grow until the layout stands
+    for _ in range(6):  # the start is too short for the decorations: grow until the layout stands
+        if np.isfinite(ratios[0]):
+            break
         h0 *= 2
         fig.set_figheight(h0)
         ratios, widths = _measure_panels(fig, panels)
+    if not np.isfinite(ratios[0]):
+        warnings.warn("the layout collapses at any height: the panels are too narrow for their labels and "
+                      "legend; use one column fewer or a wider figure")
+        return ratios, widths
     r0 = ratios[0]
     h1 = h0 * aspect / r0
     for _ in range(iters):
@@ -67,10 +73,20 @@ def _set_canvas_pad(fig):
 
 
 def _freeze_ticks(panels):
+    """Fix the ticks where they are now; the locator they came from is kept for `_unfreeze_ticks`."""
     for a in panels:
         for axis in (a.xaxis, a.yaxis):
+            if not hasattr(axis, "_auto_locator"):
+                axis._auto_locator = axis.get_major_locator()
             lo, hi = sorted(axis.get_view_interval())
             axis.set_major_locator(FixedLocator([t for t in axis.get_majorticklocs() if lo <= t <= hi]))
+
+
+def _unfreeze_ticks(panels):
+    for a in panels:
+        for axis in (a.xaxis, a.yaxis):
+            if hasattr(axis, "_auto_locator"):
+                axis.set_major_locator(axis._auto_locator)
 
 
 def _limit_leaving_room(axis, lo, hi, v, reach, size, upper):
@@ -133,6 +149,46 @@ def _keep_value_labels_inside(fig, panels):
     return changed
 
 
+HEATMAP_MIN_SIZE = 4  # points: smaller cell values are dropped instead (DESIGN.md Collisions step 4)
+
+
+def _fit_heatmap_values(fig, panels):
+    """Every row and column of a heatmap is named and every cell's value written, so they all fit their
+    cells: the cell values take one size, the largest (up to the value-label size) at which each fits its
+    cell; the row and column names one size (up to the tick-label size) at which they clear each other.
+    Never below HEATMAP_MIN_SIZE."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    heatmaps = [a for a in panels if a.images]
+    space = 0.7 * fig.dpi / 72  # the word space checks._texts_overlap asks between neighbours, per point of size
+    names_fit = rcParams["xtick.labelsize"]
+    for a in heatmaps:
+        rows, cols = a.images[0].get_array().shape[:2]
+        panel = a.get_window_extent(renderer)
+        cell_w, cell_h = panel.width / cols, panel.height / rows
+        cells = [t for t in a.texts if t.get_ha() == "center" and t.get_va() == "center" and t.get_visible() and t.get_text()]
+        if cells:
+            size = rcParams["font.size"]
+            for t in cells:
+                t.set_fontsize(size)
+            boxes = [t.get_window_extent(renderer) for t in cells]
+            fit = min(min(0.9 * cell_w * size / b.width, 0.8 * cell_h * size / b.height) for b in boxes)
+            for t in cells:
+                t.set_fontsize(max(HEATMAP_MIN_SIZE, min(size, fit)))
+                t._in_cell = True
+        for axis, along in ((a.xaxis, cell_w), (a.yaxis, cell_h)):
+            names = [t for t in axis.get_ticklabels() if t.get_visible() and t.get_text()]
+            for t in names:
+                size = t.get_fontsize()
+                box = t.get_window_extent(renderer)
+                need = box.width / size + space if axis is a.xaxis else box.height / size
+                names_fit = min(names_fit, along / need)
+    if heatmaps:
+        for a in heatmaps:
+            for axis in (a.xaxis, a.yaxis):
+                axis.set_tick_params(labelsize=max(HEATMAP_MIN_SIZE, names_fit))
+
+
 def _turn_crowded_bar_labels(fig, panels):
     """Bar values written side by side that overlap all turn upward, in every panel where any two do."""
     fig.canvas.draw()
@@ -153,9 +209,72 @@ INSIDE_SPOTS = ["upper left", "upper right", "lower left", "lower right",
                 "upper center", "lower center", "center left", "center right"]
 
 
+def _clear_spot(fig, a, legend, panels, renderer):
+    """Put the legend at the first inside spot of panel `a` where it hides nothing; whether one was found.
+    The legend is marked as placed here, so `_recheck_legends` can move it again at the final size."""
+    legend._placed_inside = True
+    for spot in INSIDE_SPOTS:
+        legend.set_loc(spot)
+        if not checks._legend_problems(fig, a, panels, renderer):
+            return True
+    return False
+
+
+def _recheck_legends(fig, panels):
+    """Panels change size a little when they are put on the standard box: a legend placed inside earlier
+    may now touch data; look again for a clear spot in its panel, else put it above. Returns whether
+    any went above (the panels then need placing again)."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    above = False
+    for a in panels:
+        legend = a.get_legend()
+        if legend is None or not getattr(legend, "_placed_inside", False) or not checks._legend_problems(fig, a, panels, renderer):
+            continue
+        if not _clear_spot(fig, a, legend, panels, renderer):
+            handles, labels = legend.legend_handles, [t.get_text() for t in legend.get_texts()]
+            legend.remove()
+            if not _place_inside(fig, [a], handles, labels, panels, renderer):
+                _legend_above(fig, a, handles, labels, several=len(panels) > 1)
+                above = True
+    return above
+
+
+def _place_inside(fig, candidates, handles, labels, panels, renderer):
+    """Put the legend inside the first of `candidates` with a spot where it hides nothing: at the legend
+    size in every candidate first, then at the smaller legend-inside size. Whether it found one."""
+    for size in (rcParams["legend.fontsize"], design.legend_inside_size):
+        for a in candidates:
+            legend = a.legend(handles, labels, fontsize=size)
+            if _clear_spot(fig, a, legend, panels, renderer):
+                return True
+            legend.remove()
+    return False
+
+
+def _legend_above(fig, a, handles, labels, several):
+    """A legend above the panels, in as few rows as fit the figure's width. Above several panels it is the
+    figure's legend: an axes legend that wide would count as part of its one panel and collapse the layout."""
+    room = fig.get_figwidth() * fig.dpi - 2 * design.canvas_pad * fig.dpi
+    for ncols in range(len(labels), 0, -1):
+        # matplotlib fills a legend column by column; reorder so its rows read left to right in entry order
+        order = [i for c in range(ncols) for i in range(c, len(labels), ncols)]
+        h, l = [handles[i] for i in order], [labels[i] for i in order]
+        if several:
+            legend = fig.legend(h, l, loc="outside upper center", ncols=ncols, borderaxespad=0)
+        else:
+            legend = a.legend(h, l, loc="lower center", bbox_to_anchor=(0.5, 1), ncols=ncols, borderaxespad=0.5)
+        if ncols == 1 or legend.get_window_extent(fig.canvas.get_renderer()).width <= room:
+            return
+        legend.remove()
+
+
 def _place_legends(fig, panels):
-    """A panel legend made without `loc` goes to the first inside spot where it hides nothing, else
-    above its panel in one row. Returns whether any went above."""
+    """A panel legend made without `loc` names series that may run through every panel, so it goes
+    inside the first panel, starting with its own, that has a spot where it hides nothing (at the legend
+    size, then the smaller legend-inside size); the other panels carry none. Where no panel has room even
+    then, it goes above its own panel at the legend size. Returns
+    whether any went above."""
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     above = False
@@ -163,16 +282,11 @@ def _place_legends(fig, panels):
         legend = a.get_legend()
         if legend is None or legend._loc != Legend.codes["best"]:
             continue
-        for spot in INSIDE_SPOTS:
-            legend.set_loc(spot)
-            if not checks._legend_problems(fig, a, panels, renderer):
-                break
-        else:
-            legend.set_loc("lower center")
-            legend.set_bbox_to_anchor((0.5, 1), transform=a.transAxes)
-            legend.set_ncols(len(legend.get_texts()))
-            legend.set_frame_on(False)
-            legend.borderaxespad = 0.5
+        handles, labels = legend.legend_handles, [t.get_text() for t in legend.get_texts()]
+        legend.remove()
+        candidates = [a, *[o for o in panels if o is not a and o.get_legend() is None]]
+        if not _place_inside(fig, candidates, handles, labels, panels, renderer):
+            _legend_above(fig, a, handles, labels, several=len(panels) > 1)
             above = True
     return above
 
@@ -232,19 +346,64 @@ def _center_group_labels(fig):
             axes[0].yaxis.label.set_y((center - first.y0) / first.height)
 
 
-def _standard_column_gap(fig, column, column_gap):
-    """The standard gap before a grid column. A column with its own y label shows a new quantity, so
-    it starts a new group, as if a new figure began there: the right margin plus the left margin (more
-    for a longer y label), plus `column_gap`, the space between the page's text columns, so in a
-    double-column figure the groups line up with single-column figures. A column with only its own
-    tick numbers (the same quantity over its own range) sits close: half a tick label, so the end
-    labels of neighbouring x axes clear each other, plus its tick labels. Otherwise half a tick label."""
+def _y_decoration_width(axes, side="left"):
+    """How far, in inches, the y tick labels and y label of these axes reach out from their panels on
+    `side`; 0 when they show none."""
+    renderer = axes[0].figure.canvas.get_renderer()
+    widths = [0.0]
+    for a in axes:
+        if not any(t.get_visible() and t.get_text() for t in a.get_yticklabels()) and not a.yaxis.label.get_text():
+            continue
+        box, panel = a.yaxis.get_tightbbox(renderer), a.get_window_extent(renderer)
+        if box is not None:
+            widths.append((panel.x0 - box.x0 if side == "left" else box.x1 - panel.x1) / a.figure.dpi)
+    return max(widths)
+
+
+def _x_end_clearance(left_column, right_column):
+    """The gap, in inches, that keeps the last x tick label of the panels on the left half an em clear of
+    the first one of the panels on the right, so "2000" and "0" never read as "20000"."""
+    renderer = left_column[0].figure.canvas.get_renderer()
+
+    def end_label(a, last):
+        lo, hi = sorted(a.xaxis.get_view_interval())
+        shown = [(loc, t) for loc, t in zip(a.xaxis.get_majorticklocs(), a.xaxis.get_majorticklabels())
+                 if lo <= loc <= hi and t.get_visible() and t.get_text()]
+        return (max if last else min)(shown, key=lambda p: p[0])[1] if shown else None
+
+    def reach(a, last):
+        label = end_label(a, last)
+        if label is None:
+            return 0.0
+        box, panel = label.get_window_extent(renderer), a.get_window_extent(renderer)
+        return max(0.0, (box.x1 - panel.x1) if last else (panel.x0 - box.x0)) / a.figure.dpi
+
+    half_em = rcParams["xtick.labelsize"] / 72 / 2
+    return max(reach(a, True) for a in left_column) + max(reach(a, False) for a in right_column) + half_em
+
+
+def _colorbar_end_clearance(left_bar, right_bar):
+    """The gap, in inches, that keeps two colorbars side by side clear at their facing ends: their ticks are
+    laid out again at the final length, so a tick may land on either end, its label centered there; half the
+    widest tick label of each, and half an em between."""
+    renderer = left_bar.figure.canvas.get_renderer()
+    half_widest = [max((t.get_window_extent(renderer).width for t in bar.get_xticklabels() if t.get_text()), default=0) / 2
+                   for bar in (left_bar, right_bar)]
+    return sum(half_widest) / left_bar.figure.dpi + rcParams["xtick.labelsize"] / 72 / 2
+
+
+def _standard_column_gap(fig, column, column_gap, starts_group):
+    """The gap before a grid column: the `panel-gap` token of free space, plus what the column's own y tick
+    labels and y label take (`_x_end_clearance` widens it where x end labels would touch). A column that
+    starts a new group begins as if a new figure began there: the standard right and left margins, plus the
+    column gap in a figure spanning both text columns (`column_gap` > 0), so its panels line up with the
+    single-column figures above and below. New groups: each sub-figure, and in a figure spanning both text
+    columns, a column with its own y label (`starts_group`)."""
     ticks, label, half = _standard_y_widths(fig)
-    shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
     label_lines = max(_line_count(a.yaxis.label) for a in column)
-    if label_lines:
+    if starts_group:
         return (design.canvas_pad + half) + column_gap + (design.canvas_pad + ticks + label * label_lines)
-    return half + ticks * shows_ticks
+    return design.panel_gap + _y_decoration_width(column)
 
 
 def _x_tick_height(fig):
@@ -268,28 +427,65 @@ def _line_count(text):
     return text.get_text().count("\n") + 1 if text.get_text() else 0
 
 
+def _subfigures_to_groups(fig):
+    """Sub-figures side by side become groups of panels on the figure's own grid: each is stretched,
+    transparent, over the whole figure, so its panels' positions are figure positions, and the panels stay
+    where the layout put them. Returns each panel's group (0 without sub-figures)."""
+    if not fig.subfigs:
+        return {a: 0 for a in fig.axes}
+    fig.canvas.draw()
+    to_figure = fig.transFigure.inverted()
+    boxes = {a: a.get_window_extent().transformed(to_figure) for a in fig.axes}
+    group = {a: i for i, sf in enumerate(fig.subfigs) for a in sf.axes}
+    fig.set_layout_engine("none")
+    for sf in fig.subfigs:
+        sf._redo_transform_rel_fig(bbox=Bbox.unit())
+        sf.patch.set_visible(False)
+    for a, box in boxes.items():
+        a.set_position(box)
+    return group
+
+
 def _place_on_standard_box(fig, panels, aspect, column_gap):
     """Panels sit at the standard margins and take the standard size, so the boxes of all figures at
     one width (and one number of columns) line up and match. The right margin is fixed; left labels
     that need more room widen the left margin and narrow the panels, which keep the standard height
     (the aspect gives way). The gaps between columns are standard (`_standard_column_gap`); the gaps between rows stay as the layout
     found them; the columns share what is left.
-    One colorbar is kept beside the panels (right) or under them (bottom), at the size and gap the
-    layout gave it, its labels inside a standard margin of their own. Returns whether they moved."""
+    One colorbar is kept beside the panels (right) or under them (bottom), its labels inside a standard
+    margin of their own; several colorbars stand one beside each column of panels, each with the room its
+    labels take before the next column, or one under each column of a single row, their end labels apart. Returns whether they moved."""
     cbars = [a for a in fig.axes if getattr(a, "_colorbar", None) is not None]
     others = [a for a in fig.axes if a not in panels and a not in cbars]
     twin_of = {t: p for t in others for p in panels
                if np.allclose(t.get_position().bounds, p.get_position().bounds)}  # ax.twinx(): a right y axis
-    if fig.subfigs or len(cbars) > 1 or len(twin_of) != len(others) or checks._is_round_panel(panels[0]):
+    nested = any(sf.subfigs for sf in fig.subfigs)
+    stacked = len({round(sf.bbox_relative.y0, 3) for sf in fig.subfigs}) > 1
+    owned = (all(getattr(c._colorbar.mappable, "axes", None) in panels for c in cbars)
+             and len({c._colorbar.orientation for c in cbars}) == 1)
+    if (nested or stacked or (fig.subfigs and cbars) or (len(cbars) > 1 and not owned) or len(twin_of) != len(others)
+            or checks._is_round_panel(panels[0])):
         return False
+    group = _subfigures_to_groups(fig)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     w, h = fig.get_size_inches()
     boxes = {a: a.get_position() for a in panels}
     columns = sorted({round(b.x0 * w, 2) for b in boxes.values()})
-    rows = sorted({round(b.y0 * h, 2) for b in boxes.values()}, reverse=True)
     col_of = {a: columns.index(round(b.x0 * w, 2)) for a, b in boxes.items()}
-    row_of = {a: rows.index(round(b.y0 * h, 2)) for a, b in boxes.items()}
+    # rows counted in each group: sub-figures lay out their rows apart
+    group_rows = {g: sorted({round(boxes[a].y0 * h, 2) for a in panels if group[a] == g}, reverse=True)
+                  for g in set(group[a] for a in panels)}
+    row_of = {a: group_rows[group[a]].index(round(b.y0 * h, 2)) for a, b in boxes.items()}
+    rows = range(max(row_of.values()) + 1)
+    column_cbar = {col_of[c._colorbar.mappable.axes]: c for c in cbars} if len(cbars) > 1 else {}
+    if len(cbars) > 1 and len(column_cbar) < len(cbars):
+        return False  # two colorbars for one column
+    vertical_bars = bool(cbars) and cbars[0]._colorbar.orientation == "vertical"
+    beside = column_cbar if vertical_bars else {}
+    under = {} if vertical_bars else column_cbar
+    if under and len(rows) > 1:
+        return False
     first_column = [a for a in panels if col_of[a] == 0]
     if not any(a.yaxis.label.get_text() or any(t.get_visible() and t.get_text() for t in a.get_yticklabels())
                for a in first_column):
@@ -297,13 +493,15 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
     left, right = _standard_side_margins(fig)
     side = left - design.canvas_pad  # an axis label and four-character tick labels
     pad = design.canvas_pad
-    cbar = cbars[0] if cbars else None
+    cbar = cbars[0] if len(cbars) == 1 else None
     vertical = cbar is not None and cbar._colorbar.orientation == "vertical"
+    cb_gap, cb_w = design.colorbar_gap, design.colorbar_width
     # the right margin never moves, so every figure's right edge lines up; a left label that needs
     # more room takes it from the panels' width, never their height, so one width keeps one height
-    if vertical:
-        cb_gap, cb_w = design.colorbar_gap, design.colorbar_width
-        right = pad + side + cb_w + cb_gap
+    # a colorbar's labels take the standard margin, or what they need when wider ("0.945"), so the canvas pad stays clear
+    last_cbar = cbar if vertical else beside.get(len(columns) - 1)
+    if last_cbar is not None:
+        right = pad + max(side, _y_decoration_width([last_cbar], "right")) + cb_w + cb_gap
     std_left, std_right = left, right
     ticks, label, half = _standard_y_widths(fig)
     for a, b in boxes.items():
@@ -317,7 +515,17 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
     right_axis = ticks + label * max((_line_count(t.yaxis.label) for t in twin_of), default=0)
     if len(columns) - 1 in right_column and not vertical:
         right = pad + right_axis
-    col_gaps = [_standard_column_gap(fig, [a for a in panels if col_of[a] == c], column_gap) + right_axis * (c - 1 in right_column)
+    # inside the grid, a right y axis takes only what it shows (none when its tick labels are hidden)
+    group_of_column = {col_of[a]: group[a] for a in panels}
+    column_panels = {c: [a for a in panels if col_of[a] == c] for c in range(len(columns))}
+    starts_group = {c: group_of_column[c] != group_of_column[c - 1]
+                    or bool(column_gap and any(a.yaxis.label.get_text() for a in column_panels[c]))
+                    for c in range(1, len(columns))}
+    col_gaps = [max(_standard_column_gap(fig, column_panels[c], column_gap, starts_group[c])
+                    + (_y_decoration_width([t for t, p in twin_of.items() if col_of[p] == c - 1], "right") if c - 1 in right_column else 0)
+                    + (cb_gap + cb_w + _y_decoration_width([beside[c - 1]], "right") if c - 1 in beside else 0),
+                    _x_end_clearance([a for a in panels if col_of[a] == c - 1], [a for a in panels if col_of[a] == c]),
+                    _colorbar_end_clearance(under[c - 1], under[c]) if c in under and c - 1 in under else 0)
                 for c in range(1, len(columns))]
     # rows: above each, half a tick label or a title line; below, x tick labels and x label lines;
     # anything more (a legend above a panel, a second line, turned labels) widens that margin
@@ -334,34 +542,67 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
         above.append(max(std_above, max(b.y1 for b in tight) / fig.dpi - y1))
         below.append(max(std_below, y0 - min(b.y0 for b in tight) / fig.dpi))
     row_gaps = [below[r] + above[r + 1] for r in range(len(rows) - 1)]
-    top_legends = [lg for lg in fig.legends if lg.get_window_extent(renderer).y0 / fig.dpi >= max(b.y1 for b in boxes.values()) * h - 1e-3]
+    # a legend made "outside upper" belongs above the panels even while it is still drawn over them
+    top_legends = [lg for lg in fig.legends if getattr(lg, "_outside_loc", None) == "upper"
+                   or lg.get_window_extent(renderer).y0 / fig.dpi >= max(b.y1 for b in boxes.values()) * h - 1e-3]
     legend_h = sum(lg.get_window_extent(renderer).height / fig.dpi for lg in top_legends)
     top = pad + legend_h + above[0]
     sup_x = fig._supxlabel if fig._supxlabel and fig._supxlabel.get_text() else None
-    bottom = pad + below[-1] + label * (_line_count(sup_x) if sup_x else 0)
-    if cbar is not None and not vertical:
-        bottom = boxes[next(a for a in panels if row_of[a] == len(rows) - 1)].y0 * h  # a colorbar under the panels keeps the layout's room
-        cb = cbar.get_position()
-        cb_h, cb_bottom = cb.height * h, cb.y0 * h
-    panel_w = (w - left - right - sum(col_gaps)) / len(columns)
-    panel_h = aspect * (w - std_left - std_right - sum(col_gaps)) / len(columns)
+    subcaptions = {g: sf._supxlabel for g, sf in enumerate(fig.subfigs) if sf._supxlabel and sf._supxlabel.get_text()}
+    caption_lines = max(_line_count(t) for t in [*subcaptions.values(), sup_x] if t) if sup_x or subcaptions else 0
+    bottom = pad + below[-1] + label * caption_lines
+    if (cbar is not None and not vertical) or under:
+        # a colorbar under the panels (or one under each column): as thick as one beside them, the colorbar gap
+        # under the x labels; its own tick labels and label keep the room the layout gave them below it
+        cb_bottom, cb_h = min(c.get_position().y0 for c in cbars) * h, design.colorbar_width
+        bottom = cb_bottom + cb_h + design.colorbar_gap + below[-1]
+    n = len(columns)
+    panel_h = aspect * (w - std_left - std_right - sum(col_gaps)) / n
+    # each column's left edge and width; a group starting halfway across a figure spanning both text columns
+    # starts exactly where a single-column figure in the second text column does, and the group before it ends
+    # where one in the first ends, so wider left labels narrow only the panels of their own half
+    mid = n // 2
+    halves = column_gap and not vertical and not column_cbar and n % 2 == 0 and n > 1 and starts_group[mid]
+    if halves:
+        half = (w - column_gap) / 2
+        second = half + col_gaps[mid - 1] - std_right
+        spans = [(left, half - std_right, range(mid)), (second, w - right, range(mid, n))]
+    else:
+        spans = [(left, w - right, range(n))]
+    col_x, col_w = {}, {}
+    for x, end, cols in spans:
+        width = (end - x - sum(col_gaps[c - 1] for c in cols if c != cols[0])) / len(cols)
+        for c in cols:
+            col_x[c], col_w[c] = x, width
+            x += width + (col_gaps[c] if c < n - 1 else 0)
     row_h = [panel_h] * len(rows)
     new_h = bottom + top + sum(row_h) + sum(row_gaps)
     fig.set_layout_engine("none")
     fig.set_figheight(new_h)
     for a in panels:
         c, r = col_of[a], row_of[a]
-        x0 = left + c * panel_w + sum(col_gaps[:c])
         y0 = bottom + sum(row_h[r + 1:]) + sum(row_gaps[r:])
-        a.set_position([x0 / w, y0 / new_h, panel_w / w, row_h[r] / new_h])
+        a.set_position([col_x[c] / w, y0 / new_h, col_w[c] / w, row_h[r] / new_h])
     for t, p in twin_of.items():
         t.set_position(p.get_position())
-    span_w = len(columns) * panel_w + sum(col_gaps)
+    for c, cb in beside.items():
+        y0 = min(a.get_position().y0 for a in column_panels[c])
+        y1 = max(a.get_position().y1 for a in column_panels[c])
+        cb.set_position([(col_x[c] + col_w[c] + cb_gap) / w, y0, cb_w / w, y1 - y0])
+    for c, cb in under.items():
+        cb.set_position([col_x[c] / w, cb_bottom / new_h, col_w[c] / w, cb_h / new_h])
+    span_w = col_x[n - 1] + col_w[n - 1] - left
     span_h = sum(row_h) + sum(row_gaps)
     if sup_x:
         sup_x.set_x((left + span_w / 2) / w)
         sup_x.set_y(pad / new_h)
         sup_x.set_verticalalignment("bottom")
+    for g, caption in subcaptions.items():
+        x0 = min(a.get_position().x0 for a in panels if group[a] == g)
+        x1 = max(a.get_position().x1 for a in panels if group[a] == g)
+        caption.set_x((x0 + x1) / 2)
+        caption.set_y(pad / new_h)
+        caption.set_verticalalignment("bottom")
     y = new_h - pad
     for lg in top_legends:
         lg.set_loc("upper center")
@@ -375,6 +616,8 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
         cbar.set_position([(left + span_w + cb_gap) / w, bottom / new_h, cb_w / w, span_h / new_h])
     elif cbar is not None:
         cbar.set_position([left / w, cb_bottom / new_h, span_w / w, cb_h / new_h])
+    for c in cbars:
+        c.set_box_aspect(None)  # placed at their exact size: no cap on their length (`_colorbars_span_panels`)
     return True
 
 
@@ -410,12 +653,40 @@ def _start_at_zero(panels):
                 set_(0, hi)
 
 
+def _denser_y_ticks(fig):
+    """matplotlib's default y ticks, but at least four where the axis has room: rounding the step to
+    1, 2, 2.5 or 5 often leaves a short panel with only 0, 200, 400."""
+    for a in fig.axes:
+        if type(a.yaxis.get_major_locator()) is AutoLocator and a.get_yscale() == "linear":
+            a.yaxis.set_major_locator(MaxNLocator(nbins="auto", steps=[1, 2, 2.5, 5, 10], min_n_ticks=4))
+
+
+def _tick_text(axis):
+    """Tick numbers as plain numbers (0, 0.5, 1) with a true minus sign; from 1000 up with an SI suffix,
+    one unit for the whole axis, when that writes the ticks shorter (0.5K, 1K, 1.5K, 2K; but 200 ... 1000
+    and 1024 stay)."""
+    def plain(v):
+        return f"{v:.10g}".replace("-", "\u2212")
+
+    def text(v, _):
+        ticks = list(axis.get_majorticklocs())
+        top = max((abs(t) for t in ticks), default=0)
+        for scale, suffix in ((1e9, "B"), (1e6, "M"), (1e3, "K")):
+            if top >= scale:
+                short = lambda t: "0" if t == 0 else plain(t / scale) + suffix
+                if sum(map(len, map(short, ticks))) < sum(map(len, map(plain, ticks))):
+                    return short(v)
+                break
+        return plain(v)
+    return text
+
+
 def _write_plain_tick_numbers(fig):
-    """Write matplotlib's default numeric ticks as plain numbers (0, 0.5, 1; 1024), with a true minus sign."""
+    """Write matplotlib's default numeric ticks short and plain (`_tick_text`)."""
     for a in fig.axes:
         for axis in (a.xaxis, a.yaxis):
             if type(axis.get_major_formatter()) is ScalarFormatter:
-                axis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:.10g}".replace("-", "\u2212")))
+                axis.set_major_formatter(FuncFormatter(_tick_text(axis)))
 
 
 def _pad_outside_legends(fig):
@@ -454,7 +725,25 @@ def _trim_round_panel_height(fig, panels):
         fig.set_figheight(fig.get_figheight() - empty)
 
 
-def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, column_gap=0):
+def _colorbars_span_panels(fig):
+    """Each colorbar runs the full height (or width) of the panels it belongs to, at the thickness the layout
+    made room for. matplotlib caps its length at 20 times its thickness and constrained layout sets that cap
+    again at every draw, so the layout is fixed first."""
+    cbars = [a for a in fig.axes if getattr(a, "_colorbar", None) is not None]
+    if not cbars:
+        return
+    fig.canvas.draw()
+    fig.set_layout_engine("none")
+    for a in cbars:
+        drawn, slot = a.get_position(), a.get_position(original=True)
+        a.set_box_aspect(None)
+        if a._colorbar.orientation == "vertical":
+            a.set_position([drawn.x0, slot.y0, drawn.width, slot.height])
+        else:
+            a.set_position([slot.x0, drawn.y0, slot.width, drawn.height])
+
+
+def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=0.9, column_gap=0):
     """Change only the figure height so each panel's height / width equals `aspect`.
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
@@ -476,8 +765,8 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, c
     A panel legend made without `loc` is placed here: the first spot of `INSIDE_SPOTS` where it
     hides no data or text, else above its panel in one row.
 
-    Last, it warns about what reads badly in print: a panel narrower than `min_width` (1.2 in; a
-    two-factor grid with shared axes and outer tick labels only passes 0.9); text cut off at the
+    Last, it warns about what reads badly in print: a panel narrower than `min_width` (0.9 in; a
+    two-factor grid passes 0.7, small multiples 0.45); text cut off at the
     figure edge, overlapping, sticking out of its panel or spilling out of its fill; text or a
     legend covering a curve or data points; a legend over text or with more than a tenth of its
     area over filled marks; a font other than Inter. Text on a white box and contour labels may
@@ -498,6 +787,7 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, c
     panels = [a for a in axes
               if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
     _write_plain_tick_numbers(fig)
+    _denser_y_ticks(fig)
     _start_at_zero(panels)
     if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         _set_canvas_pad(fig)
@@ -527,17 +817,29 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=1.2, c
     if abs(ratios[0] - aspect) / aspect >= tol:
         warnings.warn(f"finalize_figure did not converge in {iters} iterations: ratio {ratios[0]:.3f}; "
                       "check for an inside legend or text wider than the panel.")
-    if max(widths) - min(widths) > tol * max(widths):
+    # the author's layout; sub-figures' widths come from matplotlib's layout, not the author
+    if not fig.subfigs and max(widths) - min(widths) > tol * max(widths):
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     _blank_touching_corner_label(fig, panels)
-    if _place_on_standard_box(fig, panels, aspect, column_gap):
-        _freeze_ticks(panels)  # growing limits for labels now must not add ticks the layout has no room for
+    placed = _place_on_standard_box(fig, panels, aspect, column_gap)
+    if placed:
+        # ticks frozen while the height was searched fit a smaller panel: lay them out again at the final size,
+        # then fix them, since growing limits for labels must not add ticks the layout has no room for
+        _unfreeze_ticks(fig.axes)
+        fig.canvas.draw()
+        _freeze_ticks(panels)
+        _turn_crowded_bar_labels(fig, panels)  # the panels may now be narrower than when bar values were first checked
+        if _recheck_legends(fig, panels):
+            _place_on_standard_box(fig, panels, aspect, column_gap)
         _keep_value_labels_inside(fig, panels)
         ratios = _measure_panels(fig, panels)[0]
+    _colorbars_span_panels(fig)
+    _fit_heatmap_values(fig, panels)
     _center_group_labels(fig)
     _center_row_legends(fig, panels)
-    if max(ratios) - min(ratios) > tol * max(ratios):
+    # on the standard box, shapes follow its rules (a half with wider left labels has narrower panels)
+    if not placed and max(ratios) - min(ratios) > tol * max(ratios):
         warnings.warn("panels have different shapes; one figure takes one aspect (no height_ratios or width_ratios)")
     checks._warn_hard_to_read(fig, panels, min_width)
     return ratios

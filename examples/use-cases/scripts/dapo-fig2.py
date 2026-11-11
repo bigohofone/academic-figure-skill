@@ -41,7 +41,7 @@ mark_best(ax, ablation["step"][best_ablation], ablation["value"][best_ablation],
            f"{ablation['value'][best_ablation]:#.3g}", colors["neutral"])
 ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")
-ax.legend(loc="lower right")
+ax.legend()
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/dapo-fig2.pdf")

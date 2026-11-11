@@ -54,13 +54,13 @@ for r, model in enumerate(models):
             ax.set_ylabel("Pass@k")
 
 fig.supxlabel("Number of samples k")
-fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", ncol=2, frameon=False, borderaxespad=0)
+fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", ncol=2, borderaxespad=0)
 
 for r, model in enumerate(models):
     axes[r, 0].annotate(model, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0),
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
 
-finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, aspect=1.618, min_width=0.9)
 fig.savefig("../outputs/rlvr-fig2.pdf")
 fig.savefig("../outputs/rlvr-fig2.png")

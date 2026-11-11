@@ -59,6 +59,8 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     """Whether two texts overlap. A rotated text (e.g. a 45° tick label) is compared by its turned
     outline, since its upright bounding box also covers the empty corners around it."""
     a_rotated, b_rotated = a.get_rotation() % 180 != 0, b.get_rotation() % 180 != 0
+    if getattr(a, "_in_cell", False) or getattr(b, "_in_cell", False):
+        return box_a.overlaps(box_b)  # a heatmap value fitted to its cell: the cell edge keeps it apart from its neighbours
     if not (a_rotated or b_rotated):
         # side by side, upright texts need a clear word space between them (0.35 of the type size on each
         # side), or neighbours read as one at print size ("2561024", "Prefix tuningAdapter")

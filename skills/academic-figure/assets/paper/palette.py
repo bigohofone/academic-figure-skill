@@ -1,4 +1,6 @@
 """Color-blind and grayscale safety: greys and part colors spread in lightness, and color helpers."""
+import colorsys
+
 import numpy as np
 from matplotlib import colors
 
@@ -48,6 +50,37 @@ def baseline_greys(n):
     return out
 
 
+def _at_lightness(rgb, target):
+    """`rgb` mixed with white or black until its lightness is `target`."""
+    toward = np.ones(3) if _lightness(rgb) < target else np.zeros(3)
+    lo, hi = 0.0, 1.0
+    for _ in range(30):
+        mid = (lo + hi) / 2
+        if (_lightness(tuple(np.array(rgb) * (1 - mid) + toward * mid)) < target) == (toward[0] == 1):
+            lo = mid
+        else:
+            hi = mid
+    return tuple(np.array(rgb) * (1 - lo) + toward * lo)
+
+
+def ramp(color, n):
+    """n shades of one hue for a sweep inside one group (depths, sizes, batch sizes), light to dark,
+    evenly spread in lightness from L* 85 to 25, so neighbours stay apart in grayscale. Each shade keeps
+    the hue and its saturation (HLS lightness changes, not a mix with black), so the dark end stays a
+    deep color rather than grey."""
+    h, _, sat = colorsys.rgb_to_hls(*colors.to_rgb(color))
+    sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
+    levels = np.linspace(85, 25, n) if n > 1 else [_lightness(color)]
+    out = []
+    for target in levels:
+        lo, hi = 0.0, 1.0
+        for _ in range(30):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if _lightness(colorsys.hls_to_rgb(h, mid, sat)) < target else (lo, mid)
+        out.append(colorsys.hls_to_rgb(h, (lo + hi) / 2, sat))
+    return out
+
+
 def part_colors(n):
     """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
     hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
@@ -55,18 +88,7 @@ def part_colors(n):
     hues = [colors.to_rgb(design.colors[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
     levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
     order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
-    out = []
-    for hue, target in zip(hues, order):
-        toward = np.ones(3) if _lightness(hue) < target else np.zeros(3)
-        lo, hi = 0.0, 1.0
-        for _ in range(30):  # mix with white or black until the lightness hits the target
-            mid = (lo + hi) / 2
-            if (_lightness(tuple(np.array(hue) * (1 - mid) + toward * mid)) < target) == (toward[0] == 1):
-                lo = mid
-            else:
-                hi = mid
-        out.append(tuple(np.array(hue) * (1 - lo) + toward * lo))
-    return out
+    return [_at_lightness(hue, target) for hue, target in zip(hues, order)]
 
 
 def darken(color):

@@ -56,8 +56,8 @@ for ax in axes:
 fig.supxlabel("Epoch")
 
 handles, labels = axes[0].get_legend_handles_labels()
-fig.legend(handles[::-1], labels[::-1], loc="outside upper center", ncol=2, frameon=False, borderaxespad=0)
+fig.legend(handles[::-1], labels[::-1], loc="outside upper center", ncol=2, borderaxespad=0)
 
-finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, aspect=1.618, min_width=0.9)
 fig.savefig("../outputs/accuracy-and-loss.pdf")
 fig.savefig("../outputs/accuracy-and-loss.png")

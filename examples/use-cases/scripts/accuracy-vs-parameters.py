@@ -71,7 +71,7 @@ handles = [
 labels = ["EfficientNet (ours)", "Hand-designed", "NAS", "Other"]
 order = [0, 2, 1, 3]  # matplotlib fills columns first; this reads across each row
 ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower center", bbox_to_anchor=(0.5, 1),
-          borderaxespad=0.5, ncol=2, frameon=False)
+          borderaxespad=0.5, ncol=2)
 
 finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/accuracy-vs-parameters.pdf")

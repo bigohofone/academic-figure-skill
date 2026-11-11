@@ -82,10 +82,11 @@ figures/
   | Helper | Use |
   |---|---|
   | `apply_design(path)` | style from DESIGN.md; returns colors by name |
-  | `finalize_figure(fig, axes, aspect=0.618, min_width=1.2, column_gap=0)` | call last: height, layout, warnings |
+  | `finalize_figure(fig, axes, aspect=0.618, min_width=0.9, column_gap=0)` | call last: height, layout, warnings |
   | `set_group_label(axes, text, axis="x")` | one axis label for a group of panels |
   | `baseline_greys(n)` | grey fills for n compared series |
   | `part_colors(n)` | colors for parts of one whole |
+  | `ramp(color, n)` | n shades of one hue, light to dark, for a sweep (depths, sizes) |
   | `darken(color)` / `lighten(color)` | series text and edges / box and violin fills |
   | `text_color_on(fill)` | black or white, whichever reads on the fill |
   | `moving_average(values)` | smooth a logged curve |

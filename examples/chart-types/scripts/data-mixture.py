@@ -77,7 +77,7 @@ handles, labels = handles[::-1], labels[::-1]
 ncol = 3
 across = [i for c in range(ncol) for i in range(c, len(labels), ncol)]  # reads across each row
 ax.legend([handles[i] for i in across], [labels[i] for i in across], loc="lower center", bbox_to_anchor=(0.5, 1),
-          borderaxespad=0.5, ncol=ncol, frameon=False)
+          borderaxespad=0.5, ncol=ncol)
 
 finalize_figure(fig, ax, aspect=1.0)
 fig.savefig("../outputs/data-mixture.pdf")

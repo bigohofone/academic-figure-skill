@@ -43,7 +43,7 @@ twin.grid(False)
 ax.set_zorder(twin.get_zorder() + 1)
 ax.patch.set_visible(False)
 handles = ax.get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
-ax.legend(handles, [h.get_label() for h in handles], loc="upper right")
+ax.legend(handles, [h.get_label() for h in handles])
 
 finalize_figure(fig, ax)
 fig.savefig("../outputs/loss-and-learning-rate.pdf")

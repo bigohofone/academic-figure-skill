@@ -24,7 +24,7 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
   im = ax.imshow(values, cmap="RdBu_r", vmin=-m, vmax=m)  # signed
   ```
 
-- Colorbar: always; labelled with quantity ("Recall", "Attention weight"); placed per DESIGN.md Axes.
+- Colorbar: labelled with quantity ("Recall", "Attention weight"); placed per DESIGN.md Axes. None when every cell's value is written (Labels): the values carry the numbers, the colors only the pattern; the caption names the quantity.
 
   ```python
   fig.colorbar(im, ax=ax, label=...)
@@ -41,15 +41,13 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
   ax.xaxis.tick_top()
   ```
 
-- Hyperparameter grid: swept values increase rightward and upward (`origin="lower"`); cell text; best cell outlined.
-
-  ```python
-  ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"]))
-  ```
+- Hyperparameter grid: swept values increase rightward and upward (`origin="lower"`); cell text.
+- No mark on single cells (no outline, star or box on the best or worst cell): the cell values show them, the caption names them.
 
 ## Labels
 
-- Cell text: every cell when ≤ 12 × 12, in DESIGN.md value formats, text color per cell; larger: none.
+- Cell text: every cell when ≤ 12 × 12, in DESIGN.md value formats, text color per cell; larger: none. `finalize_figure` sets all of them to one size that fits every cell, down to 4 pt; still crowded: drop them (DESIGN.md Collisions step 4).
+- Row and column names: every one written (no every-m-th labelling); `finalize_figure` sets them to one size that fits the cells, down to 4 pt.
 
   ```python
   ax.text(j, i, label, ha="center", va="center", color=text_color_on(im.cmap(im.norm(v))))

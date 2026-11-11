@@ -45,7 +45,7 @@ ax.grid(axis="x", visible=False)
 ax.set_ylabel("Length (tokens)")
 handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] else lighten(model_colors[m]), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=m)
            for m in models]
-ax.legend(handles=handles, loc="upper left")
+ax.legend(handles=handles)
 
 finalize_figure(fig, ax, aspect=0.618)
 fig.savefig("../outputs/grouped-box-plot.pdf")

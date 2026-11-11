@@ -71,7 +71,7 @@ for angle, v in zip(angles, scores[ours]):
                 color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
 
 labels = [ours] + baselines
-fig.legend([handles[l] for l in labels], labels, loc="outside upper center", ncol=len(labels), frameon=False,
+fig.legend([handles[l] for l in labels], labels, loc="outside upper center", ncol=len(labels),
            borderaxespad=0)
 
 finalize_figure(fig, ax)

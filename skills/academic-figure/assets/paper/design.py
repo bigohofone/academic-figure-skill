@@ -18,7 +18,8 @@ dashed_width = None  # the dashed-line width; pass it to dashed and dotted lines
 highlight_size = None  # the marker highlight-size, for a point of interest
 filled_edge_width = None  # the marker filled-edge-width, for filled markers
 canvas_pad = None  # inches of free space at each edge of the canvas
-contour_label_size = bar_label_size = None  # points
+panel_gap = None  # inches of free space between a panel and the next one's y labels
+contour_label_size = bar_label_size = legend_inside_size = None  # points
 colorbar_width = colorbar_gap = None  # inches
 
 
@@ -34,15 +35,21 @@ def _resolve_token_refs(value, tokens):
     return value
 
 
-def _token_number(value):
-    """A token dimension such as "0.5pt" or "0.02in" as a number in its unit."""
-    return float(str(value).rstrip("ptin"))
+def _points(value):
+    """A token dimension ("3pt", "0.025in") in points, the unit matplotlib takes for sizes and pads."""
+    number = float(str(value).rstrip("ptin"))
+    return number * 72 if str(value).endswith("in") else number
+
+
+def _inches(value):
+    """A token dimension ("0.05in", "2pt") in inches, the unit of the canvas and the colorbar."""
+    return _points(value) / 72
 
 
 def apply_design(path="DESIGN.md"):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
     Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global colors, dashed_width, highlight_size, filled_edge_width, canvas_pad, colorbar_width, colorbar_gap, contour_label_size, bar_label_size
+    global colors, dashed_width, highlight_size, filled_edge_width, canvas_pad, panel_gap, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, legend_inside_size
     # one renderer everywhere: screen backends measure text differently, so finalize_figure's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
@@ -51,43 +58,46 @@ def apply_design(path="DESIGN.md"):
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     colors = c
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
-    contour_label_size = _token_number(t["contour-label"]["fontSize"])
-    bar_label_size = _token_number(t["bar-label"]["fontSize"])
+    contour_label_size = _points(t["contour-label"]["fontSize"])
+    bar_label_size = _points(t["bar-label"]["fontSize"])
+    legend_inside_size = _points(t["legend-inside"]["fontSize"])
     label, tick_label, legend, value_label, title = (
-        _token_number(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "value-label", "title"))
-    tick_pad, tick_width = _token_number(s["tick-pad"]), _token_number(k["tick"]["width"])
+        _points(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "value-label", "title"))
+    tick_pad, tick_width = _points(s["tick-pad"]), _points(k["tick"]["width"])
     rcParams.update({
         "font.sans-serif": [t["label"]["fontFamily"]],
         "font.size": value_label, "axes.labelsize": label, "figure.labelsize": label, "legend.fontsize": legend,
         "xtick.labelsize": tick_label, "ytick.labelsize": tick_label,
         "axes.titlesize": title, "axes.titleweight": t["title"].get("fontWeight", 400),
-        "axes.titlepad": _token_number(s["title-pad"]), "axes.labelpad": _token_number(s["label-pad"]),
-        "axes.xmargin": _token_number(s["data-margin"]), "axes.ymargin": _token_number(s["data-margin"]),
+        "axes.titlepad": _points(s["title-pad"]), "axes.labelpad": _points(s["label-pad"]),
+        "axes.xmargin": float(s["data-margin"].rstrip("%")) / 100, "axes.ymargin": float(s["data-margin"].rstrip("%")) / 100,
         "xtick.major.pad": tick_pad, "xtick.minor.pad": tick_pad, "ytick.major.pad": tick_pad, "ytick.minor.pad": tick_pad,
         "xtick.major.width": tick_width, "xtick.minor.width": tick_width,
         "ytick.major.width": tick_width, "ytick.minor.width": tick_width,
-        "xtick.major.size": _token_number(k["tick"]["size"]), "ytick.major.size": _token_number(k["tick"]["size"]),
-        "xtick.minor.size": _token_number(k["tick"]["minor-size"]), "ytick.minor.size": _token_number(k["tick"]["minor-size"]),
-        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": c["ink"], "ytick.color": c["ink"],
-        "axes.edgecolor": k["axes"]["textColor"], "axes.linewidth": _token_number(k["axes"]["width"]),
-        "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": _token_number(k["grid"]["width"]),
-        "lines.linewidth": _token_number(k["line"]["width"]),
-        "lines.markersize": _token_number(k["marker"]["size"]), "lines.markeredgewidth": _token_number(k["marker"]["edge-width"]),
-        "patch.linewidth": _token_number(k["outline"]["width"]),
-        "boxplot.boxprops.linewidth": _token_number(k["outline"]["width"]),
-        "boxplot.whiskerprops.linewidth": _token_number(k["outline"]["width"]),
-        "boxplot.capprops.linewidth": _token_number(k["outline"]["width"]),
-        "boxplot.medianprops.linewidth": _token_number(k["median"]["width"]),
-        "boxplot.flierprops.markersize": _token_number(k["marker"]["size"]), "boxplot.flierprops.markeredgewidth": _token_number(k["marker"]["edge-width"]),
-        "contour.linewidth": _token_number(k["contour"]["width"]),
+        "xtick.major.size": _points(k["tick"]["size"]), "ytick.major.size": _points(k["tick"]["size"]),
+        "xtick.minor.size": _points(k["tick"]["minor-size"]), "ytick.minor.size": _points(k["tick"]["minor-size"]),
+        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": k["axes"]["textColor"], "ytick.color": k["axes"]["textColor"],
+        "xtick.labelcolor": c["ink"], "ytick.labelcolor": c["ink"],
+        "axes.edgecolor": k["axes"]["textColor"], "axes.linewidth": _points(k["axes"]["width"]),
+        "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": _points(k["grid"]["width"]),
+        "lines.linewidth": _points(k["line"]["width"]),
+        "lines.markersize": _points(k["marker"]["size"]), "lines.markeredgewidth": _points(k["marker"]["edge-width"]),
+        "patch.linewidth": _points(k["outline"]["width"]),
+        "boxplot.boxprops.linewidth": _points(k["outline"]["width"]),
+        "boxplot.whiskerprops.linewidth": _points(k["outline"]["width"]),
+        "boxplot.capprops.linewidth": _points(k["outline"]["width"]),
+        "boxplot.medianprops.linewidth": _points(k["median"]["width"]),
+        "boxplot.flierprops.markersize": _points(k["marker"]["size"]), "boxplot.flierprops.markeredgewidth": _points(k["marker"]["edge-width"]),
+        "contour.linewidth": _points(k["contour"]["width"]),
         "axes.prop_cycle": cycler(color=[v for name, v in c.items() if name.startswith("series-")] + [c["neutral"]]),
         "image.cmap": k["heatmap"]["colormap"],
-        "figure.constrained_layout.w_pad": _token_number(s["layout-pad"]),
-        "figure.constrained_layout.h_pad": _token_number(s["layout-pad"]),
+        "figure.constrained_layout.w_pad": _inches(s["layout-pad"]),
+        "figure.constrained_layout.h_pad": _inches(s["layout-pad"]),
     })
-    dashed_width = _token_number(k["dashed-line"]["width"])
-    highlight_size = _token_number(k["marker"]["highlight-size"])
-    canvas_pad = _token_number(s["canvas-pad"])
-    colorbar_width, colorbar_gap = _token_number(k["colorbar"]["width"]), _token_number(k["colorbar"]["gap"])
-    filled_edge_width = _token_number(k["marker"]["filled-edge-width"])
+    dashed_width = _points(k["dashed-line"]["width"])
+    highlight_size = _points(k["marker"]["highlight-size"])
+    canvas_pad = _inches(s["canvas-pad"])
+    panel_gap = _inches(s["panel-gap"])
+    colorbar_width, colorbar_gap = _inches(k["colorbar"]["width"]), _inches(k["colorbar"]["gap"])
+    filled_edge_width = _points(k["marker"]["filled-edge-width"])
     return c

@@ -139,7 +139,15 @@ def test_smooth_is_centered():
     smoothed = moving_average(values)
     assert len(smoothed) == len(values)
     assert smoothed[49] < 0.5 < smoothed[50]
-    assert smoothed[0] == 0.0 and smoothed[-1] == 1.0
+    assert smoothed[0] == pytest.approx(0.0) and smoothed[-1] == pytest.approx(1.0)
+
+
+def test_smooth_ends_follow_a_steep_start_and_damp_noise():
+    line = [10 - 0.1 * i for i in range(200)]
+    assert moving_average(line) == pytest.approx(line)
+    noise = [(-1) ** i for i in range(200)]
+    smoothed = moving_average(noise)
+    assert abs(smoothed[0]) < 0.3 and abs(smoothed[-1]) < 0.3
 
 
 def test_darken_darkens():
@@ -177,10 +185,10 @@ def test_fit_height_keeps_value_labels_inside():
 
 
 def test_fit_height_warns_narrow_panel():
-    fig, axes = plt.subplots(1, 3, figsize=(WIDTH, 2))
+    fig, axes = plt.subplots(1, 4, figsize=(WIDTH, 2))
     for a in axes:
         a.plot([0, 1], [0, 1])
-    with pytest.warns(UserWarning, match="narrower than 1.2 in"):
+    with pytest.warns(UserWarning, match="narrower than 0.9 in"):
         finalize_figure(fig, axes)
 
 
@@ -469,6 +477,114 @@ def test_column_gap_lines_groups_up_with_single_columns():
     assert abs(p[3].x1 * 6.75 - (3.5 + s.x1 * 3.25)) < 1e-3
 
 
+def test_subfigures_are_groups_lined_up_with_single_columns():
+    fig = plt.figure(figsize=(6.75, 2), layout="constrained")
+    left, right = fig.subfigures(1, 2)
+    axes = [*left.subplots(1, 2, sharey=True), *right.subplots(1, 2, sharey=True)]
+    for a in axes:
+        a.plot([0, 1], [0, 1])
+    axes[0].set_ylabel("Accuracy")
+    axes[0].set_yticks([0, 1], ["A long method name", "Ours"])
+    axes[2].set_ylabel("Tokens")
+    left.supxlabel("(a) Accuracy")
+    right.supxlabel("(b) Length")
+    finalize_figure(fig, axes, aspect=0.618, column_gap=0.25)
+    single, _ = plt.subplots(figsize=(3.25, 2), layout="constrained")
+    single.axes[0].plot([0, 1], [0, 1])
+    single.axes[0].set_ylabel("Accuracy")
+    finalize_figure(single, single.axes[0])
+    p, s = [a.get_position() for a in axes], single.axes[0].get_position()
+    assert abs((p[1].x0 - p[0].x1) * 6.75 - paper.panel_gap) < 1e-3
+    assert abs(p[1].x1 * 6.75 - s.x1 * 3.25) < 1e-3
+    assert abs(p[3].x1 * 6.75 - (3.5 + s.x1 * 3.25)) < 1e-3
+    assert abs(right._supxlabel.get_position()[0] - (p[2].x0 + p[3].x1) / 2) < 1e-6
+
+
+def test_colorbar_as_tall_as_its_heatmap():
+    fig, ax = plt.subplots(figsize=(WIDTH, WIDTH), layout="constrained")
+    im = ax.imshow(np.arange(16).reshape(4, 4), aspect="auto")
+    cbar = fig.colorbar(im, ax=ax, label="Accuracy")
+    finalize_figure(fig, ax, aspect=1.0)
+    fig.canvas.draw()
+    panel, bar = ax.get_window_extent(), cbar.ax.get_window_extent()
+    assert abs(panel.y0 - bar.y0) < 0.5 and abs(panel.y1 - bar.y1) < 0.5
+
+
+def test_colorbar_below_spans_all_panels_at_token_width():
+    fig, axes = plt.subplots(1, 3, figsize=(6.75, 6.75), layout="constrained", sharey=True)
+    for a in axes:
+        im = a.imshow(np.arange(16).reshape(4, 4), aspect="auto", vmin=0, vmax=15)
+    cbar = fig.colorbar(im, ax=axes, location="bottom", label="Accuracy")
+    finalize_figure(fig, axes, aspect=1.0, min_width=0.7)
+    fig.canvas.draw()
+    first, last, bar = axes[0].get_window_extent(), axes[-1].get_window_extent(), cbar.ax.get_window_extent()
+    assert abs(bar.x0 - first.x0) < 0.5 and abs(bar.x1 - last.x1) < 0.5
+    assert abs(bar.height / fig.dpi - paper.colorbar_width) < 1e-3
+
+
+def test_colorbar_beside_each_heatmap():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, WIDTH), layout="constrained", sharey=True)
+    bars = []
+    for a, offset in zip(axes, (0, 100)):
+        im = a.imshow(np.arange(16).reshape(4, 4) + offset, aspect="auto")
+        a.set_yticks(range(4), ["1e-5", "2e-5", "3e-5", "5e-5"])
+        bars.append(fig.colorbar(im, ax=a, label="Accuracy"))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        finalize_figure(fig, axes, aspect=1.0, min_width=0.7)
+    assert not [w for w in caught if "overlap" in str(w.message) or "cut off" in str(w.message)]
+    fig.canvas.draw()
+    for a, bar in zip(axes, bars):
+        panel, box = a.get_window_extent(), bar.ax.get_window_extent()
+        assert abs(panel.y0 - box.y0) < 0.5 and abs(panel.y1 - box.y1) < 0.5
+        assert box.x0 > panel.x1
+
+
+def test_wide_colorbar_labels_keep_the_canvas_pad():
+    fig, ax = plt.subplots(figsize=(WIDTH, WIDTH), layout="constrained")
+    im = ax.imshow([[0.9301, 0.9452], [0.9375, 0.9405]], aspect="auto")
+    ax.set_yticks([0, 1], ["1e-5", "2e-5"])
+    cbar = fig.colorbar(im, ax=ax, label="Accuracy")
+    finalize_figure(fig, ax, aspect=1.0)
+    fig.canvas.draw()
+    assert cbar.ax.get_tightbbox().x1 / fig.dpi <= WIDTH - paper.canvas_pad + 1e-3
+
+
+def test_colorbar_under_each_heatmap():
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, WIDTH), layout="constrained", sharey=True)
+    bars = []
+    for a, (lo, hi) in zip(axes, ((0.928, 0.949), (0.85, 0.879))):
+        im = a.imshow(np.linspace(lo, hi, 16).reshape(4, 4), aspect="auto")
+        a.set_xlabel("Batch size")
+        bars.append(fig.colorbar(im, ax=a, label="Accuracy", location="bottom"))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        finalize_figure(fig, axes, aspect=1.0)
+    assert not [w for w in caught if "overlap" in str(w.message) or "cut off" in str(w.message)]
+    fig.canvas.draw()
+    for a, bar in zip(axes, bars):
+        panel, box = a.get_window_extent(), bar.ax.get_window_extent()
+        assert abs(panel.x0 - box.x0) < 0.5 and abs(panel.x1 - box.x1) < 0.5
+        assert abs(box.height / fig.dpi - paper.colorbar_width) < 1e-3
+    ends = [t.get_window_extent() for bar in bars for t in bar.ax.get_xticklabels() if t.get_text()]
+    assert all(not x.overlaps(y) for i, x in enumerate(ends) for y in ends[i + 1:])
+
+
+def test_legend_full_size_inside_when_it_fits_and_above():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.plot([0, 1], [0, 0.1], label="Ours")
+    ax.legend()
+    finalize_figure(fig, ax)
+    assert ax.get_legend().get_texts()[0].get_fontsize() == plt.rcParams["legend.fontsize"]
+    full, fax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    for y in np.linspace(0, 1, 12):
+        fax.plot([0, 0.5, 1], [y, 1 - y, y], label=f"Series {y:.2f}")
+    fax.legend()
+    finalize_figure(full, fax)
+    legends = [*full.legends, *([fax.get_legend()] if fax.get_legend() else [])]
+    assert legends[0].get_texts()[0].get_fontsize() == plt.rcParams["legend.fontsize"]
+
+
 def test_legend_sticking_out_of_its_panel_warns():
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2), layout="constrained")
     for a in axes:
@@ -586,3 +702,41 @@ def test_height_search_skips_collapsed_layouts():
     legend_bottom = fig.legends[0].get_window_extent().y0
     assert all(legend_bottom >= a.title.get_window_extent().y1 for a in axes)
     assert all(a.title.get_window_extent().y1 <= fig.bbox.y1 for a in axes)
+
+
+def test_ramp_spreads_one_hue_light_to_dark():
+    shades = paper.ramp(paper.colors["series-1"], 5)
+    lightness = [palette._lightness(c) for c in shades]
+    assert lightness == sorted(lightness, reverse=True)
+    assert all(a - b >= 10 for a, b in zip(lightness, lightness[1:]))
+
+
+
+def test_shared_legend_moves_to_a_panel_with_room():
+    fig, axes = plt.subplots(1, 2, figsize=(5.5, 2), layout="constrained")
+    x = np.linspace(0, 1, 50)
+    for name, offset in (("a", 0), ("b", 0.05), ("c", 0.1)):
+        axes[0].plot(x, np.full_like(x, 0.5) + offset, label=name)
+        axes[1].plot(x, x * 0.2 + offset, label=name)
+    axes[0].fill_between(x, 0, 1, alpha=0.2, linewidth=0)  # a band over the whole first panel: no room there
+    axes[0].legend()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, axes)
+    assert not [w for w in caught if "legend" in str(w.message)]
+    assert axes[0].get_legend() is None and axes[1].get_legend() is not None
+
+
+def test_heatmap_values_shrink_to_fit_their_cells():
+    fig, ax = plt.subplots(figsize=(2.4, 2.4), layout="constrained")
+    values = np.arange(64).reshape(8, 8) * 12.345  # 8 columns of "777.7" do not fit at the value-label size
+    ax.imshow(values, aspect="auto")
+    for i in range(8):
+        for j in range(8):
+            ax.text(j, i, f"{values[i, j]:.1f}", ha="center", va="center")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paper.finalize_figure(fig, ax, aspect=1.0, min_width=0.7)
+    assert not [w for w in caught if "overlap" in str(w.message)]
+    sizes = {t.get_fontsize() for t in ax.texts}
+    assert len(sizes) == 1 and sizes.pop() < matplotlib.rcParams["font.size"]

@@ -66,9 +66,9 @@ axes[0, 0].yaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
 axes[0, 0].set_ylabel("Samples")
 axes[1, 0].set_ylabel("Accuracy")
 fig.supxlabel("Confidence")
-fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", ncol=2, frameon=False,
+fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", ncol=2,
            borderaxespad=0)
-axes[1, 0].legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=2, frameon=False)
+axes[1, 0].legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=2)
 
 finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
 fig.savefig("../outputs/reliability-diagram.pdf")
