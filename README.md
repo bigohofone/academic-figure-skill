@@ -215,21 +215,14 @@ Figures from published papers, redrawn without any skill and following this skil
 <tr><td valign="top"><a href="examples/use-cases/without-skill/confusion-matrix.png"><img src="examples/use-cases/without-skill/confusion-matrix.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/confusion-matrix.png"><img src="examples/use-cases/outputs/confusion-matrix.png" width="264"></a></td></tr>
 </table>
 
-**Example 2.12** · Heatmap: Attention map (alignment). [Bahdanau et al. (2015), Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473), Figure 3(a). Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
-
-<table>
-<tr><th>Without the skill</th></tr><tr><td><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="528"></a></td></tr>
-<tr><th>With the skill</th></tr><tr><td><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="528"></a></td></tr>
-</table>
-
-**Example 2.13** · Contour plot: Loss landscape. [Li et al. (2018), Visualizing the Loss Landscape of Neural Nets](https://arxiv.org/abs/1712.09913), Figure 5(b). Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
+**Example 2.12** · Contour plot: Loss landscape. [Li et al. (2018), Visualizing the Loss Landscape of Neural Nets](https://arxiv.org/abs/1712.09913), Figure 5(b). Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/loss-landscape.png"><img src="examples/use-cases/without-skill/loss-landscape.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/loss-landscape.png"><img src="examples/use-cases/outputs/loss-landscape.png" width="264"></a></td></tr>
 </table>
 
-**Example 2.14** · Bar chart: Win / tie / loss rates. [Zhou et al. (2023), LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206), Figure 1. Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
+**Example 2.13** · Bar chart: Win / tie / loss rates. [Zhou et al. (2023), LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206), Figure 1. Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
