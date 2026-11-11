@@ -1,178 +1,134 @@
 [
-  {
-    "model": "EfficientNet-B0",
-    "label_in_figure": "B0",
-    "params_millions": 5.3,
-    "top1_accuracy": 77.3,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B1",
-    "label_in_figure": null,
-    "params_millions": 7.8,
-    "top1_accuracy": 79.2,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B2",
-    "label_in_figure": null,
-    "params_millions": 9.2,
-    "top1_accuracy": 80.3,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B3",
-    "label_in_figure": "B3",
-    "params_millions": 12,
-    "top1_accuracy": 81.7,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B4",
-    "label_in_figure": "B4",
-    "params_millions": 19,
-    "top1_accuracy": 83.0,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B5",
-    "label_in_figure": "B5",
-    "params_millions": 30,
-    "top1_accuracy": 83.7,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B6",
-    "label_in_figure": "B6",
-    "params_millions": 43,
-    "top1_accuracy": 84.2,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "EfficientNet-B7",
-    "label_in_figure": "EfficientNet-B7",
-    "params_millions": 66,
-    "top1_accuracy": 84.4,
-    "family": "EfficientNet",
-    "source": "Table 2"
-  },
-  {
-    "model": "Inception-v2",
-    "label_in_figure": "Inception-v2",
-    "params_millions": 11.2,
-    "top1_accuracy": 74.8,
-    "family": "hand-designed (dotted gray front)",
-    "source": "read from plot"
-  },
-  {
-    "model": "DenseNet-201",
-    "label_in_figure": "DenseNet-201",
-    "params_millions": 20.0,
-    "top1_accuracy": 77.4,
-    "family": "hand-designed (dotted gray front)",
-    "source": "read from plot"
-  },
-  {
-    "model": "Xception",
-    "label_in_figure": "Xception",
-    "params_millions": 23,
-    "top1_accuracy": 79.0,
-    "family": "hand-designed (dotted gray front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "Inception-ResNet-v2",
-    "label_in_figure": "Inception-ResNet-v2",
-    "params_millions": 56,
-    "top1_accuracy": 80.1,
-    "family": "hand-designed (dotted gray front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "ResNeXt-101",
-    "label_in_figure": "ResNeXt-101",
-    "params_millions": 84,
-    "top1_accuracy": 80.9,
-    "family": "hand-designed (dotted gray front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "SENet",
-    "label_in_figure": "SENet",
-    "params_millions": 146,
-    "top1_accuracy": 82.7,
-    "family": "hand-designed (dotted gray front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "NASNet-A (mobile)",
-    "label_in_figure": "NASNet-A",
-    "params_millions": 5.3,
-    "top1_accuracy": 74.0,
-    "family": "NAS (dashed blue front)",
-    "source": "read from plot"
-  },
-  {
-    "model": "unlabeled NAS model",
-    "label_in_figure": null,
-    "params_millions": 10.9,
-    "top1_accuracy": 78.6,
-    "family": "NAS (dashed blue front)",
-    "source": "read from plot"
-  },
-  {
-    "model": "AmoebaNet-A",
-    "label_in_figure": "AmoebaNet-A",
-    "params_millions": 87,
-    "top1_accuracy": 82.8,
-    "family": "NAS (dashed blue front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "AmoebaNet-C",
-    "label_in_figure": "AmoebaNet-C",
-    "params_millions": 155,
-    "top1_accuracy": 83.5,
-    "family": "NAS (dashed blue front)",
-    "source": "Table 2"
-  },
-  {
-    "model": "ResNet-34",
-    "label_in_figure": "ResNet-34",
-    "params_millions": 21.0,
-    "top1_accuracy": 73.3,
-    "family": "other (no line)",
-    "source": "read from plot"
-  },
-  {
-    "model": "ResNet-50",
-    "label_in_figure": "ResNet-50",
-    "params_millions": 26,
-    "top1_accuracy": 76.0,
-    "family": "other (no line)",
-    "source": "Table 2"
-  },
-  {
-    "model": "ResNet-152",
-    "label_in_figure": "ResNet-152",
-    "params_millions": 60,
-    "top1_accuracy": 77.8,
-    "family": "other (no line)",
-    "source": "Table 2"
-  },
-  {
-    "model": "NASNet-A (large)",
-    "label_in_figure": "NASNet-A",
-    "params_millions": 89,
-    "top1_accuracy": 82.7,
-    "family": "other (no line)",
-    "source": "Table 2"
-  }
+ {
+  "model": "EfficientNet-B0",
+  "params_millions": 5.3,
+  "top1_accuracy": 77.3,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B1",
+  "params_millions": 7.8,
+  "top1_accuracy": 79.2,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B2",
+  "params_millions": 9.2,
+  "top1_accuracy": 80.3,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B3",
+  "params_millions": 12,
+  "top1_accuracy": 81.7,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B4",
+  "params_millions": 19,
+  "top1_accuracy": 83.0,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B5",
+  "params_millions": 30,
+  "top1_accuracy": 83.7,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B6",
+  "params_millions": 43,
+  "top1_accuracy": 84.2,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "EfficientNet-B7",
+  "params_millions": 66,
+  "top1_accuracy": 84.4,
+  "family": "EfficientNet"
+ },
+ {
+  "model": "Inception-v2",
+  "params_millions": 11.2,
+  "top1_accuracy": 74.8,
+  "family": "hand-designed"
+ },
+ {
+  "model": "DenseNet-201",
+  "params_millions": 20.0,
+  "top1_accuracy": 77.4,
+  "family": "hand-designed"
+ },
+ {
+  "model": "Xception",
+  "params_millions": 23,
+  "top1_accuracy": 79.0,
+  "family": "hand-designed"
+ },
+ {
+  "model": "Inception-ResNet-v2",
+  "params_millions": 56,
+  "top1_accuracy": 80.1,
+  "family": "hand-designed"
+ },
+ {
+  "model": "ResNeXt-101",
+  "params_millions": 84,
+  "top1_accuracy": 80.9,
+  "family": "hand-designed"
+ },
+ {
+  "model": "SENet",
+  "params_millions": 146,
+  "top1_accuracy": 82.7,
+  "family": "hand-designed"
+ },
+ {
+  "model": "NASNet-A (mobile)",
+  "params_millions": 5.3,
+  "top1_accuracy": 74.0,
+  "family": "NAS"
+ },
+ {
+  "model": "unlabeled NAS model",
+  "params_millions": 10.9,
+  "top1_accuracy": 78.6,
+  "family": "NAS"
+ },
+ {
+  "model": "AmoebaNet-A",
+  "params_millions": 87,
+  "top1_accuracy": 82.8,
+  "family": "NAS"
+ },
+ {
+  "model": "AmoebaNet-C",
+  "params_millions": 155,
+  "top1_accuracy": 83.5,
+  "family": "NAS"
+ },
+ {
+  "model": "ResNet-34",
+  "params_millions": 21.0,
+  "top1_accuracy": 73.3,
+  "family": "other"
+ },
+ {
+  "model": "ResNet-50",
+  "params_millions": 26,
+  "top1_accuracy": 76.0,
+  "family": "other"
+ },
+ {
+  "model": "ResNet-152",
+  "params_millions": 60,
+  "top1_accuracy": 77.8,
+  "family": "other"
+ },
+ {
+  "model": "NASNet-A (large)",
+  "params_millions": 89,
+  "top1_accuracy": 82.7,
+  "family": "other"
+ }
 ]

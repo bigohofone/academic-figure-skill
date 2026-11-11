@@ -1,7 +1,7 @@
 # Task: reward-distribution
 
-Draw the distribution of reward-model scores of responses from three policies as violin plots (for an ICLR paper). `reward-distribution.json`: `rewards[policy]`, the scores of 400 responses each. The point: the scores are bimodal (bad and good responses), and our policy moves most responses into the high-reward mode.
+Draw a violin plot from `reward-distribution.json`, for an ICLR paper (single-column layout, 5.5 in text width).
 
-The data is synthetic, made to look like typical results. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+Data: `rewards[policy]`: reward-model scores of 400 responses from each of three policies (SFT, PPO, Ours).
 
 Deliverable: the figure in the figures folder with its caption, as `reward-distribution.png` and `reward-distribution.pdf`.

@@ -274,6 +274,5 @@
    0.6745
   ]
  ],
- "weights_layout": "weights[i][j] = attention weight alpha_ij of target word i (rows, generated French) on source word j (columns, English)",
- "value_source": "8-bit gray level of each cell in the paper's lossless embedded image divided by 255 (caption: 0 = black, 1 = white)"
+ "weights_layout": "weights[i][j] = attention weight alpha_ij of target word i (rows, generated French) on source word j (columns, English)"
 }

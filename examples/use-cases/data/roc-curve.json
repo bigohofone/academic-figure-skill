@@ -1,10 +1,7 @@
 {
- "panel": "Reddit (left panel of Figure 8)",
- "chance_diagonal": false,
  "methods": [
   {
    "name": "Ours: W/ P",
-   "auc": null,
    "fpr": [
     0.0,
     0.0,
@@ -98,7 +95,6 @@
   },
   {
    "name": "Ours: W/o P",
-   "auc": null,
    "fpr": [
     0.0,
     0.0,
@@ -308,7 +304,6 @@
   },
   {
    "name": "OpenAI",
-   "auc": null,
    "fpr": [
     0.0,
     0.01,
@@ -700,7 +695,6 @@
   },
   {
    "name": "GPTZero",
-   "auc": null,
    "fpr": [
     0.0,
     0.0,

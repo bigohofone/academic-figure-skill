@@ -1,7 +1,7 @@
 # Task: grouped-box-plot
 
-Draw the distribution of response lengths (tokens) of the base model and our RL-trained model on three datasets (for an ICLR paper). `grouped-box-plot.json`: `datasets`, and `lengths[model][dataset]` (60 responses each). The point: RL training lengthens responses, most on the hardest dataset (AIME).
+Draw a grouped box plot from `grouped-box-plot.json`, for an ICLR paper (single-column layout, 5.5 in text width).
 
-The data is synthetic, made to look like typical results. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+Data: `datasets` (three datasets), and `lengths[model][dataset]`: response lengths in tokens of 60 responses, for the base model and our RL-trained model.
 
 Deliverable: the figure in the figures folder with its caption, as `grouped-box-plot.png` and `grouped-box-plot.pdf`.

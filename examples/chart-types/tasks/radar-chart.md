@@ -1,7 +1,7 @@
 # Task: radar-chart
 
-Draw the scores of three 8–9B models across six benchmarks as a radar chart (for an ICLR paper). `radar-chart.json`: `benchmarks`, and `scores[model]` (accuracy %, same order). The point: ours has the most balanced profile, with its biggest gains on GSM8K and MATH.
+Draw a radar chart from `radar-chart.json`, for an ICLR paper (single-column layout, 5.5 in text width).
 
-The data is synthetic, made to look like typical results. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+Data: `benchmarks` (six benchmarks), and `scores[model]` for three 8–9B models, one of them Ours: accuracy in %, in the same order.
 
 Deliverable: the figure in the figures folder with its caption, as `radar-chart.png` and `radar-chart.pdf`.

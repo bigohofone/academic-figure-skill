@@ -1,7 +1,7 @@
 # Task: grouped-bar-chart
 
-Draw accuracy of four training methods on three benchmarks (for an ICLR paper). `grouped-bar-chart.json`: `benchmarks`, and `scores[method]` (accuracy 0–1, one per benchmark, same order). The point: ours is best on every benchmark.
+Draw a grouped bar chart from `grouped-bar-chart.json`, for an ICLR paper (single-column layout, 5.5 in text width).
 
-The data is synthetic, made to look like typical results. Venue: ICLR (single-column layout, 5.5 in text width). Size the figure for it, whatever the original paper's layout was.
+Data: `benchmarks` (three benchmarks), and `scores[method]` for four training methods, one of them Ours: accuracy (0–1) per benchmark, in the same order.
 
 Deliverable: the figure in the figures folder with its caption, as `grouped-bar-chart.png` and `grouped-bar-chart.pdf`.
