@@ -127,7 +127,7 @@ The basic chart types of matplotlib and seaborn, one realistic experiment each. 
 
 ### 2. Use cases from ML papers
 
-Figures from published papers, redrawn without any skill and following this skill (2.1–2.5, from the figures' data read from the papers' vector paths), then plots that recur across ML papers, each redrawn from a published figure with the paper's own values, recovered from the PDF (2.6–2.14), each shown with its original.
+Figures from published papers, redrawn without any skill and following this skill (2.1–2.5, from the figures' data read from the papers' vector paths), then plots that recur across ML papers, each redrawn from a published figure with the paper's own values, recovered from the PDF (2.6–2.14).
 
 **Example 2.1** · Line chart: DAPO, Figure 2 (left panel, single column). [DAPO: An Open-Source LLM Reinforcement Learning System at Scale](https://arxiv.org/abs/2503.14476) (Yu et al., 2025)
 
@@ -166,16 +166,12 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Example 2.6** · Line chart: ROC curves of AI-text detectors. [Yang et al. (2024), DNA-GPT: Divergent N-Gram Analysis for Training-Free Detection of GPT-Generated Text](https://arxiv.org/abs/2305.17359), Figure 8 (left). Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
-<a href="examples/use-cases/originals/roc-curve.png"><img src="examples/use-cases/originals/roc-curve.png" width="234"></a>
-
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/roc-curve.png"><img src="examples/use-cases/without-skill/roc-curve.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/roc-curve.png"><img src="examples/use-cases/outputs/roc-curve.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.7** · Bar chart: Confidence histograms and reliability diagrams. [Guo et al. (2017), On Calibration of Modern Neural Networks](https://arxiv.org/abs/1706.04599), Figure 1. Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
-
-<a href="examples/use-cases/originals/reliability-diagram.png"><img src="examples/use-cases/originals/reliability-diagram.png" width="339"></a>
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
@@ -184,16 +180,12 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Example 2.8** · Line chart: Scaling law with a power-law fit. [Kaplan et al. (2020), Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361), Figure 1 (right). Guidelines: [`line-chart.md`](skills/academic-figure/line-chart.md)
 
-<a href="examples/use-cases/originals/scaling-law.png"><img src="examples/use-cases/originals/scaling-law.png" width="190"></a>
-
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/scaling-law.png"><img src="examples/use-cases/without-skill/scaling-law.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/scaling-law.png"><img src="examples/use-cases/outputs/scaling-law.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.9** · Scatter plot: Accuracy against model size. [Tan & Le (2019), EfficientNet](https://arxiv.org/abs/1905.11946), Figure 1. Guidelines: [`scatter-plot.md`](skills/academic-figure/scatter-plot.md)
-
-<a href="examples/use-cases/originals/accuracy-vs-parameters.png"><img src="examples/use-cases/originals/accuracy-vs-parameters.png" width="316"></a>
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
@@ -202,16 +194,12 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Example 2.10** · Scatter plot: t-SNE embedding of learned features. [Lee et al. (2018), A Simple Unified Framework for Detecting Out-of-Distribution Samples and Adversarial Attacks](https://arxiv.org/abs/1807.03888), Figure 1(a). Guidelines: [`scatter-plot.md`](skills/academic-figure/scatter-plot.md)
 
-<a href="examples/use-cases/originals/t-sne.png"><img src="examples/use-cases/originals/t-sne.png" width="160"></a>
-
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/t-sne.png"><img src="examples/use-cases/without-skill/t-sne.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/t-sne.png"><img src="examples/use-cases/outputs/t-sne.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.11** · Heatmap: Confusion matrix. [Liu (2020), Yelp Review Rating Prediction](https://arxiv.org/abs/2012.06690), Figure 5. Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
-
-<a href="examples/use-cases/originals/confusion-matrix.png"><img src="examples/use-cases/originals/confusion-matrix.png" width="240"></a>
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
@@ -220,8 +208,6 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Example 2.12** · Heatmap: Attention map (alignment). [Bahdanau et al. (2015), Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473), Figure 3(a). Guidelines: [`heatmap.md`](skills/academic-figure/heatmap.md)
 
-<a href="examples/use-cases/originals/attention-map.png"><img src="examples/use-cases/originals/attention-map.png" width="261"></a>
-
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/attention-map.png"><img src="examples/use-cases/without-skill/attention-map.png" width="528"></a></td><td valign="top"><a href="examples/use-cases/outputs/attention-map.png"><img src="examples/use-cases/outputs/attention-map.png" width="528"></a></td></tr>
@@ -229,16 +215,12 @@ Figures from published papers, redrawn without any skill and following this skil
 
 **Example 2.13** · Contour plot: Loss landscape. [Li et al. (2018), Visualizing the Loss Landscape of Neural Nets](https://arxiv.org/abs/1712.09913), Figure 5(b). Guidelines: [`contour-plot.md`](skills/academic-figure/contour-plot.md)
 
-<a href="examples/use-cases/originals/loss-landscape.png"><img src="examples/use-cases/originals/loss-landscape.png" width="134"></a>
-
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
 <tr><td valign="top"><a href="examples/use-cases/without-skill/loss-landscape.png"><img src="examples/use-cases/without-skill/loss-landscape.png" width="264"></a></td><td valign="top"><a href="examples/use-cases/outputs/loss-landscape.png"><img src="examples/use-cases/outputs/loss-landscape.png" width="264"></a></td></tr>
 </table>
 
 **Example 2.14** · Bar chart: Win / tie / loss rates. [Zhou et al. (2023), LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206), Figure 1. Guidelines: [`bar-chart.md`](skills/academic-figure/bar-chart.md)
-
-<a href="examples/use-cases/originals/win-rate.png"><img src="examples/use-cases/originals/win-rate.png" width="256"></a>
 
 <table>
 <tr><th>Without the skill</th><th>With the skill</th></tr>
