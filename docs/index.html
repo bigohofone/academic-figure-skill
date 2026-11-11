@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>academic-figure</title>
-<meta name="description" content="A Claude Code skill that makes every figure of a paper publication-ready and consistent: one design system, sizes from a formula, and checks instead of eyeballing.">
+<meta name="description" content="A Claude Code skill that makes every figure of a paper publication-ready and consistent: sized for your venue, one clean style, nothing overlapping, a caption included.">
 <meta property="og:title" content="academic-figure: paper figures that belong together">
 <meta property="og:description" content="Claude Code alone vs with the academic-figure skill: same data, same tasks, printed size.">
 <meta property="og:image" content="https://wonjunoh.com/academic-figure-skill/og.png">
@@ -145,35 +145,16 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
   <ul class="ticks">
     <li><strong>One type scale</strong>8 pt labels, 7 pt ticks and values, one font, in every figure.</li>
     <li><strong>One palette with meaning</strong>Color-blind safe. Your method in one color, baselines in grey, everywhere.</li>
-    <li><strong>One box per width</strong>Every single-column figure's panel starts and ends at the same place, so a column of figures lines up.</li>
+    <li><strong>Everything lines up</strong>Dashed lines: where panels start and end. With the skill, every figure on the page sits on them.</li>
   </ul>
-  <div class="formula" style="margin-top:28px">panel width  = (<b>W</b> − left − right − gaps) / <b>columns</b><br>panel height = <b>aspect</b> × panel width</div>
-  <p class="intro">The dashed lines are the standard panel edges of each column. Every panel's size follows from the figure width and its columns, and the margins are fixed text measures, so with the skill every figure, one panel or many, wide or square, starts and ends on them; the figure across both columns lines up with the columns below.</p>
 </div></section>
 
 
-
-<section class="soft"><div class="wrap">
-  <div class="kicker">Heatmaps and contours</div>
-  <h2>Square cells, one colorbar slot</h2>
-  <p class="intro">Plots with a colorbar keep their own standard: square cells, a colorbar of fixed width and gap, and a right margin that fits its labels, so every heatmap and contour lines up with the others.</p>
-  
-<div class="compare" data-show="with" data-name="cbar">
-  <div class="switch" role="group" aria-label="Version">
-    <button type="button" data-v="without" aria-pressed="false">Without the skill</button>
-    <button type="button" data-v="with" aria-pressed="true">With the skill</button>
-  </div>
-  <div class="panes">
-    <div class="pane without"><div class="tag">Without the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/without/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/without/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/without/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/without/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
-    <div class="pane with"><div class="tag">With the skill</div><div class="col block"><span class="guide" style="left:9.527%"></span><span class="guide" style="left:37.564%"></span><span class="guide" style="left:59.527%"></span><span class="guide" style="left:87.564%"></span><div class="row"><img src="figures/with/hyperparameter-grid.svg" alt="hyperparameter-grid" loading="lazy" style="width:50.000%"><img src="figures/with/confusion-matrix.svg" alt="confusion-matrix" loading="lazy" style="width:50.000%"></div><div class="row"><img src="figures/with/hyperparameter-surface.svg" alt="hyperparameter-surface" loading="lazy" style="width:50.000%"><img src="figures/with/loss-landscape.svg" alt="loss-landscape" loading="lazy" style="width:50.000%"></div></div></div>
-  </div>
-</div>
-</div></section>
 
 <section><div class="wrap">
   <div class="kicker">Multi-panel layouts</div>
-  <h2>Grouped axes, second y axes, one shape</h2>
-  <p class="intro">Columns that share a quantity sit close, groups stand apart and line up with half-width figures, each quantity named once. A second y axis mirrors the first. Every panel of a figure has one shape: all four reliability panels are square.</p>
+  <h2>Multi-panel figures, done right</h2>
+  <p class="intro">Grids, grouped panels and a second y axis come out tidy without asking: related panels sit together, every label fits, and the figure keeps the size of the rest of the paper.</p>
   
 <div class="compare" data-show="with" data-name="accuracy-and-loss">
   <div class="switch" role="group" aria-label="Version">
@@ -200,15 +181,9 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 </div></section>
 
 <section class="soft"><div class="wrap">
-  <div class="kicker">Tested, not judged</div>
-  <h2>"Looks fine" is not a test</h2>
-  <p class="intro">After drawing, the figure is checked. Each warning names its fix, rotate, swap the axes, move the legend or write less, and the agent keeps going until the script runs clean. Every number is computed and asserted in the script, and the caption is written from its output.</p>
-  <div class="warns">
-    <div class="warn">texts 'Adapter' and 'LoRA' overlap</div>
-    <div class="warn">the legend covers the end of a bar</div>
-    <div class="warn">axis label is longer than its panel is tall</div>
-    <div class="warn">a legend of 10 entries is wider than the figure; use ncol=4</div>
-  </div>
+  <div class="kicker">No fixing by hand</div>
+  <h2>Nothing overlaps, nothing is cut off</h2>
+  <p class="intro">Long method names, crowded values and legends that would sit on the data are handled before you see the figure. Every number on it comes from your data, and the caption comes with it.</p>
   
 <div class="compare" data-show="with" data-name="checks">
   <div class="switch" role="group" aria-label="Version">
@@ -557,8 +532,8 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 
 <section class="soft" id="install"><div class="wrap">
   <div class="kicker">Install</div>
-  <h2>Two commands in Claude Code</h2>
-  <p class="intro">Then ask for a figure as usual: "plot the learning curves in results.json for my ICLR paper." Each figure comes as one script, <code>figures/&lt;id&gt;.py</code>, with its caption as the docstring.</p>
+  <h2>Two commands, then just ask</h2>
+  <p class="intro">Then ask as usual: "plot the learning curves in results.json for my ICLR paper." You get the figure sized for your venue, a caption ready to paste, and one short script per figure, <code>figures/&lt;id&gt;.py</code>, to rerun or tweak later.</p>
   <pre>/plugin marketplace add bigohofone/academic-figure-skill
 /plugin install academic-figure@academic-figure-skill</pre>
   <p class="thanks">If it saves you an evening before a deadline, a star helps other researchers find it. <a class="star big" href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>Star on GitHub<span class="count" hidden></span></a></p>
