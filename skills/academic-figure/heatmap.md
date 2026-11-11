@@ -19,7 +19,7 @@ Values over two categorical axes: confusion matrix, attention map, a grid of res
 
 - **Confusion matrix**: normalized per row (each true class sums to 1, so the diagonal is per-class recall) unless the user asks for counts; scale fixed to `vmin=0, vmax=1`; axes always "Predicted label" (x) and "True label" (y).
 - **Attention map**: query tokens down the y axis, key tokens along the top (`ax.xaxis.tick_top()`), as text tick labels; no cell text.
-- **Hyperparameter grid**: the swept values in order on each axis, cell text, and the best cell outlined, `ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"]))`.
+- **Hyperparameter grid**: the swept values increasing rightward and upward, as on any plot (`origin="lower"`), cell text, and the best cell outlined, `ax.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"]))`.
 
 ## Labels
 

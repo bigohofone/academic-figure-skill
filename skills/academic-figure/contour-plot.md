@@ -25,7 +25,7 @@ A function of two continuous variables: a loss landscape, a decision boundary, a
       t.set_color(text_color(mesh.cmap(mesh.norm(float(t.get_text())))))
   ```
 
-  For polylines, write each level at its given label position, `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label")`; when `fit_height` reports two of them overlapping, drop the later one.
+  For polylines, write each level at its given label position, `ax.text(x, y, f"{level:.2g}", ha="center", va="center", gid="contour-label")`. When `fit_height` reports a level label overlapping another label or a tick label, drop the level label (the later one of two), then run `fit_height` again.
 - **Points of interest**: a minimum or the trained solution as a filled star in `colors["ours"]` at the design's highlight size, `ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size, linestyle="none", label=...)`; a training trajectory as a data line with markers at its ends; named in a legend (outside, DESIGN.md Legend).
 
 ## Caption
