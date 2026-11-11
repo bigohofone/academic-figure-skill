@@ -181,7 +181,7 @@ The venue is the one the user names; with none, ICLR.
 3. **On a warning**, first free room inside the row: share the y axis when the panels plot the same quantity (step 5), apply Typography's text tick rule, shorten labels. Only when a panel is still too narrow, add a row and set the columns to ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3), then render again. Rows have no limit.
 4. **Unused cells**: turned off (5 panels in 2 × 3: the last one).
 5. **Shared axes**: when panels plot the same quantity over the same range, share it (`plt.subplots(..., sharex=True, sharey=True)`); outside a two-factor grid, every panel keeps its tick numbers, `ax.tick_params(labelleft=True, labelbottom=True)`.
-6. **Axis labels**: once per row or column of panels that plot the same quantity: the y label on the leftmost panel, the x label on the bottom one, or once for the whole row with `fig.supxlabel(label)` (`fig.supylabel` down a column); inside sub-figures, whose `supxlabel` is the subcaption, each panel keeps its own. A panel whose quantity differs carries its own label.
+6. **Axis labels**: each quantity named once. Panels side by side with the same x quantity: one `fig.supxlabel(label)` under the row, none on the panels; panels stacked with the same y quantity: the y label on the leftmost panel of each row only (or `fig.supylabel` once down the column); inside sub-figures, whose `supxlabel` is the subcaption, each panel keeps its own. A panel whose quantity differs carries its own label.
 
 ### Panel names
 
