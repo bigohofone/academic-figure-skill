@@ -117,10 +117,13 @@ def _warn_text_problems(fig, renderer):
     an axis label longer than its panel."""
     texts, x_ticks, y_ticks = _shown_texts(fig)
     boxes = [t.get_window_extent(renderer) for t in texts]
-    axis_label_of = {id(a.yaxis.label): a for a in fig.axes}
+    # a y label set for a group of rows (`set_group_label`) spans the group, not its first panel
+    rows_of = {id(axes[0].yaxis.label): axes for axes, axis in getattr(fig, "_group_labels", []) if axis == "y"}
+    span = lambda axes: max(a.get_window_extent(renderer).y1 for a in axes) - min(a.get_window_extent(renderer).y0 for a in axes)
+    axis_label_of = {id(a.yaxis.label): rows_of.get(id(a.yaxis.label), [a]) for a in fig.axes}
     for t, box in zip(texts, boxes):
         owner = axis_label_of.get(id(t))
-        if owner is not None and box.height > owner.get_window_extent(renderer).height:
+        if owner is not None and box.height > span(owner):
             warnings.warn(f"axis label {t.get_text()!r} is longer than its panel is tall; shorten it, "
                           "the detail in the caption (DESIGN.md Collisions step 2)")
         elif box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:

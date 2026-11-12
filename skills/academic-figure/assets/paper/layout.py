@@ -8,7 +8,7 @@ from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.legend import Legend
 from matplotlib.transforms import Bbox
 from matplotlib.text import Annotation
-from matplotlib.ticker import AutoLocator, FixedLocator, FuncFormatter, MaxNLocator, ScalarFormatter
+from matplotlib.ticker import AutoLocator, FixedLocator, FuncFormatter, LogFormatterSciNotation, MaxNLocator, NullFormatter, ScalarFormatter
 
 from . import design, checks
 
@@ -282,6 +282,20 @@ def _legend_above(fig, a, handles, labels, several, layout=None):
         if fixed or ncols == 1 or legend.get_window_extent(fig.canvas.get_renderer()).width <= room:
             return
         legend.remove()
+
+
+def _lift_legends_wider_than_panel(fig, panels):
+    """A panel legend made without `loc` that is wider than its panel can never go inside it, and while it
+    stays there matplotlib's layout collapses: it goes above the panels at once."""
+    renderer = fig.canvas.get_renderer()
+    for a in panels:
+        legend = a.get_legend()
+        if legend is None or legend._loc != Legend.codes["best"]:
+            continue
+        if legend.get_window_extent(renderer).width > a.get_position().width * fig.bbox.width:
+            handles, labels, layout = _legend_entries(legend)
+            legend.remove()
+            _legend_above(fig, a, handles, labels, several=len(panels) > 1, layout=layout)
 
 
 def _place_legends(fig, panels):
@@ -561,7 +575,10 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
     top_legends = [lg for lg in fig.legends if getattr(lg, "_outside_loc", None) == "upper"
                    or lg.get_window_extent(renderer).y0 / fig.dpi >= max(b.y1 for b in boxes.values()) * h - 1e-3]
     legend_h = sum(lg.get_window_extent(renderer).height / fig.dpi for lg in top_legends)
-    top = pad + legend_h + above[0]
+    # a sub-figure's legend stands above its own group, under the figure's legends
+    group_legends = {g: list(sf.legends) for g, sf in enumerate(fig.subfigs) if sf.legends}
+    group_legend_h = max((sum(lg.get_window_extent(renderer).height / fig.dpi for lg in lgs) for lgs in group_legends.values()), default=0)
+    top = pad + legend_h + group_legend_h + above[0]
     sup_x = fig._supxlabel if fig._supxlabel and fig._supxlabel.get_text() else None
     subcaptions = {g: sf._supxlabel for g, sf in enumerate(fig.subfigs) if sf._supxlabel and sf._supxlabel.get_text()}
     caption_lines = max(_line_count(t) for t in [*subcaptions.values(), sup_x] if t) if sup_x or subcaptions else 0
@@ -626,6 +643,14 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
         lg.set_loc("upper center")
         lg.set_bbox_to_anchor((x / w, y / new_h), transform=fig.transFigure)
         y -= lg.get_window_extent(renderer).height / fig.dpi
+    for g, lgs in group_legends.items():
+        x0 = min(a.get_position().x0 for a in panels if group[a] == g)
+        x1 = max(a.get_position().x1 for a in panels if group[a] == g)
+        y_group = y
+        for lg in lgs:
+            lg.set_loc("upper center")
+            lg.set_bbox_to_anchor(((x0 + x1) / 2, y_group / new_h), transform=fig.transFigure)
+            y_group -= lg.get_window_extent(renderer).height / fig.dpi
     if sup_y:
         sup_y.set_x(pad / w)
         sup_y.set_horizontalalignment("left")
@@ -699,12 +724,26 @@ def _tick_text(axis):
     return text
 
 
+def _log_tick_text(v, _):
+    """A log axis's tick: plain from 0.001 to 1000, an SI suffix above (10K, 1M), 1e−4 below."""
+    for scale, suffix in ((1e9, "B"), (1e6, "M"), (1e4, "K")):
+        if v >= scale:
+            return f"{v / (1e3 if suffix == 'K' else scale):.10g}{suffix}"
+    if v >= 1e-3:
+        return f"{v:.10g}"
+    return f"1e{np.log10(v):.0f}".replace("-", "\u2212") if np.isclose(v, 10 ** np.round(np.log10(v))) else f"{v:.1e}".replace("-", "\u2212")
+
+
 def _write_plain_tick_numbers(fig):
-    """Write matplotlib's default numeric ticks short and plain (`_tick_text`)."""
+    """Write matplotlib's default numeric ticks short and plain (`_tick_text`, `_log_tick_text`); a log
+    axis's minor ticks stay unlabelled."""
     for a in fig.axes:
         for axis in (a.xaxis, a.yaxis):
             if type(axis.get_major_formatter()) is ScalarFormatter:
                 axis.set_major_formatter(FuncFormatter(_tick_text(axis)))
+            elif type(axis.get_major_formatter()) is LogFormatterSciNotation:
+                axis.set_major_formatter(FuncFormatter(_log_tick_text))
+                axis.set_minor_formatter(NullFormatter())
 
 
 def _pad_outside_legends(fig):
@@ -810,6 +849,7 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=0.9, c
     if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         _set_canvas_pad(fig)
     checks._warn_legends_wider_than_figure(fig)
+    _lift_legends_wider_than_panel(fig, panels)
     if any(checks._is_round_panel(a) for a in panels):
         _trim_round_panel_height(fig, panels)
         _pad_outside_legends(fig)

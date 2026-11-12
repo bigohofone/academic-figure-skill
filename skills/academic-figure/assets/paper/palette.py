@@ -65,12 +65,15 @@ def _at_lightness(rgb, target):
 
 def ramp(color, n):
     """n shades of one hue for a sweep inside one group (depths, sizes, batch sizes), light to dark,
-    evenly spread in lightness from L* 85 to 25, so neighbours stay apart in grayscale. Each shade keeps
-    the hue and its saturation (HLS lightness changes, not a mix with black), so the dark end stays a
-    deep color rather than grey."""
+    evenly spread in lightness from L* 70 to 25, so neighbours stay apart in grayscale and the lightest still
+    reads as a thin line on white. Each shade keeps the hue and its saturation (HLS lightness changes, not a
+    mix with black), so the dark end stays a deep color rather than grey; a grey gives greys."""
     h, _, sat = colorsys.rgb_to_hls(*colors.to_rgb(color))
-    sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
-    levels = np.linspace(85, 25, n) if n > 1 else [_lightness(color)]
+    if sat > 0.1:
+        sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
+    else:
+        sat = 0.0  # a grey has no hue to keep (colorsys reports hue 0, red)
+    levels = np.linspace(70, 25, n) if n > 1 else [_lightness(color)]
     out = []
     for target in levels:
         lo, hi = 0.0, 1.0

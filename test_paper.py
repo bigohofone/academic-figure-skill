@@ -598,6 +598,53 @@ def test_legend_rows_write_the_shared_word_once_and_stay_in_the_canvas():
     assert box.x0 >= paper.canvas_pad * fig.dpi - 0.5 and box.x1 <= (WIDTH - paper.canvas_pad) * fig.dpi + 0.5
 
 
+def test_ramp_of_grey_stays_grey():
+    for r, g, b in paper.ramp("#808080", 3):
+        assert abs(r - g) < 1e-6 and abs(g - b) < 1e-6
+
+
+def test_log_ticks_plain_with_si_suffix_above_1000():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    ax.plot([1, 1e7], [1e-5, 10])
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    finalize_figure(fig, ax)
+    fig.canvas.draw()
+    shown = lambda axis: {t.get_text() for t in axis.get_majorticklabels() if t.get_text()}
+    assert {"1", "10", "100", "1000", "10K", "1M"} <= shown(ax.xaxis)
+    assert "1e\u22124" in shown(ax.yaxis)
+
+
+def test_group_y_label_measured_against_its_rows():
+    fig, axes = plt.subplots(2, 1, figsize=(WIDTH, 2), layout="constrained", sharex=True)
+    for a in axes:
+        a.plot([0, 1], [0, 1])
+    set_group_label(axes, "A label as long as two rows", axis="y")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        finalize_figure(fig, axes, aspect=0.3)
+    assert not [w for w in caught if "longer than its panel" in str(w.message)]
+
+
+def test_subfigure_legends_stand_above_their_own_group():
+    fig = plt.figure(figsize=(6.75, 2), layout="constrained")
+    left, right = fig.subfigures(1, 2)
+    axes = [*left.subplots(1, 2, sharey=True), *right.subplots(1, 2, sharey=True)]
+    for a in axes:
+        a.plot([0, 1], [0, 1], label="Ours")
+        a.plot([0, 1], [1, 0], label="Baseline")
+    axes[0].set_ylabel("Accuracy")
+    axes[2].set_ylabel("Tokens")
+    for sf, a in ((left, axes[0]), (right, axes[2])):
+        sf.legend(*a.get_legend_handles_labels(), loc="outside upper center", ncols=2)
+    finalize_figure(fig, axes, aspect=0.618, column_gap=0.25)
+    fig.canvas.draw()
+    for sf, (a, b) in ((left, axes[:2]), (right, axes[2:])):
+        box = sf.legends[0].get_window_extent()
+        assert a.get_window_extent().x0 <= (box.x0 + box.x1) / 2 <= b.get_window_extent().x1
+        assert box.y0 >= a.get_window_extent().y1
+
+
 def test_legend_sticking_out_of_its_panel_warns():
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 2), layout="constrained")
     for a in axes:

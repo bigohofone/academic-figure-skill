@@ -35,7 +35,7 @@ def legend_rows(target, rows, **legend_kw):
     # matplotlib fills a legend column by column
     handles, labels = zip(*[grid[r][c] for c in range(width) for r in range(len(grid))])
     # entries are short settings: columns close together, markers without a line need only a short handle
-    markers_only = all(h.get_linestyle() == "None" for _, row, _ in rows for h in row)
+    markers_only = all(isinstance(h, Line2D) and h.get_linestyle() == "None" for _, row, _ in rows for h in row)
     layout = dict(ncols=width, columnspacing=0.8, handletextpad=0.4, handlelength=1.0 if markers_only else 1.5)
     legend = target.legend(handles, labels, **layout, **legend_kw)
     legend._entries = (list(handles), list(labels), layout)

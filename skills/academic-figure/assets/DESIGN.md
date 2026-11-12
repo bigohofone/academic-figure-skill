@@ -118,7 +118,7 @@ First row that fits:
 | Some series the takeaway names, among others it does not | named ones in equal-terms order below (`series-1`, `series-4`, …); rest `baseline_greys(n)` |
 | Several series on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-4`, `series-6`, `series-5`, `series-3` in order (alternates light/dark for grayscale). Skip `ours` color: means ours in every figure of the paper |
 | More than six unordered classes (embedding) | `tab10` (≤10), `tab20` (≤20), plus own marker per class: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"` |
-| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group; within a group `paper.ramp(group_color, n)`: one hue, light to dark (L* 85 → 25), the largest setting darkest |
+| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.ramp(group_color, n)`: one hue, light to dark (L* 70 → 25), the largest setting darkest |
 | Single series, or one quantity over categories (groups in one box plot) | `series-1` |
 | Reference lines | `neutral` (white over filled plots, Shapes) |
 | Text and tick labels | `ink` |
@@ -161,7 +161,7 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 
   - Linear axis, values <0.001: scale in axis label ("Learning rate (×10⁻⁴)"), ticks 0, 1, 2, 3.
   - ≥1000: SI suffixes, one unit per axis, when that writes the ticks shorter (`0, 0.5K, 1K, 1.5K, 2K`, `10K`, `1M`; `200 … 1000` and `1024` stay); `finalize_figure` writes matplotlib's default ticks this way. Or the unit scaled in the axis label ("Training step (K)").
-  - Log axes: powers of ten plain from 0.001 to 1000; below, `1e−4` (true minus).
+  - Log axes: powers of ten plain from 0.001 to 1000; above, SI suffix (10K, 1M); below, `1e−4` (true minus). `finalize_figure` writes them so.
   - Shares: percent, `0%, 50%, 100%`, as values are written (Value labels).
 - Tick choice: x values the chart file names (stage switches), else evenly spaced nameable numbers (log axis: powers of the base, every one or every second, fifth, …); label data range ends where axis allows. On tick label overlap report: label every m-th, keep tick and gridline at every step (grid as fine as data). Panels sharing an axis share its ticks.
 
@@ -256,7 +256,7 @@ fig.savefig("outputs/{id}.pdf")
 ```
 
 - Panels: `ax` = one Axes, array, list (also panels from several sub-figures), or `subplot_mosaic` dict; hidden cells and colorbars skipped.
-- Standard box: `finalize_figure` sets standard margins, gaps, size; figures of one width and column count line up. Never set margins, `subplots_adjust`, `height_ratios`, `width_ratios`. Double-column figure, two-column venue: pass venue's column gap (Width table), e.g. ICML:
+- Standard box: `finalize_figure` sets standard margins, gaps, size; figures of one width and column count line up. Never set margins, `subplots_adjust`, `height_ratios`, `width_ratios`. Figure exactly the text width of a two-column venue (spanning both columns): pass venue's column gap (Width table), e.g. ICML; any other width: none:
 
   ```python
   finalize_figure(fig, axes, column_gap=0.25)
@@ -280,7 +280,7 @@ fig.savefig("outputs/{id}.pdf")
   ax.tick_params(axis="x", length=0)
   ```
 
-- Log axes: size, count or rate with positive values spanning >100× (max / min > 100): log. Positions along a process (training steps, epochs, time): linear. Set log scale before drawing on the axis; name it in caption. Log₁₀ axis spanning ≥1 power of ten: unlabelled minor ticks at 2–9 × each power; with gridlines, gridlines follow them.
+- Log axes: size, count or rate with positive values spanning >100× (max / min > 100, over every panel showing that quantity: one scale per quantity in a figure): log. Positions along a process (training steps, epochs, time): linear. Set log scale before drawing on the axis; name it in caption. Log₁₀ axis spanning ≥1 power of ten: unlabelled minor ticks at 2–9 × each power; with gridlines, gridlines follow them.
 
   ```python
   ax.set_xscale("log")
@@ -310,7 +310,7 @@ Marks every chart type is built from, sized by `components` tokens. Matplotlib a
 | Dashed and dotted lines (fits, fronts, series apart by line style) | `dashed-line` | 0.75 pt | `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
 | Markers | `marker` | hollow: white fill, 0.5 pt edge in series color, 2.5 pt | `rcParams["lines.markersize"]` |
 | Filled markers (embedding points) | `marker.filled-edge-width` | black edge, 0.25 pt, translucent fill | `markeredgewidth=paper.filled_edge_width` |
-| Points of interest (a minimum, the trained solution) | `marker.highlight-size` | filled star, 5 pt | `markersize=paper.highlight_size` |
+| Points of interest (a minimum, the trained solution) | `marker.highlight-size` | filled star, 5 pt (the style draws markers hollow: fill it) | `"*", markersize=paper.highlight_size, markerfacecolor=color` |
 | Outlines and edges (boxes, whiskers, error bars) | `outline` | 0.75 pt, black | `rcParams["patch.linewidth"]` |
 | Seams between fills (stacked segments, wedges, area bands) | `grid` | white, 0.5 pt | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
 | Outline of touching one-color bars, each its own value (reliability bins) | `grid` | darker shade of fill, 0.5 pt, never white | `edgecolor=darken(color), linewidth=rcParams["grid.linewidth"]` |
