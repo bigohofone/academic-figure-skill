@@ -198,23 +198,23 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 | CVPR | 3.25 in | 5.15625 in | 6.875 in | 0.375 in |
 | ACL (ARR) | 3 in | 4.6875 in | 6.25 in | 0.25 in |
 
-| Single-column venue | Half text width | Full text width |
-|---|---|---|
-| ICLR, NeurIPS | 2.75 in | 5.5 in |
+| Single-column venue | Half text width | 1.5 column | Full text width |
+|---|---|---|---|
+| ICLR, NeurIPS | 2.75 in | 4.125 in | 5.5 in |
 
 First row that applies:
 
 | Case | Width |
 |---|---|
 | User or task gives a figure width (one column of the paper, inches; venue text width alone is not one) | that width |
-| User asks for 1.5-column `figure*`, or panels at single column still fail `min_width` after grid's step 3 (`multi-panel.md`) | 1.5 column |
+| User asks for 1.5 column (`figure*` in a two-column venue), or panels at single column still fail `min_width` after grid's step 3 (`multi-panel.md`) | 1.5 column |
 | Single-column venue, several panels | half text width if they fit in one row there (every panel ≥ `min_width`), else full text width; then rows as `multi-panel.md` adds them |
 | Single-column venue, one panel | half text width; full only when Collisions step 3 calls for it |
 | Two-column venue | single column if the panels fit in one row there, else double column; then rows as `multi-panel.md` adds them |
 
 Venue: the one the user names; default ICLR.
 
-Venue not in the tables (a journal, a workshop, another conference): read its widths from its LaTeX template or author guide (`\textwidth`, `\columnwidth`, `\columnsep`; ask the user when neither is at hand), add its row to the table above in the project's DESIGN.md, then use it like the others. Two-column venue: 1.5 column = (single + double) / 2 + column gap / 4. Single-column venue: half text width = text width / 2.
+Venue not in the tables (a journal, a workshop, another conference): read its widths from its LaTeX template or author guide (`\textwidth`, `\columnwidth`, `\columnsep`; ask the user when neither is at hand), add its row to the table above in the project's DESIGN.md, then use it like the others. Two-column venue: 1.5 column = (single + double) / 2 + column gap / 4. Single-column venue: half text width = text width / 2, 1.5 column = 0.75 × text width.
 
 ### Panels
 

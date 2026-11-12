@@ -820,3 +820,17 @@ def test_default_aspect_follows_panel_width(width, columns, aspect):
         a.plot([0, 1], [0, 1])
     ratios = finalize_figure(fig, axes)
     assert ratios[0] == pytest.approx(aspect, rel=0.01)
+
+
+def test_supylabel_takes_the_standard_left_margin():
+    def left(sup):
+        fig, axes = plt.subplots(2, 2, figsize=(WIDTH, WIDTH), layout="constrained", sharex=True, sharey=True)
+        for a in axes.flat:
+            a.plot([0, 1], [0, 100])
+        if sup:
+            fig.supylabel("Accuracy")
+        else:
+            set_group_label(axes[:, 0], "Accuracy", axis="y")
+        finalize_figure(fig, axes, aspect=0.618)
+        return axes[0, 0].get_position().x0
+    assert left(True) == pytest.approx(left(False), abs=1e-3)

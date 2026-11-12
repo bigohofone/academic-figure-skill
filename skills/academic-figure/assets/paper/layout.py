@@ -533,12 +533,11 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
         right = pad + max(side, _y_decoration_width([last_cbar], "right")) + cb_w + cb_gap
     std_left, std_right = left, right
     ticks, label, half = _standard_y_widths(fig)
-    for a, b in boxes.items():
-        if col_of[a] == 0:
-            left = max(left, b.x0 * w - a.get_tightbbox(renderer).x0 / fig.dpi + pad)
+    need = max(b.x0 * w - a.get_tightbbox(renderer).x0 / fig.dpi + pad for a, b in boxes.items() if col_of[a] == 0)
     sup_y = fig._supylabel if fig._supylabel and fig._supylabel.get_text() else None
-    if sup_y:
-        left += label
+    if sup_y:  # it stands in for the panels' y labels, whose room the standard margin already holds
+        need += label
+    left = max(left, need)
     # a right y axis mirrors the left one: its tick labels and label take room from the panels' width
     right_column = {col_of[p] for p in twin_of.values()}
     right_axis = ticks + label * max((_line_count(t.yaxis.label) for t in twin_of), default=0)

@@ -123,7 +123,7 @@ figures/
 
   | Venue | Width | LaTeX |
   |---|---|---|
-  | Single-column (ICLR, NeurIPS) | full / half | `figure`, `width=\textwidth` / `width=0.5\textwidth` |
+  | Single-column (ICLR, NeurIPS) | full / 1.5 column / half | `figure`, `width=\textwidth` / `width=0.75\textwidth` / `width=0.5\textwidth` |
   | Two-column | single column | `figure`, `width=\columnwidth` |
   | Two-column | 1.5 column | `figure*`, `width=0.75\textwidth` |
   | Two-column | double | `figure*`, `width=\textwidth` |
