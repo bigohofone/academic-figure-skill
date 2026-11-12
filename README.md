@@ -14,7 +14,7 @@ Every data plot in the main text of a NeurIPS 2025 Best Paper, redrawn from the 
 
 ![Page 6 of "1000 Layer Networks for Self-Supervised RL", original vs redrawn with academic-figure](docs/paper.png)
 
-<sub>Wang et al., "1000 Layer Networks for Self-Supervised RL: Scaling Depth Can Enable New Goal-Reaching Capabilities", NeurIPS 2025, [arXiv:2503.14858](https://arxiv.org/abs/2503.14858), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). More pages and four more papers (NeurIPS, ICLR and ICML 2025) on the [project site](https://wonjunoh.com/academic-figure-skill/).</sub>
+<sub>Wang et al., "1000 Layer Networks for Self-Supervised RL: Scaling Depth Can Enable New Goal-Reaching Capabilities", NeurIPS 2025, [arXiv:2503.14858](https://arxiv.org/abs/2503.14858), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). More pages and three more papers (NeurIPS, ICLR and ICML 2025) on the [project site](https://wonjunoh.com/academic-figure-skill/).</sub>
 
 ## Same request, with and without
 
