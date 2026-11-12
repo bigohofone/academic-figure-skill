@@ -49,6 +49,6 @@ ax.set_ylabel("Validation accuracy")
 ax.grid(True)
 ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Baseline", "Mixup"])
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/learning-curve.pdf")
 fig.savefig("../outputs/learning-curve.png")

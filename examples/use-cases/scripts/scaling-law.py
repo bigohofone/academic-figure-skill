@@ -46,6 +46,6 @@ ax.set_ylabel("Test loss (nats/token)")
 ax.grid(True, which="both")
 ax.legend()
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/scaling-law.pdf")
 fig.savefig("../outputs/scaling-law.png")

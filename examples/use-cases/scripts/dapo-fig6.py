@@ -49,6 +49,6 @@ ax.set_xlabel("Training step")
 ax.set_ylabel("AIME accuracy")
 ax.legend()
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/dapo-fig6.pdf")
 fig.savefig("../outputs/dapo-fig6.png")

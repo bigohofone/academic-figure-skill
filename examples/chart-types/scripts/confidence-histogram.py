@@ -37,6 +37,6 @@ ax.set_xlabel("Confidence")
 ax.set_ylabel("Density")
 ax.legend()
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/confidence-histogram.pdf")
 fig.savefig("../outputs/confidence-histogram.png")

@@ -559,6 +559,11 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
     # rows: above each, half a tick label or a title line; below, x tick labels and x label lines;
     # anything more (a legend above a panel, a second line, turned labels) widens that margin
     above, below = [], []
+    # a y label set for a group of rows is centred on their whole span (gaps included), so it is no row's own
+    # margin: measured with its first row, it would widen the gap it is then centred on
+    group_y_labels = [axes[0].yaxis.label for axes, axis in getattr(fig, "_group_labels", []) if axis == "y"]
+    for t in group_y_labels:
+        t.set_visible(False)
     for r in range(len(rows)):
         row = [a for a in panels if row_of[a] == r]
         tight = [Bbox.union([a.get_tightbbox(renderer)] + [t.get_tightbbox(renderer) for t, p in twin_of.items() if p is a])
@@ -570,6 +575,8 @@ def _place_on_standard_box(fig, panels, aspect, column_gap):
                      + label * max(_line_count(a.xaxis.label) for a in row))
         above.append(max(std_above, max(b.y1 for b in tight) / fig.dpi - y1))
         below.append(max(std_below, y0 - min(b.y0 for b in tight) / fig.dpi))
+    for t in group_y_labels:
+        t.set_visible(True)
     row_gaps = [below[r] + above[r + 1] for r in range(len(rows) - 1)]
     # a legend made "outside upper" belongs above the panels even while it is still drawn over them
     top_legends = [lg for lg in fig.legends if getattr(lg, "_outside_loc", None) == "upper"
@@ -800,8 +807,17 @@ def _colorbars_span_panels(fig):
             a.set_position([slot.x0, drawn.y0, slot.width, drawn.height])
 
 
-def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=0.9, column_gap=0):
-    """Change only the figure height so each panel's height / width equals `aspect`.
+def _default_aspect(fig, panels):
+    """DESIGN.md Panel aspect, by the width each panel gets (figure width / columns): narrow panels
+    square, a column's width at φ : 1, wider two golden rectangles side by side."""
+    columns = len({round(a.get_position().x0, 3) for a in panels})
+    slot = fig.get_figwidth() / columns
+    return 1.0 if slot < 2.5 else 0.618 if slot <= 3.5 else 0.309
+
+
+def finalize_figure(fig, ax, aspect=None, iters=10, tol=0.005, min_width=0.9, column_gap=0):
+    """Change only the figure height so each panel's height / width equals `aspect`; without
+    one, the panel width picks it (DESIGN.md Panel aspect).
 
     The panel is the data area inside the axes spines; tick labels, axis labels, titles,
     outside legends and colorbars are not measured. Call it last, after everything is drawn,
@@ -862,6 +878,8 @@ def finalize_figure(fig, ax, aspect=0.618, iters=10, tol=0.005, min_width=0.9, c
                 "its ratio; use aspect='auto' (e.g. imshow(..., aspect='auto')).")
     if not isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         warnings.warn("finalize_figure expects layout='constrained'; ratios may be off.")
+    if aspect is None:
+        aspect = _default_aspect(fig, panels)
 
     ratios, widths = _fit_height_to_aspect(fig, panels, aspect, iters, tol)
     _turn_crowded_bar_labels(fig, panels)

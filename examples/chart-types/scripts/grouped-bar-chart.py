@@ -47,6 +47,6 @@ ax.grid(axis="x", visible=False)
 ax.set_ylabel("Accuracy")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(methods))
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/grouped-bar-chart.pdf")
 fig.savefig("../outputs/grouped-bar-chart.png")

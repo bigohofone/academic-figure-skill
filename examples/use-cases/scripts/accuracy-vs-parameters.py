@@ -59,7 +59,7 @@ ax.set_xticks([10, 100], labels=["10", "100"])
 ax.xaxis.set_minor_formatter(NullFormatter())
 ax.grid(True, which="both")
 ax.set_xlabel("Parameters (M)")
-ax.set_ylabel("ImageNet top-1 accuracy (%)")
+ax.set_ylabel("Top-1 accuracy (%)")
 
 handles = [
     Line2D([], [], marker="o", linestyle="-", color=colors["ours"]),
@@ -73,6 +73,6 @@ order = [0, 2, 1, 3]  # matplotlib fills columns first; this reads across each r
 ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower center", bbox_to_anchor=(0.5, 1),
           borderaxespad=0.5, ncol=2)
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/accuracy-vs-parameters.pdf")
 fig.savefig("../outputs/accuracy-vs-parameters.png")

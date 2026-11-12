@@ -45,6 +45,6 @@ ax.set_xticks([0, 0.25, 0.5, 0.75, 1], labels=["0%", "25%", "50%", "75%", "100%"
 ax.set_xlabel("Share of test prompts")
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=len(categories))
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/win-rate.pdf")
 fig.savefig("../outputs/win-rate.png")

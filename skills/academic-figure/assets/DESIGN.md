@@ -222,14 +222,22 @@ One panel: no title (caption names the figure). Several panels, sub-figures, or 
 
 ### Panel aspect
 
-Per panel, width : height; φ : 1 unless a row below applies:
+Per panel, width : height. Fixed by the chart's geometry for these; pass `aspect=`:
 
 | Aspect | `aspect=` | For |
 |---|---|---|
-| 1 : 1 | 1.0 | heatmap (`n_rows / n_cols` when not square), scatter plot and embedding (both axes data), contour plot, stacked area chart, reliability diagram, ROC curve, charts other than line charts in a row of panels each narrower than 1.2 in (two-factor grids, small multiples: `multi-panel.md`) |
-| φ² : 1 | 0.382 | single panel at full width (Width) |
-| 1 : φ | 1.618 | line charts in a row of panels each narrower than 1.2 in (two-factor grids, small multiples: upright keeps the vertical room the curves' changes need); a horizontal chart with more categories down y than fit at φ : 1 (`finalize_figure` reports tick labels overlapping) |
-| φ : 1 | 0.618 | everything else: curves, bars, histograms, box plots, violins, panels reflowed into rows |
+| 1 : 1 | 1.0 | embedding (t-SNE, UMAP), contour plot, stacked area chart (thin bands need the height), reliability diagram, ROC curve, scatter plot of one quantity against itself (predicted vs actual) |
+| cells square | `n_rows / n_cols` | heatmap |
+
+Every other chart: leave `aspect` out; `finalize_figure` picks it from the width each panel gets (figure width / columns):
+
+| Panel width | Aspect | For |
+|---|---|---|
+| < 2.5 in | 1 : 1 | panels in rows (two-factor grids, small multiples, sub-figures): square keeps the vertical room the data's changes need |
+| 2.5–3.5 in | φ : 1 | one column's width: a single panel at single column or half text width, two panels across a page |
+| > 3.5 in | 2φ : 1 | wider: a single panel at 1.5 column or full width, two golden rectangles side by side |
+
+A horizontal chart with more categories down y than fit (`finalize_figure` reports tick labels overlapping): Collisions step 3 first; still overlapping, 1 : φ (`aspect=1.618`).
 
 Aspect follows data, never room for labels. Pie and radar: circles; `finalize_figure` sizes them to width, ignores `aspect`.
 
@@ -239,7 +247,7 @@ Aspect follows data, never room for labels. Pie and radar: circles; `finalize_fi
 
 1. Move it: that item to next placement its chart file lists (other side of point, below value, next legend spot). Placements may differ per item.
 2. Make room inside panel: share axes (`multi-panel.md`); Typography's text-tick rule (swap axes, then 45°, then 90°); shorten text (axis label longer than panel: short name of quantity, detail in caption).
-3. Give it width, if crowding is labels along an axis (tick labels, bar values, side-by-side category names, heatmap rows or columns) and no figure width given: full width at φ² : 1, or own aspect for fixed-aspect panel (heatmap rows grow with it). After widening, retry earlier placements (horizontal before turned). Crowding inside data area (value labels on curves, scatter point names, heatmap cell values, contour labels): step 4 instead.
+3. Give it width, if crowding is labels along an axis (tick labels, bar values, side-by-side category names, heatmap rows or columns) and no figure width given: full width (aspect by Panel aspect), or own aspect for fixed-aspect panel (heatmap rows grow with it). After widening, retry earlier placements (horizontal before turned). Crowding inside data area (value labels on curves, scatter point names, heatmap cell values, contour labels): step 4 instead.
 4. Write less, alike: label every m-th item of an ordered kind (ticks, contour levels), keep every tick, gridline, line; or drop a kind whole (all point names of non-cited models, all bar values, all cell values, all shares of a band), cited numbers to caption.
 
 Never: shrink text, change a token, or change aspect for room. One exception: a heatmap's cell values and row and column names, which `finalize_figure` sets to the size that fits every cell (down to 4 pt).
@@ -251,7 +259,7 @@ Set by `finalize_figure`. Create figure at target width, height = width (too sho
 ```python
 fig, axes = plt.subplots(2, 1, figsize=(3.25, 2), sharex=True)
 ...  # plot, labels, legend, colorbar
-finalize_figure(fig, axes, aspect=0.618)
+finalize_figure(fig, axes)
 fig.savefig("outputs/{id}.pdf")
 ```
 

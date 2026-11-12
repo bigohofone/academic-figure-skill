@@ -47,6 +47,6 @@ handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] 
            for m in models]
 ax.legend(handles=handles)
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/grouped-box-plot.pdf")
 fig.savefig("../outputs/grouped-box-plot.png")

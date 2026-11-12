@@ -1,6 +1,6 @@
 # Scatter plot
 
-Two quantities per item against each other: accuracy vs parameters, FLOPs or latency (model comparison, often with Pareto front); one point per sample (correlation); 2-D embedding (t-SNE, UMAP). Panel aspect 1 : 1. Read with `DESIGN.md`; its rules apply unless overridden here.
+Two quantities per item against each other: accuracy vs parameters, FLOPs or latency (model comparison, often with Pareto front); one point per sample (correlation); 2-D embedding (t-SNE, UMAP). Panel aspect: DESIGN.md Panel aspect (1 : 1 for embeddings and one quantity against itself, else by panel width). Read with `DESIGN.md`; its rules apply unless overridden here.
 
 ## Draw
 

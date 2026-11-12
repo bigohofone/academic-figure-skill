@@ -36,6 +36,6 @@ ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
 ax.set_xlabel("Perplexity")
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/rlvr-fig6.pdf")
 fig.savefig("../outputs/rlvr-fig6.png")

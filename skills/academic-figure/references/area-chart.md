@@ -4,7 +4,7 @@ Shares of a whole along continuous x: data mixture over training, each domain's 
 
 ## Draw
 
-- Areas: panel aspect 1 : 1. Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
+- Areas: panel aspect 1 : 1 (bands need the height). Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
 
   ```python
   ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])

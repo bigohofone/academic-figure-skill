@@ -43,6 +43,6 @@ ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Reward")
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/reward-distribution.pdf")
 fig.savefig("../outputs/reward-distribution.png")

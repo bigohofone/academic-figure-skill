@@ -61,6 +61,6 @@ for r, model in enumerate(models):
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
 
-finalize_figure(fig, axes, aspect=1.618, min_width=0.9)
+finalize_figure(fig, axes, min_width=0.9)
 fig.savefig("../outputs/rlvr-fig2.pdf")
 fig.savefig("../outputs/rlvr-fig2.png")

@@ -11,7 +11,7 @@ How panels share a figure: grid, shared axes, axis labels, second y axis, panel 
    ```python
    finalize_figure(fig, axes, min_width=0.7)
    ```
-   - Small multiples (one chart repeated per setting, e.g. one panel per environment or dataset, same series in each): as a two-factor grid: DESIGN.md Panel aspect (upright only when panels are narrower than 1.2 in) and `min_width=0.45` (read as a set, by shape), but each panel keeps its own tick numbers when its range differs. Grid: steps 1–4.
+   - Small multiples (one chart repeated per setting, e.g. one panel per environment or dataset, same series in each): as a two-factor grid: DESIGN.md Panel aspect and `min_width=0.45` (read as a set, by shape), but each panel keeps its own tick numbers when its range differs. Grid: steps 1–4.
 1. Start: all panels in one row.
 2. Render: `finalize_figure` warns when a panel's data area < `min_width` (0.9 in), or text is cut off or overlaps.
 3. On warning, first free room within row: share y when panels plot same quantity (step 5); Typography text tick rule; shorten labels. Panel still too narrow: add a row, columns = ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3; 10 panels: 2 × 5 → 3 × 4); render again. No row limit.

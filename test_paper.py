@@ -48,7 +48,7 @@ def test_two_panels_shared_legend():
         ax.set_title("T")
     fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncol=2,
                frameon=False, borderaxespad=0)
-    check(fig, finalize_figure(fig, axes), 0.618)
+    check(fig, finalize_figure(fig, axes, aspect=0.618), 0.618)
 
 
 def test_grid_with_empty_cell():
@@ -56,7 +56,7 @@ def test_grid_with_empty_cell():
     for ax in axes.flat[:3]:
         ax.plot([0, 1], [0, 1])
     axes[1, 1].axis("off")
-    ratios = finalize_figure(fig, axes)
+    ratios = finalize_figure(fig, axes, aspect=0.618)
     assert len(ratios) == 3
     check(fig, ratios, 0.618)
 
@@ -118,7 +118,7 @@ def test_shared_axes():
     fig, axes = plt.subplots(2, 2, figsize=(WIDTH, 3), sharex=True, sharey=True)
     for i, ax in enumerate(axes.flat):
         ax.plot([0, 1], [0, i + 1])
-    check(fig, finalize_figure(fig, axes), 0.618)
+    check(fig, finalize_figure(fig, axes, aspect=0.618), 0.618)
 
 
 def test_pdf_embeds_inter_as_text(tmp_path):
@@ -346,7 +346,7 @@ def test_tall_outside_legend_does_not_collapse_the_layout():
     for ax in axes:
         ax.plot([0, 1], [0, 1], label="a long legend entry")
     fig.legend(*axes[0].get_legend_handles_labels(), loc="outside upper center", ncol=1, frameon=False)
-    ratios = finalize_figure(fig, axes)
+    ratios = finalize_figure(fig, axes, aspect=0.618)
     assert all(abs(r - 0.618) / 0.618 < 0.02 for r in ratios)
 
 
@@ -626,6 +626,17 @@ def test_group_y_label_measured_against_its_rows():
     assert not [w for w in caught if "longer than its panel" in str(w.message)]
 
 
+def test_group_y_label_does_not_widen_the_row_gap():
+    def gap(label):
+        fig, axes = plt.subplots(2, 1, figsize=(WIDTH, 2), layout="constrained", sharex=True)
+        for a in axes:
+            a.plot([0, 1], [0, 1])
+        set_group_label(axes, label, axis="y")
+        finalize_figure(fig, axes, aspect=0.3)
+        return axes[0].get_position().y0 - axes[1].get_position().y1
+    assert gap("A label as long as two rows") == pytest.approx(gap("Short"), abs=1e-3)
+
+
 def test_subfigure_legends_stand_above_their_own_group():
     fig = plt.figure(figsize=(6.75, 2), layout="constrained")
     left, right = fig.subfigures(1, 2)
@@ -800,3 +811,12 @@ def test_heatmap_values_shrink_to_fit_their_cells():
     assert not [w for w in caught if "overlap" in str(w.message)]
     sizes = {t.get_fontsize() for t in ax.texts}
     assert len(sizes) == 1 and sizes.pop() < matplotlib.rcParams["font.size"]
+
+
+@pytest.mark.parametrize("width, columns, aspect", [(6.75, 4, 1.0), (4.4, 2, 1.0), (3.25, 1, 0.618), (6.08, 2, 0.618), (5.5, 1, 0.309)])
+def test_default_aspect_follows_panel_width(width, columns, aspect):
+    fig, axes = plt.subplots(1, columns, figsize=(width, width), layout="constrained", squeeze=False)
+    for a in axes.flat:
+        a.plot([0, 1], [0, 1])
+    ratios = finalize_figure(fig, axes)
+    assert ratios[0] == pytest.approx(aspect, rel=0.01)

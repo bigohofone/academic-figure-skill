@@ -36,6 +36,6 @@ ax.set_xticks(range(1, 8))
 ax.set_xlabel("Human rating")
 ax.set_ylabel("Reward score")
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/correlation.pdf")
 fig.savefig("../outputs/correlation.png")

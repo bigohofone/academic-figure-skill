@@ -34,6 +34,6 @@ ax.set_xlabel("Per-problem accuracy")
 ax.set_ylabel("Problems")
 ax.legend()
 
-finalize_figure(fig, ax, aspect=0.382)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/rlvr-fig5.pdf")
 fig.savefig("../outputs/rlvr-fig5.png")

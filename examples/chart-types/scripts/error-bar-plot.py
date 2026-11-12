@@ -38,6 +38,6 @@ ax.tick_params(axis="y", length=0)
 ax.grid(axis="y", visible=False)
 ax.set_xlabel("GLUE accuracy")
 
-finalize_figure(fig, ax, aspect=0.618)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/error-bar-plot.pdf")
 fig.savefig("../outputs/error-bar-plot.png")
