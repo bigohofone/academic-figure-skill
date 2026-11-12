@@ -71,11 +71,11 @@ h1 em { font-style:normal; color:var(--accent); }
 .stage-tag { font-size:13px; font-weight:600; height:20px; position:relative; }
 .stage-tag span { position:absolute; inset:0; transition:opacity .5s ease; }
 .t-without { color:var(--grey); } .t-with { color:var(--accent); opacity:0; }
-.sheet { flex:1; background:#fff; border-radius:10px; display:grid; place-items:center; padding:7%; position:relative; box-shadow:0 20px 60px rgba(0,0,0,.45); }
-.sheet img { grid-area:1/1; width:100%; max-width:430px; height:auto; transition:opacity .7s ease, filter .7s ease; }
+.sheet { flex:1; background:#fff; border-radius:10px; display:grid; place-items:center; padding:2%; position:relative; box-shadow:0 20px 60px rgba(0,0,0,.45); }
+.sheet img { grid-area:1/1; width:100%; max-width:520px; height:auto; transition:opacity .7s ease, filter .7s ease; }
 .s-with { opacity:0; }
 .demo.done .s-with, .demo.done .t-with { opacity:1; } .demo.done .s-without, .demo.done .t-without { opacity:0; }
-.stage-cap { margin:0; font:13px/1.45 "Times New Roman", Times, serif; color:var(--ink2); opacity:0; transition:opacity .5s ease; }
+.stage-cap { margin:0; font:12px/1.45 Inter, system-ui, sans-serif; color:var(--ink2); opacity:0; transition:opacity .5s ease; }
 .demo.done .stage-cap { opacity:1; }
 .timeline { list-style:none; margin:0; padding:14px 16px; display:flex; gap:8px; border-top:1px solid var(--line); overflow-x:auto; }
 .timeline li { flex:1; min-width:110px; font-size:12.5px; color:var(--ink3); border:1px solid var(--line); border-radius:9px; padding:7px 10px; display:flex; align-items:center; gap:8px; transition:all .3s ease; white-space:nowrap; }
@@ -239,12 +239,12 @@ html.bw body > *:not(.bwtoggle) { filter:grayscale(1); }
 <div class="demo" aria-label="A Claude Code session with academic-figure, played back">
   <div class="chrome"><i></i><i></i><i></i><span>~/paper · claude</span></div>
   <div class="demo-body">
-    <div class="term"><div class="tl you" data-step="ask">plot the learning curves in results.json for my ICLR paper</div><div class="tl tool" data-step="read">Skill(academic-figure)</div><div class="tl tool" data-step="read">Read figures/DESIGN.md, references/line-chart.md</div><div class="tl tool" data-step="draw">Write figures/learning-curve.py</div><div class="tl tool" data-step="draw">Bash  python learning-curve.py</div><div class="tl out" data-step="check">takeaway: Ours 0.915, Mixup 0.897, Baseline 0.882</div><div class="tl ok" data-step="check">finalize_figure: no warnings</div><div class="tl tool" data-step="done">Saved figures/outputs/learning-curve.pdf  ·  2.75 in, ICLR half width</div><div class="tl out" data-step="done">Caption and \includegraphics line ready to paste</div><div class="tl cursor"></div></div>
+    <div class="term"><div class="tl you" data-step="ask">redraw the figures on page 8 of my ICLR paper</div><div class="tl tool" data-step="read">Skill(academic-figure)</div><div class="tl tool" data-step="read">Read figures/DESIGN.md, references/line-chart.md, multi-panel.md</div><div class="tl tool" data-step="draw">Write figures/ngpt-fig4.py, figures/ngpt-fig5.py</div><div class="tl tool" data-step="draw">Bash  python ngpt-fig4.py &amp;&amp; python ngpt-fig5.py</div><div class="tl out" data-step="check">takeaway: nGPT norms 1.00 to 1.00; GPT 1B input max 2.07</div><div class="tl out" data-step="check">takeaway: GPT attention max 5,401,000; nGPT attention max 88.2</div><div class="tl ok" data-step="check">finalize_figure: no warnings</div><div class="tl tool" data-step="done">Saved ngpt-fig4.pdf, ngpt-fig5.pdf  ·  5.5 in, ICLR text width</div><div class="tl out" data-step="done">Same captions; page 8 recompiled</div><div class="tl cursor"></div></div>
     <div class="stage">
-      <div class="stage-tag"><span class="t-without">Claude Code alone</span><span class="t-with">With academic-figure</span></div>
-      <div class="sheet"><img class="s-without" src="figures/without/learning-curve.svg?v=2f1a9aa5ef" alt="Learning curves drawn by Claude Code alone">
-      <img class="s-with" src="figures/with/learning-curve.svg?v=93309c4512" alt="The same learning curves with academic-figure"></div>
-      <p class="stage-cap"><b>Figure 1.</b> Validation accuracy on CIFAR-100 over training epochs. Ours peaks at 0.915, 0.018 above Mixup (0.897).</p>
+      <div class="stage-tag"><span class="t-without">Page 8, as published</span><span class="t-with">Page 8, redrawn with academic-figure</span></div>
+      <div class="sheet"><img class="s-without" src="papers/2410.01131/original/p8.svg?v=cb9411c9e5" alt="Page 8 of nGPT as published">
+      <img class="s-with" src="papers/2410.01131/redrawn/p8.svg?v=2c310c30f0" alt="Page 8 of nGPT with its figures redrawn by academic-figure"></div>
+      <p class="stage-cap">Loshchilov et al., <i>nGPT: Normalized Transformer</i>, ICLR 2025, <a href="https://arxiv.org/abs/2410.01131">arXiv:2410.01131</a>, CC BY 4.0.</p>
     </div>
   </div>
   <ol class="timeline"><li data-step="ask"><span></span>Ask</li><li data-step="read"><span></span>Read the design</li><li data-step="draw"><span></span>Draw</li><li data-step="check"><span></span>Check</li><li data-step="done"><span></span>Paste</li></ol>
