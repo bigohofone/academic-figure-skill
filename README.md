@@ -1,54 +1,71 @@
 # paper-figure
 
-[![GitHub stars](https://img.shields.io/github/stars/bigohofone/paper-figure-skill?style=social)](https://github.com/bigohofone/paper-figure-skill/stargazers) [![Project site](https://img.shields.io/badge/site-wonjunoh.com-d7344a)](https://wonjunoh.com/paper-figure-skill/)
+**Paper-ready figures. Right from Claude Code.**
 
-**Stop fixing figures the night before the deadline.**
+Ask for a plot. Get a figure sized for your venue, readable in print and consistent across your paper. A Claude Code skill for matplotlib and seaborn.
 
-A Claude Code skill for paper figures. Ask for a plot as usual and get one that is ready for the paper: the right size for your venue, readable at print size, and consistent with every other figure.
+[Website](https://wonjunoh.com/paper-figure-skill/) · [Real papers](https://wonjunoh.com/paper-figure-skill/papers/) · [Chart gallery](https://wonjunoh.com/paper-figure-skill/charts/) · [Panel layouts](https://wonjunoh.com/paper-figure-skill/layouts/)
 
-![paper-figure: sized for your venue, readable at print size, color-blind safe, every panel lines up, clean modern style](docs/hero.png)
+![The same figures drawn by Claude Code alone and with paper-figure](docs/readme/compare.png)
 
-## A whole paper, redrawn
-
-Every data plot in the main text of a NeurIPS 2025 Best Paper, redrawn from the values in the original figures, then the paper recompiled from its arXiv source. Same text, same captions.
-
-![Page 6 of "1000 Layer Networks for Self-Supervised RL", original vs redrawn with paper-figure](docs/paper.png)
-
-<sub>Wang et al., "1000 Layer Networks for Self-Supervised RL: Scaling Depth Can Enable New Goal-Reaching Capabilities", NeurIPS 2025, [arXiv:2503.14858](https://arxiv.org/abs/2503.14858), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). More pages and three more papers (NeurIPS, ICLR and ICML 2025) on the [project site](https://wonjunoh.com/paper-figure-skill/).</sub>
-
-## Same request, with and without
-
-The same data and the same request, on an ICML page at print size: Claude Code on its own, and with paper-figure. Nothing was touched by hand. The dashed lines mark the text columns (blue) and the standard panel edges (red).
-
-![Claude Code alone vs with paper-figure, on an ICML page](docs/page.png)
-
-## What you get
-
-- **Sized for your venue**: NeurIPS, ICML, ICLR, CVPR, ACL. One column, both columns, or half the text width, exactly.
-- **Readable at print size**: labels and ticks just under the body text, in one font, in every figure.
-- **Color-blind safe**: your method stands out in one color and the baselines step back in grey.
-- **Every panel lines up**: single panels, grids and full-width figures start and end on the same edges.
-- **Clean, modern style**: nothing overlaps, nothing is cut off, no legend on top of the data.
-- **Nice and easy**: you get the figure, a caption ready to paste, and one short script to rerun or tweak.
-
-Works with every matplotlib and seaborn chart: lines, bars, scatter, box and violin plots, histograms, heatmaps, contours, radar, pie and area charts. See all 28 examples, before and after, on the [project site](https://wonjunoh.com/paper-figure-skill/#gallery).
+<sub>Figures of Chu et al., *SFT Memorizes, RL Generalizes*, ICML 2025, [arXiv:2501.17161](https://arxiv.org/abs/2501.17161), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Same data on both sides.</sub>
 
 ## Install
 
-In Claude Code:
+Two commands in Claude Code.
 
 ```
 /plugin marketplace add bigohofone/paper-figure-skill
 /plugin install paper-figure@paper-figure-skill
 ```
 
-Then just ask:
+## Just ask
+
+Nothing to learn, nothing to set up. Name your data and your venue.
 
 > plot the learning curves in results.json for my ICLR paper
 
-Each figure comes as `figures/<id>.py`, with its caption as the docstring, and its PDF and PNG in `figures/outputs/`. To restyle every figure of a paper at once, edit `figures/DESIGN.md`.
+You get a print-ready PDF and PNG, and a caption built from your data.
 
-Without the plugin system, copy the skill folder into your skills directory:
+```
+figures/
+├── learning-curves.py    # the script, its caption as the docstring
+├── DESIGN.md             # one file for the look of every figure
+└── outputs/
+    ├── learning-curves.pdf
+    └── learning-curves.png
+```
+
+## What every figure gets
+
+- **Sized for your venue.** The exact column or text width of NeurIPS, ICML, ICLR, CVPR and ACL, or any venue you name.
+- **Readable in print.** Text sized for the printed page, in one font, the same in every figure.
+- **Your method stands out.** Ours in one color, baselines in grey, checked to stay apart in black and white.
+- **Panels line up.** Single panels, grids and full-width figures start and end on the same edges.
+- **Nothing overlaps.** Legends and labels go where they hide no data, and nothing is cut off.
+- **Numbers from your data.** Every number on the plot and in the caption is computed, never typed.
+
+## Real papers. Redrawn.
+
+Three published papers, their plots redrawn from the original numbers. Same pages. Same captions.
+
+![An original paper page next to the same page with its figures redrawn](docs/readme/papers.png)
+
+[Compare every page →](https://wonjunoh.com/paper-figure-skill/papers/)
+
+## Every chart. Done right.
+
+Lines, bars, scatter, histograms, box and violin plots, heatmaps, areas, pies, contours and error bars.
+
+![Gallery of charts drawn with paper-figure](docs/readme/charts.png)
+
+[See them with and without the skill →](https://wonjunoh.com/paper-figure-skill/charts/)
+
+## Your style, everywhere
+
+Every color, font, size and line weight lives in `figures/DESIGN.md`. Change it once and every figure of the paper follows.
+
+## Without the plugin system
 
 ```
 git clone https://github.com/bigohofone/paper-figure-skill
