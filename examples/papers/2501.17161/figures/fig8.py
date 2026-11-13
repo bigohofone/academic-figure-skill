@@ -9,7 +9,7 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from matplotlib.lines import Line2D
 
-sys.path.insert(0, "../../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../../skills/paper-figure/assets")
 import paper
 from paper import finalize_figure, make_shades
 

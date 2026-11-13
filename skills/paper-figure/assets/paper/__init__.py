@@ -1,4 +1,4 @@
-"""Paper figures in the academic-figure design. `import paper` finds the DESIGN.md above this folder and
+"""Paper figures in the paper-figure design. `import paper` finds the DESIGN.md above this folder and
 applies it to matplotlib; scripts then read `paper.colors` and call the helpers below.
 
 design.py reads DESIGN.md; layout.py sizes the figure; palette.py keeps colors apart for color-blind

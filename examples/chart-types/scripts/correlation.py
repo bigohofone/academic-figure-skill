@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib import rcParams
 from scipy import stats
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import shift_lightness, finalize_figure
 

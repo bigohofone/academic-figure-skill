@@ -6,7 +6,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, "../../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../../skills/paper-figure/assets")
 import paper
 from paper import finalize_figure, make_shades
 

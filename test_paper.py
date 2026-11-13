@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-ASSETS = Path(__file__).parent / "skills/academic-figure/assets"
+ASSETS = Path(__file__).parent / "skills/paper-figure/assets"
 sys.path.insert(0, str(ASSETS))
 import paper
 from paper import palette

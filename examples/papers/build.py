@@ -28,7 +28,7 @@ SITE = HERE.parents[1] / "docs/papers"
 
 
 def fetch_source(paper_id, src):
-    request = urllib.request.Request(f"https://arxiv.org/src/{paper_id}", headers={"User-Agent": "academic-figure-redraw/1.0"})
+    request = urllib.request.Request(f"https://arxiv.org/src/{paper_id}", headers={"User-Agent": "paper-figure-redraw/1.0"})
     data = urllib.request.urlopen(request).read()
     src.mkdir(parents=True)
     tarfile.open(fileobj=io.BytesIO(data)).extractall(src)
@@ -39,7 +39,7 @@ def prepare(tree, spec, paper_id):
     vector crops of the arXiv PDF, and the includegraphics lines pointed at the crops (`prepare` in paper.json)."""
     prep = spec.get("prepare", {})
     if prep.get("crops"):
-        request = urllib.request.Request(f"https://arxiv.org/pdf/{paper_id}", headers={"User-Agent": "academic-figure-redraw/1.0"})
+        request = urllib.request.Request(f"https://arxiv.org/pdf/{paper_id}", headers={"User-Agent": "paper-figure-redraw/1.0"})
         published = pymupdf.open(stream=urllib.request.urlopen(request).read(), filetype="pdf")
         for crop in prep["crops"]:
             rect = pymupdf.Rect(crop["rect"])

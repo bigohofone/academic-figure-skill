@@ -1,5 +1,5 @@
 ---
-name: academic-figure
+name: paper-figure
 description: Makes publication-ready figures for academic papers with matplotlib or seaborn, following a DESIGN.md design system (venue widths, print-size type, color-blind-safe colors, chart-type rules) - one script per figure with a paper-style caption. Use it when creating or editing a figure, plot or chart meant for a paper (ICML, CVPR, ACL, NeurIPS, ICLR or any paper), even if only the plotting code is asked for. Not for quick exploratory plots, notebooks, dashboards or slides.
 ---
 

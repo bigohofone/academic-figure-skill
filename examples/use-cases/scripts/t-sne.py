@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import to_rgb
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 

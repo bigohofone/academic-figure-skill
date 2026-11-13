@@ -9,7 +9,7 @@ from matplotlib import rcParams
 from matplotlib.colors import Normalize
 from matplotlib.path import Path
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 

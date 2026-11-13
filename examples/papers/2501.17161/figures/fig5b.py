@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib import rcParams
 from matplotlib.lines import Line2D
 
-sys.path.insert(0, "../../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../../skills/paper-figure/assets")
 import paper
 from paper import finalize_figure
 

@@ -2,7 +2,7 @@
  "title": "nGPT: Normalized Transformer",
  "venue": "ICLR 2025",
  "order": 2,
- "credit": "Loshchilov et al., nGPT: Normalized Transformer with Representation Learning on the Hypersphere, ICLR 2025. <a href=\"https://arxiv.org/abs/2410.01131\" target=\"_blank\" rel=\"noopener\">arXiv:2410.01131</a>, <a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>. Every data plot in the main text redrawn by academic-figure from values recovered from the PDF, then the paper recompiled from its arXiv source; text and captions unchanged.",
+ "credit": "Loshchilov et al., nGPT: Normalized Transformer with Representation Learning on the Hypersphere, ICLR 2025. <a href=\"https://arxiv.org/abs/2410.01131\" target=\"_blank\" rel=\"noopener\">arXiv:2410.01131</a>, <a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>. Every data plot in the main text redrawn by paper-figure from values recovered from the PDF, then the paper recompiled from its arXiv source; text and captions unchanged.",
  "main": "iclr2025_conference.tex",
  "prepare": {
   "crops": [

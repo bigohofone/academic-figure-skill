@@ -17,7 +17,7 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE.parents[1] / "docs/layouts"
-sys.path.insert(0, str(HERE.parents[1] / "skills/academic-figure/assets"))
+sys.path.insert(0, str(HERE.parents[1] / "skills/paper-figure/assets"))
 import paper
 from paper import finalize_figure, make_part_colors, make_shades
 
@@ -335,7 +335,15 @@ if __name__ == "__main__":
              + "".join(card for card, _, wide, _ in results if wide))
     (OUT / "index.html").write_text(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panel layouts · academic-figure-skill</title>
+<title>Panel layouts · paper-figure</title>
+<meta name="description" content="Every panel layout paper-figure draws, at print size on a two-column page: single panels, rows, grids, colorbars and second axes.">
+<link rel="canonical" href="https://wonjunoh.com/paper-figure-skill/layouts/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Panel layouts · paper-figure">
+<meta property="og:description" content="Every panel layout paper-figure draws, at print size on a two-column page: single panels, rows, grids, colorbars and second axes.">
+<meta property="og:url" content="https://wonjunoh.com/paper-figure-skill/layouts/">
+<meta property="og:image" content="https://wonjunoh.com/paper-figure-skill/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#fafaf8">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -355,9 +363,9 @@ if __name__ == "__main__":
 .layouts ul {{ margin:6px 0 0; padding-left:16px; color:var(--ink); font-size:12.5px; }}
 </style></head><body>
 <header class="top"><div class="wrap">
-  <a class="logo" href="../">academic-figure-skill</a>
+  <a class="logo" href="../">paper-figure-skill</a>
   <nav class="links"><a class="opt" href="../papers/">Papers</a><a class="opt" href="../charts/">Charts</a><a class="opt" href="../layouts/">Layouts</a>
-  <a href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener">GitHub <span class="count" hidden></span></a></nav>
+  <a href="https://github.com/bigohofone/paper-figure-skill" target="_blank" rel="noopener">GitHub <span class="count" hidden></span></a></nav>
 </div></header>
 <main>
 <div class="page-head"><div class="wrap">
@@ -366,7 +374,7 @@ if __name__ == "__main__":
 </div></div>
 <div class="layouts">{cards}</div>
 </main>
-<footer><div class="wrap"><span>academic-figure-skill · MIT license</span><span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a></span></div></footer>
+<footer><div class="wrap"><span>paper-figure-skill · MIT license</span><span><a href="https://github.com/bigohofone/paper-figure-skill">GitHub</a></span></div></footer>
 <script>if (location.protocol === "file:" || location.hostname === "localhost") setTimeout(() => location.reload(), 3000);</script>
 </body></html>
 """)

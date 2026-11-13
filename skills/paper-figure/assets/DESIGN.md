@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Academic Figure
+name: Paper Figure
 description: Print-first figures for machine learning papers, read at the size they are printed, where the reader gets one message at a glance.
 colors:
   # Tableau 10 (Tableau's default palette since 2016), in its own order; its red is ours, its grey neutral
@@ -108,7 +108,7 @@ components:
     gap: 0.05in
 ---
 
-# Academic Figure
+# Paper Figure
 
 Design system for paper figures. Front matter holds the tokens: every color, colormap, font, text size, line weight, marker size and spacing. `import paper` loads them into matplotlib's style, so a token edit, or another DESIGN.md in this one's place, changes every figure; scripts take colors from `paper.colors` and sizes from `rcParams` or `paper`, never write them. Chart type file conflicts with a rule here: chart file wins. In a project, the copy in the figures folder is the design; edit it there for a paper-specific look.
 

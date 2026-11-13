@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  fetch("https://api.github.com/repos/bigohofone/academic-figure-skill").then(r => r.json()).then(d => {
+  fetch("https://api.github.com/repos/bigohofone/paper-figure-skill").then(r => r.json()).then(d => {
     if (typeof d.stargazers_count !== "number") return;
     const n = d.stargazers_count >= 1000 ? (d.stargazers_count / 1000).toFixed(1) + "k" : String(d.stargazers_count);
     document.querySelectorAll(".count").forEach(c => { c.textContent = "★ " + n; c.hidden = false; });

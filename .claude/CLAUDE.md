@@ -25,9 +25,9 @@
 - 사용자가 적거나 유지보수가 중단된 라이브러리 사용 금지
 - 몇 줄로 직접 작성 가능한 기능을 위한 새 의존성 추가 금지 (A little copying is better than a little dependency)
 
-## 그림 크기 결정 (academic-figure)
+## 그림 크기 결정 (paper-figure)
 
-수치는 `skills/academic-figure/assets/DESIGN.md` 토큰이 기준이고, 여기는 왜 그렇게 정했는지만 적는다.
+수치는 `skills/paper-figure/assets/DESIGN.md` 토큰이 기준이고, 여기는 왜 그렇게 정했는지만 적는다.
 
 - 폭: 학회와 단 수(1, 1.5, 2단)로 정한다. 사용자가 정하는 값이라 작업 전에 묻는다.
 - panel 높이 = panel 폭 × 단계 비율. M = 1(정사각형), S = 0.75(기본값), XS = 0.5, 2XS = 0.375, 3XS = 0.25, L = 1.25, XL = 1.5. rem처럼 폭에 대한 배수다.
@@ -37,4 +37,4 @@
 - 숫자 tick: 축을 따라 0.25 in마다 하나, 간격은 1, 2, 2.5, 5 × 10ⁿ. 숫자는 건너뛰지 않고, 겹치면 간격을 넓힌다. x축은 가장 긴 숫자가 들어갈 때까지 넓힌다.
 - 데이터 여백: panel 가장자리에서 0.125 in(인치 고정, 데이터 범위 비율 아님).
 - 글씨: 기본 7 pt. 숫자 tick만 5 pt, 이름 tick은 7 pt. 그림 안 글씨도 7 pt이고, 안 들어가면 5 pt로 줄인다. legend는 항상 7 pt.
-- 확인: `examples/layouts/layouts.py`가 모든 배치를 `docs/layouts/`에 그린다. `skills/academic-figure/assets/`를 고치면 hook(`.claude/settings.json`)이 자동으로 다시 그린다.
+- 확인: `examples/layouts/layouts.py`가 모든 배치를 `docs/layouts/`에 그린다. `skills/paper-figure/assets/`를 고치면 hook(`.claude/settings.json`)이 자동으로 다시 그린다.

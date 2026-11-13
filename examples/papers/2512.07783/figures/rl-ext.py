@@ -7,7 +7,7 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 
-sys.path.insert(0, "../../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../../skills/paper-figure/assets")
 import paper
 from paper import finalize_figure
 

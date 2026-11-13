@@ -8,7 +8,7 @@ from matplotlib import rcParams
 from matplotlib.lines import Line2D
 from matplotlib.ticker import NullFormatter
 
-sys.path.insert(0, "../../../skills/academic-figure/assets")
+sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import shift_lightness, finalize_figure
 
