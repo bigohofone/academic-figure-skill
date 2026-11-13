@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -qE 'skills/academic-figure/assets/|examples/layouts/layouts.py|examples/chart-types/|examples/papers/' && (cd \"$CLAUDE_PROJECT_DIR\" && nohup sh -c \"uv run --no-project -p 3.12 --with 'matplotlib>=3.10' --with numpy --with pyyaml --with scipy python examples/layouts/layouts.py; uv run --no-project -p 3.12 --with 'matplotlib>=3.10' --with numpy --with pyyaml --with scipy python examples/build_charts.py; uv run --no-project -p 3.12 --with 'matplotlib>=3.10' --with numpy --with pyyaml --with scipy --with pymupdf python examples/papers/build.py\" > examples/layouts/last-run.log 2>&1 &) ; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -13,7 +13,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/loss-landscape.json"))
 levels = data["levels"]
@@ -46,10 +46,10 @@ for lv in levels[::label_every]:
     k = min(max(k, 1), len(line) - 2)
     angle = (np.degrees(np.arctan2(line[k + 1, 1] - line[k - 1, 1], line[k + 1, 0] - line[k - 1, 0])) + 90) % 180 - 90
     ax.text(x, y, f"{lv:.2g}", ha="center", va="center", rotation=angle, rotation_mode="anchor",
-            transform_rotates_text=True, fontsize=paper.contour_label_size, gid="contour-label",
+            transform_rotates_text=True, gid="contour-label",
             bbox=dict(facecolor="white", edgecolor="none", pad=1))
 
-ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size,
+ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_markersize,
         linestyle="none")
 ax.set_xlim(*data["x_range"])
 ax.set_ylim(*data["y_range"])
@@ -58,6 +58,6 @@ ax.set_ylabel("β")
 ax.grid(False)
 fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, label="Training loss")
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/loss-landscape.pdf")
 fig.savefig("../outputs/loss-landscape.png")

@@ -4,7 +4,7 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
 
 ## Draw
 
-- Cells: square: `finalize_figure(..., aspect=n_rows / n_cols)`; no tick marks, no gridlines; categories as text tick labels on both axes.
+- Cells: square, always: `finalize_figure` sets the panel's shape from the grid's rows and columns (no `height` needed); no tick marks, no gridlines; categories as text tick labels on both axes.
 
   ```python
   im = ax.imshow(values, aspect="auto")
@@ -50,7 +50,9 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
 - Row and column names: every one written (no every-m-th labelling); `finalize_figure` sets them to one size that fits the cells, down to 4 pt.
 
   ```python
-  ax.text(j, i, label, ha="center", va="center", color=text_color_on(im.cmap(im.norm(v))))
+  fill = im.cmap(im.norm(v))
+  ax.text(j, i, label, ha="center", va="center",
+          color="white" if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else "black")
   ```
 
 ## Caption

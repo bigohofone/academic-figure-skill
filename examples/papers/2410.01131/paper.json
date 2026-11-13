@@ -1,0 +1,227 @@
+{
+ "title": "nGPT: Normalized Transformer",
+ "venue": "ICLR 2025",
+ "order": 2,
+ "credit": "Loshchilov et al., nGPT: Normalized Transformer with Representation Learning on the Hypersphere, ICLR 2025. <a href=\"https://arxiv.org/abs/2410.01131\" target=\"_blank\" rel=\"noopener\">arXiv:2410.01131</a>, <a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>. Every data plot in the main text redrawn by academic-figure from values recovered from the PDF, then the paper recompiled from its arXiv source; text and captions unchanged.",
+ "main": "iclr2025_conference.tex",
+ "prepare": {
+  "crops": [
+   {
+    "page": 6,
+    "rect": [
+     238.68,
+     322.76,
+     373.28,
+     430.44
+    ],
+    "target": "conv1B.pdf"
+   },
+   {
+    "page": 6,
+    "rect": [
+     108.0,
+     522.24,
+     504.0,
+     654.24
+    ],
+    "target": "loss.pdf"
+   },
+   {
+    "page": 7,
+    "rect": [
+     108.0,
+     81.84,
+     504.0,
+     369.84
+    ],
+    "target": "4Ktasks.pdf"
+   },
+   {
+    "page": 8,
+    "rect": [
+     137.64,
+     81.84,
+     474.24,
+     326.64
+    ],
+    "target": "embeds.pdf"
+   },
+   {
+    "page": 8,
+    "rect": [
+     137.64,
+     391.44,
+     474.24,
+     636.24
+    ],
+    "target": "condnums.pdf"
+   },
+   {
+    "page": 9,
+    "rect": [
+     137.64,
+     81.84,
+     474.24,
+     326.64
+    ],
+    "target": "newparamsmean.pdf"
+   },
+   {
+    "page": 17,
+    "rect": [
+     147.6,
+     150.84,
+     464.4,
+     381.24
+    ],
+    "target": "figlrs.pdf"
+   },
+   {
+    "page": 18,
+    "rect": [
+     147.6,
+     108.24,
+     464.4,
+     338.64
+    ],
+    "target": "1Ktasks.pdf"
+   },
+   {
+    "page": 18,
+    "rect": [
+     147.6,
+     436.2,
+     464.4,
+     666.6
+    ],
+    "target": "8Ktasks.pdf"
+   },
+   {
+    "page": 19,
+    "rect": [
+     147.6,
+     131.16,
+     464.4,
+     236.76
+    ],
+    "target": "mwt.pdf"
+   },
+   {
+    "page": 19,
+    "rect": [
+     147.6,
+     402.24,
+     464.4,
+     632.64
+    ],
+    "target": "condnums_denorm.pdf"
+   },
+   {
+    "page": 20,
+    "rect": [
+     187.2,
+     112.32,
+     424.8,
+     323.52
+    ],
+    "target": "qkvL2.pdf"
+   },
+   {
+    "page": 20,
+    "rect": [
+     187.2,
+     440.4,
+     424.8,
+     651.6
+    ],
+    "target": "qkvL3.pdf"
+   },
+   {
+    "page": 21,
+    "rect": [
+     108.0,
+     456.25,
+     298.0,
+     591.96
+    ],
+    "target": "pg19-ppl.pdf"
+   },
+   {
+    "page": 21,
+    "rect": [
+     313.92,
+     456.25,
+     503.92,
+     591.96
+    ],
+    "target": "pg19-ppl-qknorm.pdf"
+   }
+  ],
+  "edits": [
+   {
+    "file": "iclr2025_conference.tex",
+    "from": ".eps}",
+    "to": ".pdf}"
+   },
+   {
+    "file": "analysis.tex",
+    "from": ".eps}",
+    "to": ".pdf}"
+   }
+  ]
+ },
+ "figures": [
+  {
+   "script": "validation-loss.py",
+   "target": "conv1B.pdf",
+   "caption": "during training of 1B GPT and nGPT with 4k context length"
+  },
+  {
+   "script": "final-loss.py",
+   "target": "loss.pdf",
+   "caption": "nGPT models is about 4x, 10x and 20x faster"
+  },
+  {
+   "script": "downstream-tasks.py",
+   "target": "4Ktasks.pdf",
+   "caption": "Models trained with 4k context length"
+  },
+  {
+   "script": "embeddings.py",
+   "target": "embeds.pdf",
+   "caption": "Distribution of norms of vectors from input"
+  },
+  {
+   "script": "condition-numbers.py",
+   "target": "condnums.pdf",
+   "caption": "Median condition numbers for attention and MLP matrices"
+  },
+  {
+   "script": "scaling-factors.py",
+   "target": "newparamsmean.pdf",
+   "caption": "Eigen learning rates of Attention and MLP blocks"
+  }
+ ],
+ "edits": [
+  {
+   "file": "iclr2025_conference.tex",
+   "from": "\\includegraphics[width=0.34\\textwidth]{conv1B.pdf}",
+   "to": "\\includegraphics[width=\\textwidth]{conv1B.pdf}"
+  },
+  {
+   "file": "iclr2025_conference.tex",
+   "from": "\\includegraphics[width=0.85\\textwidth]{embeds.pdf}",
+   "to": "\\includegraphics[width=\\textwidth]{embeds.pdf}"
+  },
+  {
+   "file": "iclr2025_conference.tex",
+   "from": "\\includegraphics[width=0.85\\textwidth]{condnums.pdf}",
+   "to": "\\includegraphics[width=\\textwidth]{condnums.pdf}"
+  },
+  {
+   "file": "iclr2025_conference.tex",
+   "from": "\\includegraphics[width=0.85\\textwidth]{newparamsmean.pdf}",
+   "to": "\\includegraphics[width=\\textwidth]{newparamsmean.pdf}"
+  }
+ ]
+}

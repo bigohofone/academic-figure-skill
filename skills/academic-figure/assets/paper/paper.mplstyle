@@ -33,7 +33,6 @@ legend.handletextpad: 0.5
 legend.columnspacing: 1.0
 legend.labelspacing: 0.25
 legend.fancybox: False
-legend.edgecolor: DDDDDD
 legend.facecolor: FFFFFF
 legend.framealpha: 1
 legend.borderpad: 0.3

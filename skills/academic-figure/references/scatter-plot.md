@@ -1,6 +1,6 @@
 # Scatter plot
 
-Two quantities per item against each other: accuracy vs parameters, FLOPs or latency (model comparison, often with Pareto front); one point per sample (correlation); 2-D embedding (t-SNE, UMAP). Panel aspect: DESIGN.md Panel aspect (1 : 1 for embeddings and one quantity against itself, else by panel width). Read with `DESIGN.md`; its rules apply unless overridden here.
+Two quantities per item against each other: accuracy vs parameters, FLOPs or latency (model comparison, often with Pareto front); one point per sample (correlation); 2-D embedding (t-SNE, UMAP). Panel: square for embeddings and one quantity against itself, else DESIGN.md Panel height. Read with `DESIGN.md`; its rules apply unless overridden here.
 
 ## Draw
 
@@ -16,18 +16,18 @@ Two quantities per item against each other: accuracy vs parameters, FLOPs or lat
 
 ## Variants
 
-- Trend line (takeaway is correlation): data line in `darken(color)` over points; Pearson r with n in caption (Spearman ρ for ranks or ordinal ratings).
+- Trend line (takeaway is correlation): data line in `shift_lightness(color, -1)` over points; Pearson r with n in caption (Spearman ρ for ranks or ordinal ratings).
 - Model family (sizes of one model, B0–B7): points joined in size order, solid data line, family color. Members are one kind: name every one by short tag (`B0` … `B7`); full names in legend or caption.
   ```python
   ax.plot(x, y, "o-", color=colors["ours"])  # our family
   ```
 - Pareto front: front models joined in x order, dashed `neutral` line under markers; second front dotted (`":"`). Dominated models: markers only.
   ```python
-  ax.plot(x, y, linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
+  ax.plot(x, y, linestyle="--", linewidth=paper.dashed_linewidth, color=colors["neutral"], zorder=1)
   ```
 - Embedding (t-SNE, UMAP): marker with black edge, translucent fill in class color; > 6 classes: also own marker shape (DESIGN.md Colors). One color per class (DESIGN.md Colors), legend. No ticks, tick labels, gridlines or axis labels.
   ```python
-  ax.plot(x, y, shape, markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width,
+  ax.plot(x, y, shape, markeredgecolor=colors["ink"], markeredgewidth=paper.filled_markeredgewidth,
           markerfacecolor=(*to_rgb(color), 0.5), linestyle="none", label=name)
   ax.set_xticks([])
   ax.set_yticks([])
@@ -36,9 +36,9 @@ Two quantities per item against each other: accuracy vs parameters, FLOPs or lat
 
 ## Labels
 
-- Point names: beside each labelled point, `darken(color)`. Placements (for Collisions): upper right, upper left (`xytext=(-3, 3), ha="right"`), lower right, lower left (`va="top"`). `finalize_figure` grows limits up to a quarter to keep names inside; reports any beyond.
+- Point names: beside each labelled point, `shift_lightness(color, -1)`. Placements (for Collisions): upper right, upper left (`xytext=(-3, 3), ha="right"`), lower right, lower left (`va="top"`). `finalize_figure` grows limits up to a quarter to keep names inside; reports any beyond.
   ```python
-  ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", color=darken(color))
+  ax.annotate(name, (x, y), xytext=(3, 3), textcoords="offset points", color=shift_lightness(color, -1))
   ```
 - Values: takeaway compares some labelled models: value joins name.
   ```python

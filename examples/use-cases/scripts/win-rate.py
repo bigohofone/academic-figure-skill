@@ -5,12 +5,13 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on, baseline_greys
+from paper import finalize_figure, make_shades
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/win-rate.json") as f:
     data = json.load(f)
@@ -24,7 +25,7 @@ wins, ties, losses = (shares[c] for c in categories)
 print("takeaway:", {o: (f"{w:.0%}", f"{l:.0%}", f"win+tie {w + t:.0%}") for o, w, t, l in zip(opponents, wins, ties, losses)})
 assert wins[0] > losses[0] and wins[1] > losses[1], "the takeaway does not hold"
 
-category_colors = [colors["ours"], *baseline_greys(2)]
+category_colors = [colors["ours"], *make_shades(colors["neutral"], 2)]
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 y = np.arange(len(opponents))
@@ -33,7 +34,7 @@ for category, color in zip(categories, category_colors):
     values = shares[category]
     bars = ax.barh(y, values, left=left, color=color, edgecolor="white",
                    linewidth=plt.rcParams["grid.linewidth"], label=category)
-    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color=text_color_on(color))
+    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
     left += values
 
 ax.set_yticks(y, labels=opponents)

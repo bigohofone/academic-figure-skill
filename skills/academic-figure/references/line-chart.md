@@ -12,7 +12,13 @@ Values along continuous x: learning curves, scaling curves, pass@k, metric over 
   ```python
   ax.plot(x, y, "o-", color=color)
   ```
-- Diagnostics: raw values in series color, `alpha=0.25`, unlabelled; `moving_average(values)` on top, labelled. Reported results: raw.
+- Diagnostics: raw values in series color, `alpha=0.25`, unlabelled; centered moving average over 5% of the points on top, labelled.
+  ```python
+  w = max(1, len(y) // 40) * 2 + 1
+  smooth = np.convolve(y, np.ones(w) / w, mode="valid")
+  ax.plot(x[w // 2 : len(x) - w // 2], smooth, color=color, label=name)
+  ```
+  Reported results: raw.
 - Several runs per setting (seeds, folds): mean as line, ±1 std as band.
   ```python
   ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)
@@ -20,7 +26,7 @@ Values along continuous x: learning curves, scaling curves, pass@k, metric over 
 
 ## Variants
 
-- Log₂ x (number of samples, batch size): no minor ticks. Tick and gridline at every power of 2, from first ≤ smallest x to first ≥ largest x (`top`; in a grid sharing x, largest over all panels). Labels per DESIGN.md tick rule (every one, or every m-th, rest blank). Axis ends at `top` plus design data margin.
+- Log₂ x (number of samples, batch size): no minor ticks. Tick and gridline at every power of 2, from first ≤ smallest x to first ≥ largest x (`top`; in a grid sharing x, largest over all panels). Every power labelled; too crowded: every second power as the tick step. Axis ends at `top` plus design data margin.
   ```python
   ax.set_xscale("log", base=2)
   ax.set_xticks([], minor=True)
@@ -33,10 +39,10 @@ Values along continuous x: learning curves, scaling curves, pass@k, metric over 
   ```
 - Scaling law fit: both axes log. Measured points: markers, no line. Fitted law: dashed, same color, over fitted range; exponent in legend entry, per DESIGN.md value table; N, C or D for the x quantity; mathtext (Inter has no ∝ glyph).
   ```python
-  ax.plot(x_fit, a * x_fit ** -b, linestyle="--", linewidth=paper.dashed_width, color=color,
+  ax.plot(x_fit, a * x_fit ** -b, linestyle="--", linewidth=paper.dashed_linewidth, color=color,
           label=f"Fit: $L \\propto N^{{-{b_text}}}$")
   ```
-- ROC curve: one panel, aspect 1 : 1, both axes 0–1; x "False positive rate", y "True positive rate"; chance diagonal always, named in caption. Message is low-FPR regime (detection at 0.1% FPR): both axes log, smallest rate shown to 1.
+- ROC curve: one panel, both axes 0–1 (square, set by `finalize_figure`); x "False positive rate", y "True positive rate"; chance diagonal always, named in caption. Message is low-FPR regime (detection at 0.1% FPR): both axes log, smallest rate shown to 1.
   ```python
   ax.set_xlim(0, 1)
   ax.set_ylim(0, 1)

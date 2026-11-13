@@ -10,7 +10,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/learning-curve.json"))
 epochs = np.array(data["epochs"])
@@ -33,8 +33,8 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 # ours in color and solid; the baselines grey, told apart by line style, in ascending order of best accuracy
 styles = {
     "Ours": dict(color=colors["ours"], linestyle="-"),
-    "Baseline": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_width),
-    "Mixup": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_width),
+    "Baseline": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_linewidth),
+    "Mixup": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_linewidth),
 }
 handles = {}
 for name in ["Baseline", "Mixup", "Ours"]:
@@ -52,3 +52,4 @@ ax.legend([handles["Ours"], handles["Baseline"], handles["Mixup"]], ["Ours", "Ba
 finalize_figure(fig, ax)
 fig.savefig("../outputs/learning-curve.pdf")
 fig.savefig("../outputs/learning-curve.png")
+fig.savefig("../outputs/learning-curve.svg")

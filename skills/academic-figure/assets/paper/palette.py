@@ -7,7 +7,8 @@ from matplotlib import colors
 from . import design
 
 
-GREY_GAP = 12  # L* kept clear on each side of ours, so ours stays apart in grayscale
+STOP = 12  # L* one stop moves: two series this far apart stay apart printed in black and white
+LIGHTEST, DARKEST = 80, 25  # L* range of make_shades: the lightest still reads as a thin line on white
 
 
 def _lightness(color):
@@ -23,28 +24,48 @@ def _over_white(rgba):
     return tuple(alpha * c + (1 - alpha) for c in (r, g, b))
 
 
-def _grey_of_lightness(lightness):
-    y = ((lightness + 16) / 116) ** 3
-    c = 12.92 * y if y <= 0.0031308 else 1.055 * y ** (1 / 2.4) - 0.055
-    return (c, c, c)
+def _hue_and_saturation(color):
+    h, _, sat = colorsys.rgb_to_hls(*colors.to_rgb(color))
+    return h, (sat if sat > 0.1 else 0.0)  # a grey has no hue to keep (colorsys reports hue 0, red)
 
 
-def baseline_greys(n):
-    """n grey fills, evenly spaced in lightness from the design's neutral-light to neutral-dark, light to
-    dark, skipping the band around ours' lightness; one series takes neutral."""
-    neutral, light, dark = (design.colors[k] for k in ("neutral", "neutral-light", "neutral-dark"))
+def _at_hls_lightness(h, sat, target):
+    """The color of hue `h` and saturation `sat` whose grayscale lightness is `target` L*."""
+    lo, hi = 0.0, 1.0
+    for _ in range(30):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if _lightness(colorsys.hls_to_rgb(h, mid, sat)) < target else (lo, mid)
+    return colorsys.hls_to_rgb(h, (lo + hi) / 2, sat)
+
+
+def shift_lightness(color, stops):
+    """`color` lighter (stops > 0) or darker (stops < 0), like an exposure dial: each stop moves its
+    grayscale lightness by STOP L*, keeping hue and saturation. -1: series text and edges on white;
+    +2: box and violin fills, light enough for the black median on them."""
+    h, sat = _hue_and_saturation(color)
+    return _at_hls_lightness(h, sat, min(100, max(0, _lightness(color) + STOP * stops)))
+
+
+def make_shades(color, n):
+    """n shades of `color`, light to dark, evenly spread in grayscale lightness from LIGHTEST to DARKEST:
+    a sweep inside one group (depths, sizes), or greys for n compared series. Greys skip the band around
+    ours' lightness, so ours stays apart in grayscale. One shade: `color` itself."""
     if n == 1:
-        return [tuple(colors.to_rgb(neutral))]
-    top, bottom, ours = _lightness(light), _lightness(dark), _lightness(design.colors["ours"])
-    segments = [(top, min(top, ours + GREY_GAP)), (max(bottom, ours - GREY_GAP), bottom)]
-    segments = [(a, b) for a, b in segments if a > b]
+        return [tuple(colors.to_rgb(color))]
+    h, sat = _hue_and_saturation(color)
+    if sat:
+        sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
+    segments = [(LIGHTEST, DARKEST)]
+    if not sat:
+        ours = _lightness(design.colors["ours"])
+        segments = [(a, b) for a, b in [(LIGHTEST, min(LIGHTEST, ours + STOP)), (max(DARKEST, ours - STOP), DARKEST)] if a > b]
     total = sum(a - b for a, b in segments)
     out = []
     for i in range(n):
         t = total * i / (n - 1)
         for a, b in segments:
             if t <= a - b + 1e-9:
-                out.append(_grey_of_lightness(a - t))
+                out.append(_at_hls_lightness(h, sat, a - t))
                 break
             t -= a - b
     return out
@@ -63,28 +84,7 @@ def _at_lightness(rgb, target):
     return tuple(np.array(rgb) * (1 - lo) + toward * lo)
 
 
-def ramp(color, n):
-    """n shades of one hue for a sweep inside one group (depths, sizes, batch sizes), light to dark,
-    evenly spread in lightness from L* 70 to 25, so neighbours stay apart in grayscale and the lightest still
-    reads as a thin line on white. Each shade keeps the hue and its saturation (HLS lightness changes, not a
-    mix with black), so the dark end stays a deep color rather than grey; a grey gives greys."""
-    h, _, sat = colorsys.rgb_to_hls(*colors.to_rgb(color))
-    if sat > 0.1:
-        sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
-    else:
-        sat = 0.0  # a grey has no hue to keep (colorsys reports hue 0, red)
-    levels = np.linspace(70, 25, n) if n > 1 else [_lightness(color)]
-    out = []
-    for target in levels:
-        lo, hi = 0.0, 1.0
-        for _ in range(30):
-            mid = (lo + hi) / 2
-            lo, hi = (mid, hi) if _lightness(colorsys.hls_to_rgb(h, mid, sat)) < target else (lo, mid)
-        out.append(colorsys.hls_to_rgb(h, (lo + hi) / 2, sat))
-    return out
-
-
-def part_colors(n):
+def make_part_colors(n):
     """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
     hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
     two parts stay apart when printed in black and white."""
@@ -92,18 +92,3 @@ def part_colors(n):
     levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
     order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
     return [_at_lightness(hue, target) for hue, target in zip(hues, order)]
-
-
-def darken(color):
-    """`color` darkened to 80%: for text or edges that belong to a series, so they read on white."""
-    return [c * 0.8 for c in colors.to_rgb(color)]
-
-
-def text_color_on(fill):
-    """Black or white, whichever reads on `fill`: for numbers written on bars, wedges, areas or heatmap cells."""
-    return "white" if np.dot(colors.to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else "black"
-
-
-def lighten(color):
-    """`color` mixed with white, 40% color: a box or violin fill, so the black median and points on it stay readable."""
-    return [0.4 * c + 0.6 for c in colors.to_rgb(color)]

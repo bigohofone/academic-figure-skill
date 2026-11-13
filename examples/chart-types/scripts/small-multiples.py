@@ -11,7 +11,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/small-multiples.json") as f:
     data = json.load(f)
@@ -37,7 +37,7 @@ for ax, name in zip(axes, datasets):
     for method, color, style in series:
         mean = runs[name][method].mean(axis=0)
         std = runs[name][method].std(axis=0)
-        width = paper.dashed_width if style != "-" else rcParams["lines.linewidth"]
+        width = paper.dashed_linewidth if style != "-" else rcParams["lines.linewidth"]
         ax.fill_between(epochs, mean - std, mean + std, color=color, alpha=0.2, linewidth=0)
         ax.plot(epochs, mean, color=color, linestyle=style, linewidth=width, label=method)
     ax.set_title(name)
@@ -48,6 +48,7 @@ handles, labels = axes[0].get_legend_handles_labels()
 order = [2, 0, 1]  # ours first, then the grey series in line-style order
 fig.legend([handles[i] for i in order], [labels[i] for i in order], loc="outside upper center", ncol=3, borderaxespad=0)
 
-finalize_figure(fig, axes, min_width=0.7)
+finalize_figure(fig, axes, height="M", min_width=0.7)
 fig.savefig("../outputs/small-multiples.pdf")
 fig.savefig("../outputs/small-multiples.png")
+fig.savefig("../outputs/small-multiples.svg")

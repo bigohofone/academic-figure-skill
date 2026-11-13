@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, lighten
+from paper import finalize_figure, shift_lightness
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/rlvr-fig6.json") as f:
     groups = json.load(f)["Problem 1"]
@@ -27,7 +27,7 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 for y, name in enumerate(names):
     values = groups[name]
     box = ax.boxplot(values, positions=[y], widths=0.7, patch_artist=True, showfliers=False, orientation="horizontal")
-    box["boxes"][0].set_facecolor(lighten(colors["series-1"]))
+    box["boxes"][0].set_facecolor(shift_lightness(colors["series-1"], 2))
     ax.plot(values, y + rng.uniform(-0.2, 0.2, len(values)), "o", color=colors["ink"],
             markerfacecolor="white", linestyle="none")
 ax.set_yticks(range(len(names)), labels=labels)

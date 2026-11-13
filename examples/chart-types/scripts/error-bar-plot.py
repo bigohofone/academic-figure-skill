@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, darken
+from paper import finalize_figure, shift_lightness
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/error-bar-plot.json") as f:
     runs = json.load(f)["accuracy_per_seed"]
@@ -28,10 +28,9 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 ax.axvline(means[best_baseline], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
 for y, name in enumerate(names):
     color = colors["ours"] if name == "Ours" else colors["neutral"]
-    ax.errorbar(means[name], y, xerr=stds[name], fmt="o", color=color, capsize=2,
-                elinewidth=rcParams["patch.linewidth"], capthick=rcParams["patch.linewidth"])
+    ax.errorbar(means[name], y, xerr=stds[name], fmt="o", color=color, capsize=2)
     ax.annotate(f"{means[name]:#.3g}", (means[name] + stds[name], y), xytext=(3, 0), textcoords="offset points",
-                ha="left", va="center", color=darken(color), gid="value-label")
+                ha="left", va="center_baseline", color=shift_lightness(color, -1), gid="value-label")
 ax.set_yticks(range(len(names)), labels=names)
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)
@@ -41,3 +40,4 @@ ax.set_xlabel("GLUE accuracy")
 finalize_figure(fig, ax)
 fig.savefig("../outputs/error-bar-plot.pdf")
 fig.savefig("../outputs/error-bar-plot.png")
+fig.savefig("../outputs/error-bar-plot.svg")

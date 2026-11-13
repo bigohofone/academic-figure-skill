@@ -5,13 +5,14 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/dataset-composition.json") as f:
     data = json.load(f)
@@ -35,7 +36,7 @@ print("takeaway:", {"total": f"{total / 1e6:.3g}M", f"{names[0]} + {names[1]}": 
                     **{n: share_text(v) for n, v in parts.items()}})
 assert top_two > 0.5, "the two largest sources are not a majority"
 
-part_colors = paper.part_colors(len(names))
+part_colors = paper.make_part_colors(len(names))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 wedges, _ = ax.pie(values, colors=part_colors, startangle=0, counterclock=False,
@@ -53,10 +54,11 @@ for w, name, v, color in zip(wedges, names, values, part_colors):
                                     relpos=(0, 0.5) if x > 0 else (1, 0.5)))
     else:
         ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")
-        ax.text(0.8 * x, 0.8 * y, share_text(v), ha="center", va="center", color=text_color_on(color))
+        ax.text(0.8 * x, 0.8 * y, share_text(v), ha="center", va="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
 
 ax.text(0, 0, f"{total / 1e6:.3g}M\nexamples", ha="center", va="center")
 
 finalize_figure(fig, ax)
 fig.savefig("../outputs/dataset-composition.pdf")
 fig.savefig("../outputs/dataset-composition.png")
+fig.savefig("../outputs/dataset-composition.svg")

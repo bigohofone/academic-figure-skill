@@ -10,9 +10,9 @@ from scipy import stats
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, finalize_figure
+from paper import shift_lightness, finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/correlation.json") as f:
     data = json.load(f)
@@ -30,7 +30,7 @@ ax.scatter(human, reward, s=rcParams["lines.markersize"] ** 2, color=colors["ser
 # trend line: least-squares fit over the rated range
 slope, intercept = np.polyfit(human, reward, 1)
 x_fit = np.array([human.min(), human.max()])
-ax.plot(x_fit, slope * x_fit + intercept, color=darken(colors["series-1"]))
+ax.plot(x_fit, slope * x_fit + intercept, color=shift_lightness(colors["series-1"], -1))
 
 ax.set_xticks(range(1, 8))
 ax.set_xlabel("Human rating")
@@ -39,3 +39,4 @@ ax.set_ylabel("Reward score")
 finalize_figure(fig, ax)
 fig.savefig("../outputs/correlation.pdf")
 fig.savefig("../outputs/correlation.png")
+fig.savefig("../outputs/correlation.svg")

@@ -4,7 +4,7 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 
 ## Draw
 
-- Panel: aspect 1 : 1; no gridlines (`ax.grid(False)`); both axes labelled with their variables.
+- Panel: height M, square (DESIGN.md Panel height); no gridlines (`ax.grid(False)`); both axes labelled with their variables.
 - Values spanning > 100×: contour their log (DESIGN.md log rule); caption says "contours of log loss".
 - Bands with lines: filled bands between levels in design colormap (`viridis`, low = dark; signed: `"RdBu_r"` centered at 0, as in `heatmap.md`); one flat color per band, never smooth gradient. On top: ink contour lines of the data itself, never of a smoothed copy. Levels: 6–8 at half width, 10 at full width, round values inside data range.
 
@@ -43,9 +43,10 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 - Level labels: one per level; black or white for color at its level (black on lines-only plot). Placed along path from minimum toward farthest corner (lines farthest apart): `positions` = per level, point on that path where Z crosses it.
 
   ```python
-  labels = ax.clabel(lines, fmt="%.2g", manual=positions, fontsize=paper.contour_label_size)  # inline, turned along each line
+  labels = ax.clabel(lines, fmt="%.2g", manual=positions)  # inline, turned along each line
   for t in labels:
-      t.set_color(text_color_on(mesh.cmap(mesh.norm(float(t.get_text())))))
+      fill = mesh.cmap(mesh.norm(float(t.get_text())))
+      t.set_color("white" if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else "black")
   ```
 
   - Polylines: each level once, at its first given label position, turned along line like `clabel`'s, on white box (no gap cut).
@@ -56,14 +57,14 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
   ```python
   angle = (np.degrees(np.arctan2(ys[k + 1] - ys[k - 1], xs[k + 1] - xs[k - 1])) + 90) % 180 - 90
   ax.text(x, y, f"{level:.2g}", ha="center", va="center", rotation=angle, rotation_mode="anchor",
-          transform_rotates_text=True, fontsize=paper.contour_label_size, gid="contour-label",
+          transform_rotates_text=True, gid="contour-label",
           bbox=dict(facecolor="white", edgecolor="none", pad=1))
   ```
 
 - Points of interest: minimum or trained solution: filled star in `colors["ours"]`, highlight size; training trajectory: data line, markers at ends. ≥ 2: named in legend; else in caption (DESIGN.md Legend).
 
   ```python
-  ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_size, linestyle="none", label=...)
+  ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_markersize, linestyle="none", label=...)
   ```
 
 ## Caption

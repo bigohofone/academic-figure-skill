@@ -10,9 +10,9 @@ from matplotlib.patches import Patch
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, lighten
+from paper import finalize_figure, shift_lightness
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/grouped-box-plot.json") as f:
     data = json.load(f)
@@ -37,16 +37,17 @@ for i, model in enumerate(models):
     for x, dataset in enumerate(datasets):
         box = ax.boxplot(lengths[model][dataset], positions=[x + (i - (len(models) - 1) / 2) * width],
                          widths=0.8 * width, patch_artist=True)
-        box["boxes"][0].set_facecolor(model_colors[model] if model_colors[model] == colors["ours"] else lighten(model_colors[model]))
+        box["boxes"][0].set_facecolor(model_colors[model] if model_colors[model] == colors["ours"] else shift_lightness(model_colors[model], 2))
 ax.set_xticks(range(len(datasets)), labels=datasets)
 ax.set_xlim(-0.5, len(datasets) - 0.5)
 ax.tick_params(axis="x", length=0)
 ax.grid(axis="x", visible=False)
 ax.set_ylabel("Length (tokens)")
-handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] else lighten(model_colors[m]), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=m)
+handles = [Patch(facecolor=model_colors[m] if model_colors[m] == colors["ours"] else shift_lightness(model_colors[m], 2), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=m)
            for m in models]
 ax.legend(handles=handles)
 
 finalize_figure(fig, ax)
 fig.savefig("../outputs/grouped-box-plot.pdf")
 fig.savefig("../outputs/grouped-box-plot.png")
+fig.savefig("../outputs/grouped-box-plot.svg")

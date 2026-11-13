@@ -11,8 +11,7 @@ Reported results across categories, one value each: methods, ablations or settin
   ```
 - Error bars (several runs): ±1 std.
   ```python
-  ax.bar(..., yerr=std, capsize=2, error_kw=dict(elinewidth=rcParams["patch.linewidth"],
-         capthick=rcParams["patch.linewidth"], ecolor=colors["ink"]))
+  ax.bar(..., yerr=std, capsize=2, error_kw=dict(ecolor=colors["ink"]))
   ```
 
 ## Variants
@@ -32,14 +31,14 @@ Reported results across categories, one value each: methods, ablations or settin
   ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=rcParams["grid.linewidth"])
   ax.set_ylim(0, 1)
   ```
-- Win rate (pairwise win/tie/loss): one horizontal stacked bar per opponent; segments win, tie, loss from left; each bar sums to 1. Win `colors["ours"]`, tie and loss `baseline_greys(2)`. 50% reference line only when paper reads win rates against it.
+- Win rate (pairwise win/tie/loss): one horizontal stacked bar per opponent; segments win, tie, loss from left; each bar sums to 1. Win `colors["ours"]`, tie and loss `make_shades(colors["neutral"], 2)`. 50% reference line only when paper reads win rates against it.
 - Reliability diagram (calibration): one square panel (confidence histograms above: two-factor grid of square panels, DESIGN.md Grid step 0); both axes 0–1. Confidence bins on x; per-bin accuracy as touching bars in `series-1`, outlined in darker own color, never white. Paper shows gap to bin's mean confidence: second equal-terms series (DESIGN.md Colors: `series-4`, skipping ours), opaque light fill from accuracy to confidence, drawn on top. Perfect-calibration diagonal. No value labels.
   ```python
   ax.bar(edges[:-1], accuracy, width=np.diff(edges), align="edge", color=colors["series-1"],
-         edgecolor=darken(colors["series-1"]), linewidth=rcParams["grid.linewidth"])
+         edgecolor=shift_lightness(colors["series-1"], -1), linewidth=rcParams["grid.linewidth"])
   ax.bar(edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
-         width=np.diff(edges), align="edge", color=lighten(colors["series-4"]),
-         edgecolor=darken(colors["series-4"]), linewidth=rcParams["grid.linewidth"], label="Gap")
+         width=np.diff(edges), align="edge", color=shift_lightness(colors["series-4"], 2),
+         edgecolor=shift_lightness(colors["series-4"], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
   ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
   ```
 
@@ -47,11 +46,11 @@ Reported results across categories, one value each: methods, ablations or settin
 
 - Bar values: every bar of a reported result, per DESIGN.md value table, written level; `finalize_figure` turns a panel's values upward when any overlap.
   ```python
-  ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values], fontsize=paper.bar_label_size, color=darken(color))
+  ax.bar_label(bars, labels=[f"{v:#.3g}" for v in values], color=shift_lightness(color, -1))
   ```
 - Segment values (stacked, win rate): inside each segment; `texts` as shares (DESIGN.md Value labels). Spills out of segment: drop (Collisions step 3; each segment its own kind).
   ```python
-  ax.bar_label(bars, labels=texts, label_type="center", color=text_color_on(color))
+  ax.bar_label(bars, labels=texts, label_type="center", color=text_color)  # on the segment color, DESIGN.md Typography
   ```
 
 ## Caption

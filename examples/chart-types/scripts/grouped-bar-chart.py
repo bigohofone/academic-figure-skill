@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, darken, baseline_greys
+from paper import finalize_figure, shift_lightness, make_shades
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/grouped-bar-chart.json") as f:
     data = json.load(f)
@@ -27,7 +27,7 @@ assert all(m > 0 for m in margins), "the takeaway does not hold"
 # methods left to right in ascending order of mean accuracy, so Ours ends at the right
 methods = sorted(scores, key=lambda m: np.mean(scores[m]))
 assert methods[-1] == "Ours"
-method_colors = dict(zip(methods[:-1], baseline_greys(len(methods) - 1)))
+method_colors = dict(zip(methods[:-1], make_shades(colors["neutral"], len(methods) - 1)))
 method_colors["Ours"] = colors["ours"]
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
@@ -37,9 +37,8 @@ for i, method in enumerate(methods):
     values = scores[method]
     bars = ax.bar(x + (i - (len(methods) - 1) / 2) * width, values, width,
                   color=method_colors[method], linewidth=0, label=method)
-    label_color = darken(colors["ours"] if method == "Ours" else colors["neutral"])  # one text grey for grey series
-    ax.bar_label(bars, fontsize=paper.bar_label_size, labels=[f"{v:.3f}" for v in values], color=label_color,
-                 rotation=90, padding=2)
+    label_color = shift_lightness(colors["ours"] if method == "Ours" else colors["neutral"], -1)  # one text grey for grey series
+    ax.bar_label(bars, labels=[f"{v:.3f}" for v in values], color=label_color, padding=2)
 
 ax.set_xticks(x, labels=benchmarks)
 ax.tick_params(axis="x", length=0)
@@ -50,3 +49,4 @@ ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=l
 finalize_figure(fig, ax)
 fig.savefig("../outputs/grouped-bar-chart.pdf")
 fig.savefig("../outputs/grouped-bar-chart.png")
+fig.savefig("../outputs/grouped-bar-chart.svg")

@@ -11,7 +11,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/t-sne.json") as f:
     classes = json.load(f)
@@ -32,7 +32,7 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75))
 tab10 = plt.get_cmap("tab10").colors
 shapes = ["o", "s", "^", "D", "v", "<", ">", "P", "X", "*"]  # with the color, each class keeps apart in grayscale
 for i, (name, c) in enumerate(classes.items()):
-    ax.plot(c["x"], c["y"], shapes[i], markeredgecolor=colors["ink"], markeredgewidth=paper.filled_edge_width,
+    ax.plot(c["x"], c["y"], shapes[i], markeredgecolor=colors["ink"], markeredgewidth=paper.filled_markeredgewidth,
             markerfacecolor=(*to_rgb(tab10[i]), 0.5), linestyle="none", label=name.replace("class_", "Class "))
 
 ax.set_xticks([])
@@ -46,6 +46,6 @@ order = [i for c in range(ncol) for i in range(c, len(handles), ncol)]
 # moves an ax.legend anchored above the panel a little further on every draw
 fig.legend([handles[i] for i in order], [names[i] for i in order], loc="outside upper center", ncol=ncol, borderaxespad=0)
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/t-sne.pdf")
 fig.savefig("../outputs/t-sne.png")

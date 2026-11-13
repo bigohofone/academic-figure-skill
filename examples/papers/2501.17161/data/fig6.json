@@ -1,0 +1,10 @@
+{
+ "note": "OOD success rate (%) as printed on the bars of the original figure",
+ "tasks": ["GP-L", "VIRL-L", "GP-VL", "V-IRL-VL"],
+ "success": {
+  "GP-L": {"RL": 15.0, "Init": 11.5, "SFT": 3.4},
+  "VIRL-L": {"RL": 91.8, "Init": 80.8, "SFT": 1.3},
+  "GP-VL": {"RL": 14.2, "Init": 11.2, "SFT": 5.6},
+  "V-IRL-VL": {"RL": 45.0, "Init": 35.7, "SFT": 2.5}
+ }
+}

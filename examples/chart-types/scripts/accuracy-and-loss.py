@@ -4,12 +4,13 @@ import json
 import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, moving_average
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/accuracy-and-loss.json") as f:
     data = json.load(f)
@@ -36,18 +37,20 @@ axes[3].tick_params(labelleft=False)
 
 for ax, name in zip(axes[:2], datasets):
     ax.plot(epochs, accuracy[name]["Baseline"], color=colors["neutral"], linestyle="--",
-            linewidth=paper.dashed_width, label="Baseline")
+            linewidth=paper.dashed_linewidth, label="Baseline")
     ax.plot(epochs, accuracy[name]["Ours"], color=colors["ours"], label="Ours")
     ax.set_title(name)
 axes[0].set_ylabel("Accuracy")
 
 for ax, name in zip(axes[2:], datasets):
     ax.plot(epochs, loss[name]["Baseline"], color=colors["neutral"], linestyle="--",
-            linewidth=paper.dashed_width, alpha=0.25)
+            linewidth=paper.dashed_linewidth, alpha=0.25)
     ax.plot(epochs, loss[name]["Ours"], color=colors["ours"], alpha=0.25)
-    ax.plot(epochs, moving_average(loss[name]["Baseline"]), color=colors["neutral"], linestyle="--",
-            linewidth=paper.dashed_width, label="Baseline")
-    ax.plot(epochs, moving_average(loss[name]["Ours"]), color=colors["ours"], label="Ours")
+    w = max(1, len(epochs) // 40) * 2 + 1
+    smoothed_epochs = epochs[w // 2 : len(epochs) - w // 2]
+    ax.plot(smoothed_epochs, np.convolve(loss[name]["Baseline"], np.ones(w) / w, mode="valid"), color=colors["neutral"],
+            linestyle="--", linewidth=paper.dashed_linewidth, label="Baseline")
+    ax.plot(smoothed_epochs, np.convolve(loss[name]["Ours"], np.ones(w) / w, mode="valid"), color=colors["ours"], label="Ours")
     ax.set_title(name)
 axes[2].set_ylabel("Training loss")
 
@@ -58,6 +61,7 @@ fig.supxlabel("Epoch")
 handles, labels = axes[0].get_legend_handles_labels()
 fig.legend(handles[::-1], labels[::-1], loc="outside upper center", ncol=2, borderaxespad=0)
 
-finalize_figure(fig, axes, min_width=0.9)
+finalize_figure(fig, axes, height="M", min_width=0.9)
 fig.savefig("../outputs/accuracy-and-loss.pdf")
 fig.savefig("../outputs/accuracy-and-loss.png")
+fig.savefig("../outputs/accuracy-and-loss.svg")

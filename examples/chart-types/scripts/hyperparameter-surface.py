@@ -5,14 +5,15 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 from matplotlib import rcParams
 from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/hyperparameter-surface.json"))
 learning_rate = np.array(data["learning_rate"])
@@ -49,12 +50,12 @@ for level in levels:
     k = np.argmax(along >= level)
     positions.append((10 ** np.interp(path_j[k], np.arange(13), lx), 10 ** np.interp(path_i[k], np.arange(13), ly)))
 # every second level labelled: 4.5, 5 and 5.5 crowd in the corner
-labels = ax.clabel(lines, levels=levels[::2], fmt="%.2g", manual=positions[::2], fontsize=paper.contour_label_size)
+labels = ax.clabel(lines, levels=levels[::2], fmt="%.2g", manual=positions[::2])
 for label in labels:
-    label.set_color(text_color_on(mesh.cmap(mesh.norm(float(label.get_text())))))
+    label.set_color("white" if np.dot(to_rgb(mesh.cmap(mesh.norm(float(label.get_text())))), [0.299, 0.587, 0.114]) < 0.5 else "black")
 
 ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markerfacecolor=colors["ours"],
-        markersize=paper.highlight_size, linestyle="none")
+        markersize=paper.highlight_markersize, linestyle="none")
 
 
 def log_tick(v, _):
@@ -70,6 +71,7 @@ ax.set_ylabel("Weight decay")
 ax.grid(False)
 fig.colorbar(mesh, ax=ax, label="Validation loss", ticks=levels)
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, height="M")
 fig.savefig("../outputs/hyperparameter-surface.pdf")
 fig.savefig("../outputs/hyperparameter-surface.png")
+fig.savefig("../outputs/hyperparameter-surface.svg")

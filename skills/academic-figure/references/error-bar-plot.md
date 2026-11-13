@@ -6,8 +6,7 @@ Means with uncertainty, one point per method or setting. Use when values differ 
 
 - Points: hollow marker at mean; error bar in series color.
   ```python
-  ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2,
-              elinewidth=rcParams["patch.linewidth"], capthick=rcParams["patch.linewidth"])
+  ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2)
   ```
 - Axis: methods are categories; tick marks hidden; horizontal gridlines only. Value axis: spans intervals, default margins, not from 0.
 
@@ -25,13 +24,13 @@ Means with uncertainty, one point per method or setting. Use when values differ 
 
 ## Labels
 
-- Means: beside end of error bar, `darken(color)`: above upper cap; forest plot: right of right cap.
+- Means: beside end of error bar, `shift_lightness(color, -1)`: above upper cap; forest plot: right of right cap.
   ```python
   ax.annotate(f"{m:#.3g}", (x, m + err), xytext=(0, 3), textcoords="offset points",
-              ha="center", va="bottom", color=darken(color), gid="value-label")
+              ha="center", va="bottom", color=shift_lightness(color, -1), gid="value-label")
   # forest plot
   ax.annotate(f"{m:#.3g}", (m + err, y), xytext=(3, 0), textcoords="offset points",
-              ha="left", va="center", color=darken(color), gid="value-label")
+              ha="left", va="center_baseline", color=shift_lightness(color, -1), gid="value-label")
   ```
 
 ## Caption

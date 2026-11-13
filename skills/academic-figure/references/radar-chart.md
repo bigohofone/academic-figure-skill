@@ -4,7 +4,7 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
 
 ## Draw
 
-- Axes: polar; one spoke per benchmark, evenly spaced, clockwise from top. `finalize_figure` sizes chart to width, ignores `aspect`.
+- Axes: polar; one spoke per benchmark, evenly spaced, clockwise from top. `finalize_figure` sizes chart to width, ignores `height`.
 
   ```python
   fig, ax = plt.subplots(figsize=(width, width), subplot_kw={"projection": "polar"})
@@ -32,7 +32,7 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
 
   ```python
   ax.plot(loop, np.r_[values, values[:1]], color=color, linestyle=style,
-          linewidth=1 if style == "-" else paper.dashed_width, label=name)
+          linewidth=1 if style == "-" else paper.dashed_linewidth, label=name)
   ax.fill(angles, values, color=color, alpha=0.1)
   ```
 
@@ -52,7 +52,7 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
 
 ## Labels
 
-- Values: ours only, at each spoke, in `darken(colors["ours"])`, outside vertex (angles clockwise from top):
+- Values: ours only, at each spoke, in `shift_lightness(colors["ours"], -1)`, outside vertex (angles clockwise from top):
   - Side spokes: beside vertex, outward, hanging toward horizontal axis, away from spoke name.
   - Top and bottom spokes: just beyond vertex.
   - Crossing a ring line: white box.
@@ -63,7 +63,7 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
   ax.annotate(f"{v:#.3g}", (angle, v), xytext=(4 * np.sign(side), 4 * np.sign(up)), textcoords="offset points",
               ha="left" if side > 0 else "right" if side < 0 else "center",
               va=("top" if np.cos(angle) > 0 else "bottom") if side else ("bottom" if up > 0 else "top"),
-              color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
+              color=shift_lightness(colors["ours"], -1), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
   ```
 
   Placements (for Collisions): as above; then spoke names pushed out (`pad=8`, then 10, 12, …).

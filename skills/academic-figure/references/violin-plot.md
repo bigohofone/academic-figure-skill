@@ -4,11 +4,11 @@ As box plot (`box-plot.md`), when spread shape matters: several modes, long tail
 
 ## Draw
 
-- Body: series color lightened, full opacity (grey series: `lighten(baseline_greys(n)[i])`; ours: full color, stays apart from pale greys in grayscale); black edge.
+- Body: series color lightened, full opacity (grey series: `shift_lightness(make_shades(colors["neutral"], n)[i], 2)`; ours: full color, stays apart from pale greys in grayscale); black edge.
   ```python
   parts = ax.violinplot(values, positions=[x], widths=0.8, showextrema=False)
   body = parts["bodies"][0]
-  body.set_facecolor(lighten(color))
+  body.set_facecolor(shift_lightness(color, 2))
   body.set_edgecolor(colors["ink"])
   body.set_linewidth(rcParams["patch.linewidth"])
   body.set_alpha(1)
@@ -18,8 +18,8 @@ As box plot (`box-plot.md`), when spread shape matters: several modes, long tail
   q1, median, q3 = np.percentile(values, [25, 50, 75])
   low = min(v for v in values if v >= q1 - 1.5 * (q3 - q1))
   high = max(v for v in values if v <= q3 + 1.5 * (q3 - q1))
-  ax.vlines(x, low, high, color=colors["ink"], linewidth=rcParams["patch.linewidth"])
-  ax.vlines(x, q1, q3, color=colors["ink"], linewidth=4 * rcParams["patch.linewidth"])
+  ax.vlines(x, low, high, color=colors["ink"], linewidth=rcParams["grid.linewidth"])
+  ax.vlines(x, q1, q3, color=colors["ink"], linewidth=4 * rcParams["grid.linewidth"])
   ax.plot(x, median, "o", color=colors["ink"], markerfacecolor="white", zorder=3)
   ```
 - Axis: groups are categories; tick marks hidden; horizontal gridlines only.

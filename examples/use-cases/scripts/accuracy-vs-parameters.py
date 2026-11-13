@@ -10,9 +10,9 @@ from matplotlib.ticker import NullFormatter
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, finalize_figure
+from paper import shift_lightness, finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/accuracy-vs-parameters.json") as f:
     models = json.load(f)
@@ -40,9 +40,9 @@ ax.set_xscale("log")
 
 # baselines: the two Pareto fronts, dashed and dotted, under the markers; every baseline a grey marker
 ax.plot([m["params_millions"] for m in hand], [m["top1_accuracy"] for m in hand],
-        linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
+        linestyle="--", linewidth=paper.dashed_linewidth, color=colors["neutral"], zorder=1)
 ax.plot([m["params_millions"] for m in nas], [m["top1_accuracy"] for m in nas],
-        linestyle=":", linewidth=paper.dashed_width, color=colors["neutral"], zorder=1)
+        linestyle=":", linewidth=paper.dashed_linewidth, color=colors["neutral"], zorder=1)
 ax.plot([m["params_millions"] for m in baselines], [m["top1_accuracy"] for m in baselines],
         "o", color=colors["neutral"])
 
@@ -52,8 +52,12 @@ ax.plot([m["params_millions"] for m in ours], [m["top1_accuracy"] for m in ours]
 # point names: every EfficientNet by its tag, upper left of its point, above the curve; the compared
 # accuracies have no free spot beside the crowded top right, so they are given in the caption
 for m in ours:
-    ax.annotate(m["model"].removeprefix("EfficientNet-"), (m["params_millions"], m["top1_accuracy"]),
-                xytext=(-3, 3), textcoords="offset points", ha="right", color=darken(colors["ours"]))
+    tag = m["model"].removeprefix("EfficientNet-")
+    # B1 sits too close to B2 for both to be named above: it takes the next placement, left of its point
+    left = tag == "B1"
+    ax.annotate(tag, (m["params_millions"], m["top1_accuracy"]), xytext=(-4, 0) if left else (-3, 3),
+                textcoords="offset points", ha="right", va="center_baseline" if left else "baseline",
+                color=shift_lightness(colors["ours"], -1))
 
 ax.set_xticks([10, 100], labels=["10", "100"])
 ax.xaxis.set_minor_formatter(NullFormatter())
@@ -63,8 +67,8 @@ ax.set_ylabel("Top-1 accuracy (%)")
 
 handles = [
     Line2D([], [], marker="o", linestyle="-", color=colors["ours"]),
-    Line2D([], [], marker="o", linestyle="--", linewidth=paper.dashed_width, color=colors["neutral"]),
-    Line2D([], [], marker="o", linestyle=":", linewidth=paper.dashed_width, color=colors["neutral"]),
+    Line2D([], [], marker="o", linestyle="--", linewidth=paper.dashed_linewidth, color=colors["neutral"]),
+    Line2D([], [], marker="o", linestyle=":", linewidth=paper.dashed_linewidth, color=colors["neutral"]),
     Line2D([], [], marker="o", linestyle="none", color=colors["neutral"]),
 ]
 # no corner inside the panel is free of data, so the legend goes above it, two entries per row

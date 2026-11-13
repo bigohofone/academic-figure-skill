@@ -1,0 +1,58 @@
+{
+ "note": "growth in % over the starting checkpoint; one point per training compute, from the marker opacity on the 3e9-6e9 color bar",
+ "gflops": [
+  3000000000.0,
+  4500000000.0,
+  6000000000.0
+ ],
+ "runs": {
+  "VIter 1": {
+   "ood_growth": [
+    0.19,
+    0.39,
+    0.48
+   ],
+   "id_growth": [
+    6.456,
+    10.846,
+    13.286
+   ]
+  },
+  "VIter 3": {
+   "ood_growth": [
+    0.87,
+    1.22,
+    2.15
+   ],
+   "id_growth": [
+    3.876,
+    7.926,
+    12.166
+   ]
+  },
+  "VIter 5": {
+   "ood_growth": [
+    0.85,
+    1.71,
+    2.99
+   ],
+   "id_growth": [
+    5.726,
+    11.756,
+    12.536
+   ]
+  },
+  "VIter 10": {
+   "ood_growth": [
+    2.14,
+    4.77,
+    5.99
+   ],
+   "id_growth": [
+    4.596,
+    8.176,
+    10.896
+   ]
+  }
+ }
+}

@@ -5,12 +5,13 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/hyperparameter-grid.json"))
 learning_rates = data["learning_rates"]
@@ -26,7 +27,7 @@ im = ax.imshow(accuracy, aspect="auto", origin="lower")
 for i in range(len(learning_rates)):
     for j in range(len(batch_sizes)):
         v = accuracy[i, j]
-        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color=text_color_on(im.cmap(im.norm(v))))
+        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color="white" if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else "black")
 ax.set_xticks(range(len(batch_sizes)), labels=[str(b) for b in batch_sizes])
 ax.set_yticks(range(len(learning_rates)), labels=[lr.replace("-", "−") for lr in learning_rates])
 ax.set_xlabel("Batch size")
@@ -34,6 +35,7 @@ ax.set_ylabel("Learning rate")
 ax.tick_params(length=0)
 ax.grid(False)
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/hyperparameter-grid.pdf")
 fig.savefig("../outputs/hyperparameter-grid.png")
+fig.savefig("../outputs/hyperparameter-grid.svg")

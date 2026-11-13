@@ -1,0 +1,51 @@
+{
+ "title": "On the Interplay of Pre-Training, Mid-Training, and RL",
+ "venue": "ICML 2026",
+ "order": 3,
+ "credit": "Zhang et al., On the Interplay of Pre-Training, Mid-Training, and RL on Reasoning Language Models, ICML 2026. <a href=\"https://arxiv.org/abs/2512.07783\" target=\"_blank\" rel=\"noopener\">arXiv:2512.07783</a>, arXiv non-exclusive license. Every data plot in the main text redrawn by academic-figure from values recovered from the PDF, then the paper recompiled from its arXiv source; text and captions unchanged.",
+ "main": "main.tex",
+ "figures": [
+  {
+   "script": "rl-ext.py",
+   "target": "figures/rl_ext.pdf",
+   "caption": "RL is applied to four different data regimes"
+  },
+  {
+   "script": "graph-similarity.py",
+   "target": "figures/hist_graph_similarity.pdf",
+   "caption": "Distribution of topological similarity between generated correct"
+  },
+  {
+   "script": "mid-rl-split.py",
+   "target": "figures/cpt_rl_compare_mid_rl_split.pdf",
+   "caption": "Different lines indicate the compute allocation strategies"
+  },
+  {
+   "script": "reward-mixes.py",
+   "target": "figures/op11-14_reward_mixes_passat1_passat128_pass.pdf",
+   "caption": "consistently yields measurable performance gains across evaluation settings"
+  },
+  {
+   "script": "error-types.py",
+   "target": "figures/op_group_breakdown.pdf",
+   "caption": "Effects of reward mixtures on reasoning correctness"
+  }
+ ],
+ "edits": [
+  {
+   "file": "sec/3_post_training.tex",
+   "from": "\\includegraphics[width=0.9\\linewidth]{figures/rl_ext.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/rl_ext.pdf}"
+  },
+  {
+   "file": "sec/4_pre_training.tex",
+   "from": "\\includegraphics[width=0.9\\linewidth]{figures/hist_graph_similarity.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/hist_graph_similarity.pdf}"
+  },
+  {
+   "file": "sec/6_hacking.tex",
+   "from": "\\includegraphics[width=0.8\\linewidth]{figures/op_group_breakdown.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/op_group_breakdown.pdf}"
+  }
+ ]
+}

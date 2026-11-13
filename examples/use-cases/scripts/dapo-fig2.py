@@ -8,15 +8,17 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, mark_value, darken
+from paper import finalize_figure, shift_lightness
 
 
-def mark_best(ax, x, y, text, color, **kw):
+def mark_best(ax, x, y, text, color, below=False):
     """The paper's figure draws each run's best as a line across the panel, so this one does too."""
-    ax.axhline(y, linewidth=plt.rcParams["grid.linewidth"], color=darken(color), zorder=1)
-    mark_value(ax, x, y, text, color, **kw)
+    ax.axhline(y, linewidth=plt.rcParams["grid.linewidth"], color=shift_lightness(color, -1), zorder=1)
+    ax.plot(x, y, "o", color=color)
+    ax.annotate(text, (x, y), xytext=(0, -4 if below else 4), textcoords="offset points", ha="center",
+                va="top" if below else "bottom", color=shift_lightness(color, -1), gid="value-label")
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/dapo.json") as f:
     runs = json.load(f)["fig2a"]
@@ -34,7 +36,7 @@ assert ours["value"][best_ours] > ablation["value"][best_ablation], "the takeawa
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 ax.plot(ours["step"], ours["value"], color=colors["ours"], label="w/ Clip-Higher")
 ax.plot(ablation["step"], ablation["value"], color=colors["neutral"], linestyle="--",
-        linewidth=paper.dashed_width, label="w/o Clip-Higher")
+        linewidth=paper.dashed_linewidth, label="w/o Clip-Higher")
 mark_best(ax, ours["step"][best_ours], ours["value"][best_ours],
            f"{ours['value'][best_ours]:#.3g}", colors["ours"])
 mark_best(ax, ablation["step"][best_ablation], ablation["value"][best_ablation],

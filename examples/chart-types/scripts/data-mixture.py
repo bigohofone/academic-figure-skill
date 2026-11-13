@@ -5,13 +5,14 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/data-mixture.json") as f:
     data = json.load(f)
@@ -42,23 +43,24 @@ assert stage_values("Code")[0] < stage_values("Code")[-1] and stage_values("Math
 # The flattest part at the bottom, the rest in data order above it
 bottom = min(shares, key=lambda name: np.std(shares[name]))
 order = [bottom] + [name for name in shares if name != bottom]
-band_colors = paper.part_colors(len(order))
+band_colors = paper.make_part_colors(len(order))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
-polys = ax.stackplot(steps, [shares[name] for name in order], colors=band_colors, labels=order, step="post",
+polys = ax.stackplot(steps, [shares[name] for name in order], colors=band_colors, labels=order, alpha=0.875, step="post",
                      edgecolor="white", linewidth=rcParams["grid.linewidth"])
 for s in switches:
-    ax.axvline(s, linestyle="--", linewidth=paper.dashed_width, color="white")
+    ax.axvline(s, linestyle="--", linewidth=paper.dashed_linewidth, color="white")
 
-# Shares the takeaway cites, inside their bands at each stage
-cited = ["Web", "Code", "Math"]
+# Shares the takeaway cites, inside their bands at each stage; Math's first band is too thin for its share
+# even at the small size, so all of Math's shares go to the caption (DESIGN.md Collisions step 4)
+cited = ["Web", "Code"]
 base = np.zeros(len(steps))
 for name, color in zip(order, band_colors):
     if name in cited:
         for start, end in zip(stage_starts, stage_ends):
             i = list(steps).index(start)
             ax.text((start + end) / 2, base[i] + shares[name][i] / 2, share_text(shares[name][i]),
-                    ha="center", va="center", color=text_color_on(color))
+                    ha="center", va="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
     base = base + shares[name]
 
 ax.set_xlim(steps[0], steps[-1])
@@ -79,6 +81,7 @@ across = [i for c in range(ncol) for i in range(c, len(labels), ncol)]  # reads 
 ax.legend([handles[i] for i in across], [labels[i] for i in across], loc="lower center", bbox_to_anchor=(0.5, 1),
           borderaxespad=0.5, ncol=ncol)
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax, height="M")
 fig.savefig("../outputs/data-mixture.pdf")
 fig.savefig("../outputs/data-mixture.png")
+fig.savefig("../outputs/data-mixture.svg")

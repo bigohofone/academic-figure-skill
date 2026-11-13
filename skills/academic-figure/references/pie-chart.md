@@ -4,15 +4,15 @@ Composition of one whole with 2–6 parts, when composition is the message: data
 
 ## Draw
 
-- Donut: each part own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole). Clockwise from 3 o'clock, largest first (small parts end at right, outside labels stack vertically). Parts < 3%: joined into one "Other", drawn last.
+- Donut: each part own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole). Clockwise from 3 o'clock, largest first (small parts end at right, outside labels stack vertically). Parts < 3%: joined into one "Other", drawn last.
 
   ```python
-  part_colors = paper.part_colors(n)
+  part_colors = paper.make_part_colors(n)
   wedges, _ = ax.pie(shares, colors=part_colors, startangle=0, counterclock=False,
                      wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))
   ```
 
-- Size: `finalize_figure` sizes circle to width, ignores `aspect`; no axes, ticks or grid (`ax.pie` hides them).
+- Size: `finalize_figure` sizes circle to width, ignores `height`; no axes, ticks or grid (`ax.pie` hides them).
 
 ## Variants
 
@@ -32,7 +32,7 @@ Composition of one whole with 2–6 parts, when composition is the message: data
 - Shares: inside ring at wedge middle (0.8 = middle of width-0.4 ring); `share_text` per DESIGN.md value table (a share).
 
   ```python
-  ax.text(0.8 * x, 0.8 * y, share_text, ha="center", va="center", color=text_color_on(color))
+  ax.text(0.8 * x, 0.8 * y, share_text, ha="center", va="center", color=text_color)  # on the wedge color, DESIGN.md Typography
   ```
 
   Placements (for Collisions): inside wedge; then joined to name outside, `f"{name} {share_text}"`, straight leader line from label's side (below); then later of two moved outward (`xytext` at `1.35` instead of `1.12`).

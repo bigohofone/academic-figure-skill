@@ -1,0 +1,133 @@
+{
+ "note": "each pair: one checkpoint evaluated out of distribution (circle) and in distribution (star); gflops recovered from the marker opacity, mapped linearly onto the color bar",
+ "panels": {
+  "Rule Variants": {
+   "SFT": [
+    {
+     "gflops": 43440000000.0,
+     "ood_success": 13.3,
+     "ood_recognition": 71.28,
+     "id_success": 21.08,
+     "id_recognition": 78.15
+    },
+    {
+     "gflops": 55840000000.0,
+     "ood_success": 12.02,
+     "ood_recognition": 54.98,
+     "id_success": 21.08,
+     "id_recognition": 72.81
+    },
+    {
+     "gflops": 68250000000.0,
+     "ood_success": 10.3,
+     "ood_recognition": 50.25,
+     "id_success": 19.73,
+     "id_recognition": 67.86
+    },
+    {
+     "gflops": 80650000000.0,
+     "ood_success": 9.44,
+     "ood_recognition": 32.66,
+     "id_success": 13.9,
+     "id_recognition": 60.13
+    }
+   ],
+   "RL": [
+    {
+     "gflops": 42880000000.0,
+     "ood_success": 11.16,
+     "ood_recognition": 91.03,
+     "id_success": 37.63,
+     "id_recognition": 97.04
+    },
+    {
+     "gflops": 54670000000.0,
+     "ood_success": 14.59,
+     "ood_recognition": 95.32,
+     "id_success": 46.04,
+     "id_recognition": 97.46
+    },
+    {
+     "gflops": 78140000000.0,
+     "ood_success": 17.6,
+     "ood_recognition": 95.75,
+     "id_success": 52.44,
+     "id_recognition": 97.89
+    }
+   ],
+   "Init": [
+    {
+     "gflops": 31040000000.0,
+     "ood_success": 11.16,
+     "ood_recognition": 74.29,
+     "id_success": 24.22,
+     "id_recognition": 84.62
+    }
+   ]
+  },
+  "Visual Variants": {
+   "SFT": [
+    {
+     "gflops": 43440000000.0,
+     "ood_success": 26.61,
+     "ood_recognition": 76.01,
+     "id_success": 21.08,
+     "id_recognition": 78.15
+    },
+    {
+     "gflops": 55840000000.0,
+     "ood_success": 15.45,
+     "ood_recognition": 71.04,
+     "id_success": 21.08,
+     "id_recognition": 72.81
+    },
+    {
+     "gflops": 68250000000.0,
+     "ood_success": 16.31,
+     "ood_recognition": 68.0,
+     "id_success": 19.73,
+     "id_recognition": 67.86
+    },
+    {
+     "gflops": 80650000000.0,
+     "ood_success": 12.02,
+     "ood_recognition": 60.0,
+     "id_success": 13.9,
+     "id_recognition": 60.13
+    }
+   ],
+   "RL": [
+    {
+     "gflops": 42880000000.0,
+     "ood_success": 32.62,
+     "ood_recognition": 95.32,
+     "id_success": 37.63,
+     "id_recognition": 97.04
+    },
+    {
+     "gflops": 78140000000.0,
+     "ood_success": 40.77,
+     "ood_recognition": 94.89,
+     "id_success": 52.44,
+     "id_recognition": 97.89
+    },
+    {
+     "gflops": 89840000000.0,
+     "ood_success": 46.35,
+     "ood_recognition": 97.46,
+     "id_success": 61.57,
+     "id_recognition": 98.75
+    }
+   ],
+   "Init": [
+    {
+     "gflops": 31040000000.0,
+     "ood_success": 23.61,
+     "ood_recognition": 78.0,
+     "id_success": 24.22,
+     "id_recognition": 84.62
+    }
+   ]
+  }
+ }
+}

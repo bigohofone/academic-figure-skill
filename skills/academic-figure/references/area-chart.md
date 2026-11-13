@@ -4,10 +4,10 @@ Shares of a whole along continuous x: data mixture over training, each domain's 
 
 ## Draw
 
-- Areas: panel aspect 1 : 1 (bands need the height). Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
+- Areas: height M, square (thin bands need the height), fills at `alpha=0.875` so gridlines show through. Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
 
   ```python
-  ax.stackplot(x, ys, colors=series_colors, labels=names, edgecolor="white", linewidth=rcParams["grid.linewidth"])
+  ax.stackplot(x, ys, colors=series_colors, labels=names, alpha=0.875, edgecolor="white", linewidth=rcParams["grid.linewidth"])
   ```
 
 - Axes: shares normalized to 1 at each x; y fixed to the whole; no x margins.
@@ -30,13 +30,13 @@ Shares of a whole along continuous x: data mixture over training, each domain's 
 
   ```python
   ax.stackplot(..., step="post")
-  ax.axvline(step, linestyle="--", linewidth=paper.dashed_width, color="white")
+  ax.axvline(step, linestyle="--", linewidth=paper.dashed_linewidth, color="white")
   ```
 
 ## Labels
 
 - Band names: legend above panel (DESIGN.md Legend, a filled plot), entries from top band down.
-- Shares: shares the takeaway cites, inside band at each stage, as shares (DESIGN.md Value labels), in `text_color_on(band_color)`; if one share of a band spills out: all that band's shares to caption.
+- Shares: shares the takeaway cites, inside band at each stage, as shares (DESIGN.md Value labels), black or white on the band (DESIGN.md Typography); if one share of a band spills out: all that band's shares to caption.
 
 ## Caption
 

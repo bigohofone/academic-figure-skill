@@ -1,0 +1,50 @@
+{
+ "rewards": [
+  "1.0 Outcome",
+  "0.2 Outcome + 0.8 Process",
+  "0.5 Outcome + 0.5 Process",
+  "1.0 Outcome if Process is Correct"
+ ],
+ "panels": [
+  {
+   "metric": "pass@1",
+   "ops": "op=2-14",
+   "pass_at_k": [
+    70.708,
+    75.439,
+    75.347,
+    75.9
+   ]
+  },
+  {
+   "metric": "pass@1",
+   "ops": "op=15-20",
+   "pass_at_k": [
+    5.584,
+    9.884,
+    9.0,
+    9.65
+   ]
+  },
+  {
+   "metric": "pass@128",
+   "ops": "op=2-14",
+   "pass_at_k": [
+    94.746,
+    94.715,
+    94.654,
+    95.0
+   ]
+  },
+  {
+   "metric": "pass@128",
+   "ops": "op=15-20",
+   "pass_at_k": [
+    23.201,
+    27.666,
+    26.25,
+    25.833
+   ]
+  }
+ ]
+}

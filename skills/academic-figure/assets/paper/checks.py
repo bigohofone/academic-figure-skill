@@ -14,13 +14,14 @@ from matplotlib.transforms import Bbox
 from matplotlib.lines import AxLine
 from matplotlib.patches import Rectangle, Wedge
 from matplotlib.text import Annotation
+from typing import NamedTuple
 
 from . import design, palette
 
 
 def _is_value_label(a, t):
-    """A `mark_value` label or a bar label (`ax.bar_label`), the labels layout.finalize_figure keeps inside the panel."""
-    if t.get_gid() in ("value-label", "value-mark"):
+    """A tagged value label or a bar label (`ax.bar_label`), the labels layout.finalize_figure keeps inside the panel."""
+    if t.get_gid() == "value-label":
         return True
     ends = _bar_label_anchors(a)
     return (isinstance(t, Annotation) and t.xycoords == "data" and len(ends) > 0
@@ -73,72 +74,142 @@ def _texts_overlap(a, box_a, b, box_b, renderer):
     return _rotated_text_outline(rotated, box_rotated, renderer).intersects_bbox(other_box, filled=True)
 
 
-def _warn_hard_to_read(fig, panels, min_width):
-    """Warn about what makes a figure hard to read in print, so it can be fixed before saving."""
+class Problem(NamedTuple):
+    """One thing that reads badly: where it is, what is wrong, and how to fix it."""
+    where: str
+    what: str
+    fix: str
+
+    def __str__(self):
+        return f"{self.where}: {self.what}. Fix: {self.fix}"
+
+
+class Context(NamedTuple):
+    """What every check gets: the figure, its panels in reading order, a renderer, the narrowest panel allowed."""
+    fig: object
+    panels: list
+    renderer: object
+    min_width: float
+
+
+CHECKS = []
+
+
+def check(fn):
+    """Register a check. A check takes a Context and returns or yields Problems; finalize_figure runs
+    every registered check last and warns once per Problem. A new check is a new decorated function."""
+    CHECKS.append(fn)
+    return fn
+
+
+def run_checks(fig, panels, min_width):
     fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
-    for a in panels:
-        if a.get_window_extent(renderer).width / fig.dpi < min_width:
-            warnings.warn(f"panel {a.get_title()!r} is narrower than {min_width} in; use one column fewer")
-    _warn_text_problems(fig, renderer)
-    for a in panels:
-        fills = _filled_shapes(a)
-        _warn_text_over_data(fig, a, panels, fills, renderer)
-        _warn_grayscale_lookalikes(a)
-        if a.get_legend():
-            for problem in _legend_problems(fig, a, panels, renderer):
-                warnings.warn(problem)
+    ctx = Context(fig, panels, fig.canvas.get_renderer(), min_width)
+    for fn in CHECKS:
+        for problem in fn(ctx):
+            warnings.warn(str(problem))
 
 
-def _shown_texts(fig):
-    """Every visible text of the figure, and the ids of the x and y tick labels among them."""
-    figures = [fig, *fig.subfigs]
-    texts = [t for f in figures for t in f.texts]
+def _panel_name(a, panels):
+    """A panel as the script's author finds it: its place in reading order, and its title if any."""
+    title = f" {a.get_title()!r}" if a.get_title() else ""
+    if a not in panels:
+        return f"twin axis{title}"
+    if len(panels) == 1:
+        return f"the panel{title}"
+    return f"panel {panels.index(a) + 1} of {len(panels)}{title}"
+
+
+def _shown_texts(fig, panels):
+    """Every visible text of the figure, each with where it is ("panel 2 of 4, x tick label '0.5'"), and the
+    ids of the x and y tick labels among them."""
+    figures = [fig]
+    shown = [(t, "figure text") for f in figures for t in f.texts]
     x_ticks, y_ticks = set(), set()
-    for legend in [lg for f in figures for lg in f.legends] + [a.get_legend() for a in fig.axes if a.get_legend()]:
-        texts += legend.get_texts()
+    for f in figures:
+        for legend in f.legends:
+            shown += [(t, "figure legend") for t in legend.get_texts()]
+    for a in fig.axes:
+        if a.get_legend():
+            shown += [(t, f"{_panel_name(a, panels)}, legend") for t in a.get_legend().get_texts()]
     for a in fig.axes:
         if not (a.get_visible() and a.axison):
             continue
-        texts += [a.title, a.xaxis.label, a.yaxis.label, *a.texts]
-        for axis in (a.xaxis, a.yaxis):
+        name = _panel_name(a, panels)
+        shown += [(a.title, f"{name}, title"), (a.xaxis.label, f"{name}, x label"), (a.yaxis.label, f"{name}, y label")]
+        shown += [(t, f"{name}, text") for t in a.texts]
+        for axis, side in ((a.xaxis, "x"), (a.yaxis, "y")):
             lo, hi = sorted(axis.get_view_interval())
             # matplotlib keeps labels for ticks just outside the view, which are never drawn;
             # label2 is the right (top) side's: a twin axis draws its labels there
             labels = [label for loc, tick in zip(axis.get_majorticklocs(), axis.get_major_ticks())
                       if lo <= loc <= hi and axis.get_visible() for label in (tick.label1, tick.label2)]
-            texts += labels
-            (x_ticks if axis is a.xaxis else y_ticks).update(map(id, labels))
-    return [t for t in texts if t.get_visible() and t.get_text()], x_ticks, y_ticks
+            shown += [(t, f"{name}, {side} tick label") for t in labels]
+            (x_ticks if side == "x" else y_ticks).update(map(id, labels))
+    shown = [(t, f"{where} {t.get_text()!r}") for t, where in shown if t.get_visible() and t.get_text()]
+    return shown, x_ticks, y_ticks
 
 
-def _warn_text_problems(fig, renderer):
-    """Text cut off at the figure edge, overlapping other text, in a font other than the design's, or
-    an axis label longer than its panel."""
-    texts, x_ticks, y_ticks = _shown_texts(fig)
-    boxes = [t.get_window_extent(renderer) for t in texts]
-    # a y label set for a group of rows (`set_group_label`) spans the group, not its first panel
-    rows_of = {id(axes[0].yaxis.label): axes for axes, axis in getattr(fig, "_group_labels", []) if axis == "y"}
-    span = lambda axes: max(a.get_window_extent(renderer).y1 for a in axes) - min(a.get_window_extent(renderer).y0 for a in axes)
-    axis_label_of = {id(a.yaxis.label): rows_of.get(id(a.yaxis.label), [a]) for a in fig.axes}
-    for t, box in zip(texts, boxes):
-        owner = axis_label_of.get(id(t))
-        if owner is not None and box.height > span(owner):
-            warnings.warn(f"axis label {t.get_text()!r} is longer than its panel is tall; shorten it, "
-                          "the detail in the caption (DESIGN.md Collisions step 2)")
-        elif box.x0 < 0 or box.y0 < 0 or box.x1 > fig.bbox.x1 or box.y1 > fig.bbox.y1:
-            warnings.warn(f"text {t.get_text()!r} is cut off at the figure edge")
+@check
+def narrow_panels(ctx):
+    for a in ctx.panels:
+        if a.get_window_extent(ctx.renderer).width / ctx.fig.dpi < ctx.min_width:
+            yield Problem(_panel_name(a, ctx.panels), f"narrower than {ctx.min_width} in",
+                          "use one column fewer (multi-panel.md Grid step 3)")
+
+
+def _long_axis_labels(ctx):
+    """y labels taller than their panel; a figure's y label (`fig.supylabel`) is not one of them."""
+    texts, _, _ = _shown_texts(ctx.fig, ctx.panels)
+    span = lambda axes: max(a.get_window_extent(ctx.renderer).y1 for a in axes) - min(a.get_window_extent(ctx.renderer).y0 for a in axes)
+    owner_of = {id(a.yaxis.label): [a] for a in ctx.fig.axes}
+    return [(t, where) for t, where in texts
+            if id(t) in owner_of and t.get_window_extent(ctx.renderer).height > span(owner_of[id(t)])]
+
+
+@check
+def long_axis_labels(ctx):
+    for t, where in _long_axis_labels(ctx):
+        yield Problem(where, "is longer than its panel is tall",
+                      "shorten it; put the detail in the caption (DESIGN.md Collisions step 2)")
+
+
+@check
+def cut_off_text(ctx):
+    texts, _, _ = _shown_texts(ctx.fig, ctx.panels)
+    too_long = {id(t) for t, _ in _long_axis_labels(ctx)}
+    for t, where in texts:
+        box = t.get_window_extent(ctx.renderer)
+        # text set flush to the edge (no canvas pad) lands within a pixel of it
+        if id(t) not in too_long and (box.x0 < -1 or box.y0 < -1 or box.x1 > ctx.fig.bbox.x1 + 1 or box.y1 > ctx.fig.bbox.y1 + 1):
+            yield Problem(where, "is cut off at the figure edge", "shorten it or move it inside (DESIGN.md Collisions)")
+
+
+@check
+def wrong_font(ctx):
+    texts, _, _ = _shown_texts(ctx.fig, ctx.panels)
+    for t, where in texts:
         if t.get_fontname() != rcParams["font.sans-serif"][0]:
-            warnings.warn(f"text {t.get_text()!r} is in {t.get_fontname()}; call design.apply_design() before plotting")
+            yield Problem(where, f"is in {t.get_fontname()}", "import paper before plotting")
+
+
+@check
+def overlapping_text(ctx):
+    texts, x_ticks, y_ticks = _shown_texts(ctx.fig, ctx.panels)
+    boxes = [t.get_window_extent(ctx.renderer) for t, _ in texts]
     for i in range(len(texts)):
         for j in range(i + 1, len(texts)):
-            if _texts_overlap(texts[i], boxes[i], texts[j], boxes[j], renderer):
-                pair = {id(texts[i]), id(texts[j])}
-                if pair & x_ticks and pair & y_ticks:
-                    warnings.warn(f"tick labels {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap at the corner; "
-                                  "drop the y axis's first label (DESIGN.md Corner labels)")
-                else:
-                    warnings.warn(f"texts {texts[i].get_text()!r} and {texts[j].get_text()!r} overlap")
+            (a, where_a), (b, where_b) = texts[i], texts[j]
+            if not _texts_overlap(a, boxes[i], b, boxes[j], ctx.renderer):
+                continue
+            pair = {id(a), id(b)}
+            if pair & x_ticks and pair & y_ticks:
+                fix = "drop the y axis's first tick label (DESIGN.md Corner labels)"
+            elif pair <= x_ticks or pair <= y_ticks:
+                fix = "numbers: a wider tick step; names: turn them (DESIGN.md Typography, Collisions)"
+            else:
+                fix = "move one to its next placement, then make room (DESIGN.md Collisions)"
+            yield Problem(f"{where_a} and {where_b}", "overlap", fix)
 
 
 def _filled_shapes(a):
@@ -167,9 +238,17 @@ def _data_marks(fig, a, panels):
     return curves, points
 
 
-def _warn_text_over_data(fig, a, panels, fills, renderer):
+@check
+def text_over_data(ctx):
+    for a in ctx.panels:
+        yield from _text_over_data(ctx.fig, a, ctx.panels, ctx.renderer)
+
+
+def _text_over_data(fig, a, panels, renderer):
     """Text in a panel that sticks out of it, spills out of the fill it sits on, or covers a curve or data points."""
     curves, points = _data_marks(fig, a, panels)
+    fills = _filled_shapes(a)
+    name = _panel_name(a, panels)
     contour_labels = [t for c in a.collections if isinstance(c, ContourSet) for t in c.labelTexts]
     # text on a white box is meant to sit over data, and contour labels sit in gaps cut for them
     plain = [t for t in a.texts if t.get_visible() and t.get_text() and t.get_bbox_patch() is None
@@ -179,47 +258,59 @@ def _warn_text_over_data(fig, a, panels, fills, renderer):
         box = t.get_window_extent(renderer)
         if not _is_value_label(a, t) and not _is_round_panel(a) and isinstance(t, Annotation) and t.xycoords == "data" and not (
                 panel.x0 - 1 <= box.x0 and box.x1 <= panel.x1 + 1 and panel.y0 - 1 <= box.y0 and box.y1 <= panel.y1 + 1):
-            warnings.warn(f"text {t.get_text()!r} sticks out of panel {a.get_title()!r}; move it")
+            yield Problem(f"{name}, text {t.get_text()!r}", "sticks out of panel",
+                          "move it to the other side of its point (the chart file's placements)")
         corners = [(box.x0, box.y0), (box.x1, box.y0), (box.x1, box.y1), (box.x0, box.y1)]
         for fill in fills:
             if fill.contains_point(((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2)) and not fill.contains_points(corners).all():
-                warnings.warn(f"text {t.get_text()!r} spills out of its fill in panel {a.get_title()!r}; drop or move it")
+                yield Problem(f"{name}, text {t.get_text()!r}", "spills out of its fill",
+                              "drop every label of its kind, numbers to the caption (DESIGN.md Collisions step 4)")
                 break
     # a label anchored on a data point may touch the curve through that point (its own series)
     covers = [(t.get_text(), t.get_window_extent(renderer),
                a.transData.transform(t.xy) if isinstance(t, Annotation) and t.xycoords == "data" else None) for t in plain]
-    for name, box, anchor in covers:
+    fix = "move it to its next placement (the chart file's placements, DESIGN.md Collisions step 1)"
+    for text, box, anchor in covers:
         others = [c for c in curves if anchor is None or np.hypot(*(c.vertices - anchor).T).min() > 2]
         if any(curve.intersects_bbox(box, filled=False) for curve in others):
-            warnings.warn(f"{name} covers a curve in panel {a.get_title()!r}; move it")
+            yield Problem(f"{name}, text {text!r}", "covers a curve", fix)
         elif any(box.contains(x, y) for xy in points for x, y in xy):
-            warnings.warn(f"{name} covers data points in panel {a.get_title()!r}; move it")
+            yield Problem(f"{name}, text {text!r}", "covers data points", fix)
+
+
+@check
+def legends_over_data(ctx):
+    for a in ctx.panels:
+        if a.get_legend():
+            yield from _legend_problems(ctx.fig, a, ctx.panels, ctx.renderer)
 
 
 def _legend_problems(fig, a, panels, renderer):
     """What the panel's legend hides: a curve or data points, text, filled marks or a bar's end; or
     an inside legend sticking out of its panel. Empty when the legend sits clear."""
-    box, panel, where = a.get_legend().get_window_extent(renderer), a.get_window_extent(renderer), f"in panel {a.get_title()!r}"
+    box, panel = a.get_legend().get_window_extent(renderer), a.get_window_extent(renderer)
+    where = f"{_panel_name(a, panels)}, legend"
+    move = "drop its loc so finalize_figure places it, or put it above the panel (DESIGN.md Legend)"
     curves, points = _data_marks(fig, a, panels)
     problems = []
     if any(curve.intersects_bbox(box, filled=False) for curve in curves):
-        problems.append(f"the legend covers a curve {where}; move it")
+        problems.append(Problem(where, "the legend covers a curve", move))
     elif any(box.contains(x, y) for xy in points for x, y in xy):
-        problems.append(f"the legend covers data points {where}; move it")
+        problems.append(Problem(where, "the legend covers data points", move))
     # an inside legend (one that overlaps its panel) must fit in it; a wider one goes above
     if box.overlaps(panel) and (box.x0 < panel.x0 - 1 or box.x1 > panel.x1 + 1 or box.y1 > panel.y1 + 1):
-        problems.append(f"the legend sticks out of panel {a.get_title()!r}; put it above the panel "
-                        "(above its row in a grid, DESIGN.md Legend)")
+        problems.append(Problem(where, "the legend sticks out of panel",
+                                "put it above the panel, above its row in a grid (DESIGN.md Legend)"))
     if any(t.get_visible() and t.get_text() and box.overlaps(t.get_window_extent(renderer)) for t in a.texts):
-        problems.append(f"the legend covers text {where}; move it")
+        problems.append(Problem(where, "the legend covers text", move))
     # the filled area under the legend, not the shapes' bounding boxes: a histogram is one wide polygon
     covered = sum(_polygon_area(poly) for shape in _filled_shapes(a) for poly in shape.clip_to_bbox(box).to_polygons())
     if covered > box.width * box.height / 10:
-        problems.append(f"the legend covers filled marks (bars, boxes, bands, areas) {where}; move it")
+        problems.append(Problem(where, "the legend covers filled marks (bars, boxes, bands, areas)", move))
     # a bar's value is its end: covering even a sliver of it hides the number the bar shows
     if any(_bar_value_edge(bar, c.orientation, renderer).overlaps(box)
            for c in a.containers if isinstance(c, BarContainer) for bar in c.patches):
-        problems.append(f"the legend covers the end of a bar {where}; move it")
+        problems.append(Problem(where, "the legend covers the end of a bar", move))
     return problems
 
 
@@ -246,11 +337,18 @@ def _warn_legends_wider_than_figure(fig):
         if legend.get_window_extent().width > room:
             n, ncol = len(legend.get_texts()), legend._ncols
             fewer = [math.ceil(n / k) for k in range(2, n + 1) if math.ceil(n / k) < ncol]
-            fix = f"use ncol={fewer[0]}" if fewer else "shorten its entries"
-            warnings.warn(f"a legend of {n} entries in {ncol} columns is wider than the figure; {fix}")
+            fix = f"pass ncol={fewer[0]}" if fewer else "shorten its entries"
+            warnings.warn(str(Problem(f"legend of {n} entries in {ncol} columns", "is wider than the figure",
+                                      f"{fix} (DESIGN.md Legend)")))
 
 
-def _warn_grayscale_lookalikes(a):
+@check
+def grayscale_lookalikes(ctx):
+    for a in ctx.panels:
+        yield from _grayscale_lookalikes(a, ctx.panels)
+
+
+def _grayscale_lookalikes(a, panels):
     """Series told apart by color alone (lines of one style and marker, or bars) must differ in lightness,
     or they merge when printed in black and white."""
     groups = {}
@@ -276,6 +374,6 @@ def _warn_grayscale_lookalikes(a):
             for j in range(i + 1, len(series)):
                 (n1, c1), (n2, c2) = series[i], series[j]
                 if abs(palette._lightness(c1) - palette._lightness(c2)) < 10:
-                    warnings.warn(f"series {n1!r} and {n2!r} look alike in grayscale in panel {a.get_title()!r} "
-                                  f"(L* {palette._lightness(c1):.0f} vs {palette._lightness(c2):.0f}); use baseline_greys(n), or tell them "
-                                  "apart by line style or marker (DESIGN.md Colors)")
+                    yield Problem(f"{_panel_name(a, panels)}, series {n1!r} and {n2!r}",
+                                  f"look alike in grayscale (L* {palette._lightness(c1):.0f} vs {palette._lightness(c2):.0f})",
+                                  "use make_shades(colors[\"neutral\"], n), or tell them apart by line style or marker (DESIGN.md Colors)")

@@ -5,12 +5,13 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import to_rgb
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, text_color_on
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/confusion-matrix.json"))
 labels = data["labels"]
@@ -32,9 +33,9 @@ ax.grid(False)
 for i in range(matrix.shape[0]):
     for j in range(matrix.shape[1]):
         v = matrix[i, j]
-        ax.text(j, i, f"{v:#.2g}", ha="center", va="center", fontsize=paper.bar_label_size,
-                color=text_color_on(im.cmap(im.norm(v))))
+        ax.text(j, i, f"{v:#.2g}", ha="center", va="center",
+                color="white" if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else "black")
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/confusion-matrix.pdf")
 fig.savefig("../outputs/confusion-matrix.png")

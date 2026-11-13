@@ -11,7 +11,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/rlvr.json") as f:
     data = json.load(f)
@@ -44,9 +44,9 @@ for r, model in enumerate(models):
         base = data[benchmark][model]["Base"]
         ax.plot(rl["k"], rl["pass"], color=colors["ours"], label="RL")
         ax.plot(base["k"], base["pass"], color=colors["neutral"], linestyle="--",
-                linewidth=paper.dashed_width, label="Base")
+                linewidth=paper.dashed_linewidth, label="Base")
         ax.set_xticks([], minor=True)
-        ax.set_xticks(ticks, labels=[str(t) if i % 5 == 0 else "" for i, t in enumerate(ticks)])
+        ax.set_xticks(ticks[::5], labels=[str(t) for t in ticks[::5]])
         ax.set_xlim(first_k / margin, top * margin)
         if r == 0:
             ax.set_title(benchmark)
@@ -61,6 +61,6 @@ for r, model in enumerate(models):
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
 
-finalize_figure(fig, axes, min_width=0.9)
+finalize_figure(fig, axes, height="M", min_width=0.9)
 fig.savefig("../outputs/rlvr-fig2.pdf")
 fig.savefig("../outputs/rlvr-fig2.png")

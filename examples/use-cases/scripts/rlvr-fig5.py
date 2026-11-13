@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, finalize_figure
+from paper import shift_lightness, finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/rlvr-fig5.json") as f:
     data = json.load(f)
@@ -26,7 +26,7 @@ width = 0.8 / 2
 fig, ax = plt.subplots(figsize=(5.5, 5.5), layout="constrained")
 for i, (name, counts, color) in enumerate([("Base", base, colors["neutral"]), ("RL", rl, colors["ours"])]):
     bars = ax.bar(x + (i - 0.5) * width, counts, width, color=color, linewidth=0, label=name)
-    ax.bar_label(bars, fontsize=paper.bar_label_size, labels=[f"{round(v)}" for v in counts], color=darken(color))
+    ax.bar_label(bars, labels=[f"{round(v)}" for v in counts], color=shift_lightness(color, -1))
 ax.grid(axis="x", visible=False)
 ax.tick_params(axis="x", length=0)
 ax.set_xticks(x, labels=bins, rotation=45, ha="right", rotation_mode="anchor")

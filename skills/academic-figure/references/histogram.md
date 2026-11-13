@@ -36,12 +36,12 @@ Spread of one quantity: scores, confidences, lengths, per-problem accuracies. Sh
 
 ## Labels
 
-- Means (when takeaway compares series' centers): thin solid vertical reference line in `darken(color)`; value just above panel at the line.
+- Means (when takeaway compares series' centers): thin solid vertical reference line in `shift_lightness(color, -1)`; value just above panel at the line.
 
   ```python
-  ax.axvline(mean, linewidth=rcParams["grid.linewidth"], color=darken(color))
+  ax.axvline(mean, linewidth=rcParams["grid.linewidth"], color=shift_lightness(color, -1))
   ax.annotate(f"{mean:#.3g}", (mean, 1), xycoords=("data", "axes fraction"), xytext=(0, 2), textcoords="offset points",
-              ha="center", va="bottom", color=darken(color))
+              ha="center", va="bottom", color=shift_lightness(color, -1))
   ```
 
 ## Caption

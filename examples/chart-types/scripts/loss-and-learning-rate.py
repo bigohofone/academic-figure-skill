@@ -8,9 +8,9 @@ import numpy as np
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, moving_average
+from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/loss-and-learning-rate.json") as f:
     data = json.load(f)
@@ -19,7 +19,9 @@ loss = np.array(data["training_loss"])
 learning_rate = np.array(data["learning_rate"])
 
 # takeaway: most of the loss decrease happens during the warmup
-smoothed = np.array(moving_average(loss))
+w = max(1, len(loss) // 40) * 2 + 1
+smoothed = np.convolve(loss, np.ones(w) / w, mode="valid")
+smoothed_steps = steps[w // 2 : len(steps) - w // 2]
 warmup_end = int(np.argmax(learning_rate))
 share = (loss[0] - loss[warmup_end]) / (loss[0] - smoothed[-1])
 print("takeaway:", "warmup steps", steps[warmup_end], "loss start", f"{loss[0]:#.3g}",
@@ -31,12 +33,12 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75))
 twin = ax.twinx()
 
 ax.plot(steps, loss, color=colors["series-1"], alpha=0.25)
-ax.plot(steps, smoothed, color=colors["series-1"], label="Training loss")
+ax.plot(smoothed_steps, smoothed, color=colors["series-1"], label="Training loss")
 ax.set_ylabel("Training loss")
 ax.set_xlabel("Training step")
 ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
 
-twin.plot(steps, learning_rate * 1e4, color=colors["series-4"], linestyle="--", linewidth=paper.dashed_width, label="Learning rate")
+twin.plot(steps, learning_rate * 1e4, color=colors["series-4"], linestyle="--", linewidth=paper.dashed_linewidth, label="Learning rate")
 twin.set_ylabel("Learning rate (×10⁻⁴)")
 twin.grid(False)
 
@@ -48,3 +50,4 @@ ax.legend(handles, [h.get_label() for h in handles])
 finalize_figure(fig, ax)
 fig.savefig("../outputs/loss-and-learning-rate.pdf")
 fig.savefig("../outputs/loss-and-learning-rate.png")
+fig.savefig("../outputs/loss-and-learning-rate.svg")

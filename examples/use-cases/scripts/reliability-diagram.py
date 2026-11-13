@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, darken, lighten
+from paper import finalize_figure, shift_lightness
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/reliability-diagram.json") as f:
     data = json.load(f)
@@ -52,10 +52,10 @@ for col, m in enumerate(models):
     accuracy = np.array(m["accuracy_per_bin"])
     confidence = np.array(m["avg_confidence_per_bin"])
     bottom.bar(rel_edges[:-1], accuracy, width=np.diff(rel_edges), align="edge", color=colors["series-1"],
-               edgecolor=darken(colors["series-1"]), linewidth=rcParams["grid.linewidth"], label="Outputs")
+               edgecolor=shift_lightness(colors["series-1"], -1), linewidth=rcParams["grid.linewidth"], label="Outputs")
     bottom.bar(rel_edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
-               width=np.diff(rel_edges), align="edge", color=lighten(colors["series-4"]),
-               edgecolor=darken(colors["series-4"]), linewidth=rcParams["grid.linewidth"], label="Gap")
+               width=np.diff(rel_edges), align="edge", color=shift_lightness(colors["series-4"], 2),
+               edgecolor=shift_lightness(colors["series-4"], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
     bottom.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
     bottom.set_xlim(0, 1)
     bottom.set_ylim(0, 1)
@@ -70,6 +70,6 @@ fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="outside upper center", 
            borderaxespad=0)
 axes[1, 0].legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=2)
 
-finalize_figure(fig, axes, aspect=1.0, min_width=0.9)
+finalize_figure(fig, axes, min_width=0.9)
 fig.savefig("../outputs/reliability-diagram.pdf")
 fig.savefig("../outputs/reliability-diagram.png")

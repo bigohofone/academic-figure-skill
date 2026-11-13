@@ -4,10 +4,10 @@ Spread of many values per group, across groups: per-problem accuracies, per-samp
 
 ## Draw
 
-- Box: fill = series color lightened (grey series: `lighten(baseline_greys(n)[i])`); ours: full color (stays apart from pale greys in grayscale). Design draws black outline, whiskers, caps, median.
+- Box: fill = series color lightened (grey series: `shift_lightness(make_shades(colors["neutral"], n)[i], 2)`); ours: full color (stays apart from pale greys in grayscale). Design draws black outline, whiskers, caps, median.
   ```python
   box = ax.boxplot(values, positions=[x], widths=0.7, patch_artist=True)
-  box["boxes"][0].set_facecolor(lighten(color))
+  box["boxes"][0].set_facecolor(shift_lightness(color, 2))
   ```
 - Axis: groups are categories; tick marks hidden; horizontal gridlines only.
   ```python
@@ -30,7 +30,7 @@ Spread of many values per group, across groups: per-problem accuracies, per-samp
   ```python
   width = 0.8 / n_series
   ax.boxplot(values, positions=[x + (i - (n_series - 1) / 2) * width], widths=0.8 * width, ...)  # box i
-  Patch(facecolor=lighten(color), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=name)
+  Patch(facecolor=shift_lightness(color, 2), edgecolor=colors["ink"], linewidth=rcParams["patch.linewidth"], label=name)
   ```
 
 ## Caption

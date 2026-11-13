@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import finalize_figure, darken
+from paper import finalize_figure, shift_lightness
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/confidence-histogram.json") as f:
     data = json.load(f)
@@ -29,9 +29,9 @@ for name, values in series.items():
     color = series_colors[name]
     ax.hist(values, bins=bins, density=True, histtype="stepfilled", color=color, alpha=0.2, linewidth=0)
     ax.hist(values, bins=bins, density=True, histtype="step", color=color, label=name)
-    ax.axvline(means[name], linewidth=rcParams["grid.linewidth"], color=darken(color))
+    ax.axvline(means[name], linewidth=rcParams["grid.linewidth"], color=shift_lightness(color, -1))
     ax.annotate(f"{means[name]:#.3g}", (means[name], 1), xycoords=("data", "axes fraction"),
-                xytext=(0, 2), textcoords="offset points", ha="center", va="bottom", color=darken(color))
+                xytext=(0, 2), textcoords="offset points", ha="center", va="bottom", color=shift_lightness(color, -1))
 ax.grid(axis="x", visible=False)
 ax.set_xlabel("Confidence")
 ax.set_ylabel("Density")
@@ -40,3 +40,4 @@ ax.legend()
 finalize_figure(fig, ax)
 fig.savefig("../outputs/confidence-histogram.pdf")
 fig.savefig("../outputs/confidence-histogram.png")
+fig.savefig("../outputs/confidence-histogram.svg")

@@ -11,7 +11,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/scaling-law.json"))
 n = np.array(data["non_embedding_parameters"])
@@ -33,7 +33,7 @@ ax.set_yscale("log")
 
 color = colors["series-1"]
 ax.plot(n, loss, "o", color=color, label="Transformer LMs")
-ax.plot(n_fit, loss_fit, linestyle="--", linewidth=paper.dashed_width, color=color,
+ax.plot(n_fit, loss_fit, linestyle="--", linewidth=paper.dashed_linewidth, color=color,
         label=f"Fit: $L \\propto N^{{-{alpha}}}$")
 
 ax.set_xticks([1e4, 1e5, 1e6, 1e7, 1e8, 1e9], labels=["10K", "100K", "1M", "10M", "100M", "1B"])

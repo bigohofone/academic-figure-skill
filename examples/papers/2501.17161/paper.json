@@ -1,0 +1,81 @@
+{
+ "title": "SFT Memorizes, RL Generalizes",
+ "venue": "ICML 2025",
+ "order": 1,
+ "credit": "Chu et al., SFT Memorizes, RL Generalizes: A Comparative Study of Foundation Model Post-training, ICML 2025. <a href=\"https://arxiv.org/abs/2501.17161\" target=\"_blank\" rel=\"noopener\">arXiv:2501.17161</a>, <a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>. Every data plot in the main text redrawn by academic-figure from values recovered from the PDF, then the paper recompiled from its arXiv source; text and captions unchanged.",
+ "main": "main.tex",
+ "figures": [
+  {
+   "script": "fig5a.py",
+   "target": "figures/fig5a.pdf",
+   "caption": "trendlines for RL and SFT on"
+  },
+  {
+   "script": "fig5b.py",
+   "target": "figures/fig5b.pdf",
+   "caption": "trendlines for RL and SFT on"
+  },
+  {
+   "script": "fig6.py",
+   "target": "figures/results_figures/ood_bar_row.pdf",
+   "caption": "For each subplot, RL and SFT are trained with equal"
+  },
+  {
+   "script": "fig7a.py",
+   "target": "figures/fig7a.pdf",
+   "caption": "present both the performance dynamics (shown as lines) and"
+  },
+  {
+   "script": "fig7b.py",
+   "target": "figures/fig7b.pdf",
+   "caption": "present both the performance dynamics (shown as lines) and"
+  },
+  {
+   "script": "fig8.py",
+   "target": "figures/results_figures/merged_scatter_recog_success.pdf",
+   "caption": "pairs are evaluated using same checkpoints"
+  },
+  {
+   "script": "fig9.py",
+   "target": "figures/results_figures/figure_failure.pdf",
+   "caption": "All trials fail due to poor instruction following"
+  },
+  {
+   "script": "fig10.py",
+   "target": "figures/results_figures/scatter_ablate_viter.pdf",
+   "caption": "We record RL experiments with different"
+  }
+ ],
+ "edits": [
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.9\\linewidth]{figures/results_figures/Env_Plots_v2.pdf}",
+   "to": "\\begin{minipage}[t]{0.45\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5a.pdf}\\\\(a) Language-only\\end{minipage}\\hfill\\begin{minipage}[t]{0.45\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5b.pdf}\\\\(b) With vision\\end{minipage}"
+  },
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/vision_ood.pdf}",
+   "to": "\\includegraphics[width=0.49\\linewidth]{figures/fig7a.pdf}\\hfill\\includegraphics[width=0.49\\linewidth]{figures/fig7b.pdf}"
+  },
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.9\\linewidth]{figures/results_figures/ood_bar_row.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/results_figures/ood_bar_row.pdf}"
+  },
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.9\\linewidth]{figures/results_figures/merged_scatter_recog_success.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/results_figures/merged_scatter_recog_success.pdf}"
+  },
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/figure_failure.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/results_figures/figure_failure.pdf}"
+  },
+  {
+   "file": "Tex/results.tex",
+   "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/scatter_ablate_viter.pdf}",
+   "to": "\\includegraphics[width=\\linewidth]{figures/results_figures/scatter_ablate_viter.pdf}"
+  }
+ ]
+}

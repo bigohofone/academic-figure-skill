@@ -14,13 +14,22 @@ for _font in Path(__file__).parent.glob("Inter-*.ttf"):
 
 # the tokens the other modules and the scripts use, all set by apply_design()
 colors = {}  # the colors tokens by name: colors["ours"], colors["neutral"], ...
-dashed_width = None  # the dashed-line width; pass it to dashed and dotted lines
-highlight_size = None  # the marker highlight-size, for a point of interest
-filled_edge_width = None  # the marker filled-edge-width, for filled markers
+# every line is a multiple of the one line width DESIGN.md sets: data at full weight, what is compared a step
+# lighter, frames and context half, the finest edges a quarter
+WEIGHTS = {"data": 1, "compared": 0.75, "outline": 0.75, "context": 0.5, "fine": 0.25}
+# markers scale with the same line width, so a point stays in proportion to the line through it
+MARKERS = {"marker": 2.5, "highlight": 3.5}
+dashed_linewidth = None  # compared series: pass it to dashed and dotted lines
+highlight_markersize = None  # the marker highlight-size, for a point of interest
+filled_markeredgewidth = None  # the edge of filled markers
 canvas_pad = None  # inches of free space at each edge of the canvas
-panel_gap = None  # inches of free space between a panel and the next one's y labels
-contour_label_size = bar_label_size = legend_inside_size = None  # points
+panel_gap = None  # free space between panels, as a share of the panel's size
+legend_gap = None  # inches between a legend outside the panels and their box
+value_label_small_fontsize = tick_label_text_fontsize = None  # points
 colorbar_width = colorbar_gap = None  # inches
+panel_ratios = {}  # height / width by step: panel_ratios["M"] == 1
+tick_spacing = None  # inches between numeric ticks
+data_margin = None  # inches between the data and the panel edge
 
 
 def _resolve_token_refs(value, tokens):
@@ -46,58 +55,76 @@ def _inches(value):
     return _points(value) / 72
 
 
-def apply_design(path="DESIGN.md"):
-    """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `path`, a DESIGN.md.
-    Returns the colors by name, e.g. colors["series-1"], colors["ours"]."""
-    global colors, dashed_width, highlight_size, filled_edge_width, canvas_pad, panel_gap, colorbar_width, colorbar_gap, contour_label_size, bar_label_size, legend_inside_size
+def _merge(base, extra):
+    return {k: _merge(base[k], v) if isinstance(v, dict) and isinstance(base.get(k), dict) else v
+            for k, v in {**base, **extra}.items()}
+
+
+def apply_design(*paths):
+    """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `paths`, DESIGN.md files:
+    each later file changes only the tokens it names. Returns the colors by name, e.g. colors["ours"]."""
+    global colors, dashed_linewidth, highlight_markersize, filled_markeredgewidth, canvas_pad, panel_gap, legend_gap, colorbar_width, colorbar_gap, value_label_small_fontsize, tick_label_text_fontsize, panel_ratios, tick_spacing, data_margin
     # one renderer everywhere: screen backends measure text differently, so finalize_figure's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
-    tokens = yaml.safe_load(Path(path).read_text().split("---")[1])
+    tokens = {}
+    for path in paths:
+        tokens = _merge(tokens, yaml.safe_load(Path(path).read_text().split("---")[1]))
     tokens = _resolve_token_refs(tokens, tokens)
     c, t, s, k = tokens["colors"], tokens["typography"], tokens["spacing"], tokens["components"]
     colors = c
     matplotlib.style.use(Path(__file__).parent / "paper.mplstyle")
-    contour_label_size = _points(t["contour-label"]["fontSize"])
-    bar_label_size = _points(t["bar-label"]["fontSize"])
-    legend_inside_size = _points(t["legend-inside"]["fontSize"])
+    value_label_small_fontsize = _points(t["value-label-small"]["fontSize"])
+    tick_label_text_fontsize = _points(t["tick-label-text"]["fontSize"])
     label, tick_label, legend, value_label, title = (
         _points(t[name]["fontSize"]) for name in ("label", "tick-label", "legend", "value-label", "title"))
-    tick_pad, tick_width = _points(s["tick-pad"]), _points(k["tick"]["width"])
+    line = _points(k["line"]["width"])
+    from .palette import shift_lightness  # palette reads this module's colors, so it is imported once they exist
+    # the frame (panel box, tick marks) two stops lighter than the grey compared series: data > frame > grid
+    frame = shift_lightness(c["neutral"], 2)
+    weight = {role: line * share for role, share in WEIGHTS.items()}
+    tick_pad, tick_width = _points(s["tick-pad"]), weight["context"]
     rcParams.update({
         "font.sans-serif": [t["label"]["fontFamily"]],
         "font.size": value_label, "axes.labelsize": label, "figure.labelsize": label, "legend.fontsize": legend,
         "xtick.labelsize": tick_label, "ytick.labelsize": tick_label,
         "axes.titlesize": title, "axes.titleweight": t["title"].get("fontWeight", 400),
         "axes.titlepad": _points(s["title-pad"]), "axes.labelpad": _points(s["label-pad"]),
-        "axes.xmargin": float(s["data-margin"].rstrip("%")) / 100, "axes.ymargin": float(s["data-margin"].rstrip("%")) / 100,
         "xtick.major.pad": tick_pad, "xtick.minor.pad": tick_pad, "ytick.major.pad": tick_pad, "ytick.minor.pad": tick_pad,
         "xtick.major.width": tick_width, "xtick.minor.width": tick_width,
         "ytick.major.width": tick_width, "ytick.minor.width": tick_width,
         "xtick.major.size": _points(k["tick"]["size"]), "ytick.major.size": _points(k["tick"]["size"]),
         "xtick.minor.size": _points(k["tick"]["minor-size"]), "ytick.minor.size": _points(k["tick"]["minor-size"]),
-        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": k["axes"]["textColor"], "ytick.color": k["axes"]["textColor"],
+        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": frame, "ytick.color": frame,
         "xtick.labelcolor": c["ink"], "ytick.labelcolor": c["ink"],
-        "axes.edgecolor": k["axes"]["textColor"], "axes.linewidth": _points(k["axes"]["width"]),
-        "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": _points(k["grid"]["width"]),
-        "lines.linewidth": _points(k["line"]["width"]),
-        "lines.markersize": _points(k["marker"]["size"]), "lines.markeredgewidth": _points(k["marker"]["edge-width"]),
-        "patch.linewidth": _points(k["outline"]["width"]),
-        "boxplot.boxprops.linewidth": _points(k["outline"]["width"]),
-        "boxplot.whiskerprops.linewidth": _points(k["outline"]["width"]),
-        "boxplot.capprops.linewidth": _points(k["outline"]["width"]),
-        "boxplot.medianprops.linewidth": _points(k["median"]["width"]),
-        "boxplot.flierprops.markersize": _points(k["marker"]["size"]), "boxplot.flierprops.markeredgewidth": _points(k["marker"]["edge-width"]),
-        "contour.linewidth": _points(k["contour"]["width"]),
+        "axes.edgecolor": frame, "axes.linewidth": weight["context"],
+        "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": weight["context"],
+        "lines.linewidth": weight["data"],
+        "lines.markersize": line * MARKERS["marker"], "lines.markeredgewidth": weight["context"],
+        "patch.linewidth": weight["outline"],
+        "boxplot.boxprops.linewidth": weight["outline"],
+        "boxplot.whiskerprops.linewidth": weight["context"],
+        "boxplot.capprops.linewidth": weight["context"],
+        "boxplot.medianprops.linewidth": weight["context"],
+        "boxplot.flierprops.markersize": line * MARKERS["marker"], "boxplot.flierprops.markeredgewidth": weight["context"],
+        "contour.linewidth": weight["context"],
+        "errorbar.elinewidth": weight["context"], "errorbar.capthick": weight["context"],
+        "boxplot.meanprops.linewidth": weight["context"], "boxplot.flierprops.linewidth": weight["outline"],
+        "savefig.transparent": True,  # a figure sits on the paper's own page: no white box around it
+        "legend.linewidth": weight["context"], "legend.edgecolor": frame, "hatch.linewidth": weight["context"],
         "axes.prop_cycle": cycler(color=[v for name, v in c.items() if name.startswith("series-")] + [c["neutral"]]),
         "image.cmap": k["heatmap"]["colormap"],
         "figure.constrained_layout.w_pad": _inches(s["layout-pad"]),
         "figure.constrained_layout.h_pad": _inches(s["layout-pad"]),
     })
-    dashed_width = _points(k["dashed-line"]["width"])
-    highlight_size = _points(k["marker"]["highlight-size"])
+    dashed_linewidth = weight["compared"]
+    highlight_markersize = line * MARKERS["highlight"]
     canvas_pad = _inches(s["canvas-pad"])
-    panel_gap = _inches(s["panel-gap"])
+    panel_gap = float(s["panel-gap"].rstrip("%")) / 100
+    legend_gap = _inches(s["legend-gap"])
     colorbar_width, colorbar_gap = _inches(k["colorbar"]["width"]), _inches(k["colorbar"]["gap"])
-    filled_edge_width = _points(k["marker"]["filled-edge-width"])
+    panel_ratios = {key.removeprefix("height-").upper(): float(v) for key, v in k["panel"].items()}
+    tick_spacing = _inches(k["tick"]["spacing"])
+    data_margin = _inches(s["data-margin"])
+    filled_markeredgewidth = weight["fine"]
     return c

@@ -9,9 +9,9 @@ from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
-from paper import darken, finalize_figure
+from paper import shift_lightness, finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 with open("../data/radar-chart.json") as f:
     data = json.load(f)
@@ -52,7 +52,7 @@ baselines = sorted(baselines, key=lambda b: scores[b].mean())
 handles = {}
 for name, style in zip(baselines, ["--", ":"]):
     (handles[name],) = ax.plot(loop, np.r_[scores[name], scores[name][:1]], color=colors["neutral"], linestyle=style,
-                               linewidth=paper.dashed_width, label=name)
+                               linewidth=paper.dashed_linewidth, label=name)
     ax.fill(angles, scores[name], color=colors["neutral"], alpha=0.1)
 (handles[ours],) = ax.plot(loop, np.r_[scores[ours], scores[ours][:1]], color=colors["ours"], label=ours)
 ax.fill(angles, scores[ours], color=colors["ours"], alpha=0.1)
@@ -68,7 +68,7 @@ for angle, v in zip(angles, scores[ours]):
     ax.annotate(f"{v:#.3g}", (angle, v), xytext=(4 * np.sign(side), 4 * np.sign(up)), textcoords="offset points",
                 ha="left" if side > 0 else "right" if side < 0 else "center",
                 va=("top" if np.cos(angle) > 0 else "bottom") if side else ("bottom" if up > 0 else "top"),
-                color=darken(colors["ours"]), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
+                color=shift_lightness(colors["ours"], -1), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
 
 labels = [ours] + baselines
 fig.legend([handles[l] for l in labels], labels, loc="outside upper center", ncol=len(labels),
@@ -77,3 +77,4 @@ fig.legend([handles[l] for l in labels], labels, loc="outside upper center", nco
 finalize_figure(fig, ax)
 fig.savefig("../outputs/radar-chart.pdf")
 fig.savefig("../outputs/radar-chart.png")
+fig.savefig("../outputs/radar-chart.svg")

@@ -11,7 +11,7 @@ sys.path.insert(0, "../../../skills/academic-figure/assets")
 import paper  # registers the bundled Inter font
 from paper import finalize_figure
 
-colors = paper.apply_design("../../../skills/academic-figure/assets/DESIGN.md")
+colors = paper.colors
 
 data = json.load(open("../data/roc-curve.json"))
 curves = {m["name"]: (np.array(m["fpr"]), np.array(m["tpr"])) for m in data["methods"]}
@@ -27,9 +27,9 @@ fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
 # variants of ours in the ours color, told apart by line style; baselines grey, in ascending order of AUC
 styles = {
     "Ours: W/ P": dict(color=colors["ours"], linestyle="-"),
-    "Ours: W/o P": dict(color=colors["ours"], linestyle="--", linewidth=paper.dashed_width),
-    "OpenAI": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_width),
-    "GPTZero": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_width),
+    "Ours: W/o P": dict(color=colors["ours"], linestyle="--", linewidth=paper.dashed_linewidth),
+    "OpenAI": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_linewidth),
+    "GPTZero": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_linewidth),
 }
 ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
 for name in ["OpenAI", "GPTZero", "Ours: W/o P", "Ours: W/ P"]:
@@ -45,6 +45,6 @@ handles, labels = ax.get_legend_handles_labels()
 order = [3, 2, 0, 1]  # the full method first, then its variant, then the baselines
 ax.legend([handles[i] for i in order], [labels[i] for i in order])
 
-finalize_figure(fig, ax, aspect=1.0)
+finalize_figure(fig, ax)
 fig.savefig("../outputs/roc-curve.pdf")
 fig.savefig("../outputs/roc-curve.png")

@@ -4,5 +4,13 @@ __pycache__/
 
 # example notebooks also write PDFs; the README shows the PNGs
 examples/*/outputs/*.pdf
-docs/og.html
-docs/page_shot.html
+examples/*/outputs/*.svg
+
+# layout test set: regenerated on every edit
+examples/layouts/last-run.log
+
+# paper examples: arXiv sources and build trees are fetched and made by examples/papers/build.py
+examples/papers/*/src/
+examples/papers/*/build/
+examples/papers/*/out/
+examples/papers/__pycache__/

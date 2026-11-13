@@ -11,71 +11,58 @@ colors:
   series-6: "#AA3377"
   ours: "{colors.series-2}"
   neutral: "#737373"
-  neutral-light: "#D1D1D1"
-  neutral-dark: "#555555"
   ink: "#000000"
 typography:
   tick-label:
     fontFamily: Inter
-    fontSize: 6pt
+    fontSize: 5pt
+  tick-label-text:
+    fontFamily: Inter
+    fontSize: 7pt
   label:
     fontFamily: Inter
     fontSize: 7pt
   legend:
     fontFamily: Inter
     fontSize: 7pt
-  legend-inside:
-    fontFamily: Inter
-    fontSize: 5pt
   value-label:
     fontFamily: Inter
-    fontSize: 6pt
+    fontSize: 7pt
     fontWeight: 400
   title:
     fontFamily: Inter
     fontSize: 7pt
     fontWeight: 400
-  contour-label:
+  value-label-small:
     fontFamily: Inter
-    fontSize: 6pt
-  bar-label:
-    fontFamily: Inter
-    fontSize: 6pt
+    fontSize: 5pt
 spacing:
   layout-pad: 0in
-  canvas-pad: 0.05in
-  panel-gap: 0.05in
+  canvas-pad: 0in
+  panel-gap: 5%
+  legend-gap: 0.25in
   title-pad: 4pt
   label-pad: 1pt
   tick-pad: 1pt
-  data-margin: 5%
+  data-margin: 0.125in
 components:
-  axes:
-    width: 0.5pt
-    textColor: "{colors.neutral}"
   tick:
-    width: 0.5pt
     size: 1.5pt
     minor-size: 1pt
+    spacing: 0.25in
+  panel:
+    height-3xs: 0.25
+    height-2xs: 0.375
+    height-xs: 0.5
+    height-s: 0.75
+    height-m: 1
+    height-l: 1.25
+    height-xl: 1.5
   grid:
-    width: 0.5pt
     color: "{colors.ink}"
     opacity: 0.1
   line:
-    width: 1pt
-  dashed-line:
-    width: 0.75pt
-  marker:
-    size: 2.5pt
-    edge-width: 0.5pt
-    highlight-size: 5pt
-    filled-edge-width: 0.25pt
-  outline:
-    width: 0.75pt
-  median:
-    width: 1pt
-  contour:
-    width: 0.5pt
+    width: 1.5pt  # the one line weight; every other line is a multiple (Shapes)
   heatmap:
     colormap: viridis
   colorbar:
@@ -85,14 +72,14 @@ components:
 
 # Academic Figure
 
-Design system for paper figures. Front matter holds the tokens; `paper.apply_design()` loads them into matplotlib's style, so a token edit changes every figure. Chart type file conflicts with a rule here: chart file wins. In a project, the copy in the figures folder is the design; edit it there for a paper-specific look.
+Design system for paper figures. Front matter holds the tokens; `import paper` loads them into matplotlib's style, so a token edit changes every figure. Chart type file conflicts with a rule here: chart file wins. In a project, the copy in the figures folder is the design; edit it there for a paper-specific look.
 
 ## Overview
 
 Figure is read in print, at its set width, for a few seconds. Goal: one message at a glance, exact numbers the paper claims readable. Case not covered: apply these principles.
 
 1. Print first: sizes are printed sizes, from tokens. Never scale text down; draw at printed width.
-2. One message, one emphasis: color only for what the takeaway is about (ours, or series it names). Everything compared or context (baselines, ablations, fronts, reference lines, grids): `neutral` grey or `ink`. Several colors only when takeaway compares series on equal terms.
+2. One message, one emphasis: name the emphasis first (what the eye must land on: a series, a gap, a point, a change along x), then set color and panel height from it. Color only for what the takeaway is about (ours, or series it names). Everything compared or context (baselines, ablations, fronts, reference lines, grids): `neutral` grey or `ink`. Several colors only when takeaway compares series on equal terms.
 3. Alike looks alike: one treatment for every item of a kind, or none. Kind = items with one role: bars of one series, levels of one contour plot, shares of one band, models the takeaway cites (and, separately, those it does not). Series keeps color, marker, name in every panel and figure. Kind labelled throughout or not at all; each label may sit where it fits (inside or outside its mark). Style that tells two series apart: used the same way throughout.
 4. Nothing hides data: text, legends, marks never cover data or each other, never leave panel or fill. Context (grid, reference lines) behind data, never decides placement.
 5. Exact and verifiable: number the takeaway cites written on plot in Value labels table format; in caption if it cannot fit. Every number computed from data in the script. Drawing shows all given data: nothing hidden by limits, dropped, or smoothed away when a reported result.
@@ -100,10 +87,10 @@ Figure is read in print, at its set width, for a few seconds. Goal: one message 
 
 ## Colors
 
-`colors` tokens: Paul Tol's color-blind-safe `bright` set, by role. `paper.apply_design()` returns them by name:
+`colors` tokens: Paul Tol's color-blind-safe `bright` set, by role. `paper.colors` holds them by name:
 
 ```python
-colors = paper.apply_design()
+colors = paper.colors
 colors["series-1"], colors["ours"]
 ```
 
@@ -114,21 +101,21 @@ First row that fits:
 | "Ours" among baselines or ablations: authors' method, else series the takeaway is about (RL-trained model vs. its base) | `ours`; every compared series `neutral` |
 | Ours vs. its own ablation (with vs. without a component; takeaway is the component) | full method `ours`, ablated variants `neutral`, as compared series |
 | Variants of ours together vs. other methods | all `ours`, apart by marker `"o"`, `"s"`, `"^"` on solid lines (dashes belong to grey series). Curves without markers (ROC/PR staircases, smoothed logs): by line style, full method solid, others `"--"`, `":"`. Full method first in legend |
-| Parts of one whole (pie wedges, stacked area bands, stacked bar segments) | each part own color, `paper.part_colors(n)`: palette hues in stacking order, lightness evenly spread, alternating dark/light, every two parts apart in grayscale. Not compared series: all six colors free |
-| Some series the takeaway names, among others it does not | named ones in equal-terms order below (`series-1`, `series-4`, …); rest `baseline_greys(n)` |
+| Parts of one whole (pie wedges, stacked area bands, stacked bar segments) | each part own color, `paper.make_part_colors(n)`: palette hues in stacking order, lightness evenly spread, alternating dark/light, every two parts apart in grayscale. Not compared series: all six colors free |
+| Some series the takeaway names, among others it does not | named ones in equal-terms order below (`series-1`, `series-4`, …); rest `make_shades(colors["neutral"], n)` |
 | Several series on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-4`, `series-6`, `series-5`, `series-3` in order (alternates light/dark for grayscale). Skip `ours` color: means ours in every figure of the paper |
 | More than six unordered classes (embedding) | `tab10` (≤10), `tab20` (≤20), plus own marker per class: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"` |
-| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.ramp(group_color, n)`: one hue, light to dark (L* 70 → 25), the largest setting darkest |
+| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.make_shades(group_color, n)`: one hue, light to dark (L* 70 → 25), the largest setting darkest |
 | Single series, or one quantity over categories (groups in one box plot) | `series-1` |
 | Reference lines | `neutral` (white over filled plots, Shapes) |
 | Text and tick labels | `ink` |
-| Panel box and tick marks | `neutral` (the `axes.textColor` token) |
+| Panel box and tick marks | `neutral` two stops lighter, `shift_lightness(neutral, 2)`: lighter than data, darker than grid (set by style) |
 | Continuous values | `heatmap.colormap` token, `viridis`, low values dark; signed values `RdBu_r` (`heatmap.md`) |
 
-- Grey series: assigned in Order rule's order (Layout). Lines: line style `"--"`, `":"`, `"-."` (solid is ours' alone), dashed/dotted at `linewidth=paper.dashed_width`. Fills (bars, boxes, violins, areas): shade, `baseline_greys(n)` for n grey series, evenly spaced `neutral-light` to `neutral-dark`, light to dark, skipping `ours` lightness. One grey series: `neutral`.
+- Grey series: assigned in Order rule's order (Layout). Lines: line style `"--"`, `":"`, `"-."` (solid is ours' alone), dashed/dotted at `linewidth=paper.dashed_linewidth`. Fills (bars, boxes, violins, areas): shade, `make_shades(colors["neutral"], n)` for n grey series, light to dark, skipping `ours` lightness. One grey series: `neutral`.
 - Many grey series: >4 lines: add markers, one shape per series (`line-chart.md`). >6: draw series the takeaway names; group rest as one grey series, "Other baselines".
 - Shared color (ours and its variants, greys): differ by line style or shade as above.
-- On white: grey lines, markers, reference lines `neutral` at full opacity; `neutral-light` fills only. Series text: `darken(series_color)` (grey series: `darken(colors["neutral"])`). Text on fill: Typography.
+- On white: grey lines, markers, reference lines `neutral` at full opacity; light greys for fills only. Series text: `shift_lightness(series_color, -1)` (grey series: `shift_lightness(colors["neutral"], -1)`). Text on fill: Typography.
 - Grayscale / color blindness: series told apart by color alone also differ in lightness by ≥10 L*: ours (`series-2`, L* 61) vs. darker `neutral` (L* 48); greys skip its lightness. Lines also differ by style or marker, bars by shade. `finalize_figure` warns when two such series look alike in grayscale.
 - Emphasis: user names a series to emphasize: color it as ours, all others as compared.
 - Other palettes: paper-wide (lab, brand): change `colors` tokens in design copy. One-off for one figure ("match the original"): dict in that figure's script:
@@ -143,13 +130,12 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 
 | Token | Size | Used for |
 |---|---|---|
-| `tick-label` | 6 pt | tick labels |
-| `value-label` | 6 pt | all text inside chart (value labels, cell text, point names, pie labels); default for `ax.text`, `ax.annotate` |
-| `bar-label` | 6 pt | values above bars (row must not crowd): `fontsize=paper.bar_label_size` |
-| `contour-label` | 6 pt | contour level labels (must not crowd lines): `fontsize=paper.contour_label_size` |
+| `tick-label` | 5 pt | numeric tick labels (`0.5`, `1K`, `1e−4`, `50%`) |
+| `tick-label-text` | 7 pt | text tick labels (method, benchmark, category names); set by `finalize_figure` |
+| `value-label` | 7 pt | all text inside a chart: values, bar labels, heatmap cells, contour levels, point names, pie labels; default for `ax.text`, `ax.annotate`, `ax.bar_label`, `ax.clabel`, so pass no `fontsize` |
+| `value-label-small` | 5 pt | text inside a chart that does not fit at 7 pt: crowded or spilling out of its fill; set by `finalize_figure` |
 | `label` | 7 pt | axis labels, subcaptions |
 | `legend` | 7 pt | legend entries |
-| `legend-inside` | 5 pt | entries of a legend inside a panel with no spot at `legend` size (set by `finalize_figure`) |
 | `title` | 7 pt | panel titles, row and column headers |
 
 - Values given as text in the data (`"1e-5"`, `"3e-4"`): written as given, keeping the scientific notation; only the hyphen becomes a true minus (`1e−5`).
@@ -163,7 +149,7 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
   - ≥1000: SI suffixes, one unit per axis, when that writes the ticks shorter (`0, 0.5K, 1K, 1.5K, 2K`, `10K`, `1M`; `200 … 1000` and `1024` stay); `finalize_figure` writes matplotlib's default ticks this way. Or the unit scaled in the axis label ("Training step (K)").
   - Log axes: powers of ten plain from 0.001 to 1000; above, SI suffix (10K, 1M); below, `1e−4` (true minus). `finalize_figure` writes them so.
   - Shares: percent, `0%, 50%, 100%`, as values are written (Value labels).
-- Tick choice: x values the chart file names (stage switches), else evenly spaced nameable numbers (log axis: powers of the base, every one or every second, fifth, …); label data range ends where axis allows. On tick label overlap report: label every m-th, keep tick and gridline at every step (grid as fine as data). Panels sharing an axis share its ticks.
+- Tick choice: x values the chart file names (stage switches), else evenly spaced nameable numbers. `finalize_figure` puts a numeric tick about every `tick.spacing` (0.25 in) along the axis, at a step of 1, 2, 2.5 or 5 × 10ⁿ, so a taller panel shows more; on x, the step widens until the widest label fits. Every numeric tick is labelled; never skip labels. Log axis: powers of the base. Panels sharing an axis share its ticks.
 
   ```python
   ax.set_xticks(ticks, labels=[str(t) if i % m == 0 else "" for i, t in enumerate(ticks)])
@@ -172,7 +158,7 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 - Corner labels: first tick labels of both axes overlap at corner: `finalize_figure` drops y axis's first label itself.
 - Text tick labels (non-numeric) reported overlapping:
   - Unordered categories, one value each (methods, models, groups in one bar, error bar or box chart): swap axes, names horizontal down y (horizontal bars, forest plot, horizontal boxes), top to bottom per Order.
-  - Names down y axis (heatmap rows, horizontal bars): panel height by widening at own aspect (Collisions step 3).
+  - Names down y axis (heatmap rows, horizontal bars): a taller step (Panel height), then Collisions step 3.
   - Everything keeping the x axis (named bins, categories of grouped series, benchmarks shared across panels): 45° (`ha="left"` on top axis), then 90°. Still overlapping at 90°: Collisions steps 3 and 4 (colorbar beside panel first moves below it, giving its width to the panel).
 
     ```python
@@ -181,7 +167,13 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
     ```
 
 - Math: mathtext in Inter (`r"$\mathrm{PPL}_{\mathrm{Base}}$"`). Symbols Inter lacks (∝, ≈): mathtext too (`$\propto$`).
-- Text on fill (bar segment, wedge, heatmap cell, area band): black or white, whichever reads, `color=text_color_on(fill)`.
+- Text beside a mark, on its line (a value right of an error bar, a name left of a point): `va="center_baseline"`, so the digits sit on the mark's center line; `"center"` centres the text box, descender room included, and lifts them.
+- Text on fill (bar segment, wedge, heatmap cell, area band): black or white by the fill's luminance:
+
+  ```python
+  text_color = "white" if np.dot(to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else "black"  # from matplotlib.colors import to_rgb
+  ```
+
 - Text over mixed content (note over bars, gridlines, reference line; no single fill sets contrast): white box. Contour labels: none, they sit in the gap cut for them.
 
   ```python
@@ -202,7 +194,7 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 |---|---|---|---|
 | ICLR, NeurIPS | 2.75 in | 4.125 in | 5.5 in |
 
-First row that applies:
+Column span not given: ask the user before drawing. Recommend the first row that applies:
 
 | Case | Width |
 |---|---|
@@ -218,28 +210,38 @@ Venue not in the tables (a journal, a workshop, another conference): read its wi
 
 ### Panels
 
-One panel: no title (caption names the figure). Several panels, sub-figures, or second y axis (`ax.twinx()`): read `multi-panel.md` in skill's `references/` for grid, shared axes, axis labels, panel names.
+One panel: no title (caption names the figure). One figure carries one takeaway: several takeaways or chart types are separate figures. Several panels or second y axis (`ax.twinx()`): read `multi-panel.md` in skill's `references/` for grid, shared axes, axis labels, panel names.
 
-### Panel aspect
+### Panel height
 
-Per panel, width : height. Fixed by the chart's geometry for these; pass `aspect=`:
+A panel's height is a multiple of its own width, the `panel` tokens: M is square, every other step a share of
+it, as rem is of the root size. The shape follows from the step, so panels of one step look alike at any width.
+`finalize_figure(fig, ax, height=...)`, default `"S"`:
 
-| Aspect | `aspect=` | For |
+| Step | Height / width | For |
 |---|---|---|
-| 1 : 1 | 1.0 | embedding (t-SNE, UMAP), contour plot, stacked area chart (thin bands need the height), reliability diagram, ROC curve, scatter plot of one quantity against itself (predicted vs actual) |
-| cells square | `n_rows / n_cols` | heatmap |
+| `"3XS"`, `"2XS"` | 0.25, 0.375 | one wide panel across the full text width |
+| `"XS"` | 0.5 | a wide panel at 1.5 columns; a short chart with few values |
+| `"S"` | 0.75 | default: one panel at single column, a row of panels |
+| `"M"` | 1 | square: grids and small multiples compared by shape; the emphasis is a difference in y |
+| `"L"`, `"XL"` | 1.25, 1.5 | many categories down y (horizontal bars, long legends inside): the smallest step where they fit |
 
-Every other chart: leave `aspect` out; `finalize_figure` picks it from the width each panel gets (figure width / columns):
+Pass any step but S with a one-line comment giving the emphasis it serves:
 
-| Panel width | Aspect | For |
-|---|---|---|
-| < 2.5 in | 1 : 1 | panels in rows (two-factor grids, small multiples, sub-figures): square keeps the vertical room the data's changes need |
-| 2.5–3.5 in | φ : 1 | one column's width: a single panel at single column or half text width, two panels across a page |
-| > 3.5 in | 2φ : 1 | wider: a single panel at 1.5 column or full width, two golden rectangles side by side |
+```python
+# emphasis: the gap between Ours and the best baseline; M gives it height
+finalize_figure(fig, ax, height="M")
+```
 
-A horizontal chart with more categories down y than fit (`finalize_figure` reports tick labels overlapping): Collisions step 3 first; still overlapping, 1 : φ (`aspect=1.618`).
+Where the data fixes the shape, `finalize_figure` sets it and ignores `height`; nothing to pass:
 
-Aspect follows data, never room for labels. Pie and radar: circles; `finalize_figure` sizes them to width, ignores `aspect`.
+| Data | Shape |
+|---|---|
+| heatmap | cells square |
+| a y = x diagonal, `ax.axline((0, 0), (1, 1))`: ROC curve, reliability diagram, predicted vs actual | square |
+| embedding (t-SNE, UMAP), no ticks on either axis | square |
+
+Pie and radar: circles; `finalize_figure` sizes them to width. Height follows the emphasis, never room for labels.
 
 ### Collisions
 
@@ -247,10 +249,10 @@ Aspect follows data, never room for labels. Pie and radar: circles; `finalize_fi
 
 1. Move it: that item to next placement its chart file lists (other side of point, below value, next legend spot). Placements may differ per item.
 2. Make room inside panel: share axes (`multi-panel.md`); Typography's text-tick rule (swap axes, then 45°, then 90°); shorten text (axis label longer than panel: short name of quantity, detail in caption).
-3. Give it width, if crowding is labels along an axis (tick labels, bar values, side-by-side category names, heatmap rows or columns) and no figure width given: full width (aspect by Panel aspect), or own aspect for fixed-aspect panel (heatmap rows grow with it). After widening, retry earlier placements (horizontal before turned). Crowding inside data area (value labels on curves, scatter point names, heatmap cell values, contour labels): step 4 instead.
-4. Write less, alike: label every m-th item of an ordered kind (ticks, contour levels), keep every tick, gridline, line; or drop a kind whole (all point names of non-cited models, all bar values, all cell values, all shares of a band), cited numbers to caption.
+3. Give it width, if crowding is labels along an axis (tick labels, bar values, side-by-side category names, heatmap rows or columns) and no figure width given: full width, or own aspect for fixed-aspect panel (heatmap rows grow with it). After widening, retry earlier placements (horizontal before turned). Crowding inside data area (value labels on curves, scatter point names, heatmap cell values, contour labels): step 4 instead.
+4. Write less, alike: label every m-th contour level, keep every line; numeric ticks: a wider step instead, never skipped labels; or drop a kind whole (all point names of non-cited models, all bar values, all cell values, all shares of a band), cited numbers to caption.
 
-Never: shrink text, change a token, or change aspect for room. One exception: a heatmap's cell values and row and column names, which `finalize_figure` sets to the size that fits every cell (down to 4 pt).
+Never: shrink text, change a token, or change height for room. One exception: text inside a chart and a heatmap's row and column names, which `finalize_figure` sets to 5 pt when 7 pt does not fit; not fitting at 5 pt either: Collisions step 4.
 
 ### Height
 
@@ -263,15 +265,9 @@ finalize_figure(fig, axes)
 fig.savefig("outputs/{id}.pdf")
 ```
 
-- Panels: `ax` = one Axes, array, list (also panels from several sub-figures), or `subplot_mosaic` dict; hidden cells and colorbars skipped.
-- Standard box: `finalize_figure` sets standard margins, gaps, size; figures of one width and column count line up. Never set margins, `subplots_adjust`, `height_ratios`, `width_ratios`. Figure exactly the text width of a two-column venue (spanning both columns): pass venue's column gap (Width table), e.g. ICML; any other width: none:
-
-  ```python
-  finalize_figure(fig, axes, column_gap=0.25)
-  ```
-
-  Right of panels: only colorbar or right y axis. Names that would go there (band names, line-end names): legend above panel.
-- Labels inside: `finalize_figure` keeps `mark_value` labels, bar labels, tagged value labels inside panel by growing limits; other text never moved.
+- Panels: `ax` = one Axes, array, list, or `subplot_mosaic` dict; hidden cells and colorbars skipped.
+- Standard box: `finalize_figure` sets standard margins, gaps, size; figures of one width and column count line up. Never set margins, `subplots_adjust`, `height_ratios`, `width_ratios`, sub-figures. Right of panels: only colorbar or right y axis. Names that would go there (band names, line-end names): legend above panel.
+- Labels inside: `finalize_figure` keeps bar labels and tagged value labels inside panel by growing limits; other text never moved.
 - Errors: `ValueError` (fixed aspect): images with `aspect="auto"`. "Different widths" warning: give all panels same width.
 
   ```python
@@ -280,7 +276,7 @@ fig.savefig("outputs/{id}.pdf")
 
 ### Axes
 
-- Limits: matplotlib defaults plus `data-margin` token (5% of data range) each end, edge marks clear the box. Except axis whose marks together fill a bounded whole: fixed to it (stacked shares and areas 0–1, ROC and reliability unit square, radar scale, field on fixed range such as loss landscape −1 to 1). Metrics (accuracy, histogram per-bin fractions): defaults. Never-negative quantity: starts at ≥0; `finalize_figure` raises negative lower limit to 0 when all data >0, never grows one below 0.
+- Limits: matplotlib defaults plus `data-margin` token (0.125 in at print size, whatever the panel's size) each end, edge marks clear the box. Except axis whose marks together fill a bounded whole: fixed to it (stacked shares and areas 0–1, ROC and reliability unit square, radar scale, field on fixed range such as loss landscape −1 to 1). Metrics (accuracy, histogram per-bin fractions): defaults. Never-negative quantity: starts at ≥0; `finalize_figure` raises negative lower limit to 0 when all data >0, never grows one below 0.
 - Order: categories and series with no natural order (methods, models, ablation variants): ascending by value the takeaway compares, left to right (top to bottom when horizontal); ours, usually best, ends right. Natural order stays: sizes, time, bins, swept values, any order task or data gives explicitly (benchmark list, list of opponents). Legends of side-by-side series: same order.
 - Category axes: tick marks hidden on that axis, every panel (`axis="y"` when horizontal):
 
@@ -307,26 +303,29 @@ fig.savefig("outputs/{id}.pdf")
 
 ## Shapes
 
-Marks every chart type is built from, sized by `components` tokens. Matplotlib applies them; code reads from `rcParams` or `paper`, never writes the numbers.
+Marks every chart type is built from. Every line is a multiple of the one `line.width` token (1.5 pt), by role;
+change the token and every weight follows. Matplotlib applies them; code reads from `rcParams` or `paper`, never writes the numbers.
 
-| Mark | Token | Look | In code |
-|---|---|---|---|
-| Panel box | `axes` | full box, all four sides, `neutral` grey, 0.5 pt; tick marks the same grey, tick labels `ink` | `rcParams["axes.linewidth"]` |
-| Ticks | `tick` | outside box, 0.5 pt, 1.5 pt long (minor 1 pt) | set by style |
-| Grid | `grid` | `ink` at 10% opacity, 0.5 pt, behind data, both directions unless chart file says otherwise | `rcParams["grid.linewidth"]`, `rcParams["grid.alpha"]` |
-| Data lines | `line` | 1 pt, solid | set by style |
-| Dashed and dotted lines (fits, fronts, series apart by line style) | `dashed-line` | 0.75 pt | `linewidth=paper.dashed_width` with every `linestyle` other than `"-"` |
-| Markers | `marker` | hollow: white fill, 0.5 pt edge in series color, 2.5 pt | `rcParams["lines.markersize"]` |
-| Filled markers (embedding points) | `marker.filled-edge-width` | black edge, 0.25 pt, translucent fill | `markeredgewidth=paper.filled_edge_width` |
-| Points of interest (a minimum, the trained solution) | `marker.highlight-size` | filled star, 5 pt (the style draws markers hollow: fill it) | `"*", markersize=paper.highlight_size, markerfacecolor=color` |
-| Outlines and edges (boxes, whiskers, error bars) | `outline` | 0.75 pt, black | `rcParams["patch.linewidth"]` |
-| Seams between fills (stacked segments, wedges, area bands) | `grid` | white, 0.5 pt | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
-| Outline of touching one-color bars, each its own value (reliability bins) | `grid` | darker shade of fill, 0.5 pt, never white | `edgecolor=darken(color), linewidth=rcParams["grid.linewidth"]` |
-| Box plot median | `median` | 1 pt, black | set by style |
-| Contour lines | `contour` | 0.5 pt | `rcParams["contour.linewidth"]` |
-| Colorbar | `colorbar` | 0.1 in wide, 0.06 in from panels, labels in standard margin beside it | placed by `finalize_figure` |
+| Role | Weight | Lines |
+|---|---|---|
+| Data | ×1 | data lines |
+| Compared | ×0.75 | dashed and dotted lines (grey series, fits, fronts): `linewidth=paper.dashed_linewidth` |
+| Outline | ×0.75 | the edge of a shape that holds data: box plot boxes, violin bodies (black) |
+| Context | ×0.5 | lines inside or beside such shapes: box plot medians, means, whiskers and caps; a violin's inner range line; error bars; legend frame (the panel box's color); edges of hollow markers and box plot outliers (a small mark: a heavier edge fills it); panel box and ticks (`neutral` +2 stops), grid (`ink` at 10%), reference lines, seams between fills (white), edges of touching one-color bars, contour lines, colorbar outline |
+| Fine | ×0.25 | edges of filled markers (embedding points, black): `markeredgewidth=paper.filled_markeredgewidth` |
 
-- Opacity: fills at full series color, except bands (`alpha=0.2`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), box plots and violins: `lighten(color)` so black median and points on them stay readable; grey series too (`lighten` of their `baseline_greys(n)` shade). Ours keeps full color there (lightened colors all print pale grey; ours must stay apart).
+| Mark | Look | In code |
+|---|---|---|
+| Panel box | full box, all four sides, `neutral` two stops lighter; tick marks the same, outside, 1.5 pt long (minor 1 pt); tick labels `ink` | set by style |
+| Grid | `ink` at 10% opacity, behind data, both directions unless chart file says otherwise | `rcParams["grid.linewidth"]`, `rcParams["grid.alpha"]` |
+| Markers | hollow: white fill, edge in series color, 2.5 × `line.width`; above every line and band (set by `finalize_figure`) | `rcParams["lines.markersize"]` |
+| Points of interest (a minimum, the trained solution) | filled star, 3.5 × `line.width` (the style draws markers hollow: fill it) | `"*", markersize=paper.highlight_markersize, markerfacecolor=color` |
+| Seams between fills (stacked segments, wedges, area bands) | white | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
+| Outline of touching one-color bars, each its own value (reliability bins) | darker shade of fill, never white | `edgecolor=shift_lightness(color, -1), linewidth=rcParams["grid.linewidth"]` |
+| Bars and histogram bins | no edge | `linewidth=0` |
+| Colorbar | 0.1 in wide, 0.05 in from panels, labels in standard margin beside it | placed by `finalize_figure` |
+
+- Opacity: fills at full series color, except bands (`alpha=0.2`), fills that show a quantity by their area (stacked areas, area under a curve: `alpha=0.875`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), box plots and violins: `shift_lightness(color, 2)` so black median and points on them stay readable; grey series too (their `make_shades(colors["neutral"], n)` shade, shifted +2). Ours keeps full color there (lightened colors all print pale grey; ours must stay apart).
 - Reference lines (baseline score, threshold, diagonal): context, look like no data series. Thin, solid, `neutral`, grid width, thinner than every data line, never dashed (dashes belong to grey series). Across filled plot (stacked area, heatmap, contour gradient; grey sinks into fills): white, dashed. Second and later in one panel: dotted. Line with own value (baseline score, threshold): legend entry if panel has a legend, else caption's reading guide names it with its value (Legend: a single entry). Line whose meaning the axes give (y = x, chance, zero): no entry; caption's reading guide names it.
 
   ```python
@@ -365,29 +364,25 @@ First row that fits:
 |---|---|
 | Single entry (one series, or one marked point such as a minimum) | none (lone entry above panel reads as title); caption's reading guide names it ("the star marks the trained minimizer") |
 | Filled plot (heatmap, contour gradient, stacked area, stacked or win-rate bars, embedding) | outside, above panels (above top row in a grid); none when every segment named inside |
-| One panel | `ax.legend()` without `loc`: `finalize_figure` puts it at the first inside spot where it hides nothing (corners, then edge centers): at `legend` size, else at `legend-inside` size, else above the panel in one row at `legend` size |
-| Several panels, same series | one legend, shown once: `ax.legend()` without `loc` on the first panel; `finalize_figure` puts it inside the first panel that has a spot where it hides nothing (sizes as for one panel: every panel at `legend` size first), the others carry none; no panel has room: above, centred over the row |
-| Row of panels with own series (rows of different plots) | one per row, as for several panels with the same series, within the row |
+| One panel | `ax.legend()` without `loc`: `finalize_figure` puts it at the first inside spot where it hides nothing (corners, then edge centers), else above the panel in one row |
+| Several panels, same series | one legend, shown once: `ax.legend()` without `loc` on the first panel; `finalize_figure` puts it inside the first panel that has a spot where it hides nothing; the others carry none; no panel has room: above, centred over the row |
 | Panels with different series | one per panel, placed as for one panel |
-| Sub-figures | one per sub-figure, above its panels (`sub-figure legend` below) |
 | One series per panel | none; title names it |
 | Outside, above one panel | `outside panel legend` below |
 
 ```python
-# sub-figure legend
-left.legend(handles, labels, loc="outside upper center", ncol=n_entries)
 # outside panel legend
-ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=n_entries)
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=paper.legend_gap * 72 / rcParams["legend.fontsize"], ncol=n_entries)
 ```
 
-- Frame: every legend, inside or outside, in its box (the style's light grey edge, opaque fill); never `frameon=False`.
+- Frame: every legend, inside or outside, in its box (the panel box's edge, opaque fill); never `frameon=False`.
 - Inside: worth a small overlap (opaque frame, no height cost). Hides nothing: no curve, data point, text or bar end; ≤1/10 of its area over filled marks. `finalize_figure` checks this when placing it, and warns when a legend with an explicit `loc` breaks it.
 - Outside legend columns: start in one row. On cut-off text or matplotlib layout collapse: `ncol = ceil(n / 2)`, then `ceil(n / 3)`, …, skip repeated counts, down to 1.
-- Shared words: entries that share a word and differ by a setting ("Depth 4", "Depth 8", …; a sweep in `ramp` shades): `paper.legend_rows`, one row per shared word, written once at the row's start, each entry only its setting ("Depth  4 8 16 32 64"; two sweeps: two rows). A row too wide for any panel: on the figure, above the panels.
+- Shared words: entries that share a word and differ by a setting ("Depth 4", "Depth 8", …; a sweep in `make_shades` shades): `paper.add_legend_rows`, one row per shared word, written once at the row's start, each entry only its setting ("Depth  4 8 16 32 64"; two sweeps: two rows). A row too wide for any panel: on the figure, above the panels.
 
   ```python
-  paper.legend_rows(ax, [("Depth", handles, [4, 8, 16, 32, 64])])
-  paper.legend_rows(fig, [("Depth", depth_handles, depths), ("Width", width_handles, widths)],
+  paper.add_legend_rows(ax, [("Depth", handles, [4, 8, 16, 32, 64])])
+  paper.add_legend_rows(fig, [("Depth", depth_handles, depths), ("Width", width_handles, widths)],
                     loc="outside upper center", borderaxespad=0)
   ```
 - Entry order: curves: ours first, then others in color, line-style or shade order. Side-by-side series (grouped bars, boxes): left to right. Stacked bars and areas: segments as met (top to bottom for vertical stacks, left to right for horizontal). Drawing order differs: pass handles in entry order. Always pass entries in reading order: when `finalize_figure` lays a legend out in several columns, it keeps the rows reading left to right.
@@ -396,7 +391,7 @@ ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=0.5, ncol=n
   ax.legend([h_ours, h_a, h_b], ["Ours", "A", "B"])
   ```
 
-- `loc`: none for a panel legend (`finalize_figure` places it); explicit for figure, sub-figure and outside legends. Never `"best"`.
+- `loc`: none for a panel legend (`finalize_figure` places it); explicit for figure and outside legends. Never `"best"`.
 
 ### Value labels
 
@@ -430,5 +425,12 @@ tiny = f"{m:#.3g}×10{exp}"
 other = f"{v:#.3g}".rstrip(".")
 ```
 
-- Look: 6 pt (`value-label`); beside a mark `darken(series_color)`, for every grey series one color, `darken(colors["neutral"])`; on a fill `text_color_on(fill)`.
-- Tag: value label at a data point via `ax.annotate` or `ax.text`: pass `gid="value-label"`, so `finalize_figure` keeps it inside panel. `mark_value` tags its own (`gid="value-mark"`); `ax.bar_label` needs none. No tag: labels outside panel on purpose (histogram means above it), point names (even with a value joined).
+- Look: 7 pt (`value-label`), 5 pt where it does not fit; beside a mark `shift_lightness(series_color, -1)`, for every grey series one color, `shift_lightness(colors["neutral"], -1)`; on a fill black or white (Typography).
+- Tag: value label at a data point via `ax.annotate` or `ax.text`: pass `gid="value-label"`, so `finalize_figure` keeps it inside panel; an annotation at a side edge turns inward. `ax.bar_label` needs none.
+
+  ```python
+  ax.plot(x, y, "o", color=color)  # a compared value: hollow circle, value above
+  ax.annotate(text, (x, y), xytext=(0, 4), textcoords="offset points", ha="center", va="bottom",
+              color=shift_lightness(color, -1), gid="value-label")
+  ```
+ No tag: labels outside panel on purpose (histogram means above it), point names (even with a value joined).
