@@ -4,7 +4,7 @@ Means with uncertainty, one point per method or setting. Use when values differ 
 
 ## Draw
 
-- Points: hollow marker at mean; error bar in series color.
+- Points: marker at mean; error bar in series color.
   ```python
   ax.errorbar(x, mean, yerr=err, fmt="o", color=color, capsize=2)
   ```

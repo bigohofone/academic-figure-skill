@@ -40,7 +40,7 @@ part_colors = paper.make_part_colors(len(names))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 wedges, _ = ax.pie(values, colors=part_colors, startangle=0, counterclock=False,
-                   wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))
+                   wedgeprops=dict(width=0.4, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]))
 
 # Shares inside their wedges; those too small for their wedge join the name outside, with a leader line
 outside = ["Synthetic", "Other"]
@@ -54,7 +54,7 @@ for w, name, v, color in zip(wedges, names, values, part_colors):
                                     relpos=(0, 0.5) if x > 0 else (1, 0.5)))
     else:
         ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")
-        ax.text(0.8 * x, 0.8 * y, share_text(v), ha="center", va="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
+        ax.text(0.8 * x, 0.8 * y, share_text(v), ha="center", va="center", color=colors["paper"] if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
 
 ax.text(0, 0, f"{total / 1e6:.3g}M\nexamples", ha="center", va="center")
 

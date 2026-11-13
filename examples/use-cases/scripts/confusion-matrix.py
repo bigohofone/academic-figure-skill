@@ -34,7 +34,7 @@ for i in range(matrix.shape[0]):
     for j in range(matrix.shape[1]):
         v = matrix[i, j]
         ax.text(j, i, f"{v:#.2g}", ha="center", va="center",
-                color="white" if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else "black")
+                color=colors["paper"] if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
 
 finalize_figure(fig, ax)
 fig.savefig("../outputs/confusion-matrix.pdf")

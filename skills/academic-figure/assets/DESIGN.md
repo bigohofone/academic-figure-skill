@@ -3,15 +3,20 @@ version: alpha
 name: Academic Figure
 description: Print-first figures for machine learning papers, read at the size they are printed, where the reader gets one message at a glance.
 colors:
-  series-1: "#4477AA"
-  series-2: "#EE6677"
-  series-3: "#228833"
-  series-4: "#CCBB44"
-  series-5: "#66CCEE"
-  series-6: "#AA3377"
-  ours: "{colors.series-2}"
-  neutral: "#737373"
+  # Tableau 10 (Tableau's default palette since 2016), in its own order; its red is ours, its grey neutral
+  series-1: "#4E79A7"  # blue, L* 50
+  series-2: "#F28E2B"  # orange, L* 68
+  series-3: "#E15759"  # red, L* 56
+  series-4: "#76B7B2"  # teal, L* 70
+  series-5: "#59A14F"  # green, L* 60
+  series-6: "#EDC948"  # yellow, L* 82
+  series-7: "#B07AA1"  # purple, L* 58
+  series-8: "#FF9DA7"  # pink, L* 75
+  series-9: "#9C755F"  # brown, L* 53
+  ours: "{colors.series-3}"
+  neutral: "#BAB0AC"  # grey, L* 73
   ink: "#000000"
+  paper: "#FFFFFF"  # the page: marker edges, legend fill
 typography:
   tick-label:
     fontFamily: Inter
@@ -62,9 +67,42 @@ components:
     color: "{colors.ink}"
     opacity: 0.1
   line:
-    width: 1.5pt  # the one line weight; every other line is a multiple (Shapes)
-  heatmap:
-    colormap: viridis
+    width: 1pt  # the one line weight; every other line is a multiple of it, by role (Shapes)
+    data: 1
+    compared: 1
+    outline: 1
+    context: 0.5
+  marker:
+    size: 3.5  # × line.width
+    highlight-size: 5  # × line.width: points of interest, and points read on a color scale
+    edge: "{colors.paper}"
+  box:
+    color: "{colors.ink}"  # box plot outline, whiskers, caps, median and outliers
+  frame:
+    lighter: 0  # panel box and tick marks: `neutral` this many stops lighter
+  legend:
+    fill: "{colors.paper}"
+    handle-length: 1.5  # this and below in legend font sizes
+    handle-text-pad: 0.5
+    column-spacing: 1
+    label-spacing: 0.25
+    border-pad: 0.3
+    border-axes-pad: 0.25
+  series:
+    order: [series-1, series-2, series-4, series-5, series-6, series-7, series-8, series-9]  # equal terms: Tableau order, ours skipped
+  shades:
+    stop: 12  # L* one lightness stop moves (shift_lightness)
+    lightest: 80  # L* range of make_shades
+    darkest: 25
+  part-colors:
+    order: [series-1, series-5, series-4, series-6, series-2, series-7, series-9, series-3, series-8]  # make_part_colors: the first four ≥10 L* apart, then neighbours
+  colormap:
+    # as Tableau's default continuous palettes: "Blue", and "Orange-Blue Diverging"
+    sequential: "{colors.series-1}"  # low values light, high dark: cmap="paper" (the default)
+    negative: "{colors.series-2}"  # signed values below zero: cmap="paper-diverging"
+    positive: "{colors.series-1}"  # above zero
+    lightest: 95  # L* at the low end, and at zero of the diverging map
+    darkest: 20  # L* at the high end, and at both ends of the diverging map
   colorbar:
     width: 0.1in
     gap: 0.05in
@@ -72,7 +110,7 @@ components:
 
 # Academic Figure
 
-Design system for paper figures. Front matter holds the tokens; `import paper` loads them into matplotlib's style, so a token edit changes every figure. Chart type file conflicts with a rule here: chart file wins. In a project, the copy in the figures folder is the design; edit it there for a paper-specific look.
+Design system for paper figures. Front matter holds the tokens: every color, colormap, font, text size, line weight, marker size and spacing. `import paper` loads them into matplotlib's style, so a token edit, or another DESIGN.md in this one's place, changes every figure; scripts take colors from `paper.colors` and sizes from `rcParams` or `paper`, never write them. Chart type file conflicts with a rule here: chart file wins. In a project, the copy in the figures folder is the design; edit it there for a paper-specific look.
 
 ## Overview
 
@@ -87,7 +125,7 @@ Figure is read in print, at its set width, for a few seconds. Goal: one message 
 
 ## Colors
 
-`colors` tokens: Paul Tol's color-blind-safe `bright` set, by role. `paper.colors` holds them by name:
+`colors` tokens: Tableau 10, Tableau's default palette, in its own order; its red is `ours`, its grey `neutral`. Its colors sit close in lightness (L* 50 to 82): series told apart by color alone in black and white need the lightness rule below, else a line style or marker. `paper.colors` holds them by name:
 
 ```python
 colors = paper.colors
@@ -101,22 +139,23 @@ First row that fits:
 | "Ours" among baselines or ablations: authors' method, else series the takeaway is about (RL-trained model vs. its base) | `ours`; every compared series `neutral` |
 | Ours vs. its own ablation (with vs. without a component; takeaway is the component) | full method `ours`, ablated variants `neutral`, as compared series |
 | Variants of ours together vs. other methods | all `ours`, apart by marker `"o"`, `"s"`, `"^"` on solid lines (dashes belong to grey series). Curves without markers (ROC/PR staircases, smoothed logs): by line style, full method solid, others `"--"`, `":"`. Full method first in legend |
-| Parts of one whole (pie wedges, stacked area bands, stacked bar segments) | each part own color, `paper.make_part_colors(n)`: palette hues in stacking order, lightness evenly spread, alternating dark/light, every two parts apart in grayscale. Not compared series: all six colors free |
+| Parts of one whole (pie wedges, stacked area bands, stacked bar segments) | each part own color, `paper.make_part_colors(n)`: the palette's colors unchanged, in stacking order by the `part-colors` token (blue, green, teal, yellow first: any four stay ≥10 L* apart in grayscale; Tableau 10 has no fifth, so parts are told apart by their place, the seams in `paper` between them and their names on the parts; the grayscale check skips them). Not compared series: all nine colors free |
 | Some series the takeaway names, among others it does not | named ones in equal-terms order below (`series-1`, `series-4`, …); rest `make_shades(colors["neutral"], n)` |
-| Several series on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-4`, `series-6`, `series-5`, `series-3` in order (alternates light/dark for grayscale). Skip `ours` color: means ours in every figure of the paper |
-| More than six unordered classes (embedding) | `tab10` (≤10), `tab20` (≤20), plus own marker per class: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"` |
+| Several series on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-2`, `series-4`, `series-5`, … in Tableau order (`series.order` token), as `paper.series_colors[0]`, `[1]`, … in scripts. Their lightness is close: on lines, also a marker of their own; on bars, check the grayscale warning. Skip `ours` color: means ours in every figure of the paper |
+| More than nine unordered classes (embedding) | `tab20` (≤20), plus own marker per class: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"` |
 | Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.make_shades(group_color, n)`: one hue, light to dark (L* 70 → 25), the largest setting darkest |
-| Single series, or one quantity over categories (groups in one box plot) | `series-1` |
+| Single series, or one quantity over categories (groups in one box plot) | `series-1`; `ours` when the series is ours, here or in another figure of the paper |
 | Reference lines | `neutral` (white over filled plots, Shapes) |
 | Text and tick labels | `ink` |
 | Panel box and tick marks | `neutral` two stops lighter, `shift_lightness(neutral, 2)`: lighter than data, darker than grid (set by style) |
-| Continuous values | `heatmap.colormap` token, `viridis`, low values dark; signed values `RdBu_r` (`heatmap.md`) |
+| Continuous values | `colormap` tokens, built from the palette: `"paper"` (the default, as Tableau's "Blue": Tableau blue from light to dark, low values light, lightness evenly spread); signed values `"paper-diverging"` (as Tableau's "Orange-Blue Diverging": orange below zero, near-white at zero, blue above) (`heatmap.md`) |
 
 - Grey series: assigned in Order rule's order (Layout). Lines: line style `"--"`, `":"`, `"-."` (solid is ours' alone), dashed/dotted at `linewidth=paper.dashed_linewidth`. Fills (bars, boxes, violins, areas): shade, `make_shades(colors["neutral"], n)` for n grey series, light to dark, skipping `ours` lightness. One grey series: `neutral`.
 - Many grey series: >4 lines: add markers, one shape per series (`line-chart.md`). >6: draw series the takeaway names; group rest as one grey series, "Other baselines".
 - Shared color (ours and its variants, greys): differ by line style or shade as above.
+- One channel per variable: each variable the marks differ by (method, split, compute, seed) gets one channel of its own: hue, lightness, line style, marker, or panel. Lightness that shows a value (compute, a sweep in `make_shades` shades) is spent: series then differ by line style or marker, never by color alone, since in grayscale color is only lightness. Ours keeps its hue; compared series keep their line styles (`"--"`, `":"`, `"-."`) as in every other figure of the paper. No channel left: one panel per value of a variable. `finalize_figure` warns when two labelled series share line styles and markers while one's lightness varies.
 - On white: grey lines, markers, reference lines `neutral` at full opacity; light greys for fills only. Series text: `shift_lightness(series_color, -1)` (grey series: `shift_lightness(colors["neutral"], -1)`). Text on fill: Typography.
-- Grayscale / color blindness: series told apart by color alone also differ in lightness by ≥10 L*: ours (`series-2`, L* 61) vs. darker `neutral` (L* 48); greys skip its lightness. Lines also differ by style or marker, bars by shade. `finalize_figure` warns when two such series look alike in grayscale.
+- Grayscale / color blindness: series told apart by color alone also differ in lightness by ≥10 L*: ours (`series-3`, L* 56) vs. lighter `neutral` (L* 73); greys skip its lightness. Lines also differ by style or marker, bars by shade. `finalize_figure` warns when two such series look alike in grayscale (it reads each mark's `label`).
 - Emphasis: user names a series to emphasize: color it as ours, all others as compared.
 - Other palettes: paper-wide (lab, brand): change `colors` tokens in design copy. One-off for one figure ("match the original"): dict in that figure's script:
 
@@ -171,13 +210,13 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
 - Text on fill (bar segment, wedge, heatmap cell, area band): black or white by the fill's luminance:
 
   ```python
-  text_color = "white" if np.dot(to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else "black"  # from matplotlib.colors import to_rgb
+  text_color = colors["paper"] if np.dot(to_rgb(fill), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"]  # from matplotlib.colors import to_rgb
   ```
 
 - Text over mixed content (note over bars, gridlines, reference line; no single fill sets contrast): white box. Contour labels: none, they sit in the gap cut for them.
 
   ```python
-  bbox=dict(facecolor="white", edgecolor="none", pad=1)
+  bbox=dict(facecolor=colors["paper"], edgecolor="none", pad=1)
   ```
 
 ## Layout
@@ -303,24 +342,23 @@ fig.savefig("outputs/{id}.pdf")
 
 ## Shapes
 
-Marks every chart type is built from. Every line is a multiple of the one `line.width` token (1.5 pt), by role;
-change the token and every weight follows. Matplotlib applies them; code reads from `rcParams` or `paper`, never writes the numbers.
+Marks every chart type is built from. Every line is a multiple of the one `line.width` token (1 pt), by role (the `line` tokens below it);
+change the tokens and every weight follows. Matplotlib applies them; code reads from `rcParams` or `paper`, never writes the numbers.
 
 | Role | Weight | Lines |
 |---|---|---|
 | Data | ×1 | data lines |
-| Compared | ×0.75 | dashed and dotted lines (grey series, fits, fronts): `linewidth=paper.dashed_linewidth` |
-| Outline | ×0.75 | the edge of a shape that holds data: box plot boxes, violin bodies (black) |
-| Context | ×0.5 | lines inside or beside such shapes: box plot medians, means, whiskers and caps; a violin's inner range line; error bars; legend frame (the panel box's color); edges of hollow markers and box plot outliers (a small mark: a heavier edge fills it); panel box and ticks (`neutral` +2 stops), grid (`ink` at 10%), reference lines, seams between fills (white), edges of touching one-color bars, contour lines, colorbar outline |
-| Fine | ×0.25 | edges of filled markers (embedding points, black): `markeredgewidth=paper.filled_markeredgewidth` |
+| Compared | ×1 | dashed and dotted lines (grey series, fits, fronts): `linewidth=paper.dashed_linewidth` |
+| Outline | ×1 | the edge of a shape that holds data: box plot boxes, violin bodies (black) |
+| Context | ×0.5 | lines inside or beside such shapes: box plot medians, means, whiskers and caps; a violin's inner range line; error bars; legend frame (the panel box's color); panel box and ticks (`neutral` +2 stops), grid (`ink` at 10%), reference lines, seams between fills (white), edges of touching one-color bars, contour lines, colorbar outline; edges of every marker: white around series markers and box plot outliers (style default), black around embedding points (`markeredgewidth=paper.filled_markeredgewidth`) |
 
 | Mark | Look | In code |
 |---|---|---|
 | Panel box | full box, all four sides, `neutral` two stops lighter; tick marks the same, outside, 1.5 pt long (minor 1 pt); tick labels `ink` | set by style |
 | Grid | `ink` at 10% opacity, behind data, both directions unless chart file says otherwise | `rcParams["grid.linewidth"]`, `rcParams["grid.alpha"]` |
-| Markers | hollow: white fill, edge in series color, 2.5 × `line.width`; above every line and band (set by `finalize_figure`) | `rcParams["lines.markersize"]` |
-| Points of interest (a minimum, the trained solution) | filled star, 3.5 × `line.width` (the style draws markers hollow: fill it) | `"*", markersize=paper.highlight_markersize, markerfacecolor=color` |
-| Seams between fills (stacked segments, wedges, area bands) | white | `edgecolor="white", linewidth=rcParams["grid.linewidth"]` |
+| Markers | filled in series color, thin edge in `paper` (`marker.edge`), `marker.size` (3.5) × `line.width`; above every line and band (set by `finalize_figure`) | `rcParams["lines.markersize"]` |
+| Points of interest (a minimum, the trained solution) | filled star, `marker.highlight-size` (5) × `line.width`, edge in its own color (a white edge eats its thin arms) | `"*", markersize=paper.highlight_markersize, markeredgecolor=color` |
+| Seams between fills (stacked segments, wedges, area bands) | `paper` | `edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]` |
 | Outline of touching one-color bars, each its own value (reliability bins) | darker shade of fill, never white | `edgecolor=shift_lightness(color, -1), linewidth=rcParams["grid.linewidth"]` |
 | Bars and histogram bins | no edge | `linewidth=0` |
 | Colorbar | 0.1 in wide, 0.05 in from panels, labels in standard margin beside it | placed by `finalize_figure` |
@@ -375,7 +413,7 @@ First row that fits:
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=paper.legend_gap * 72 / rcParams["legend.fontsize"], ncol=n_entries)
 ```
 
-- Frame: every legend, inside or outside, in its box (the panel box's edge, opaque fill); never `frameon=False`.
+- Frame: a legend inside a panel in its box (the panel box's edge, opaque fill); outside the panels, no box (`finalize_figure` removes it: nothing under it to keep apart). Never `frameon=False` by hand.
 - Inside: worth a small overlap (opaque frame, no height cost). Hides nothing: no curve, data point, text or bar end; ≤1/10 of its area over filled marks. `finalize_figure` checks this when placing it, and warns when a legend with an explicit `loc` breaks it.
 - Outside legend columns: start in one row. On cut-off text or matplotlib layout collapse: `ncol = ceil(n / 2)`, then `ceil(n / 3)`, …, skip repeated counts, down to 1.
 - Shared words: entries that share a word and differ by a setting ("Depth 4", "Depth 8", …; a sweep in `make_shades` shades): `paper.add_legend_rows`, one row per shared word, written once at the row's start, each entry only its setting ("Depth  4 8 16 32 64"; two sweeps: two rows). A row too wide for any panel: on the figure, above the panels.
@@ -429,7 +467,7 @@ other = f"{v:#.3g}".rstrip(".")
 - Tag: value label at a data point via `ax.annotate` or `ax.text`: pass `gid="value-label"`, so `finalize_figure` keeps it inside panel; an annotation at a side edge turns inward. `ax.bar_label` needs none.
 
   ```python
-  ax.plot(x, y, "o", color=color)  # a compared value: hollow circle, value above
+  ax.plot(x, y, "o", color=color)  # a compared value: marker, value above
   ax.annotate(text, (x, y), xytext=(0, 4), textcoords="offset points", ha="center", va="bottom",
               color=shift_lightness(color, -1), gid="value-label")
   ```

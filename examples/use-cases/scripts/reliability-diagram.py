@@ -54,8 +54,8 @@ for col, m in enumerate(models):
     bottom.bar(rel_edges[:-1], accuracy, width=np.diff(rel_edges), align="edge", color=colors["series-1"],
                edgecolor=shift_lightness(colors["series-1"], -1), linewidth=rcParams["grid.linewidth"], label="Outputs")
     bottom.bar(rel_edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
-               width=np.diff(rel_edges), align="edge", color=shift_lightness(colors["series-4"], 2),
-               edgecolor=shift_lightness(colors["series-4"], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
+               width=np.diff(rel_edges), align="edge", color=shift_lightness(paper.series_colors[1], 2),
+               edgecolor=shift_lightness(paper.series_colors[1], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
     bottom.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
     bottom.set_xlim(0, 1)
     bottom.set_ylim(0, 1)

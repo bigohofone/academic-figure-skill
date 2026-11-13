@@ -52,9 +52,9 @@ for level in levels:
 # every second level labelled: 4.5, 5 and 5.5 crowd in the corner
 labels = ax.clabel(lines, levels=levels[::2], fmt="%.2g", manual=positions[::2])
 for label in labels:
-    label.set_color("white" if np.dot(to_rgb(mesh.cmap(mesh.norm(float(label.get_text())))), [0.299, 0.587, 0.114]) < 0.5 else "black")
+    label.set_color(colors["paper"] if np.dot(to_rgb(mesh.cmap(mesh.norm(float(label.get_text())))), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
 
-ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markerfacecolor=colors["ours"],
+ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markeredgecolor=colors["ours"],
         markersize=paper.highlight_markersize, linestyle="none")
 
 

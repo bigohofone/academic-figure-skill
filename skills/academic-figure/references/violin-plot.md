@@ -20,7 +20,7 @@ As box plot (`box-plot.md`), when spread shape matters: several modes, long tail
   high = max(v for v in values if v <= q3 + 1.5 * (q3 - q1))
   ax.vlines(x, low, high, color=colors["ink"], linewidth=rcParams["grid.linewidth"])
   ax.vlines(x, q1, q3, color=colors["ink"], linewidth=4 * rcParams["grid.linewidth"])
-  ax.plot(x, median, "o", color=colors["ink"], markerfacecolor="white", zorder=3)
+  ax.plot(x, median, "o", color=colors["ink"], markerfacecolor=colors["paper"], zorder=3)
   ```
 - Axis: groups are categories; tick marks hidden; horizontal gridlines only.
 

@@ -33,7 +33,7 @@ series = [
     ("rl", "RL", colors["ours"], "-", "o"),
 ]
 
-fig, axes = plt.subplots(2, 2, figsize=(3.0375, 3.0375), sharex="col")
+fig, axes = plt.subplots(2, 2, figsize=(3.3075, 3.3075), sharex="col")
 for r, split in enumerate(splits):
     for c, task in enumerate(tasks):
         ax = axes[r, c]

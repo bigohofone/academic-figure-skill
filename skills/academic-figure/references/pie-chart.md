@@ -9,7 +9,7 @@ Composition of one whole with 2–6 parts, when composition is the message: data
   ```python
   part_colors = paper.make_part_colors(n)
   wedges, _ = ax.pie(shares, colors=part_colors, startangle=0, counterclock=False,
-                     wedgeprops=dict(width=0.4, edgecolor="white", linewidth=rcParams["grid.linewidth"]))
+                     wedgeprops=dict(width=0.4, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]))
   ```
 
 - Size: `finalize_figure` sizes circle to width, ignores `height`; no axes, ticks or grid (`ax.pie` hides them).

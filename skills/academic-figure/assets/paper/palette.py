@@ -7,8 +7,6 @@ from matplotlib import colors
 from . import design
 
 
-STOP = 12  # L* one stop moves: two series this far apart stay apart printed in black and white
-LIGHTEST, DARKEST = 80, 25  # L* range of make_shades: the lightest still reads as a thin line on white
 
 
 def _lightness(color):
@@ -40,14 +38,14 @@ def _at_hls_lightness(h, sat, target):
 
 def shift_lightness(color, stops):
     """`color` lighter (stops > 0) or darker (stops < 0), like an exposure dial: each stop moves its
-    grayscale lightness by STOP L*, keeping hue and saturation. -1: series text and edges on white;
+    grayscale lightness by the `shades.stop` token's L*, keeping hue and saturation. -1: series text and edges on white;
     +2: box and violin fills, light enough for the black median on them."""
     h, sat = _hue_and_saturation(color)
-    return _at_hls_lightness(h, sat, min(100, max(0, _lightness(color) + STOP * stops)))
+    return _at_hls_lightness(h, sat, min(100, max(0, _lightness(color) + design.shades["stop"] * stops)))
 
 
 def make_shades(color, n):
-    """n shades of `color`, light to dark, evenly spread in grayscale lightness from LIGHTEST to DARKEST:
+    """n shades of `color`, light to dark, evenly spread in grayscale lightness over the `shades` tokens' range:
     a sweep inside one group (depths, sizes), or greys for n compared series. Greys skip the band around
     ours' lightness, so ours stays apart in grayscale. One shade: `color` itself."""
     if n == 1:
@@ -55,10 +53,11 @@ def make_shades(color, n):
     h, sat = _hue_and_saturation(color)
     if sat:
         sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
-    segments = [(LIGHTEST, DARKEST)]
+    lightest, darkest, stop = design.shades["lightest"], design.shades["darkest"], design.shades["stop"]
+    segments = [(lightest, darkest)]
     if not sat:
         ours = _lightness(design.colors["ours"])
-        segments = [(a, b) for a, b in [(LIGHTEST, min(LIGHTEST, ours + STOP)), (max(DARKEST, ours - STOP), DARKEST)] if a > b]
+        segments = [(a, b) for a, b in [(lightest, min(lightest, ours + stop)), (max(darkest, ours - stop), darkest)] if a > b]
     total = sum(a - b for a, b in segments)
     out = []
     for i in range(n):
@@ -71,24 +70,23 @@ def make_shades(color, n):
     return out
 
 
-def _at_lightness(rgb, target):
-    """`rgb` mixed with white or black until its lightness is `target`."""
-    toward = np.ones(3) if _lightness(rgb) < target else np.zeros(3)
-    lo, hi = 0.0, 1.0
-    for _ in range(30):
-        mid = (lo + hi) / 2
-        if (_lightness(tuple(np.array(rgb) * (1 - mid) + toward * mid)) < target) == (toward[0] == 1):
-            lo = mid
-        else:
-            hi = mid
-    return tuple(np.array(rgb) * (1 - lo) + toward * lo)
+def make_sequential_colormap(name, color, lightest, darkest):
+    """One palette color as a colormap for values that only grow: low values light, high dark, its grayscale
+    lightness evenly spread from `lightest` to `darkest` L*, so the order reads in black and white too."""
+    h, sat = _hue_and_saturation(color)
+    return colors.LinearSegmentedColormap.from_list(name, [_at_hls_lightness(h, sat, l) for l in np.linspace(lightest, darkest, 256)])
+
+
+def make_diverging_colormap(name, negative, positive, lightest, darkest):
+    """Two palette colors as a colormap for signed values: dark negative through near-white zero to dark
+    positive, each side the same lightness at the same distance from zero."""
+    sides = [_hue_and_saturation(c) for c in (negative, positive)]
+    ramp = np.linspace(darkest, lightest, 128)
+    return colors.LinearSegmentedColormap.from_list(
+        name, [_at_hls_lightness(*sides[0], l) for l in ramp] + [_at_hls_lightness(*sides[1], l) for l in ramp[::-1]])
 
 
 def make_part_colors(n):
-    """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's
-    hues, each moved to its own lightness, evenly spread from dark to light and alternating, so every
-    two parts stay apart when printed in black and white."""
-    hues = [colors.to_rgb(design.colors[k]) for k in ("series-1", "series-4", "series-6", "series-5", "series-3", "series-2")]
-    levels = list(np.linspace(34, 88, n)) if n > 1 else [50]
-    order = [levels.pop(0) if i % 2 == 0 else levels.pop() for i in range(n)]  # dark, light, dark, light, ...
-    return [_at_lightness(hue, target) for hue, target in zip(hues, order)]
+    """n colors for the parts of one whole (bands, wedges, segments), in stacking order: the palette's own colors,
+    unchanged, in the `part-colors` token's order, whose neighbours stay apart in black and white."""
+    return [design.colors[name] for name in design.part_colors["order"][:n]]

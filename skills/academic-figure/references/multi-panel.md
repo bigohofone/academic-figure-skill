@@ -44,6 +44,8 @@ No figure title; caption names it. First row that fits:
 | Several panels reader must tell apart | Title above each, `ax.set_title` |
 | One panel | None |
 
+A figure split into parts (one script per part, side by side under one caption): each part named under it, "(a) …", "(b) …", in the paper's caption font (LaTeX `subcaption`, or a minipage with the name under the image). A name every panel of a part shares (the task, the dataset) goes there once; panel titles keep only what tells the panels of one part apart ("Training", "Final").
+
 ```python
 # A: two-factor grid headers
 ax.set_title(col_name)

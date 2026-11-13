@@ -28,7 +28,7 @@ Reported results across categories, one value each: methods, ablations or settin
   ```
 - Stacked (parts of a whole per category): segments in series order from bottom; shares: axis fixed to whole.
   ```python
-  ax.bar(x, v, bottom=below, color=color, edgecolor="white", linewidth=rcParams["grid.linewidth"])
+  ax.bar(x, v, bottom=below, color=color, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"])
   ax.set_ylim(0, 1)
   ```
 - Win rate (pairwise win/tie/loss): one horizontal stacked bar per opponent; segments win, tie, loss from left; each bar sums to 1. Win `colors["ours"]`, tie and loss `make_shades(colors["neutral"], 2)`. 50% reference line only when paper reads win rates against it.
@@ -37,8 +37,8 @@ Reported results across categories, one value each: methods, ablations or settin
   ax.bar(edges[:-1], accuracy, width=np.diff(edges), align="edge", color=colors["series-1"],
          edgecolor=shift_lightness(colors["series-1"], -1), linewidth=rcParams["grid.linewidth"])
   ax.bar(edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
-         width=np.diff(edges), align="edge", color=shift_lightness(colors["series-4"], 2),
-         edgecolor=shift_lightness(colors["series-4"], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
+         width=np.diff(edges), align="edge", color=shift_lightness(paper.series_colors[1], 2),
+         edgecolor=shift_lightness(paper.series_colors[1], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
   ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
   ```
 

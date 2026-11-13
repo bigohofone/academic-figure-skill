@@ -28,8 +28,7 @@ for y, name in enumerate(names):
     values = groups[name]
     box = ax.boxplot(values, positions=[y], widths=0.7, patch_artist=True, showfliers=False, orientation="horizontal")
     box["boxes"][0].set_facecolor(shift_lightness(colors["series-1"], 2))
-    ax.plot(values, y + rng.uniform(-0.2, 0.2, len(values)), "o", color=colors["ink"],
-            markerfacecolor="white", linestyle="none")
+    ax.plot(values, y + rng.uniform(-0.2, 0.2, len(values)), "o", color=colors["ink"], linestyle="none")
 ax.set_yticks(range(len(names)), labels=labels)
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0)

@@ -27,7 +27,7 @@ first_split = min(lv for lv in levels if len(pieces[lv]) > 1)
 print("takeaway:", f"single rings {rings[0]:.2g} to {rings[-1]:.2g}; split from {first_split:.2g}")
 assert rings == [lv for lv in levels if lv < first_split], "the takeaway does not hold"
 
-cmap = plt.get_cmap("viridis")
+cmap = plt.get_cmap("paper")
 norm = Normalize(min(levels), max(levels))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
@@ -47,9 +47,9 @@ for lv in levels[::label_every]:
     angle = (np.degrees(np.arctan2(line[k + 1, 1] - line[k - 1, 1], line[k + 1, 0] - line[k - 1, 0])) + 90) % 180 - 90
     ax.text(x, y, f"{lv:.2g}", ha="center", va="center", rotation=angle, rotation_mode="anchor",
             transform_rotates_text=True, gid="contour-label",
-            bbox=dict(facecolor="white", edgecolor="none", pad=1))
+            bbox=dict(facecolor=colors["paper"], edgecolor="none", pad=1))
 
-ax.plot(0, 0, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_markersize,
+ax.plot(0, 0, "*", color=colors["ours"], markeredgecolor=colors["ours"], markersize=paper.highlight_markersize,
         linestyle="none")
 ax.set_xlim(*data["x_range"])
 ax.set_ylim(*data["y_range"])

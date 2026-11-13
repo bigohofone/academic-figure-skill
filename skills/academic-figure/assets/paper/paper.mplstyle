@@ -14,29 +14,15 @@ axes.grid: True
 axes.grid.axis: both
 axes.axisbelow: True
 
-# hollow markers: white fill, an edge in the line's color
-lines.markerfacecolor: FFFFFF
-lines.markeredgecolor: auto
+# filled markers in the line's color; their edge color is a token
+lines.markerfacecolor: auto
 
-# box plots: black outline, whiskers, caps and median; the box is filled with its series color
+# box plots: the box is filled with its series color; outline colors are tokens
 boxplot.patchartist: True
-boxplot.boxprops.color: black
-boxplot.whiskerprops.color: black
-boxplot.capprops.color: black
-boxplot.medianprops.color: black
 boxplot.flierprops.marker: o
-boxplot.flierprops.markeredgecolor: black
-boxplot.flierprops.markerfacecolor: FFFFFF
 
-legend.handlelength: 1.5
-legend.handletextpad: 0.5
-legend.columnspacing: 1.0
-legend.labelspacing: 0.25
 legend.fancybox: False
-legend.facecolor: FFFFFF
 legend.framealpha: 1
-legend.borderpad: 0.3
-legend.borderaxespad: 0.25
 
 figure.constrained_layout.use: True
 figure.constrained_layout.hspace: 0

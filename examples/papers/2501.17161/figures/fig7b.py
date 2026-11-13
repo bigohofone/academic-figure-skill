@@ -13,7 +13,6 @@ import paper
 from paper import finalize_figure, make_shades, shift_lightness
 
 colors = paper.colors
-PALETTE = {"previous-sota": "#EE7733"}  # the caption names this line orange
 
 data = json.load(open("../data/fig7.json"))["V-IRL-VL"]
 final = data["final"]
@@ -45,8 +44,8 @@ for key, name, color, style, marker in series:
     ax.plot(gflops, s["smoothed"], color=color, linestyle=style, linewidth=width)
 ax.grid(True)
 for a in (ax, ax_bar):
-    a.axhline(sota, color=PALETTE["previous-sota"], linewidth=rcParams["grid.linewidth"], zorder=1)
-ax.set_title("V-IRL-VL training")
+    a.axhline(sota, color=colors["ink"], linewidth=rcParams["grid.linewidth"], zorder=1)  # a reference line, apart from every series
+ax.set_title("Training")
 ax.set_xlabel("GFLOPs")
 ax.set_ylabel("V-OOD success (%)")
 
@@ -54,15 +53,16 @@ for i, m in enumerate(methods):
     bars = ax_bar.bar(i, final[m], color=bar_colors[m], linewidth=0)
     ax_bar.bar_label(bars, labels=[f"{final[m]:.1f}%"], color=text_colors[m])
 ax_bar.set_xticks(range(len(methods)), labels=methods)
+ax_bar.tick_params(axis="y", labelleft=True)  # a bar panel is read on its own: its values need their axis
 ax_bar.tick_params(axis="x", length=0)
 ax_bar.grid(axis="x", visible=False)
-ax_bar.set_title("V-IRL-VL final")
+ax_bar.set_title("Final")
 
 # RL first, then the grey series in line-style order
 handles = [Line2D([], [], color=color, linestyle=style, marker=marker,
                   linewidth=rcParams["lines.linewidth"] if style == "-" else paper.dashed_linewidth)
            for _, _, color, style, marker in series[::-1]]
-handles.append(Line2D([], [], color=PALETTE["previous-sota"], linewidth=rcParams["grid.linewidth"]))
+handles.append(Line2D([], [], color=colors["ink"], linewidth=rcParams["grid.linewidth"]))
 ax.legend(handles, [name for _, name, *_ in series[::-1]] + [f"Previous SOTA ({sota:.1f}%)"])  # a reference line with its own value names it
 
 # original ratio 0.348 (height / width of the whole figure); M panels keep the page layout

@@ -50,12 +50,12 @@
   {
    "file": "Tex/results.tex",
    "from": "\\includegraphics[width=0.9\\linewidth]{figures/results_figures/Env_Plots_v2.pdf}",
-   "to": "\\begin{minipage}[t]{0.45\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5a.pdf}\\\\(a) Language-only\\end{minipage}\\hfill\\begin{minipage}[t]{0.45\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5b.pdf}\\\\(b) With vision\\end{minipage}"
+   "to": "\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5a.pdf}\\\\(a) Language-only\\end{minipage}\\hfill\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig5b.pdf}\\\\(b) With vision\\end{minipage}"
   },
   {
    "file": "Tex/results.tex",
    "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/vision_ood.pdf}",
-   "to": "\\includegraphics[width=0.49\\linewidth]{figures/fig7a.pdf}\\hfill\\includegraphics[width=0.49\\linewidth]{figures/fig7b.pdf}"
+   "to": "\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig7a.pdf}\\\\(a) GP-VL\\end{minipage}\\hfill\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/fig7b.pdf}\\\\(b) V-IRL-VL\\end{minipage}"
   },
   {
    "file": "Tex/results.tex",
@@ -69,7 +69,7 @@
   },
   {
    "file": "Tex/results.tex",
-   "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/figure_failure.pdf}",
+   "from": "\\includegraphics[width=0.85\\linewidth]{figures/results_figures/figure_failure.pdf}\\vspace{-0.25cm}",
    "to": "\\includegraphics[width=\\linewidth]{figures/results_figures/figure_failure.pdf}"
   },
   {

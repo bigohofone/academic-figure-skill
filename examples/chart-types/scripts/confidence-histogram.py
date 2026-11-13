@@ -16,7 +16,7 @@ colors = paper.colors
 with open("../data/confidence-histogram.json") as f:
     data = json.load(f)
 series = {"Correct": data["correct"], "Incorrect": data["incorrect"]}
-series_colors = {"Correct": colors["series-1"], "Incorrect": colors["series-4"]}
+series_colors = {"Correct": paper.series_colors[0], "Incorrect": paper.series_colors[1]}
 
 means = {name: float(np.mean(values)) for name, values in series.items()}
 print("takeaway:", {name: f"{v:#.3g}" for name, v in means.items()})

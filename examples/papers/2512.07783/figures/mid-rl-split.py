@@ -30,8 +30,8 @@ greys = make_shades(colors["neutral"], 2)
 styles = {
     "Full Mid": dict(color=greys[0], linestyle="--", linewidth=paper.dashed_linewidth, marker="o"),
     "Full RL": dict(color=greys[1], linestyle=":", linewidth=paper.dashed_linewidth, marker="s"),
-    "Light RL": dict(color=colors["series-1"], marker="^"),
-    "Heavy RL": dict(color=colors["series-4"], marker="D"),
+    "Light RL": dict(color=paper.series_colors[0], marker="^"),
+    "Heavy RL": dict(color=paper.series_colors[1], marker="D"),
 }
 for ax, (metric, title, values) in zip(axes, panels):
     for name in strategies:

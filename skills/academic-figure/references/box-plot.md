@@ -13,11 +13,10 @@ Spread of many values per group, across groups: per-problem accuracies, per-samp
   ```python
   ax.grid(axis="x", visible=False)
   ```
-- Points: ≤ 30 values per box: every value on top, jittered within box, design markers black on white, `showfliers=False`. More: only values beyond whiskers, design markers (matplotlib default fliers).
+- Points: ≤ 30 values per box: every value on top, jittered within box, design markers black, `showfliers=False`. More: only values beyond whiskers, design markers (matplotlib default fliers).
   ```python
   rng = np.random.default_rng(0)
-  ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color=colors["ink"],
-          markerfacecolor="white", linestyle="none")
+  ax.plot(x + rng.uniform(-0.2, 0.2, len(values)), values, "o", color=colors["ink"], linestyle="none")
   ```
 
 ## Variants

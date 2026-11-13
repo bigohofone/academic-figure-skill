@@ -65,6 +65,7 @@ Before any code, think it through like a person would, and write the answers as 
 3. **What does that sentence point at?** Its subject is the emphasis: ours, a gap, a point, a change along x.
 4. **Which chart shows it?** From DESIGN.md's chart type table: compare, trend, distribution, parts of a whole, a point.
 5. **How does the emphasis stand out in that chart?** Color by DESIGN.md Colors; panel height as a share of its width, 3XS to XL (M square), by DESIGN.md Panel height, unless the chart fixes its shape.
+6. **What must the reader tell apart?** Every variable the marks differ by (method, split, compute, seed), each with its own channel: hue, lightness, line style, marker, or panel. One variable per channel, by DESIGN.md Colors (One channel per variable). Write it as a table: variable → channel. Every value of every variable named in the legend or on the plot.
 
 **One figure, one takeaway.** More than one: one script each.
 
@@ -134,7 +135,7 @@ assert best["Ours"] > max(v for name, v in best.items() if name != "Ours"), "the
 ax.plot(x, y, "o-", color=colors["ours"])
 ax.plot(x, y, "--", linewidth=paper.dashed_linewidth, color=colors["neutral"])
 # don't
-ax.plot(x, y, "o-", color="#EE6677", linewidth=1.5, markersize=4)
+ax.plot(x, y, "o-", color="#D55E00", linewidth=1.5, markersize=4)
 ```
 
 **Placement left to `finalize_figure`.** No `loc` on panel legends, bar values level, no manual margins. It turns crowded bar values upward. The style saves the figure with a transparent background, so it sits on the paper's page: never pass `facecolor` or `transparent=False`.
@@ -149,6 +150,17 @@ ax.legend(loc="upper left")
 ax.bar_label(bars, rotation=90)
 fig.subplots_adjust(left=0.15)
 fig.savefig(..., bbox_inches="tight")
+```
+
+**Every mark labelled with its series.** `label=name` on each line, point, bar and band of a series, also when one series is drawn as many artists and the legend is built from handles: `finalize_figure` reads the labels to check that series stay apart.
+
+```python
+# do
+for run in runs[method]:
+    ax.plot(run["x"], run["y"], linestyle=styles[method], color=shade(run), label=method)
+ax.legend(handles, names)
+# don't
+ax.plot(run["x"], run["y"], color=shade(run))  # unlabelled: no check sees it
 ```
 
 **Plain code, top to bottom.** At most a loop over series.

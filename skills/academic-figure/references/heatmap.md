@@ -16,12 +16,12 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
 
   | Values | Colormap |
   |---|---|
-  | Sequential (counts, accuracies, attention) | design's `heatmap.colormap`, `viridis` (pass nothing); `n` discrete levels: below |
-  | Signed (differences, correlations) | `"RdBu_r"`, symmetric around 0 (negative blue, positive red): below |
+  | Sequential (counts, accuracies, attention) | design's `"paper"`, low light, high dark (pass nothing); `n` discrete levels: below |
+  | Signed (differences, correlations) | `"paper-diverging"`, symmetric around 0 (negative orange, positive blue, as Tableau's Orange-Blue): below |
 
   ```python
-  cmap = plt.get_cmap("viridis", n)                       # n discrete levels
-  im = ax.imshow(values, cmap="RdBu_r", vmin=-m, vmax=m)  # signed
+  cmap = plt.get_cmap("paper", n)                                  # n discrete levels
+  im = ax.imshow(values, cmap="paper-diverging", vmin=-m, vmax=m)  # signed
   ```
 
 - Colorbar: labelled with quantity ("Recall", "Attention weight"); placed per DESIGN.md Axes. None when every cell's value is written (Labels): the values carry the numbers, the colors only the pattern; the caption names the quantity.
@@ -52,7 +52,7 @@ Values over two categorical axes: confusion matrix, attention map, grid over two
   ```python
   fill = im.cmap(im.norm(v))
   ax.text(j, i, label, ha="center", va="center",
-          color="white" if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else "black")
+          color=colors["paper"] if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
   ```
 
 ## Caption

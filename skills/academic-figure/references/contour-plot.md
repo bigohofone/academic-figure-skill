@@ -6,7 +6,7 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 
 - Panel: height M, square (DESIGN.md Panel height); no gridlines (`ax.grid(False)`); both axes labelled with their variables.
 - Values spanning > 100×: contour their log (DESIGN.md log rule); caption says "contours of log loss".
-- Bands with lines: filled bands between levels in design colormap (`viridis`, low = dark; signed: `"RdBu_r"` centered at 0, as in `heatmap.md`); one flat color per band, never smooth gradient. On top: ink contour lines of the data itself, never of a smoothed copy. Levels: 6–8 at half width, 10 at full width, round values inside data range.
+- Bands with lines: filled bands between levels in design colormap (`"paper"`, low = light; signed: `"paper-diverging"` centered at 0, as in `heatmap.md`); one flat color per band, never smooth gradient. On top: ink contour lines of the data itself, never of a smoothed copy. Levels: 6–8 at half width, 10 at full width, round values inside data range.
 
   ```python
   levels = np.arange(lo, hi + step / 2, step)
@@ -22,10 +22,10 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 
 ## Variants
 
-- Lines only: each line colored by level from whole `viridis` colormap; colorbar for line colors.
+- Lines only: each line colored by level from whole `"paper"` colormap; colorbar for line colors.
 
   ```python
-  cmap = plt.get_cmap("viridis")
+  cmap = plt.get_cmap("paper")
   lines = ax.contour(X, Y, Z, levels=levels, cmap=cmap)
   fig.colorbar(plt.cm.ScalarMappable(norm=Normalize(lo, hi), cmap=cmap), ax=ax, label=...)
   ```
@@ -46,7 +46,7 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
   labels = ax.clabel(lines, fmt="%.2g", manual=positions)  # inline, turned along each line
   for t in labels:
       fill = mesh.cmap(mesh.norm(float(t.get_text())))
-      t.set_color("white" if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else "black")
+      t.set_color(colors["paper"] if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
   ```
 
   - Polylines: each level once, at its first given label position, turned along line like `clabel`'s, on white box (no gap cut).
@@ -58,13 +58,13 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
   angle = (np.degrees(np.arctan2(ys[k + 1] - ys[k - 1], xs[k + 1] - xs[k - 1])) + 90) % 180 - 90
   ax.text(x, y, f"{level:.2g}", ha="center", va="center", rotation=angle, rotation_mode="anchor",
           transform_rotates_text=True, gid="contour-label",
-          bbox=dict(facecolor="white", edgecolor="none", pad=1))
+          bbox=dict(facecolor=colors["paper"], edgecolor="none", pad=1))
   ```
 
 - Points of interest: minimum or trained solution: filled star in `colors["ours"]`, highlight size; training trajectory: data line, markers at ends. ≥ 2: named in legend; else in caption (DESIGN.md Legend).
 
   ```python
-  ax.plot(x, y, "*", color=colors["ours"], markerfacecolor=colors["ours"], markersize=paper.highlight_markersize, linestyle="none", label=...)
+  ax.plot(x, y, "*", color=colors["ours"], markeredgecolor=colors["ours"], markersize=paper.highlight_markersize, linestyle="none", label=...)
   ```
 
 ## Caption

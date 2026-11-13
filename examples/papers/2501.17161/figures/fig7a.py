@@ -42,7 +42,7 @@ for key, name, color, style, marker in series:
     ax.plot(gflops, s["raw"], marker, color=color)
     ax.plot(gflops, s["smoothed"], color=color, linestyle=style, linewidth=width)
 ax.grid(True)
-ax.set_title("GP-VL training")
+ax.set_title("Training")
 ax.set_xlabel("GFLOPs")
 ax.set_ylabel("V-OOD success (%)")
 
@@ -50,9 +50,10 @@ for i, m in enumerate(methods):
     bars = ax_bar.bar(i, final[m], color=bar_colors[m], linewidth=0)
     ax_bar.bar_label(bars, labels=[f"{final[m]:.1f}%"], color=text_colors[m])
 ax_bar.set_xticks(range(len(methods)), labels=methods)
+ax_bar.tick_params(axis="y", labelleft=True)  # a bar panel is read on its own: its values need their axis
 ax_bar.tick_params(axis="x", length=0)
 ax_bar.grid(axis="x", visible=False)
-ax_bar.set_title("GP-VL final")
+ax_bar.set_title("Final")
 
 # RL first, then the grey series in line-style order
 handles = [Line2D([], [], color=color, linestyle=style, marker=marker,

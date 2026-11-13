@@ -8,7 +8,8 @@ Two quantities per item against each other: accuracy vs parameters, FLOPs or lat
   ```python
   ax.scatter(x, y, s=rcParams["lines.markersize"] ** 2, color=color, edgecolors="none", alpha=0.5)
   ```
-- Few labelled points (models, accuracy vs cost): one hollow marker per model. Proposed model present: ours `colors["ours"]`, all others `colors["neutral"]`. Absent: `series-1`, or one color per model family when families are the message.
+- Points that carry a value in their color (a colorbar reads them: compute, step, temperature): markers at `paper.highlight_markersize`, every point. The design size marks a point on a line; a color scale needs area to be read.
+- Few labelled points (models, accuracy vs cost): one marker per model. Proposed model present: ours `colors["ours"]`, all others `colors["neutral"]`. Absent: `series-1`, or one color per model family when families are the message.
   ```python
   ax.plot(x, y, "o", color=color)
   ```
@@ -25,7 +26,7 @@ Two quantities per item against each other: accuracy vs parameters, FLOPs or lat
   ```python
   ax.plot(x, y, linestyle="--", linewidth=paper.dashed_linewidth, color=colors["neutral"], zorder=1)
   ```
-- Embedding (t-SNE, UMAP): marker with black edge, translucent fill in class color; > 6 classes: also own marker shape (DESIGN.md Colors). One color per class (DESIGN.md Colors), legend. No ticks, tick labels, gridlines or axis labels.
+- Embedding (t-SNE, UMAP): marker with black edge, translucent fill in class color; > 9 classes: also own marker shape (DESIGN.md Colors). One color per class (DESIGN.md Colors), legend. No ticks, tick labels, gridlines or axis labels.
   ```python
   ax.plot(x, y, shape, markeredgecolor=colors["ink"], markeredgewidth=paper.filled_markeredgewidth,
           markerfacecolor=(*to_rgb(color), 0.5), linestyle="none", label=name)

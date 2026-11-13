@@ -63,7 +63,7 @@ A few models' profiles across 5–10 benchmarks or capabilities, when profile sh
   ax.annotate(f"{v:#.3g}", (angle, v), xytext=(4 * np.sign(side), 4 * np.sign(up)), textcoords="offset points",
               ha="left" if side > 0 else "right" if side < 0 else "center",
               va=("top" if np.cos(angle) > 0 else "bottom") if side else ("bottom" if up > 0 else "top"),
-              color=shift_lightness(colors["ours"], -1), bbox=dict(facecolor="white", edgecolor="none", pad=1), gid="value-label")
+              color=shift_lightness(colors["ours"], -1), bbox=dict(facecolor=colors["paper"], edgecolor="none", pad=1), gid="value-label")
   ```
 
   Placements (for Collisions): as above; then spoke names pushed out (`pad=8`, then 10, 12, …).

@@ -346,6 +346,14 @@ def _standard_y_widths(fig):
     return ticks, label, text / 2
 
 
+def _standard_inner_y_width(column, ticks, label):
+    """The room a column's y decorations take at least, as the left margin does: four-character tick labels
+    when it shows tick labels, and a label line when it has a label. So two figures of one shape match,
+    whether a column's ticks read "90" or "100"."""
+    shows_ticks = any(t.get_visible() and t.get_text() for a in column for t in a.get_yticklabels())
+    return (ticks if shows_ticks else 0) + (label if any(a.get_ylabel() for a in column) else 0)
+
+
 def _standard_side_margins(fig):
     """The left and right margins, in inches, of a standard panel: on each side a y-axis label and
     four-character tick labels. The right one holds a second y axis (`ax.twinx()`) whether or not
@@ -368,6 +376,19 @@ def _center_row_legends(fig, panels):
         # the anchor sits below the legend by its border pad, which matplotlib adds again above the anchor
         pad = legend.borderaxespad * legend._fontsize * fig.dpi / 72
         legend.set_bbox_to_anchor((center, (box.y0 - pad) / fig.bbox.height), transform=fig.transFigure)
+
+
+def _unframe_outside_legends(fig):
+    """A legend outside the panels sits on white with nothing under it: its box would only add a line. Inside a
+    panel the box keeps it apart from the grid and the data."""
+    fig.canvas.draw()
+    for legend in fig.legends:
+        legend.set_frame_on(False)
+    for a in fig.axes:
+        legend = a.get_legend()
+        box = legend.get_window_extent() if legend else None
+        if legend and not a.get_window_extent().contains((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2):
+            legend.set_frame_on(False)
 
 
 def _y_decoration_width(axes, side="left"):
@@ -505,7 +526,7 @@ def _place_on_standard_box(fig, panels, aspect, by_step=True):
     # of the height between rows
     free_x = design.panel_gap * np.mean([b.width * w for b in boxes.values()])
     for _ in range(3):  # the gaps and the panel width they are a share of settle together
-        col_gaps = [max(free_x + _y_decoration_width(column_panels[c])
+        col_gaps = [max(free_x + max(_y_decoration_width(column_panels[c]), _standard_inner_y_width(column_panels[c], ticks, label))
                         + (_y_decoration_width([t for t, p in twin_of.items() if col_of[p] == c - 1], "right") if c - 1 in right_column else 0)
                         + (cb_gap + cb_w + _y_decoration_width([beside[c - 1]], "right") if c - 1 in beside else 0),
                         _x_end_clearance([a for a in panels if col_of[a] == c - 1], [a for a in panels if col_of[a] == c]),
@@ -909,6 +930,7 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
     _colorbars_span_panels(fig)
     _fit_heatmap_values(fig, panels)
     _center_row_legends(fig, panels)
+    _unframe_outside_legends(fig)
     # on the standard box, shapes follow its rules (a half with wider left labels has narrower panels)
     if not placed and max(ratios) - min(ratios) > tol * max(ratios):
         warnings.warn("panels have different shapes; one figure takes one aspect (no height_ratios or width_ratios)")

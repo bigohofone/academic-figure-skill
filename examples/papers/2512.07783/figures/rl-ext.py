@@ -27,7 +27,7 @@ fig, axes = plt.subplots(1, 3, figsize=(6.3, 6.3), layout="constrained", sharex=
 
 # four RL regimes on equal terms, the base model as the grey reference
 styles = {"Base": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_linewidth, marker="o")}
-for name, color, marker in zip(regimes, ["series-1", "series-4", "series-6", "series-5"], ["s", "^", "D", "v"]):
+for name, color, marker in zip(regimes, paper.design.series_order[:4], ["s", "^", "D", "v"]):
     styles[name] = dict(color=colors[color], marker=marker)
 
 margin = 2 ** (rcParams["axes.xmargin"] * math.log2(ks[-1] / ks[0]))

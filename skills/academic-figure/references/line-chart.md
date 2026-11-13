@@ -8,7 +8,7 @@ Values along continuous x: learning curves, scaling curves, pass@k, metric over 
   ```python
   ax.plot(x, y, color=color)
   ```
-- Markers (not ROC/PR): when the longest curve in the figure has ≤ 30 measured points, hollow marker at each point, all series and panels; else plain lines. One shape per series in every panel, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`.
+- Markers (not ROC/PR): when the longest curve in the figure has ≤ 30 measured points, marker at each point, all series and panels; else plain lines. One shape per series in every panel, in series order: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"P"`.
   ```python
   ax.plot(x, y, "o-", color=color)
   ```

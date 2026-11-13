@@ -47,9 +47,9 @@ band_colors = paper.make_part_colors(len(order))
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 polys = ax.stackplot(steps, [shares[name] for name in order], colors=band_colors, labels=order, alpha=0.875, step="post",
-                     edgecolor="white", linewidth=rcParams["grid.linewidth"])
+                     edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"])
 for s in switches:
-    ax.axvline(s, linestyle="--", linewidth=paper.dashed_linewidth, color="white")
+    ax.axvline(s, linestyle="--", linewidth=paper.dashed_linewidth, color=colors["paper"])
 
 # Shares the takeaway cites, inside their bands at each stage; Math's first band is too thin for its share
 # even at the small size, so all of Math's shares go to the caption (DESIGN.md Collisions step 4)
@@ -60,7 +60,7 @@ for name, color in zip(order, band_colors):
         for start, end in zip(stage_starts, stage_ends):
             i = list(steps).index(start)
             ax.text((start + end) / 2, base[i] + shares[name][i] / 2, share_text(shares[name][i]),
-                    ha="center", va="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
+                    ha="center", va="center", color=colors["paper"] if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
     base = base + shares[name]
 
 ax.set_xlim(steps[0], steps[-1])

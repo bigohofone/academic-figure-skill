@@ -32,9 +32,9 @@ y = np.arange(len(opponents))
 left = np.zeros(len(opponents))
 for category, color in zip(categories, category_colors):
     values = shares[category]
-    bars = ax.barh(y, values, left=left, color=color, edgecolor="white",
+    bars = ax.barh(y, values, left=left, color=color, edgecolor=colors["paper"],
                    linewidth=plt.rcParams["grid.linewidth"], label=category)
-    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color="white" if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else "black")
+    ax.bar_label(bars, labels=[f"{v:.0%}" for v in values], label_type="center", color=colors["paper"] if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
     left += values
 
 ax.set_yticks(y, labels=opponents)

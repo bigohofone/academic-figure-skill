@@ -32,13 +32,13 @@ assert share > 0.5, "the takeaway does not hold"
 fig, ax = plt.subplots(figsize=(2.75, 2.75))
 twin = ax.twinx()
 
-ax.plot(steps, loss, color=colors["series-1"], alpha=0.25)
-ax.plot(smoothed_steps, smoothed, color=colors["series-1"], label="Training loss")
+ax.plot(steps, loss, color=paper.series_colors[0], alpha=0.25)
+ax.plot(smoothed_steps, smoothed, color=paper.series_colors[0], label="Training loss")
 ax.set_ylabel("Training loss")
 ax.set_xlabel("Training step")
 ax.set_xticks([0, 5000, 10000, 15000, 20000], labels=["0", "5K", "10K", "15K", "20K"])
 
-twin.plot(steps, learning_rate * 1e4, color=colors["series-4"], linestyle="--", linewidth=paper.dashed_linewidth, label="Learning rate")
+twin.plot(steps, learning_rate * 1e4, color=paper.series_colors[1], linestyle="--", linewidth=paper.dashed_linewidth, label="Learning rate")
 twin.set_ylabel("Learning rate (×10⁻⁴)")
 twin.grid(False)
 

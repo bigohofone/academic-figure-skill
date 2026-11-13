@@ -27,7 +27,7 @@ im = ax.imshow(accuracy, aspect="auto", origin="lower")
 for i in range(len(learning_rates)):
     for j in range(len(batch_sizes)):
         v = accuracy[i, j]
-        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color="white" if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else "black")
+        ax.text(j, i, f"{v:#.3g}", ha="center", va="center", color=colors["paper"] if np.dot(to_rgb(im.cmap(im.norm(v))), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
 ax.set_xticks(range(len(batch_sizes)), labels=[str(b) for b in batch_sizes])
 ax.set_yticks(range(len(learning_rates)), labels=[lr.replace("-", "−") for lr in learning_rates])
 ax.set_xlabel("Batch size")

@@ -1,5 +1,5 @@
 """Readability checks finalize_figure runs last: text cut off or overlapping, labels and legends covering data,
-series that merge in grayscale, panels too narrow to read; and the tests on texts and panels that the
+series that merge in grayscale or share every channel, panels too narrow to read; and the tests on texts and panels that the
 layout shares (does a text overlap another, is it a value label, is a panel round)."""
 import math
 import warnings
@@ -343,37 +343,60 @@ def _warn_legends_wider_than_figure(fig):
 
 
 @check
-def grayscale_lookalikes(ctx):
+def series_lookalikes(ctx):
     for a in ctx.panels:
-        yield from _grayscale_lookalikes(a, ctx.panels)
+        yield from _series_lookalikes(a, ctx.panels)
 
 
-def _grayscale_lookalikes(a, panels):
-    """Series told apart by color alone (lines of one style and marker, or bars) must differ in lightness,
-    or they merge when printed in black and white."""
-    groups = {}
+def _series_marks(a):
+    """Each labelled series' look: its line styles, markers and colors. A series may be drawn as many artists
+    under one label (a line per checkpoint, a dot per run); their colors may vary (lightness for compute)."""
+    series = {}
+
+    def add(label, kind, colors, style=None, marker=None):
+        if not label or label.startswith("_"):
+            return
+        s = series.setdefault(label, {"shape": set(), "colors": []})
+        s["shape"].add((kind, style, marker))
+        s["colors"] += [palette._over_white(c) for c in colors]
+
     for line in a.get_lines():
-        if not line.get_label().startswith("_"):
-            key = ("line", str(line.get_linestyle()), str(line.get_marker()))
-            groups.setdefault(key, []).append((line.get_label(), line.get_color()))
+        style, marker = str(line.get_linestyle()), str(line.get_marker())
+        add(line.get_label(), "line", [line.get_color()], None if style in ("None", "none", "") else style,
+            None if marker in ("None", "none", "") else marker)
     for c in a.containers:
-        if isinstance(c, BarContainer) and c.patches and not str(c.get_label()).startswith("_"):
-            groups.setdefault(("bar",), []).append((c.get_label(), palette._over_white(c.patches[0].get_facecolor())))
-    # histograms (step outlines or filled shapes) and labelled bands, translucent fills as seen over white
+        if isinstance(c, BarContainer) and c.patches:
+            add(str(c.get_label()), "bar", [p.get_facecolor() for p in c.patches])
+    # histograms (step outlines or filled shapes), translucent fills as seen over white. Parts of one whole
+    # (wedges, stacked bands) are not series: their place and the seams between them tell them apart
     for p in a.patches:
-        label = p.get_label() or ""
-        if not isinstance(p, Rectangle) and label and not label.startswith("_"):
-            color = palette._over_white(p.get_facecolor()) if p.get_fill() else p.get_edgecolor()
-            groups.setdefault(("fill",), []).append((label, color))
+        if not isinstance(p, (Rectangle, Wedge)):
+            add(p.get_label(), "fill", [p.get_facecolor() if p.get_fill() else p.get_edgecolor()])
     for c in a.collections:
-        label = c.get_label() or ""
-        if isinstance(c, PolyCollection) and label and not label.startswith("_") and len(c.get_facecolor()):
-            groups.setdefault(("fill",), []).append((label, palette._over_white(c.get_facecolor()[0])))
-    for series in groups.values():
-        for i in range(len(series)):
-            for j in range(i + 1, len(series)):
-                (n1, c1), (n2, c2) = series[i], series[j]
-                if abs(palette._lightness(c1) - palette._lightness(c2)) < 10:
-                    yield Problem(f"{_panel_name(a, panels)}, series {n1!r} and {n2!r}",
-                                  f"look alike in grayscale (L* {palette._lightness(c1):.0f} vs {palette._lightness(c2):.0f})",
-                                  "use make_shades(colors[\"neutral\"], n), or tell them apart by line style or marker (DESIGN.md Colors)")
+        if isinstance(c, PathCollection) and len(c.get_facecolor()):
+            shape = tuple(np.round(c.get_paths()[0].vertices, 2).ravel()) if c.get_paths() else None
+            add(c.get_label(), "scatter", c.get_facecolor(), marker=shape)
+    return series
+
+
+def _series_lookalikes(a, panels):
+    """Series told apart by color alone (same line styles and markers, or bars) must differ in lightness, or they
+    merge when printed in black and white. A series whose own lightness varies (it shows a value, as compute)
+    leaves lightness no room to tell series apart: those series need a line style or marker of their own."""
+    series = list(_series_marks(a).items())
+    for i in range(len(series)):
+        for j in range(i + 1, len(series)):
+            (n1, s1), (n2, s2) = series[i], series[j]
+            if s1["shape"] != s2["shape"]:
+                continue
+            where = f"{_panel_name(a, panels)}, series {n1!r} and {n2!r}"
+            spent = [n for n, s in ((n1, s1), (n2, s2)) if np.ptp([palette._lightness(c) for c in s["colors"]]) >= 10]
+            if spent:
+                yield Problem(where, f"share line style and marker, and {spent[0]!r} already uses lightness for a value: "
+                                     "color alone cannot tell them apart",
+                              "give each variable its own channel: a line style or marker per series (DESIGN.md Colors)")
+                continue
+            l1, l2 = palette._lightness(s1["colors"][0]), palette._lightness(s2["colors"][0])
+            if abs(l1 - l2) < 10:
+                yield Problem(where, f"look alike in grayscale (L* {l1:.0f} vs {l2:.0f})",
+                              "use make_shades(colors[\"neutral\"], n), or tell them apart by line style or marker (DESIGN.md Colors)")

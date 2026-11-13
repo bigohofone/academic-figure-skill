@@ -138,7 +138,7 @@ def test_pdf_embeds_inter_as_text(tmp_path):
 def test_shift_lightness_moves_one_stop_per_step():
     ours = palette._lightness(paper.colors["ours"])
     for stops in (-2, -1, 1, 2):
-        assert palette._lightness(shift_lightness(paper.colors["ours"], stops)) == pytest.approx(ours + palette.STOP * stops, abs=0.5)
+        assert palette._lightness(shift_lightness(paper.colors["ours"], stops)) == pytest.approx(ours + paper.design.shades["stop"] * stops, abs=0.5)
 
 
 def test_fit_height_keeps_value_labels_inside():
@@ -567,6 +567,30 @@ def test_bars_alike_in_grayscale_warn():
     ax.bar([1], [2], color="#228833", label="B")
     with pytest.warns(UserWarning, match="look alike in grayscale"):
         finalize_figure(fig, ax)
+
+
+def _series_shaded_by_compute(ax, styles):
+    """Two methods drawn a checkpoint at a time, each checkpoint shaded by its compute (the RL/SFT/Init case)."""
+    greys = paper.make_shades(paper.colors["neutral"], 4)
+    for method, style, shades in (("SFT", styles[0], greys[1:]), ("Init", styles[1], greys[:1])):
+        for k, color in enumerate(shades):
+            ax.plot([k, k + 1], [k, k + 2], style, color=color, label=method)
+
+
+def test_series_differing_only_in_a_lightness_already_spent_warn():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    _series_shaded_by_compute(ax, ["o-", "o-"])
+    with pytest.warns(UserWarning, match=r"series 'SFT' and 'Init': share line style and marker, and 'SFT' already uses lightness"):
+        finalize_figure(fig, ax)
+
+
+def test_series_with_their_own_line_style_pass_though_lightness_is_spent():
+    fig, ax = plt.subplots(figsize=(WIDTH, 2), layout="constrained")
+    _series_shaded_by_compute(ax, ["o--", "o:"])
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        finalize_figure(fig, ax)
+    assert not any("series 'SFT'" in str(w.message) for w in caught)
 
 
 def test_legend_without_loc_takes_the_first_clear_spot():

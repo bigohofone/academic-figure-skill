@@ -86,7 +86,7 @@ def twin_axis():
     fig, ax = plt.subplots(figsize=(SINGLE, SINGLE), layout="constrained")
     ax.plot(steps, 3 * np.exp(-steps / 600) + 1, color=colors["series-1"], label="Loss")
     twin = ax.twinx()
-    twin.plot(steps, np.minimum(steps / 500, 1) * 3, "--", linewidth=paper.dashed_linewidth, color=colors["series-4"], label="Learning rate")
+    twin.plot(steps, np.minimum(steps / 500, 1) * 3, "--", linewidth=paper.dashed_linewidth, color=paper.series_colors[1], label="Learning rate")
     twin.grid(False)
     ax.set_zorder(twin.get_zorder() + 1)
     ax.patch.set_visible(False)
@@ -133,7 +133,7 @@ def heatmap():
     for (i, j), v in np.ndenumerate(values):
         fill = im.cmap(im.norm(v))
         ax.text(j, i, f"{v:.2f}", ha="center", va="center",
-                color="white" if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else "black")
+                color=colors["paper"] if np.dot(fill[:3], [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
     ax.set_xlabel("Batch size")
     ax.set_ylabel("Learning rate")
     ax.grid(False)
@@ -157,9 +157,10 @@ def heatmap_colorbar(rows, cols):
 
 def square_scatter():
     fig, ax = plt.subplots(figsize=(SINGLE, SINGLE), layout="constrained")
-    for k, c in enumerate(["series-1", "series-4", "series-6"]):
+    # translucent class colors come close in grayscale: each class also keeps its own marker
+    for k, (c, marker) in enumerate(zip(paper.series_colors[:3], ["o", "s", "^"])):
         xy = rng.normal(k * 2, 0.8, (60, 2))
-        ax.scatter(*xy.T, s=6, color=colors[c], alpha=0.5, label=f"Class {k + 1}")
+        ax.scatter(*xy.T, s=6, marker=marker, color=c, alpha=0.5, label=f"Class {k + 1}")
     ax.set_xticks([])
     ax.set_yticks([])
     ax.legend()
@@ -170,7 +171,7 @@ def square_scatter():
 def stacked_area():
     fig, ax = plt.subplots(figsize=(SINGLE, SINGLE), layout="constrained")
     shares = rng.dirichlet([5, 2, 1], len(steps)).T
-    ax.stackplot(steps, shares, colors=make_part_colors(3), labels=["Web", "Code", "Math"], alpha=0.875, edgecolor="white",
+    ax.stackplot(steps, shares, colors=make_part_colors(3), labels=["Web", "Code", "Math"], alpha=0.875, edgecolor=colors["paper"],
                  linewidth=plt.rcParams["grid.linewidth"])
     ax.set_xlabel("Training step")
     ax.set_ylabel("Share")
@@ -194,7 +195,7 @@ def log_axis():
 
 def pie():
     fig, ax = plt.subplots(figsize=(SINGLE, SINGLE), layout="constrained")
-    ax.pie([45, 25, 15, 10, 5], colors=make_part_colors(5), wedgeprops=dict(width=0.4, edgecolor="white"))
+    ax.pie([45, 25, 15, 10, 5], colors=make_part_colors(5), wedgeprops=dict(width=0.4, edgecolor=colors["paper"]))
     finalize_figure(fig, ax)
     return fig
 
@@ -277,6 +278,16 @@ def describe(fig, panels):
     }
 
 
+def caption(d):
+    """The figure's types written as the rest of a paper caption: "Single column, 1 × 2 panels, height M. ..."."""
+    height = f"panel height {d['Height']}" if d["Height"] in paper.panel_ratios else f"{d['Height']} panels"
+    first = f"{'Single column' if d['Column'] == 'single' else 'Full width'}, {d['Grid']} panels, {height}."
+    rest = [f"{d['Chart']} chart" if d["Chart"] != "—" else "", d["Axes"] if d["Axes"] != "—" else "",
+            d["Labels"] if d["Labels"] != "—" else "", "no legend" if d["Legend"] == "none" else f"legend {d['Legend']}"]
+    rest = "; ".join(r for r in rest if r)
+    return f"{first} {rest[0].upper() + rest[1:]}."
+
+
 def render(name):
     """Draw one case; return its card's HTML and a one-line report."""
     with warnings.catch_warnings(record=True) as caught:
@@ -288,75 +299,77 @@ def render(name):
             panels = [a for a in fig.axes if a.get_visible() and a.axison and getattr(a, "_colorbar", None) is None]
             pw, ph = paper.layout._panel_size(panels[0])
             image = f'<img src="img/{file}?v={time.time():.0f}" style="width:{fig.get_figwidth()}in">'
-            tags = "".join(f"<span><i>{k}</i> {html.escape(v)}</span>" for k, v in describe(fig, panels).items() if v != "—")
+            tags = caption(describe(fig, panels))
             size = f"panel {pw:.2f} × {ph:.2f} in"
             fig_width = fig.get_figwidth()
         except Exception as error:
             size, image, fig_width, tags = "failed", f"<pre>{html.escape(repr(error))}</pre>", DOUBLE, ""
+            fig = None
     notes = "".join(f"<li>{html.escape(str(w.message))}</li>" for w in caught)
     wide = ' class="wide"' if fig_width > SINGLE + 0.01 else ""
-    card = (f'<figure{wide}>{image}<figcaption><b>{html.escape(name)}</b><div class="meta">{tags}</div></figcaption>'
+    # "§" stands for the figure number, given in page order once every case is drawn
+    card = (f'<figure{wide}>{image}<figcaption>Figure §: <b>{html.escape(name)}.</b> {html.escape(tags)}</figcaption>'
             f'{f"<ul>{notes}</ul>" if notes else ""}</figure>')
-    return card, f"{name}: {size}, {len(caught)} warnings"
+    height = fig.get_figheight() if fig is not None else 1
+    return card, f"{name}: {size}, {len(caught)} warnings", bool(wide), height
 
 
 if __name__ == "__main__":
     (OUT / "img").mkdir(parents=True, exist_ok=True)
-    start = time.time()
     with ProcessPoolExecutor() as pool:
         results = list(pool.map(render, CASES))
-    for _, line in results:
+    for _, line, _, _ in results:
         print(line)
-    cards = "".join(card for card, _ in results)
+    # all single-column figures first, in two columns, each going to the shorter one (the caption adds about
+    # half an inch), so figures of different heights sit right under each other; then the full-width figures
+    # numbered as the page shows them: the single-column figures (placed in order), then the full-width ones
+    ordered = [r for r in results if not r[2]] + [r for r in results if r[2]]
+    results = [(card.replace("Figure §", f"Figure {n}"), *rest) for n, (card, *rest) in enumerate(ordered, 1)]
+    cols, heights = [[], []], [0, 0]
+    for card, _, wide, height in results:
+        if not wide:
+            c = heights.index(min(heights))
+            cols[c].append(card)
+            heights[c] += height + 0.5
+    cards = ('<div class="pair">' + "".join(f'<div class="col">{"".join(col)}</div>' for col in cols) + "</div>"
+             + "".join(card for card, _, wide, _ in results if wide))
     (OUT / "index.html").write_text(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How layouts line up · academic-figure-skill</title>
-<meta name="theme-color" content="#07080b">
+<title>Panel layouts · academic-figure-skill</title>
+<meta name="theme-color" content="#fafaf8">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site.css">
+<script src="../site.js"></script>
 <style>
-:root {{ --panel:#11141a; --bg:#07080b; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14); --ink:#f3f4f6; --ink2:#a9afbb; --ink3:#6e7583; --accent:#ff4d63;
-  --page:{DOUBLE}in; }}
-* {{ box-sizing:border-box; }}
-body {{ margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }}
-a {{ color:inherit; }}
-nav {{ position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:10; width:min(820px, calc(100% - 32px));
-  display:flex; align-items:center; gap:22px; padding:8px 8px 8px 18px; border:1px solid var(--line2); border-radius:14px;
-  background:rgba(12,14,19,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }}
-nav .logo {{ font-weight:700; text-decoration:none; white-space:nowrap; display:flex; align-items:center; gap:9px; }}
-nav .logo i {{ width:18px; height:14px; border:2px solid var(--accent); border-radius:4px; display:inline-block; }}
-nav .links {{ display:flex; gap:20px; margin-left:auto; font-size:14.5px; color:var(--ink2); align-items:center; padding-right:10px; }}
-nav .links a {{ text-decoration:none; }} nav .links a:hover {{ color:var(--ink); }}
-.sec-head {{ text-align:center; max-width:760px; margin:0 auto 46px; padding:150px 24px 0; }}
-.label {{ display:inline-block; font:500 12.5px "JetBrains Mono", monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }}
-h1 {{ font-size:clamp(32px,5vw,58px); letter-spacing:-.04em; line-height:1.03; margin:0 0 16px; font-weight:800; }}
-h1 em {{ font-style:normal; color:var(--ink3); }}
-.intro {{ color:var(--ink2); font-size:18px; margin:0; }}
-/* cards: the gap between them is the page's column gap less both paddings, so every image keeps its printed
-   position and single-column and full-width figures line up edge to edge */
-main {{ --p:0.0625in; margin:0 auto 110px; display:grid; grid-template-columns:repeat(2, calc({SINGLE}in + 2 * var(--p)));
-  gap:calc({DOUBLE - 2 * SINGLE}in - 2 * var(--p)); row-gap:18px; width:calc(var(--page) + 2 * var(--p)); align-items:start; grid-auto-flow:row dense; }}
-figure {{ margin:0; padding:var(--p); background:var(--panel); border-radius:14px; box-shadow:0 0 0 1px var(--line); }}
-figure.wide {{ grid-column:1 / -1; }}
-img {{ display:block; border-radius:8px; background:#fff; }}
-figcaption {{ padding:12px 6px 6px; font-size:13px; line-height:1.45; color:var(--ink3); }}
-figcaption b {{ color:var(--ink); font-weight:600; }}
-.meta {{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:2px 14px; margin-top:6px; font:12px/1.5 "JetBrains Mono", monospace; color:var(--ink2); }}
-.meta i {{ font-style:normal; color:var(--ink3); }}
-ul {{ margin:6px 0 0; padding-left:16px; color:var(--accent); font-size:12.5px; }}
-footer {{ padding:0 0 90px; color:var(--ink3); font-size:14px; }}
-footer div {{ max-width:1180px; margin:0 auto; padding:28px 24px 0; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:18px; }}
-footer a {{ text-decoration:none; }} footer a:hover {{ color:var(--ink); }}
+/* figures at their printed positions: the gap between the two columns is the page's column gap, so
+   single-column and full-width figures line up edge to edge */
+.layouts {{ margin:0 auto 56px; width:{DOUBLE}in; display:flex; flex-direction:column; gap:28px; }}
+.layouts .pair {{ display:grid; grid-template-columns:repeat(2, {SINGLE}in); column-gap:{DOUBLE - 2 * SINGLE}in; align-items:start; }}
+.layouts .col {{ display:flex; flex-direction:column; gap:28px; }}
+.layouts figure {{ margin:0; }}
+.layouts img {{ display:block; background:#fff; }}
+/* captions as in the paper, at print size: 9 pt Times, the lead in bold */
+.layouts figcaption {{ margin-top:6pt; font:9pt/11pt "Times New Roman", Times, serif; color:#111; text-align:justify; hyphens:auto; }}
+.layouts figcaption b {{ font-weight:700; }}
+.layouts ul {{ margin:6px 0 0; padding-left:16px; color:var(--ink); font-size:12.5px; }}
 </style></head><body>
-<nav><a class="logo" href="../"><i></i>academic-figure-skill</a>
-<div class="links"><a href="../#examples">Examples</a>
-  <a href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener" style="padding-right:10px">GitHub</a></div></nav>
-<div class="sec-head"><span class="label">How layouts line up</span><h1>How layouts line up</h1>
-<p class="intro">Every layout the skill draws, at print size on a two-column page: edges line up across figures. Updated {time.strftime("%Y-%m-%d %H:%M")}.</p></div>
-<main>{cards}</main>
-<footer><div><span>academic-figure-skill · MIT license</span><span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a></span></div></footer>
+<header class="top"><div class="wrap">
+  <a class="logo" href="../">academic-figure-skill</a>
+  <nav class="links"><a class="opt" href="../papers/">Papers</a><a class="opt" href="../charts/">Charts</a><a class="opt" href="../layouts/">Layouts</a>
+  <a href="https://github.com/bigohofone/academic-figure-skill" target="_blank" rel="noopener">GitHub <span class="count" hidden></span></a></nav>
+</div></header>
+<main>
+<div class="page-head"><div class="wrap">
+  <h1>Every layout. <span class="dim">Lined up.</span></h1>
+  <p class="lead">Single panels, rows and grids at print size, on a real two-column page.</p>
+</div></div>
+<div class="layouts">{cards}</div>
+</main>
+<footer><div class="wrap"><span>academic-figure-skill · MIT license</span><span><a href="https://github.com/bigohofone/academic-figure-skill">GitHub</a></span></div></footer>
 <script>if (location.protocol === "file:" || location.hostname === "localhost") setTimeout(() => location.reload(), 3000);</script>
 </body></html>
 """)
+
 
 
