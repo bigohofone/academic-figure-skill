@@ -344,7 +344,7 @@ if __name__ == "__main__":
 <meta property="og:url" content="https://wonjunoh.com/paper-figure-skill/layouts/">
 <meta property="og:image" content="https://wonjunoh.com/paper-figure-skill/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#fafaf8">
+<meta name="theme-color" content="#0b0c10">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../site.css">
@@ -352,7 +352,7 @@ if __name__ == "__main__":
 <style>
 /* figures at their printed positions: the gap between the two columns is the page's column gap, so
    single-column and full-width figures line up edge to edge */
-.layouts {{ margin:0 auto 56px; width:{DOUBLE}in; display:flex; flex-direction:column; gap:28px; }}
+.layouts {{ margin:0 auto 56px; width:calc({DOUBLE}in + 1in); padding:0.5in; display:flex; flex-direction:column; gap:28px; background:#fff; border-radius:12px; color:#111; }}  /* a white sheet: the page the figures are printed on */
 .layouts .pair {{ display:grid; grid-template-columns:repeat(2, {SINGLE}in); column-gap:{DOUBLE - 2 * SINGLE}in; align-items:start; }}
 .layouts .col {{ display:flex; flex-direction:column; gap:28px; }}
 .layouts figure {{ margin:0; }}
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 /* captions as in the paper, at print size: 9 pt Times, the lead in bold */
 .layouts figcaption {{ margin-top:6pt; font:9pt/11pt "Times New Roman", Times, serif; color:#111; text-align:justify; hyphens:auto; }}
 .layouts figcaption b {{ font-weight:700; }}
-.layouts ul {{ margin:6px 0 0; padding-left:16px; color:var(--ink); font-size:12.5px; }}
+.layouts ul {{ margin:6px 0 0; padding-left:16px; color:#4d4d4d; font-size:12.5px; }}
 </style></head><body>
 <header class="top"><div class="wrap">
   <a class="logo" href="../">paper-figure-skill</a>
