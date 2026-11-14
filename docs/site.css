@@ -163,11 +163,37 @@ pre.mini .ok { color:#6ee7a0; }
 .examples { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
 .example { display:flex; flex-direction:column; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition:box-shadow .2s, transform .2s; }
 .example:hover { box-shadow:var(--shadow-lift); transform:translateY(-2px); }
-.example .shot { height:260px; display:grid; place-items:center; overflow:hidden; padding:22px; background:var(--canvas); }
-.example .shot:has(.mosaic) { display:block; }
-.example .mosaic { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8px; height:100%; }
-.example .mosaic img { width:100%; height:100%; min-height:0; object-fit:contain; padding:6px; }
+.example .shot { height:260px; display:grid; place-items:center; position:relative; overflow:hidden; padding:22px; background:var(--canvas); }
+/* before / after: the "before" lies on top and fades out as the particles fly; layouts start out of line */
+.example .ba { position:relative; width:100%; height:100%; }
+.example .crop { position:relative; }
+.example .ba > .ba-before { position:absolute; inset:0; }
+.example .crop .ba-before { position:absolute; top:0; left:0; }
+.example .ba-before { transition:opacity .45s; }
+.example:not(.before) .ba-before { opacity:0; }
+.example .aligned .stack img { transition:transform .6s cubic-bezier(.3,1.4,.5,1); }
+.example .aligned .guide { transition:opacity .4s .3s; }
+.example.before .aligned .stack img { transition-duration:.45s; }
+.example.before .aligned .stack img:nth-child(1) { transform:translateX(-5%) scale(.92); }
+.example.before .aligned .stack img:nth-child(2) { transform:translateX(6%) scale(.86); }
+.example.before .aligned .stack img:nth-child(3) { transform:translateX(-3%) scale(.95); }
+.example.before .aligned .guide { opacity:0; transition-delay:0s; }
+.ba-burst { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+.example .shot:has(.mosaic, .crop, .aligned, .ba) { display:block; }
+/* one white box per card, the same size in all three; what is in it has no box of its own */
+.example .mosaic, .example .aligned, .example .crop { width:100%; height:100%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.example .mosaic { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:4px; padding:8px; }
+.example :is(.mosaic, .aligned) img { box-shadow:none; }
+.example .mosaic img { width:100%; height:100%; min-height:0; object-fit:contain; }
 .example .shot img { max-width:100%; max-height:100%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+/* figures of one width, stacked: dashed guides on the shared left and right panel edges show they line up */
+.example .aligned { display:flex; align-items:center; padding:6px; }
+.example .aligned .stack { position:relative; width:100%; display:flex; flex-direction:column; gap:3px; }
+.example .aligned img { display:block; width:100%; max-height:none; }
+/* a page cropped to its figure: the text area (8% to 92% of the width) from just under the running head */
+.example .crop { overflow:hidden; }
+.example .crop img { display:block; width:119%; max-width:none; max-height:none; margin:-8% 0 0 -9.5%; box-shadow:none; }
+.example .aligned .guide { position:absolute; top:-6px; bottom:-6px; border-left:1px dashed #e15759; }
 .example .foot { display:flex; align-items:center; justify-content:center; gap:8px; padding:18px 20px; border-top:1px solid var(--line); }
 .example .foot span { color:var(--ink3); transition:transform .2s, color .2s; }
 .example:hover .foot span { color:var(--ink); transform:translateX(3px); }

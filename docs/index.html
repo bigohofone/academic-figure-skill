@@ -82,11 +82,11 @@
 <section id="examples"><div class="wrap">
   <div class="sec-head"><h2>See the difference. <span class="dim">On real papers, every chart, every layout.</span></h2></div>
   <div class="examples">
-    <a class="example" href="papers/"><div class="shot"><img src="papers/2410.01131/redrawn/p8.svg" alt="A redrawn paper page" loading="lazy"></div>
+    <a class="example" href="papers/"><div class="shot"><div class="crop"><img src="papers/2410.01131/redrawn/p8.svg" alt="Figure 3 of a redrawn paper page" loading="lazy"><img class="ba-before" src="papers/2410.01131/original/p8.svg" alt="" loading="lazy"></div></div>
       <div class="foot"><h3>On real papers</h3><span aria-hidden="true">→</span></div></a>
-    <a class="example" href="charts/"><div class="shot"><div class="mosaic"><img src="charts/img/with/grouped-bar-chart.svg" alt="" loading="lazy"><img src="charts/img/with/data-mixture.svg" alt="" loading="lazy"><img src="charts/img/with/hyperparameter-grid.svg" alt="" loading="lazy"><img src="charts/img/with/dataset-composition.svg" alt="" loading="lazy"></div></div>
+    <a class="example" href="charts/"><div class="shot"><div class="ba"><div class="mosaic"><img src="charts/img/with/learning-curve.svg" alt="" loading="lazy"><img src="charts/img/with/grouped-bar-chart.svg" alt="" loading="lazy"><img src="charts/img/with/confidence-histogram.svg" alt="" loading="lazy"><img src="charts/img/with/grouped-box-plot.svg" alt="" loading="lazy"></div><div class="mosaic ba-before"><img src="charts/img/without/learning-curve.svg" alt="" loading="lazy"><img src="charts/img/without/grouped-bar-chart.svg" alt="" loading="lazy"><img src="charts/img/without/confidence-histogram.svg" alt="" loading="lazy"><img src="charts/img/without/grouped-box-plot.svg" alt="" loading="lazy"></div></div></div>
       <div class="foot"><h3>On every chart type</h3><span aria-hidden="true">→</span></div></a>
-    <a class="example" href="layouts/"><div class="shot"><img src="layouts/img/grid-2x3-full-width.png" alt="A grid of panels lined up" loading="lazy"></div>
+    <a class="example" href="layouts/"><div class="shot"><div class="aligned" role="img" aria-label="Figures with one, three and six panels, their edges lined up"><div class="stack"><img src="layouts/img/one-panel-full-width-xs.png" alt="" loading="lazy"><img src="layouts/img/row-of-3.png" alt="" loading="lazy"><img src="layouts/img/row-of-6-sq.png" alt="" loading="lazy"><i class="guide" style="left:5.11%"></i><i class="guide" style="left:94.89%"></i></div></div></div>
       <div class="foot"><h3>On every panel layout</h3><span aria-hidden="true">→</span></div></a>
   </div>
 </div></section>
@@ -115,6 +115,46 @@
     const move = e => { const r = s.getBoundingClientRect(); set((e.clientX - r.left) / r.width * 100); };
     s.addEventListener("pointerdown", e => { s.setPointerCapture(e.pointerId); move(e); });
     s.addEventListener("pointermove", e => { if (s.hasPointerCapture(e.pointerId)) move(e); });
+  });
+})();
+</script>
+<script>
+// the example cards: each shows its "before" (Claude Code alone; for layouts, figures out of line), then bursts
+// into particles and turns into the "after", over and over, the cards a little apart
+(() => {
+  const cards = [...document.querySelectorAll(".example")].filter(c => c.querySelector(".ba-before, .aligned"));
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#E15759", "#4E79A7", "#59A14F", "#EDC948", "#F28E2B", "#76B7B2"];
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const burst = shot => {
+    const canvas = document.createElement("canvas"), r = shot.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+    canvas.className = "ba-burst"; canvas.width = r.width * dpr; canvas.height = r.height * dpr; shot.append(canvas);
+    const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr);
+    const parts = Array.from({ length: 90 }, () => {
+      const x = 22 + Math.random() * (r.width - 44), y = 22 + Math.random() * (r.height - 44), a = Math.random() * Math.PI * 2, v = 1 + Math.random() * 3.5;
+      return { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.5, s: 2 + Math.random() * 3, c: colors[Math.floor(Math.random() * colors.length)] };
+    });
+    const start = performance.now();
+    const frame = now => {
+      const t = (now - start) / 900;
+      ctx.clearRect(0, 0, r.width, r.height);
+      if (t >= 1) { canvas.remove(); return; }
+      ctx.globalAlpha = 1 - t;
+      for (const p of parts) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s); }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  };
+  cards.forEach(async (card, i) => {
+    card.classList.add("before");
+    await wait(1200 + i * 700);
+    for (;;) {
+      burst(card.querySelector(".shot"));
+      card.classList.remove("before");
+      await wait(4500);
+      card.classList.add("before");
+      await wait(2200);
+    }
   });
 })();
 </script>
