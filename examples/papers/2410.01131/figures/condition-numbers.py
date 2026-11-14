@@ -42,6 +42,5 @@ fig.supxlabel("Normalized layer index")
 paper.add_legend_rows(axes[0, 0], [("nGPT", [handles["nGPT 0.5B"], handles["nGPT 1B"]], ["0.5B", "1B"]),
                                    ("GPT", [handles["GPT 0.5B"], handles["GPT 1B"]], ["0.5B", "1B"])])
 
-# square panels
-finalize_figure(fig, axes, height="M", min_width=0.45)
+finalize_figure(fig, axes, min_width=0.45)
 fig.savefig("../out/condition-numbers.pdf")

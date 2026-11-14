@@ -37,10 +37,9 @@ for ax, (task, series) in zip(axes.flat, tasks.items()):
     ax.grid(True)
 for row in axes:
     row[0].set_ylabel("Value")
-fig.supxlabel("Training tokens in billions")
+fig.supxlabel("Training tokens (B)")
 paper.add_legend_rows(axes[0, 0], [("nGPT", [handles["nGPT 0.5B"], handles["nGPT 1B"]], ["0.5B", "1B"]),
                                    ("GPT", [handles["GPT 0.5B"], handles["GPT 1B"]], ["0.5B", "1B"])])
 
-# original figure height / width 0.73 (4.00 in printed); M keeps it (3.86 in)
-finalize_figure(fig, axes, height="M", min_width=0.45)
+finalize_figure(fig, axes, min_width=0.45)
 fig.savefig("../out/downstream-tasks.pdf")

@@ -7,10 +7,10 @@ import numpy as np
 from matplotlib import rcParams
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.legend import Legend
-from matplotlib.lines import AxLine
+from matplotlib.lines import AxLine, Line2D
 from matplotlib.transforms import Bbox
 from matplotlib.text import Annotation
-from matplotlib.ticker import AutoLocator, FixedLocator, FuncFormatter, LogFormatterSciNotation, MultipleLocator, NullFormatter, ScalarFormatter
+from matplotlib.ticker import AutoLocator, FixedLocator, Formatter, FuncFormatter, LogFormatterSciNotation, MultipleLocator, NullFormatter, ScalarFormatter
 
 from . import design, checks
 
@@ -458,7 +458,7 @@ def _line_count(text):
     return text.get_text().count("\n") + 1 if text.get_text() else 0
 
 
-def _place_on_standard_box(fig, panels, aspect, by_step=True):
+def _place_on_standard_box(fig, panels, aspect, panel_height=None):
     """Panels sit at the standard margins and take the standard size, so the boxes of all figures at
     one width (and one number of columns) line up and match. The right margin is fixed; left labels
     that need more room widen the left margin and narrow the panels, which keep the standard height
@@ -503,7 +503,6 @@ def _place_on_standard_box(fig, panels, aspect, by_step=True):
     # the right margin never moves, so every figure's right edge lines up; a left label that needs
     # more room takes it from the panels' width, never their height, so one width keeps one height
     # a colorbar's labels take the standard margin, or what they need when wider ("0.945"), so the canvas pad stays clear
-    plain_right = right  # the right margin without a colorbar: the panel height is a share of that width
     last_cbar = cbar if vertical else beside.get(len(columns) - 1)
     if last_cbar is not None:
         right = pad + max(side, _y_decoration_width([last_cbar], "right")) + cb_w + cb_gap
@@ -561,11 +560,8 @@ def _place_on_standard_box(fig, panels, aspect, by_step=True):
         cb_bottom, cb_h = min(c.get_position().y0 for c in cbars) * h, design.colorbar_width
         bottom = cb_bottom + cb_h + design.colorbar_gap + below[-1]
     n = len(columns)
-    # a colorbar beside the panels takes their width, never their height: the height is the share of the width
-    # the panels would have without it, so a figure with a colorbar is as tall as the same figure without
-    beside_room = sum(cb_gap + cb_w + _y_decoration_width([beside[c]], "right") for c in beside if c < n - 1)
-    # (only for a height step: a shape the data fixes, such as square heatmap cells, follows the panel's own width)
-    panel_h = aspect * ((w - std_left - plain_right - sum(col_gaps) + beside_room) if by_step else (w - std_left - std_right - sum(col_gaps))) / n
+    # a height step is inches at any width; a shape (SQ, square heatmap cells) follows the panel's own width
+    panel_h = panel_height or aspect * (w - std_left - std_right - sum(col_gaps)) / n
     row_gaps = [g + design.panel_gap * panel_h for g in row_gaps]
     col_x, col_w = {}, {}
     x, width = left, (w - right - left - sum(col_gaps)) / n
@@ -699,24 +695,30 @@ def _ticks_by_length(fig, panels, aspect):
                     axis.set_major_locator(MultipleLocator(_step_for(axis, length)))
 
 
-def _tick_text(axis):
+class _TickText(Formatter):
     """Tick numbers as plain numbers (0, 0.5, 1) with a true minus sign; from 1000 up with an SI suffix,
     one unit for the whole axis, when that writes the ticks shorter (0.5K, 1K, 1.5K, 2K; but 200 ... 1000
-    and 1024 stay)."""
+    and 1024 stay). The axis's ticks come from `set_locs`, once per axis update: asking the axis for
+    them on every tick made this the slowest step of `finalize_figure`."""
+    ticks = []
+
+    @staticmethod
     def plain(v):
         return f"{v:.10g}".replace("-", "\u2212")
 
-    def text(v, _):
-        ticks = list(axis.get_majorticklocs())
+    def set_locs(self, locs):
+        self.ticks = list(locs)
+
+    def __call__(self, v, pos=None):
+        ticks = self.ticks
         top = max((abs(t) for t in ticks), default=0)
         for scale, suffix in ((1e9, "B"), (1e6, "M"), (1e3, "K")):
             if top >= scale:
-                short = lambda t: "0" if t == 0 else plain(t / scale) + suffix
-                if sum(map(len, map(short, ticks))) < sum(map(len, map(plain, ticks))):
+                short = lambda t: "0" if t == 0 else self.plain(t / scale) + suffix
+                if sum(map(len, map(short, ticks))) < sum(map(len, map(self.plain, ticks))):
                     return short(v)
                 break
-        return plain(v)
-    return text
+        return self.plain(v)
 
 
 def _log_tick_text(v, _):
@@ -730,12 +732,12 @@ def _log_tick_text(v, _):
 
 
 def _write_plain_tick_numbers(fig):
-    """Write matplotlib's default numeric ticks short and plain (`_tick_text`, `_log_tick_text`); a log
+    """Write matplotlib's default numeric ticks short and plain (`_TickText`, `_log_tick_text`); a log
     axis's minor ticks stay unlabelled."""
     for a in fig.axes:
         for axis in (a.xaxis, a.yaxis):
             if type(axis.get_major_formatter()) is ScalarFormatter:
-                axis.set_major_formatter(FuncFormatter(_tick_text(axis)))
+                axis.set_major_formatter(_TickText())
             elif type(axis.get_major_formatter()) is LogFormatterSciNotation:
                 axis.set_major_formatter(FuncFormatter(_log_tick_text))
                 axis.set_minor_formatter(NullFormatter())
@@ -830,9 +832,19 @@ def _markers_on_top(fig):
                 line.set_zorder(max(line.get_zorder(), 2.5))
 
 
+
+
+def _edge_highlight_markers(fig):
+    """Every highlight-size marker, in the legend too, gets a thin dark edge: its lightest shades stand apart from the paper."""
+    for line in fig.findobj(Line2D):
+        if np.isclose(line.get_markersize(), design.highlight_markersize):
+            line.set_markeredgecolor(design.highlight_markeredgecolor)
+            line.set_markeredgewidth(design.filled_markeredgewidth)
+
+
 def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _aspect=None):
-    """Change only the figure height so every panel is `height` times as tall as wide: a step of DESIGN.md Panel
-    height, "3XS" to "XL", M square. Where the data fixes the shape (`_shape_of_data`: heatmap cells, a y = x
+    """Change only the figure height so every panel is `height` tall: a step of DESIGN.md Panel height, "XS" to
+    "XL" in inches at any width, or "SQ" as tall as wide. Where the data fixes the shape (`_shape_of_data`: heatmap cells, a y = x
     diagonal, an embedding), that shape instead.
     Numeric ticks follow the panel's size, one about every tick spacing.
 
@@ -876,6 +888,7 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
     _write_plain_tick_numbers(fig)
     _size_text_tick_labels(fig)
     _markers_on_top(fig)
+    _edge_highlight_markers(fig)
     _start_at_zero(panels)
     if isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         _set_canvas_pad(fig)
@@ -884,6 +897,7 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
     if any(checks._is_round_panel(a) for a in panels):
         _trim_round_panel_height(fig, panels)
         _pad_outside_legends(fig)
+        _unframe_outside_legends(fig)
         checks.run_checks(fig, panels, min_width)
         return _measure_panels(fig, panels)[0]
     for a in panels:
@@ -893,8 +907,10 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
                 "its ratio; use aspect='auto' (e.g. imshow(..., aspect='auto')).")
     if not isinstance(fig.get_layout_engine(), ConstrainedLayoutEngine):
         warnings.warn("finalize_figure expects layout='constrained'; ratios may be off.")
-    fixed = _aspect or _shape_of_data(panels)
-    aspect = fixed or design.panel_ratios[height]
+    fixed = _aspect or _shape_of_data(panels) or (1.0 if height == "SQ" else None)
+    panel_height = None if fixed else design.panel_heights[height]
+    fig.canvas.draw()
+    aspect = fixed or panel_height / _panel_size(panels[0])[0]
     _margins_by_length(fig, panels, aspect)
     _ticks_by_length(fig, panels, aspect)
 
@@ -915,7 +931,7 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
         warnings.warn("panels have different widths, so not all can match the aspect; "
                       f"panel ratios: {[round(r, 3) for r in ratios]}")
     _blank_touching_corner_label(fig, panels)
-    placed = _place_on_standard_box(fig, panels, aspect, by_step=not fixed)
+    placed = _place_on_standard_box(fig, panels, aspect, panel_height)
     if placed:
         # ticks frozen while the height was searched fit a smaller panel: lay them out again at the final size,
         # then fix them, since growing limits for labels must not add ticks the layout has no room for
@@ -924,7 +940,7 @@ def finalize_figure(fig, ax, height="S", min_width=0.9, iters=10, tol=0.005, _as
         _freeze_ticks(panels)
         _turn_crowded_bar_labels(fig, panels)  # the panels may now be narrower than when bar values were first checked
         if _recheck_legends(fig, panels):
-            _place_on_standard_box(fig, panels, aspect, by_step=not fixed)
+            _place_on_standard_box(fig, panels, aspect, panel_height)
         _keep_value_labels_inside(fig, panels)
         ratios = _measure_panels(fig, panels)[0]
     _colorbars_span_panels(fig)

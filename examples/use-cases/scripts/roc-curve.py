@@ -5,7 +5,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
@@ -31,7 +30,7 @@ styles = {
     "OpenAI": dict(color=colors["neutral"], linestyle="--", linewidth=paper.dashed_linewidth),
     "GPTZero": dict(color=colors["neutral"], linestyle=":", linewidth=paper.dashed_linewidth),
 }
-ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+ax.axline((0, 0), (1, 1), color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
 for name in ["OpenAI", "GPTZero", "Ours: W/o P", "Ours: W/ P"]:
     fpr, tpr = curves[name]
     ax.plot(fpr, tpr, label=f"{name} (AUC {auc[name]:#.3g})", **styles[name])

@@ -17,6 +17,7 @@ colors = paper.colors
 data = json.load(open("../data/fig5.json"))
 tasks = ["GP-L", "V-IRL-L"]  # (a) language-only
 splits = ["In-distribution", "Out-of-distribution"]
+unit = " (%)"
 panels = {(p["split"], p["task"]): p for p in data["panels"]}
 
 # takeaway: at the end of training RL is above SFT out of distribution on every task
@@ -49,7 +50,7 @@ for r, split in enumerate(splits):
         if r == 0:
             ax.set_title(task)
     # the caption names the quantity; the row headers name the split
-    axes[r, 0].annotate(split, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0),
+    axes[r, 0].annotate(split + unit, xy=(0, 0.5), xycoords=axes[r, 0].yaxis.label, xytext=(-4, 0),
                         textcoords="offset points", ha="right", va="center", rotation=90,
                         fontsize=rcParams["axes.titlesize"])
 fig.supxlabel("Training computation (GFLOPs)")
@@ -58,8 +59,9 @@ fig.supxlabel("Training computation (GFLOPs)")
 handles = [Line2D([], [], color=color, linestyle=style, marker=marker,
                   linewidth=rcParams["lines.linewidth"] if style == "-" else paper.dashed_linewidth)
            for _, _, color, style, marker in series[::-1]]
-fig.legend(handles, [name for _, name, *_ in series[::-1]], loc="outside upper center", ncol=3, borderaxespad=0)
+# inside: V-IRL-L in-distribution is empty below its curves
+axes[0, 1].legend(handles, [name for _, name, *_ in series[::-1]], loc="lower right")
 
-# (a) of Figure 5, split from the 2 x 4 original (ratio 0.541) so each half carries one takeaway; square panels
-finalize_figure(fig, axes, height="M", min_width=0.7)
+# (a) of Figure 5, split from the 2 x 4 original so each half carries one takeaway
+finalize_figure(fig, axes, min_width=0.7)
 fig.savefig("../out/fig5a.pdf")

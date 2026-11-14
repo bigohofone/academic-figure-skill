@@ -30,11 +30,10 @@ for name, style in styles.items():
 
 ax.set_title("4k context: OpenWebText")
 ax.set_xticks(range(0, 201, 50))  # the automatic step of 25 crowds the labels at this width
-ax.set_xlabel("Iterations in thousands")
-ax.set_ylabel("Loss")  # "Validation loss" is taller than the XS panel; the caption says validation
+ax.set_xlabel("Iterations (K)")
+ax.set_ylabel("Validation loss")
 ax.grid(True)
 ax.legend()
 
-# original figure height / width 0.80 (1.50 in printed); XS keeps the printed height (1.53 in)
-finalize_figure(fig, ax, height="2XS")
+finalize_figure(fig, ax)
 fig.savefig("../out/validation-loss.pdf")

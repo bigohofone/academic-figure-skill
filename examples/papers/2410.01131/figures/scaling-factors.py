@@ -51,6 +51,5 @@ for row in axes:
 axes[1, 2].set_ylabel("Density")
 paper.add_legend_rows(axes[0, 0], [("nGPT", handles, ["0.5B", "1B"])])
 
-# square panels
-finalize_figure(fig, axes, height="M")
+finalize_figure(fig, axes)
 fig.savefig("../out/scaling-factors.pdf")

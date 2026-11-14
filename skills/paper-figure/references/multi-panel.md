@@ -9,9 +9,9 @@ How panels share a figure: grid, shared axes, axis labels, second y axis, panel 
    - Tick numbers only on left column and bottom row (step 5 does not apply); panels may be as narrow as 0.7 in. Still narrower: factor with fewer levels on columns; never reflow.
    - No value marks or emphasis singling out one panel; compared numbers in caption.
    ```python
-   finalize_figure(fig, axes, height="M", min_width=0.7)
+   finalize_figure(fig, axes, height="SQ", min_width=0.7)
    ```
-   - Small multiples (one chart repeated per setting, e.g. one panel per environment or dataset, same series in each): as a two-factor grid: height M (DESIGN.md Panel height) and `min_width=0.45` (read as a set, by shape), but each panel keeps its own tick numbers when its range differs. Grid: steps 1–4.
+   - Small multiples (one chart repeated per setting, e.g. one panel per environment or dataset, same series in each): as a two-factor grid: height SQ (DESIGN.md Panel height) and `min_width=0.45` (read as a set, by shape), but each panel keeps its own tick numbers when its range differs. Grid: steps 1–4.
 1. Start: all panels in one row.
 2. Render: `finalize_figure` warns when a panel's data area < `min_width` (0.9 in), or text is cut off or overlaps.
 3. On warning, first free room within row: share y when panels plot same quantity (step 5); Typography text tick rule; shorten labels. Panel still too narrow: add a row, columns = ⌈panels / rows⌉ (4 panels: 1 × 4 → 2 × 2; 5 panels: 2 × 3; 10 panels: 2 × 5 → 3 × 4); render again. No row limit.
@@ -20,7 +20,7 @@ How panels share a figure: grid, shared axes, axis labels, second y axis, panel 
    ```python
    fig, axes = plt.subplots(..., sharex=True, sharey=True)
    ```
-6. Axis labels: each quantity named once, in one or two words when panels are narrow (Accuracy, Loss; detail in the caption).
+6. Axis labels: each quantity named once, in one or two words when panels are narrow (Accuracy, Loss; detail in the caption), always with its unit (DESIGN.md Typography).
    - Side by side, same x quantity: one `fig.supxlabel` under row; none on panels.
    - Stacked, same y quantity: y label on leftmost panel of each row only (or `fig.supylabel` once down column).
    - Side by side, same y quantity, shared or not: y label on leftmost panel only.

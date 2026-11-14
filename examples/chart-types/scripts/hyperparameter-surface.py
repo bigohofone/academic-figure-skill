@@ -54,8 +54,7 @@ labels = ax.clabel(lines, levels=levels[::2], fmt="%.2g", manual=positions[::2])
 for label in labels:
     label.set_color(colors["paper"] if np.dot(to_rgb(mesh.cmap(mesh.norm(float(label.get_text())))), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
 
-ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markeredgecolor=colors["ours"],
-        markersize=paper.highlight_markersize, linestyle="none")
+ax.plot(learning_rate[j], weight_decay[i], "*", color=colors["ours"], markersize=paper.highlight_markersize, linestyle="none")
 
 
 def log_tick(v, _):
@@ -71,7 +70,7 @@ ax.set_ylabel("Weight decay")
 ax.grid(False)
 fig.colorbar(mesh, ax=ax, label="Validation loss", ticks=levels)
 
-finalize_figure(fig, ax, height="M")
+finalize_figure(fig, ax, height="SQ")
 fig.savefig("../outputs/hyperparameter-surface.pdf")
 fig.savefig("../outputs/hyperparameter-surface.png")
 fig.savefig("../outputs/hyperparameter-surface.svg")

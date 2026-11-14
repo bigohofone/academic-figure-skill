@@ -37,10 +37,9 @@ for ax, (context, series) in zip(axes, runs.items()):
     ax.set_title(f"{context}: OpenWebText")
     ax.grid(True)
 axes[0].set_ylabel("Validation loss")
-fig.supxlabel("Training tokens in billions")
+fig.supxlabel("Training tokens (B)")
 paper.add_legend_rows(axes[0], [("nGPT", [handles["nGPT 0.5B"], handles["nGPT 1B"]], ["0.5B", "1B"]),
                                 ("GPT", [handles["GPT 0.5B"], handles["GPT 1B"]], ["0.5B", "1B"])])
 
-# original figure height / width 0.33 (1.83 in printed); XS comes closest (1.66 in)
-finalize_figure(fig, axes, height="M")
+finalize_figure(fig, axes)
 fig.savefig("../out/final-loss.pdf")

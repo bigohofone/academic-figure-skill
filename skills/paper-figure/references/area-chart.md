@@ -4,7 +4,7 @@ Shares of a whole along continuous x: data mixture over training, each domain's 
 
 ## Draw
 
-- Areas: height M, square (thin bands need the height), fills at `alpha=0.875` so gridlines show through. Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
+- Areas: height SQ (thin bands need the height), fills at `alpha=0.875` so gridlines show through. Bottom: part whose share changes least over x (smallest std), giving others a flat base; rest above in data order. Each band own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole), bottom up.
 
   ```python
   ax.stackplot(x, ys, colors=series_colors, labels=names, alpha=0.875, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"])

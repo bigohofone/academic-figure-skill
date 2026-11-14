@@ -16,8 +16,13 @@
    "caption": "Distribution of topological similarity between generated correct"
   },
   {
-   "script": "mid-rl-split.py",
-   "target": "figures/cpt_rl_compare_mid_rl_split.pdf",
+   "script": "mid-rl-split-a.py",
+   "target": "figures/mid-rl-split-a.pdf",
+   "caption": "Different lines indicate the compute allocation strategies"
+  },
+  {
+   "script": "mid-rl-split-b.py",
+   "target": "figures/mid-rl-split-b.pdf",
    "caption": "Different lines indicate the compute allocation strategies"
   },
   {
@@ -46,6 +51,11 @@
    "file": "sec/6_hacking.tex",
    "from": "\\includegraphics[width=0.8\\linewidth]{figures/op_group_breakdown.pdf}",
    "to": "\\includegraphics[width=\\linewidth]{figures/op_group_breakdown.pdf}"
+  },
+  {
+   "file": "sec/5_mid_training.tex",
+   "from": "\\includegraphics[width=0.99\\linewidth]{figures/cpt_rl_compare_mid_rl_split.pdf}",
+   "to": "\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/mid-rl-split-a.pdf}\\\\(a) OOD-edge (op=11-14)\\end{minipage}\\hfill\\begin{minipage}[t]{0.49\\linewidth}\\centering\\includegraphics[width=\\linewidth]{figures/mid-rl-split-b.pdf}\\\\(b) OOD-hard (op=15-20)\\end{minipage}"
   }
  ]
 }

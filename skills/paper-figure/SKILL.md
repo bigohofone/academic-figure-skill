@@ -64,7 +64,7 @@ Before any code, think it through like a person would, and write the answers as 
 2. **What should the reader take away?** One sentence with a number from the data. It becomes the caption's last sentence.
 3. **What does that sentence point at?** Its subject is the emphasis: ours, a gap, a point, a change along x.
 4. **Which chart shows it?** From DESIGN.md's chart type table: compare, trend, distribution, parts of a whole, a point.
-5. **How does the emphasis stand out in that chart?** Color by DESIGN.md Colors; panel height as a share of its width, 3XS to XL (M square), by DESIGN.md Panel height, unless the chart fixes its shape.
+5. **How does the emphasis stand out in that chart?** Color by DESIGN.md Colors; panel height in inches, XS to XL, or SQ for square, by DESIGN.md Panel height, unless the chart fixes its shape.
 6. **What must the reader tell apart?** Every variable the marks differ by (method, split, compute, seed), each with its own channel: hue, lightness, line style, marker, or panel. One variable per channel, by DESIGN.md Colors (One channel per variable). Write it as a table: variable → channel. Every value of every variable named in the legend or on the plot.
 
 **One figure, one takeaway.** More than one: one script each.

@@ -44,6 +44,5 @@ fig.supylabel("Percentage (%)")
 
 axes[0, 0].legend(axes[0, 0].containers[0], mixtures)
 
-# original height / width 259.2 / 691.2 = 0.38, 1.89 in printed; 2XS gives the closest height
 finalize_figure(fig, axes, height="XS", min_width=0.7)
 fig.savefig("../out/error-types.pdf")

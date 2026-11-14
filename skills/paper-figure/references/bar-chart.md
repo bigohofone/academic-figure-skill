@@ -39,7 +39,7 @@ Reported results across categories, one value each: methods, ablations or settin
   ax.bar(edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
          width=np.diff(edges), align="edge", color=shift_lightness(paper.series_colors[1], 2),
          edgecolor=shift_lightness(paper.series_colors[1], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
-  ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+  ax.axline((0, 0), (1, 1), color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
   ```
 
 ## Labels

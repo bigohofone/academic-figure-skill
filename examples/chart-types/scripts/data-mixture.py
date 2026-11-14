@@ -81,7 +81,7 @@ across = [i for c in range(ncol) for i in range(c, len(labels), ncol)]  # reads 
 ax.legend([handles[i] for i in across], [labels[i] for i in across], loc="lower center", bbox_to_anchor=(0.5, 1),
           borderaxespad=0.5, ncol=ncol)
 
-finalize_figure(fig, ax, height="M")
+finalize_figure(fig, ax, height="SQ")
 fig.savefig("../outputs/data-mixture.pdf")
 fig.savefig("../outputs/data-mixture.png")
 fig.savefig("../outputs/data-mixture.svg")

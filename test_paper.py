@@ -38,7 +38,7 @@ def test_single_line():
     ax.set_ylabel("y")
     finalize_figure(fig, ax)
     assert fig.get_figwidth() == WIDTH
-    assert paper.layout._panel_size(ax)[1] == pytest.approx(paper.panel_ratios["S"] * paper.layout._panel_size(ax)[0], rel=0.01)
+    assert paper.layout._panel_size(ax)[1] == pytest.approx(paper.panel_heights["S"], rel=0.01)
 
 
 def test_two_panels_shared_legend():
@@ -111,7 +111,7 @@ def test_ticks_that_change_with_height_converge():
     ax.set_ylim(78, 95)
     finalize_figure(fig, ax)
     assert fig.get_figwidth() == 3.0
-    assert paper.layout._panel_size(ax)[1] == pytest.approx(paper.panel_ratios["S"] * paper.layout._panel_size(ax)[0], rel=0.01)
+    assert paper.layout._panel_size(ax)[1] == pytest.approx(paper.panel_heights["S"], rel=0.01)
     assert ax.get_ylim() == (78, 95)
 
 
@@ -242,7 +242,7 @@ def test_fit_height_allows_legend_over_a_bar_corner():
     ax.legend(loc="upper right")
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        finalize_figure(fig, ax)
+        finalize_figure(fig, ax, height="M")
     assert not [w for w in caught if "legend" in str(w.message)]
 
 
@@ -705,7 +705,7 @@ def test_heatmap_values_shrink_to_fit_their_cells():
     assert len(sizes) == 1 and sizes.pop() < matplotlib.rcParams["font.size"]
 
 
-@pytest.mark.parametrize("width, rows, columns, height", [(3.25, 1, 1, "S"), (6.75, 1, 4, "M"), (6.75, 2, 3, "M"), (3.25, 3, 1, "XS"), (6.75, 1, 1, "3XS"), (3.25, 1, 1, "XL")])
+@pytest.mark.parametrize("width, rows, columns, height", [(3.25, 1, 1, "S"), (6.75, 1, 1, "S"), (6.75, 1, 4, "M"), (6.75, 2, 3, "M"), (3.25, 3, 1, "XS"), (6.75, 1, 1, "XS"), (3.25, 1, 1, "XL")])
 def test_every_row_takes_its_height_step(width, rows, columns, height):
     fig, axes = plt.subplots(rows, columns, figsize=(width, width), layout="constrained", squeeze=False)
     for a in axes.flat:
@@ -713,7 +713,7 @@ def test_every_row_takes_its_height_step(width, rows, columns, height):
     finalize_figure(fig, axes, height=height)
     for a in axes.flat:
         w, h = paper.layout._panel_size(a)
-        assert h == pytest.approx(paper.panel_ratios[height] * w, rel=0.01)
+        assert h == pytest.approx(paper.panel_heights[height], rel=0.01)
 
 
 def test_taller_panels_get_more_numeric_ticks():
@@ -776,11 +776,11 @@ def test_gaps_are_a_share_of_the_panel_size():
         assert row_gaps[height] >= paper.panel_gap * p[0][0].height * h - 1e-6
     assert row_gaps["M"] > row_gaps["XS"]
 
-def test_m_makes_panels_as_tall_as_wide():
+def test_sq_makes_panels_as_tall_as_wide():
     fig, axes = plt.subplots(2, 4, figsize=(6.75, 6.75), layout="constrained")
     for a in axes.flat:
         a.plot([0, 1], [0, 2])
-    finalize_figure(fig, axes, height="M")
+    finalize_figure(fig, axes, height="SQ")
     w, h = paper.layout._panel_size(axes[0, 0])
     assert h == pytest.approx(w, rel=0.01)
 

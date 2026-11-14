@@ -57,7 +57,7 @@ def row(n, height, width=DOUBLE):
     return fig
 
 
-def grid(rows, cols, width, height="M"):
+def grid(rows, cols, width, height="SQ"):
     fig, axes = plt.subplots(rows, cols, figsize=(width, width), layout="constrained", sharex=True, sharey=True, squeeze=False)
     for (r, c), ax in np.ndenumerate(axes):
         curves(ax, gap=0.02 * (r + c + 1))
@@ -110,7 +110,7 @@ def grouped_bars():
     ax.set_xticks(x, labels=benchmarks)
     ax.set_ylabel("Accuracy")
     ax.legend()
-    finalize_figure(fig, ax, height="M")
+    finalize_figure(fig, ax, height="SQ")
     return fig
 
 
@@ -177,7 +177,7 @@ def stacked_area():
     ax.set_ylabel("Share")
     ax.set_ylim(0, 1)
     fig.legend(loc="outside upper center", ncol=3)
-    finalize_figure(fig, ax, height="M")
+    finalize_figure(fig, ax, height="SQ")
     return fig
 
 
@@ -206,14 +206,14 @@ CASES = {
     "One panel, M": lambda: one_panel("M"),
     "One panel, L": lambda: one_panel("L"),
     "One panel, XL": lambda: one_panel("XL"),
-    "One panel, full width, 2XS": lambda: one_panel("2XS", DOUBLE),
-    "One panel, full width, 3XS": lambda: one_panel("3XS", DOUBLE),
+    "One panel, SQ": lambda: one_panel("SQ"),
+    "One panel, full width, XS": lambda: one_panel("XS", DOUBLE),
     "Row of 2": lambda: row(2, "S"),
-    "Row of 2, single column, M": lambda: row(2, "M", SINGLE),
+    "Row of 2, single column, SQ": lambda: row(2, "SQ", SINGLE),
     "Row of 3": lambda: row(3, "S"),
-    "Row of 4, M": lambda: row(4, "M"),
-    "Row of 5, M": lambda: row(5, "M"),
-    "Row of 6, M": lambda: row(6, "M"),
+    "Row of 4, SQ": lambda: row(4, "SQ"),
+    "Row of 5, SQ": lambda: row(5, "SQ"),
+    "Row of 6, SQ": lambda: row(6, "SQ"),
     "Grid 2 × 1, single column, S": lambda: grid(2, 1, SINGLE, "S"),
     "Grid 2 × 2, single column": lambda: grid(2, 2, SINGLE),
     "Grid 3 × 2, single column": lambda: grid(3, 2, SINGLE),
@@ -225,13 +225,13 @@ CASES = {
     "Grid 2 × 4, full width, S": lambda: grid(2, 4, DOUBLE, "S"),
     "Stacked 3 × 1": stacked,
     "Second y axis": twin_axis,
-    "Grouped bars, M": grouped_bars,
+    "Grouped bars, SQ": grouped_bars,
     "Horizontal bars, L": horizontal_bars,
     "Heatmap, square cells": heatmap,
     "Heatmap 6 × 8, colorbar": lambda: heatmap_colorbar(6, 8),
     "Heatmap 8 × 4, colorbar": lambda: heatmap_colorbar(8, 4),
     "Embedding, square": square_scatter,
-    "Stacked area, M": stacked_area,
+    "Stacked area, SQ": stacked_area,
     "Log axes": log_axis,
     "Pie": pie,
 }
@@ -247,7 +247,7 @@ def describe(fig, panels):
     rows = len({round(p.get_position().y0, 3) for p in panels})
     cols = len({round(p.get_position().x0, 3) for p in panels})
     w, h = paper.layout._panel_size(a)
-    step = [s for s, r in paper.panel_ratios.items() if abs(r * w - h) < 0.01]
+    step = [s for s, v in paper.panel_heights.items() if abs(v - h) < 0.01]
     if any(isinstance(p, Wedge) for p in a.patches):
         height = "round"
     else:
@@ -280,7 +280,7 @@ def describe(fig, panels):
 
 def caption(d):
     """The figure's types written as the rest of a paper caption: "Single column, 1 × 2 panels, height M. ..."."""
-    height = f"panel height {d['Height']}" if d["Height"] in paper.panel_ratios else f"{d['Height']} panels"
+    height = f"panel height {d['Height']}" if d["Height"] in paper.panel_heights else f"{d['Height']} panels"
     first = f"{'Single column' if d['Column'] == 'single' else 'Full width'}, {d['Grid']} panels, {height}."
     rest = [f"{d['Chart']} chart" if d["Chart"] != "—" else "", d["Axes"] if d["Axes"] != "—" else "",
             d["Labels"] if d["Labels"] != "—" else "", "no legend" if d["Legend"] == "none" else f"legend {d['Legend']}"]

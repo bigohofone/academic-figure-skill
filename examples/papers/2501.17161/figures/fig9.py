@@ -14,6 +14,10 @@ from paper import finalize_figure, make_shades
 colors = paper.colors
 
 runs = json.load(open("../data/fig9.json"))["runs"]
+# the original plots fractions (0 to 0.3) under a "(%)" label: written here as the percentages the label names
+for run in runs.values():
+    for key in ("raw", "smoothed", "error_low", "error_high"):
+        run[key] = [100 * v for v in run[key]]
 rates = ["5e-7", "1e-6", "2e-6"]  # the learning rate sweep, smallest first
 
 # takeaway: every learning rate ends at zero success
@@ -29,7 +33,7 @@ for rate, color, marker in zip(rates, shades, ["o", "s", "^"]):
     gflops = np.array(run["gflops"])
     ax.fill_between(gflops, run["error_low"], run["error_high"], color=color, alpha=0.2, linewidth=0)
     ax.plot(gflops, run["raw"], marker, color=color, label=rate)
-    # a success rate is never below 0; the original smoothing dips under it (to −0.024), so it is clipped there
+    # a success rate is never below 0; the original smoothing dips under it (to −2.4%), so it is clipped there
     ax.plot(gflops, np.clip(run["smoothed"], 0, None), color=color, label=rate)
 ax.set_xlabel("Computation (GFLOPs)")
 ax.set_ylabel("Success rate (%)")
@@ -37,6 +41,5 @@ ax.grid(True)
 ax.legend([Line2D([], [], color=color, marker=marker) for color, marker in zip(shades, ["o", "s", "^"])],
           [rate.replace("-", "−") for rate in rates])
 
-# XS, as Figure 10 beside it
-finalize_figure(fig, ax, height="XS")
+finalize_figure(fig, ax)
 fig.savefig("../out/fig9.pdf")

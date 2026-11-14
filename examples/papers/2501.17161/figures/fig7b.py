@@ -44,9 +44,9 @@ for key, name, color, style, marker in series:
     ax.plot(gflops, s["smoothed"], color=color, linestyle=style, linewidth=width)
 ax.grid(True)
 for a in (ax, ax_bar):
-    a.axhline(sota, color=colors["ink"], linewidth=rcParams["grid.linewidth"], zorder=1)  # a reference line, apart from every series
+    a.axhline(sota, color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
 ax.set_title("Training")
-ax.set_xlabel("GFLOPs")
+ax.set_xlabel("Compute (GFLOPs)")
 ax.set_ylabel("V-OOD success (%)")
 
 for i, m in enumerate(methods):
@@ -62,9 +62,9 @@ ax_bar.set_title("Final")
 handles = [Line2D([], [], color=color, linestyle=style, marker=marker,
                   linewidth=rcParams["lines.linewidth"] if style == "-" else paper.dashed_linewidth)
            for _, _, color, style, marker in series[::-1]]
-handles.append(Line2D([], [], color=colors["ink"], linewidth=rcParams["grid.linewidth"]))
-ax.legend(handles, [name for _, name, *_ in series[::-1]] + [f"Previous SOTA ({sota:.1f}%)"])  # a reference line with its own value names it
+ax.legend(handles, [name for _, name, *_ in series[::-1]])
+# a reference line is named on the line itself, with its value: above the short SFT and Init bars, where nothing is
+ax_bar.text(0.02, sota, f"Prev. SOTA\n{sota:.1f}%", transform=ax_bar.get_yaxis_transform(), va="bottom", color=shift_lightness(colors["reference"], -1))
 
-# original ratio 0.348 (height / width of the whole figure); M panels keep the page layout
-finalize_figure(fig, [ax, ax_bar], height="M")
+finalize_figure(fig, [ax, ax_bar])
 fig.savefig("../out/fig7b.pdf")

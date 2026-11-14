@@ -38,6 +38,5 @@ for ax, panel in zip(axes, data["panels"]):
 axes[0].set_ylabel("pass@k (%)")
 axes[0].legend()
 
-# original height / width 185.6 / 851.3 = 0.22, 1.37 in printed; XS gives the closest height
-finalize_figure(fig, axes, height="S")
+finalize_figure(fig, axes, height="XS")
 fig.savefig("../out/reward-mixes.pdf")

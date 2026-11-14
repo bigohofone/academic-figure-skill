@@ -4,11 +4,11 @@ Composition of one whole with 2–6 parts, when composition is the message: data
 
 ## Draw
 
-- Donut: each part own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole). Clockwise from 3 o'clock, largest first (small parts end at right, outside labels stack vertically). Parts < 3%: joined into one "Other", drawn last.
+- Donut: each part own color, `paper.make_part_colors(n)` (DESIGN.md Colors, parts of one whole): the legend is read by color. Clockwise from 12 o'clock, largest first. Parts < 3%: joined into one "Other", drawn last.
 
   ```python
   part_colors = paper.make_part_colors(n)
-  wedges, _ = ax.pie(shares, colors=part_colors, startangle=0, counterclock=False,
+  wedges, _ = ax.pie(shares, colors=part_colors, startangle=90, counterclock=False,
                      wedgeprops=dict(width=0.4, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]))
   ```
 
@@ -16,29 +16,14 @@ Composition of one whole with 2–6 parts, when composition is the message: data
 
 ## Variants
 
-- Two wholes (train and test splits): two donuts side by side, titled.
+- Two wholes (train and test splits): two donuts side by side, titled, one legend for both.
 
 ## Labels
 
-- Names: outside, next to wedges; no legend.
+- Names and shares: in a legend right of the donut, one entry per part in wedge order, `f"{name} {share_text}"` (`share_text` per DESIGN.md value table, a share); nothing written on or beside the wedges, so small parts read like large ones. Right of a round panel is free (overrides DESIGN.md Layout, right of panels).
 
   ```python
-  for w, name in zip(wedges, names):
-      mid = np.deg2rad((w.theta1 + w.theta2) / 2)
-      x, y = np.cos(mid), np.sin(mid)
-      ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")
-  ```
-
-- Shares: inside ring at wedge middle (0.8 = middle of width-0.4 ring); `share_text` per DESIGN.md value table (a share).
-
-  ```python
-  ax.text(0.8 * x, 0.8 * y, share_text, ha="center", va="center", color=text_color)  # on the wedge color, DESIGN.md Typography
-  ```
-
-  Placements (for Collisions): inside wedge; then joined to name outside, `f"{name} {share_text}"`, straight leader line from label's side (below); then later of two moved outward (`xytext` at `1.35` instead of `1.12`).
-
-  ```python
-  arrowprops = dict(arrowstyle="-", color=colors["ink"], linewidth=rcParams["grid.linewidth"], relpos=(0, 0.5) if x > 0 else (1, 0.5))
+  fig.legend(wedges, [f"{name} {share_text}" for name, share_text in ...], loc="outside right center")
   ```
 
 - Total: whole's size in center.

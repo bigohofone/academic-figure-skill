@@ -25,6 +25,13 @@ import pymupdf
 
 HERE = Path(__file__).resolve().parent
 SITE = HERE.parents[1] / "docs/papers"
+ASSETS = HERE.parents[1] / "skills/paper-figure/assets"
+
+
+def newest(*paths):
+    """The latest change time among these files and everything under these folders."""
+    files = [f for p in paths for f in ([p] if p.is_file() else p.rglob("*")) if f.is_file() and f.suffix != ".pyc"]
+    return max(f.stat().st_mtime for f in files)
 
 
 def fetch_source(paper_id, src):
@@ -83,9 +90,19 @@ def build(paper_dir):
     src, out, work = paper_dir / "src", paper_dir / "out", paper_dir / "build"
     if not src.exists():
         fetch_source(paper_id, src)
+    pages_json = SITE / paper_id / "pages.json"
+    if pages_json.exists() and pages_json.stat().st_mtime > newest(paper_dir / "paper.json", paper_dir / "figures", paper_dir / "data", ASSETS):
+        return json.loads(pages_json.read_text())
     out.mkdir(exist_ok=True)
-    for figure in spec["figures"]:
-        result = subprocess.run([sys.executable, figure["script"]], cwd=paper_dir / "figures", capture_output=True, text=True)
+    # only figures whose PDF is older than their script, the data or the skill's assets are drawn again
+    inputs = newest(paper_dir / "data", ASSETS)
+    pdf = lambda figure: out / Path(figure["script"]).with_suffix(".pdf")
+    stale = [f for f in spec["figures"] if not pdf(f).exists()
+             or pdf(f).stat().st_mtime < max(inputs, (paper_dir / "figures" / f["script"]).stat().st_mtime)]
+    draw = lambda figure: subprocess.run([sys.executable, figure["script"]], cwd=paper_dir / "figures", capture_output=True, text=True)
+    with ThreadPoolExecutor() as pool:
+        results = list(pool.map(draw, stale))
+    for figure, result in zip(stale, results):
         if result.returncode:
             raise RuntimeError(f"{paper_id}/{figure['script']}:\n{result.stderr[-2000:]}")
     shutil.rmtree(work, ignore_errors=True)
@@ -101,8 +118,8 @@ def build(paper_dir):
         if edit["from"] not in text:
             raise RuntimeError(f"{paper_id}: edit not found in {edit['file']}: {edit['from']!r}")
         tex.write_text(text.replace(edit["from"], edit["to"]))
-    original = compile_paper(work / "original", spec["main"])
-    redrawn = compile_paper(work / "redrawn", spec["main"])
+    with ThreadPoolExecutor() as pool:
+        original, redrawn = pool.map(lambda tree: compile_paper(tree, spec["main"]), [work / "original", work / "redrawn"])
 
     shutil.rmtree(SITE / paper_id, ignore_errors=True)
     pages, seen = [], set()
@@ -147,6 +164,10 @@ def export_hero():
     hero.mkdir(parents=True, exist_ok=True)
     for pdf in (HERE / first / "out").glob("*.pdf"):
         (hero / pdf.with_suffix(".svg").name).write_text(pymupdf.open(pdf)[0].get_svg_image(text_as_path=True))
+    # each image's ?v= is its content hash, so a browser that cached the old drawing loads the new one
+    page = SITE.parent / "index.html"
+    version = lambda m: f'{m.group(1)}?v={hashlib.sha1((page.parent / m.group(1)).read_bytes()).hexdigest()[:10]}"'
+    page.write_text(re.sub(r'(hero/with[a-z]*/[\w.-]+\.svg)(\?v=\w+)?"', version, page.read_text()))
 
 
 if __name__ == "__main__":

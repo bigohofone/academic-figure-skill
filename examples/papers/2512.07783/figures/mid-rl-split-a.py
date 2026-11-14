@@ -14,16 +14,13 @@ colors = paper.colors
 
 data = json.load(open("../data/mid-rl-split.json"))
 strategies = ["Full Mid", "Full RL", "Light RL", "Heavy RL"]
-panels = [(metric, title, values) for metric, by_range in data.items() for title, values in by_range.items()]
+split = "OOD-edge (op=11-14)"  # (a) of Figure 6, split from the 1 x 4 original so each part is one range of tasks
 
-best_edge = {s: max(data["pass@1"]["OOD-edge (op=11-14)"][s]) for s in strategies}
-mean_hard = {m: {s: np.mean(data[m]["OOD-hard (op=15-20)"][s]) for s in strategies} for m in data}
-print("takeaway: best pass@1 on OOD-edge", best_edge)
-print("takeaway: mean OOD-hard", {m: {s: f"{v:#.3g}" for s, v in by_s.items()} for m, by_s in mean_hard.items()})
-assert best_edge["Light RL"] == max(best_edge.values()), "Light RL is not best at pass@1 on OOD-edge"
-assert all(by_s["Heavy RL"] == max(by_s.values()) for by_s in mean_hard.values()), "Heavy RL is not best on OOD-hard"
+best = {s: max(data["pass@1"][split][s]) for s in strategies}
+print("takeaway: best pass@1 on OOD-edge", best)
+assert best["Light RL"] == max(best.values()), "Light RL is not best at pass@1 on OOD-edge"
 
-fig, axes = plt.subplots(1, 4, figsize=(6.24, 6.24), layout="constrained")
+fig, axes = plt.subplots(1, 2, figsize=(3.087, 3.087), layout="constrained")
 
 # the takeaway names Light RL and Heavy RL; the full-budget strategies are grey and dashed
 greys = make_shades(colors["neutral"], 2)
@@ -33,17 +30,16 @@ styles = {
     "Light RL": dict(color=paper.series_colors[0], marker="^"),
     "Heavy RL": dict(color=paper.series_colors[1], marker="D"),
 }
-for ax, (metric, title, values) in zip(axes, panels):
+for ax, metric in zip(axes, data):
+    values = data[metric][split]
     for name in strategies:
         ax.plot(values["op"], values[name], label=name, **styles[name])
     ax.set_xticks(values["op"])
-    ax.set_title(f"{metric}\n{title}")
+    ax.set_title(metric)
     ax.grid(True)
-
 axes[0].set_ylabel("pass@k (%)")
 fig.supxlabel("Task Difficulty")
 axes[0].legend()
 
-# original height / width 172.8 / 748.8 = 0.23, 1.44 in printed; XS gives the closest height
-finalize_figure(fig, axes, height="S")
-fig.savefig("../out/mid-rl-split.pdf")
+finalize_figure(fig, axes, height="XS")
+fig.savefig("../out/mid-rl-split-a.pdf")

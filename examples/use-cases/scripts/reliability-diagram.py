@@ -42,10 +42,10 @@ for col, m in enumerate(models):
     # confidence histogram, with the mean confidence and the accuracy over all samples
     top.bar(hist_edges[:-1], m["fraction_of_samples_per_bin"], width=np.diff(hist_edges), align="edge",
             color=colors["series-1"], linewidth=0)
-    top.axvline(m["accuracy_line"], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1,
+    top.axvline(m["accuracy_line"], color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1,
                 label="Accuracy")
-    top.axvline(m["avg_confidence_line"], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1,
-                linestyle=":", label="Avg. confidence")
+    top.axvline(m["avg_confidence_line"], color=colors["reference"], linestyle=":", linewidth=paper.dashed_linewidth, zorder=1,
+                label="Avg. confidence")
     top.grid(axis="x", visible=False)
 
     # reliability diagram: accuracy per bin, the gap to the bin's mean confidence on top
@@ -56,7 +56,7 @@ for col, m in enumerate(models):
     bottom.bar(rel_edges[:-1], np.abs(confidence - accuracy), bottom=np.minimum(accuracy, confidence),
                width=np.diff(rel_edges), align="edge", color=shift_lightness(paper.series_colors[1], 2),
                edgecolor=shift_lightness(paper.series_colors[1], -1), linewidth=rcParams["grid.linewidth"], label="Gap")
-    bottom.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+    bottom.axline((0, 0), (1, 1), color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
     bottom.set_xlim(0, 1)
     bottom.set_ylim(0, 1)
     bottom.set_xticks([0, 0.5, 1])

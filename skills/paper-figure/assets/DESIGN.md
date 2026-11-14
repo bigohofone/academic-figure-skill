@@ -15,6 +15,7 @@ colors:
   series-9: "#9C755F"  # brown, L* 53
   ours: "{colors.series-3}"
   neutral: "#BAB0AC"  # grey, L* 73
+  reference: "{colors.series-6}"  # reference lines: previous SOTA, baseline score, threshold, diagonal
   ink: "#000000"
   paper: "#FFFFFF"  # the page: marker edges, legend fill
 typography:
@@ -52,17 +53,15 @@ spacing:
   data-margin: 0.125in
 components:
   tick:
-    size: 1.5pt
+    size: 2pt
     minor-size: 1pt
     spacing: 0.25in
   panel:
-    height-3xs: 0.25
-    height-2xs: 0.375
-    height-xs: 0.5
-    height-s: 0.75
-    height-m: 1
-    height-l: 1.25
-    height-xl: 1.5
+    height-xs: 1in
+    height-s: 1.5in
+    height-m: 2in
+    height-l: 2.5in
+    height-xl: 3in
   grid:
     color: "{colors.ink}"
     opacity: 0.1
@@ -73,13 +72,14 @@ components:
     outline: 1
     context: 0.5
   marker:
-    size: 3.5  # × line.width
-    highlight-size: 5  # × line.width: points of interest, and points read on a color scale
+    size: 3  # × line.width
+    highlight-size: 6  # × line.width: points of interest, and points read on a color scale
     edge: "{colors.paper}"
+    highlight-edge: "{colors.ink}"  # dark, so the lightest shades stand apart from the paper
   box:
     color: "{colors.ink}"  # box plot outline, whiskers, caps, median and outliers
   frame:
-    lighter: 0  # panel box and tick marks: `neutral` this many stops lighter
+    lighter: 0  # legend frame: `neutral` this many stops lighter
   legend:
     fill: "{colors.paper}"
     handle-length: 1.5  # this and below in legend font sizes
@@ -92,8 +92,9 @@ components:
     order: [series-1, series-2, series-4, series-5, series-6, series-7, series-8, series-9]  # equal terms: Tableau order, ours skipped
   shades:
     stop: 12  # L* one lightness stop moves (shift_lightness)
-    lightest: 80  # L* range of make_shades
-    darkest: 25
+    step: 18  # L* between neighbouring make_shades shades: apart in grayscale
+    lightest: 90  # L* range make_shades stays in; a color's darkest shade is the color itself
+    darkest: 15
   part-colors:
     order: [series-1, series-5, series-4, series-6, series-2, series-7, series-9, series-3, series-8]  # make_part_colors: the first four ≥10 L* apart, then neighbours
   colormap:
@@ -143,18 +144,18 @@ First row that fits:
 | Some series the takeaway names, among others it does not | named ones in equal-terms order below (`series-1`, `series-4`, …); rest `make_shades(colors["neutral"], n)` |
 | Several series on equal terms, no "ours" (models in a survey, correct vs. incorrect answers, error types) | `series-1`, `series-2`, `series-4`, `series-5`, … in Tableau order (`series.order` token), as `paper.series_colors[0]`, `[1]`, … in scripts. Their lightness is close: on lines, also a marker of their own; on bars, check the grayscale warning. Skip `ours` color: means ours in every figure of the paper |
 | More than nine unordered classes (embedding) | `tab20` (≤20), plus own marker per class: `"o"`, `"s"`, `"^"`, `"D"`, `"v"`, `"<"`, `">"`, `"P"`, `"X"`, `"*"` |
-| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.make_shades(group_color, n)`: one hue, light to dark (L* 70 → 25), the largest setting darkest |
+| Groups with sizes or sweeps inside (model sizes per family, network depths, batch sizes) | one color per group (ours: `ours`; a baseline family: `neutral`, dashed); within a group `paper.make_shades(group_color, n)`: one hue, light to dark, `shades.step` L* apart and the darkest the color itself, the largest setting darkest |
 | Single series, or one quantity over categories (groups in one box plot) | `series-1`; `ours` when the series is ours, here or in another figure of the paper |
-| Reference lines | `neutral` (white over filled plots, Shapes) |
+| Reference lines | `reference` (yellow), dashed (white over filled plots, Shapes) |
 | Text and tick labels | `ink` |
-| Panel box and tick marks | `neutral` two stops lighter, `shift_lightness(neutral, 2)`: lighter than data, darker than grid (set by style) |
+| Panel box and tick marks | `ink` (black) at the context weight (×0.5): thin, so the data stays darker in weight (set by style) |
 | Continuous values | `colormap` tokens, built from the palette: `"paper"` (the default, as Tableau's "Blue": Tableau blue from light to dark, low values light, lightness evenly spread); signed values `"paper-diverging"` (as Tableau's "Orange-Blue Diverging": orange below zero, near-white at zero, blue above) (`heatmap.md`) |
 
 - Grey series: assigned in Order rule's order (Layout). Lines: line style `"--"`, `":"`, `"-."` (solid is ours' alone), dashed/dotted at `linewidth=paper.dashed_linewidth`. Fills (bars, boxes, violins, areas): shade, `make_shades(colors["neutral"], n)` for n grey series, light to dark, skipping `ours` lightness. One grey series: `neutral`.
 - Many grey series: >4 lines: add markers, one shape per series (`line-chart.md`). >6: draw series the takeaway names; group rest as one grey series, "Other baselines".
 - Shared color (ours and its variants, greys): differ by line style or shade as above.
 - One channel per variable: each variable the marks differ by (method, split, compute, seed) gets one channel of its own: hue, lightness, line style, marker, or panel. Lightness that shows a value (compute, a sweep in `make_shades` shades) is spent: series then differ by line style or marker, never by color alone, since in grayscale color is only lightness. Ours keeps its hue; compared series keep their line styles (`"--"`, `":"`, `"-."`) as in every other figure of the paper. No channel left: one panel per value of a variable. `finalize_figure` warns when two labelled series share line styles and markers while one's lightness varies.
-- On white: grey lines, markers, reference lines `neutral` at full opacity; light greys for fills only. Series text: `shift_lightness(series_color, -1)` (grey series: `shift_lightness(colors["neutral"], -1)`). Text on fill: Typography.
+- On white: grey lines and markers `neutral` at full opacity; light greys for fills only. Series text: `shift_lightness(series_color, -1)` (grey series: `shift_lightness(colors["neutral"], -1)`). Text on fill: Typography.
 - Grayscale / color blindness: series told apart by color alone also differ in lightness by ≥10 L*: ours (`series-3`, L* 56) vs. lighter `neutral` (L* 73); greys skip its lightness. Lines also differ by style or marker, bars by shade. `finalize_figure` warns when two such series look alike in grayscale (it reads each mark's `label`).
 - Emphasis: user names a series to emphasize: color it as ours, all others as compared.
 - Other palettes: paper-wide (lab, brand): change `colors` tokens in design copy. One-off for one figure ("match the original"): dict in that figure's script:
@@ -184,6 +185,10 @@ One family, `Inter` (bundled), all text and math, regular weight only (nothing b
   ax.yaxis.set_major_formatter(lambda v, _: f"{v:.10g}".replace("-", "−"))
   ```
 
+- Axis labels (and colorbar labels): quantity, then its unit in parentheses: "Success rate (%)", "Length (tokens)",
+  "Compute (GFLOPs)", "Training tokens (B)". Never drop the unit, not for room either: shorten the quantity instead.
+  No parentheses only for a quantity without a unit (a 0–1 accuracy or rate, loss, a count of the thing named).
+  A row header standing in for the y label (`multi-panel.md`) carries the unit too.
   - Linear axis, values <0.001: scale in axis label ("Learning rate (×10⁻⁴)"), ticks 0, 1, 2, 3.
   - ≥1000: SI suffixes, one unit per axis, when that writes the ticks shorter (`0, 0.5K, 1K, 1.5K, 2K`, `10K`, `1M`; `200 … 1000` and `1024` stay); `finalize_figure` writes matplotlib's default ticks this way. Or the unit scaled in the axis label ("Training step (K)").
   - Log axes: powers of ten plain from 0.001 to 1000; above, SI suffix (10K, 1M); below, `1e−4` (true minus). `finalize_figure` writes them so.
@@ -253,17 +258,18 @@ One panel: no title (caption names the figure). One figure carries one takeaway:
 
 ### Panel height
 
-A panel's height is a multiple of its own width, the `panel` tokens: M is square, every other step a share of
-it, as rem is of the root size. The shape follows from the step, so panels of one step look alike at any width.
+A panel's height is fixed in inches, the `panel` tokens, at any width: one step gives the same height, and so
+the same number of y ticks (one per tick spacing), in a single-column figure and a full-width one. `"SQ"` makes
+the panel as tall as it is wide.
 `finalize_figure(fig, ax, height=...)`, default `"S"`:
 
-| Step | Height / width | For |
+| Step | Height | For |
 |---|---|---|
-| `"3XS"`, `"2XS"` | 0.25, 0.375 | one wide panel across the full text width |
-| `"XS"` | 0.5 | a wide panel at 1.5 columns; a short chart with few values |
-| `"S"` | 0.75 | default: one panel at single column, a row of panels |
-| `"M"` | 1 | square: grids and small multiples compared by shape; the emphasis is a difference in y |
-| `"L"`, `"XL"` | 1.25, 1.5 | many categories down y (horizontal bars, long legends inside): the smallest step where they fit |
+| `"XS"` | 1 in | a short chart with few values; a wide panel across the full text width |
+| `"S"` | 1.5 in | default: one panel, a row of panels |
+| `"M"` | 2 in | the emphasis is a difference in y |
+| `"L"`, `"XL"` | 2.5, 3 in | many categories down y (horizontal bars, long legends inside): the smallest step where they fit |
+| `"SQ"` | panel width | square: grids and small multiples compared by shape |
 
 Pass any step but S with a one-line comment giving the emphasis it serves:
 
@@ -287,7 +293,7 @@ Pie and radar: circles; `finalize_figure` sizes them to width. Height follows th
 `finalize_figure` reports text overlapping, covering data, cut off at figure edge, out of its panel, or spilling out of its fill: first step that clears, render after each:
 
 1. Move it: that item to next placement its chart file lists (other side of point, below value, next legend spot). Placements may differ per item.
-2. Make room inside panel: share axes (`multi-panel.md`); Typography's text-tick rule (swap axes, then 45°, then 90°); shorten text (axis label longer than panel: short name of quantity, detail in caption).
+2. Make room inside panel: share axes (`multi-panel.md`); Typography's text-tick rule (swap axes, then 45°, then 90°); shorten text (axis label longer than panel: short name of quantity, unit kept, detail in caption).
 3. Give it width, if crowding is labels along an axis (tick labels, bar values, side-by-side category names, heatmap rows or columns) and no figure width given: full width, or own aspect for fixed-aspect panel (heatmap rows grow with it). After widening, retry earlier placements (horizontal before turned). Crowding inside data area (value labels on curves, scatter point names, heatmap cell values, contour labels): step 4 instead.
 4. Write less, alike: label every m-th contour level, keep every line; numeric ticks: a wider step instead, never skipped labels; or drop a kind whole (all point names of non-cited models, all bar values, all cell values, all shares of a band), cited numbers to caption.
 
@@ -348,27 +354,27 @@ change the tokens and every weight follows. Matplotlib applies them; code reads 
 | Role | Weight | Lines |
 |---|---|---|
 | Data | ×1 | data lines |
-| Compared | ×1 | dashed and dotted lines (grey series, fits, fronts): `linewidth=paper.dashed_linewidth` |
+| Compared | ×1 | dashed and dotted lines (grey series, reference lines, fits, fronts): `linewidth=paper.dashed_linewidth` |
 | Outline | ×1 | the edge of a shape that holds data: box plot boxes, violin bodies (black) |
-| Context | ×0.5 | lines inside or beside such shapes: box plot medians, means, whiskers and caps; a violin's inner range line; error bars; legend frame (the panel box's color); panel box and ticks (`neutral` +2 stops), grid (`ink` at 10%), reference lines, seams between fills (white), edges of touching one-color bars, contour lines, colorbar outline; edges of every marker: white around series markers and box plot outliers (style default), black around embedding points (`markeredgewidth=paper.filled_markeredgewidth`) |
+| Context | ×0.5 | lines inside or beside such shapes: box plot medians, means, whiskers and caps; a violin's inner range line; error bars; legend frame (`frame` color); panel box and tick marks (black), grid (`ink` at 10%), seams between fills (white), edges of touching one-color bars, contour lines, colorbar outline; edges of every marker: white around series markers and box plot outliers (style default), black around highlight-size markers (set by `finalize_figure`) and embedding points (`markeredgewidth=paper.filled_markeredgewidth`) |
 
 | Mark | Look | In code |
 |---|---|---|
-| Panel box | full box, all four sides, `neutral` two stops lighter; tick marks the same, outside, 1.5 pt long (minor 1 pt); tick labels `ink` | set by style |
+| Panel box | full box, all four sides, `ink` (black), ×0.5; tick marks the same, outside, 2 pt long (minor 1 pt); tick labels `ink` | set by style |
 | Grid | `ink` at 10% opacity, behind data, both directions unless chart file says otherwise | `rcParams["grid.linewidth"]`, `rcParams["grid.alpha"]` |
-| Markers | filled in series color, thin edge in `paper` (`marker.edge`), `marker.size` (3.5) × `line.width`; above every line and band (set by `finalize_figure`) | `rcParams["lines.markersize"]` |
-| Points of interest (a minimum, the trained solution) | filled star, `marker.highlight-size` (5) × `line.width`, edge in its own color (a white edge eats its thin arms) | `"*", markersize=paper.highlight_markersize, markeredgecolor=color` |
+| Markers | filled in series color, thin edge in `paper` (`marker.edge`), `marker.size` (3) × `line.width`; above every line and band (set by `finalize_figure`) | `rcParams["lines.markersize"]` |
+| Points of interest (a minimum, the trained solution) | filled star, `marker.highlight-size` (6) × `line.width`, thin `marker.highlight-edge` edge (set by `finalize_figure` for every marker of this size, legend too) | `"*", markersize=paper.highlight_markersize` |
 | Seams between fills (stacked segments, wedges, area bands) | `paper` | `edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]` |
 | Outline of touching one-color bars, each its own value (reliability bins) | darker shade of fill, never white | `edgecolor=shift_lightness(color, -1), linewidth=rcParams["grid.linewidth"]` |
 | Bars and histogram bins | no edge | `linewidth=0` |
 | Colorbar | 0.1 in wide, 0.05 in from panels, labels in standard margin beside it | placed by `finalize_figure` |
 
 - Opacity: fills at full series color, except bands (`alpha=0.2`), fills that show a quantity by their area (stacked areas, area under a curve: `alpha=0.875`), scatter clouds (`alpha=0.5`), light polygon fills (radar, `alpha=0.1`), box plots and violins: `shift_lightness(color, 2)` so black median and points on them stay readable; grey series too (their `make_shades(colors["neutral"], n)` shade, shifted +2). Ours keeps full color there (lightened colors all print pale grey; ours must stay apart).
-- Reference lines (baseline score, threshold, diagonal): context, look like no data series. Thin, solid, `neutral`, grid width, thinner than every data line, never dashed (dashes belong to grey series). Across filled plot (stacked area, heatmap, contour gradient; grey sinks into fills): white, dashed. Second and later in one panel: dotted. Line with own value (baseline score, threshold): legend entry if panel has a legend, else caption's reading guide names it with its value (Legend: a single entry). Line whose meaning the axes give (y = x, chance, zero): no entry; caption's reading guide names it.
+- Reference lines (previous SOTA, baseline score, threshold, diagonal): look like no data series: `reference` (yellow), dashed, ×1 (`paper.dashed_linewidth`), behind the data; the hue keeps them apart from dashed grey series. Its name and value written on the plot (a direct label, "Prev. SOTA 44.4%"): `shift_lightness(colors["reference"], -1)`, as series text. Across filled plot (stacked area, heatmap, contour gradient; grey sinks into fills): white, dashed. Second and later in one panel: dotted. Line with own value (baseline score, threshold): legend entry if panel has a legend, else caption's reading guide names it with its value (Legend: a single entry). Line whose meaning the axes give (y = x, chance, zero): no entry; caption's reading guide names it.
 
   ```python
-  ax.axhline(y, color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
-  ax.axhline(y2, color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1, linestyle=":")
+  ax.axhline(y, color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
+  ax.axhline(y2, color=colors["reference"], linestyle=":", linewidth=paper.dashed_linewidth, zorder=1)
   ```
 
 ## Components
@@ -413,7 +419,7 @@ First row that fits:
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1), borderaxespad=paper.legend_gap * 72 / rcParams["legend.fontsize"], ncol=n_entries)
 ```
 
-- Frame: a legend inside a panel in its box (the panel box's edge, opaque fill); outside the panels, no box (`finalize_figure` removes it: nothing under it to keep apart). Never `frameon=False` by hand.
+- Frame: a legend inside a panel in its box (`frame` color edge, opaque fill); outside the panels, no box (`finalize_figure` removes it: nothing under it to keep apart). Never `frameon=False` by hand.
 - Inside: worth a small overlap (opaque frame, no height cost). Hides nothing: no curve, data point, text or bar end; ≤1/10 of its area over filled marks. `finalize_figure` checks this when placing it, and warns when a legend with an explicit `loc` breaks it.
 - Outside legend columns: start in one row. On cut-off text or matplotlib layout collapse: `ncol = ceil(n / 2)`, then `ceil(n / 3)`, …, skip repeated counts, down to 1.
 - Shared words: entries that share a word and differ by a setting ("Depth 4", "Depth 8", …; a sweep in `make_shades` shades): `paper.add_legend_rows`, one row per shared word, written once at the row's start, each entry only its setting ("Depth  4 8 16 32 64"; two sweeps: two rows). A row too wide for any panel: on the figure, above the panels.

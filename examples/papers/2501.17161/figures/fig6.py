@@ -39,6 +39,5 @@ for ax, task in zip(axes, tasks):
     ax.grid(axis="x", visible=False)
     ax.tick_params(axis="x", length=0)
 
-# original ratio 0.257 (height / width): S is closest, but with S this figure moves up beside Figure 5; M keeps the page layout
-finalize_figure(fig, axes, height="M")
+finalize_figure(fig, axes)
 fig.savefig("../out/fig6.pdf")

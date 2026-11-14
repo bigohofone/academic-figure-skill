@@ -36,8 +36,9 @@ for ax, title, panel in zip(axes, data["panels"], data["probability"]):
 
 axes[0].set_ylabel("probability (%)")
 fig.supxlabel("similarity")
-axes[1].legend()
+# above the panels, in one row: inside it covers curves at this height
+handles, labels = axes[1].get_legend_handles_labels()
+fig.legend(handles, labels, loc="outside upper center", ncol=len(labels))
 
-# original height / width 187.2 / 648.0 = 0.29, 1.64 in printed; S gives the closest height
-finalize_figure(fig, axes, height="S")
+finalize_figure(fig, axes, height="XS")
 fig.savefig("../out/graph-similarity.pdf")

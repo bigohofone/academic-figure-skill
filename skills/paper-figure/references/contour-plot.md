@@ -4,7 +4,7 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 
 ## Draw
 
-- Panel: height M, square (DESIGN.md Panel height); no gridlines (`ax.grid(False)`); both axes labelled with their variables.
+- Panel: height SQ (DESIGN.md Panel height); no gridlines (`ax.grid(False)`); both axes labelled with their variables.
 - Values spanning > 100×: contour their log (DESIGN.md log rule); caption says "contours of log loss".
 - Bands with lines: filled bands between levels in design colormap (`"paper"`, low = light; signed: `"paper-diverging"` centered at 0, as in `heatmap.md`); one flat color per band, never smooth gradient. On top: ink contour lines of the data itself, never of a smoothed copy. Levels: 6–8 at half width, 10 at full width, round values inside data range.
 
@@ -64,7 +64,7 @@ Function of two continuous variables: loss landscape, decision boundary, objecti
 - Points of interest: minimum or trained solution: filled star in `colors["ours"]`, highlight size; training trajectory: data line, markers at ends. ≥ 2: named in legend; else in caption (DESIGN.md Legend).
 
   ```python
-  ax.plot(x, y, "*", color=colors["ours"], markeredgecolor=colors["ours"], markersize=paper.highlight_markersize, linestyle="none", label=...)
+  ax.plot(x, y, "*", color=colors["ours"], markersize=paper.highlight_markersize, linestyle="none", label=...)
   ```
 
 ## Caption

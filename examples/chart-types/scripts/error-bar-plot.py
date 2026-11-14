@@ -5,7 +5,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/paper-figure/assets")
 import paper  # registers the bundled Inter font
@@ -25,7 +24,7 @@ print("takeaway:", {n: f"{means[n]:#.3g}" for n in names}, "best baseline:", bes
 assert names[-1] == "Ours", "the takeaway does not hold"
 
 fig, ax = plt.subplots(figsize=(2.75, 2.75), layout="constrained")
-ax.axvline(means[best_baseline], color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+ax.axvline(means[best_baseline], color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
 for y, name in enumerate(names):
     color = colors["ours"] if name == "Ours" else colors["neutral"]
     ax.errorbar(means[name], y, xerr=stds[name], fmt="o", color=color, capsize=2)

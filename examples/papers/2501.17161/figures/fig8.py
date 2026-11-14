@@ -30,9 +30,12 @@ for panel, runs in data.items():
 # compute is a sweep inside each method: one hue per method (RL ours, SFT grey), light to dark with compute
 all_gflops = [r["gflops"] for runs in data.values() for rs in runs.values() for r in rs]
 norm = Normalize(min(all_gflops), max(all_gflops))
+# as many shades as the compute values each method shows, so neighbouring values stay apart in grayscale
+counts = {m: len({r["gflops"] for runs in data.values() for k, rs in runs.items() if k in group for r in rs})
+          for m, group in (("RL", ["RL"]), ("SFT", ["SFT", "Init"]))}
 cmaps = {
-    "RL": LinearSegmentedColormap.from_list("rl", make_shades(colors["ours"], 2)),
-    "SFT": LinearSegmentedColormap.from_list("sft", make_shades(colors["neutral"], 2)),
+    "RL": LinearSegmentedColormap.from_list("rl", make_shades(colors["ours"], counts["RL"])),
+    "SFT": LinearSegmentedColormap.from_list("sft", make_shades(colors["neutral"], counts["SFT"])),
 }
 cmaps["Init"] = cmaps["SFT"]  # the shared starting checkpoint, at the least compute
 # lightness is taken by compute, so the three methods differ by line style, as in Figures 5 and 7
@@ -46,7 +49,7 @@ for ax, (panel, runs) in zip(axes, data.items()):
             ax.plot([r["ood_success"], r["id_success"]], [r["ood_recognition"], r["id_recognition"]],
                     color=color, linestyle=styles[method], zorder=1, label=method)
             ax.plot(r["ood_success"], r["ood_recognition"], "o", color=color, markersize=paper.highlight_markersize, label=method)
-            ax.plot(r["id_success"], r["id_recognition"], "*", color=color, markeredgecolor=color, markersize=paper.highlight_markersize,
+            ax.plot(r["id_success"], r["id_recognition"], "*", color=color, markersize=paper.highlight_markersize,
                     label=method)
     ax.set_title(panel)
     ax.grid(True)
@@ -58,14 +61,14 @@ handles = [Line2D([], [], color=cmaps["RL"](0.8), linestyle=styles["RL"]),
            Line2D([], [], color=cmaps["SFT"](0.8), linestyle=styles["SFT"]),
            Line2D([], [], color=cmaps["SFT"](0.3), linestyle=styles["Init"]),
            Line2D([], [], color=colors["ink"], marker="o", markersize=paper.highlight_markersize, linestyle="none"),
-           Line2D([], [], color=colors["ink"], marker="*", markeredgecolor=colors["ink"], markersize=paper.highlight_markersize, linestyle="none")]
-fig.legend(handles, ["RL", "SFT", "Init", "Out-of-distribution", "In-distribution"], loc="outside upper center", ncol=5, borderaxespad=0)
+           Line2D([], [], color=colors["ink"], marker="*", markersize=paper.highlight_markersize, linestyle="none")]
+# inside: the lower right of the first panel is empty
+axes[0].legend(handles, ["RL", "SFT", "Init", "Out-of-distribution", "In-distribution"])
 
 # one gauge for compute: the SFT scale and the RL scale side by side in one bar, its ticks and label once
 bar = fig.colorbar(ScalarMappable(norm, cmaps["RL"]), ax=axes, label="GFLOPs (SFT | RL)")
 bar.ax.imshow(np.linspace(1, 0, 256)[:, None], cmap=cmaps["SFT"], aspect="auto", extent=(0, 0.5, *norm.inverse([0, 1])), zorder=2)
 bar.ax.set_xlim(0, 1)  # the strip would shrink the bar to its own half
 
-# original ratio 0.335 (height / width); S panels keep the page layout
-finalize_figure(fig, axes, height="XS")
+finalize_figure(fig, axes)
 fig.savefig("../out/fig8.pdf")

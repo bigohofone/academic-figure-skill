@@ -49,7 +49,7 @@ for lv in levels[::label_every]:
             transform_rotates_text=True, gid="contour-label",
             bbox=dict(facecolor=colors["paper"], edgecolor="none", pad=1))
 
-ax.plot(0, 0, "*", color=colors["ours"], markeredgecolor=colors["ours"], markersize=paper.highlight_markersize,
+ax.plot(0, 0, "*", color=colors["ours"], markersize=paper.highlight_markersize,
         linestyle="none")
 ax.set_xlim(*data["x_range"])
 ax.set_ylim(*data["y_range"])

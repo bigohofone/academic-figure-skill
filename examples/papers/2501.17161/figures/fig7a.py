@@ -43,7 +43,7 @@ for key, name, color, style, marker in series:
     ax.plot(gflops, s["smoothed"], color=color, linestyle=style, linewidth=width)
 ax.grid(True)
 ax.set_title("Training")
-ax.set_xlabel("GFLOPs")
+ax.set_xlabel("Compute (GFLOPs)")
 ax.set_ylabel("V-OOD success (%)")
 
 for i, m in enumerate(methods):
@@ -61,6 +61,5 @@ handles = [Line2D([], [], color=color, linestyle=style, marker=marker,
            for _, _, color, style, marker in series[::-1]]
 ax.legend(handles, [name for _, name, *_ in series[::-1]])
 
-# original ratio 0.348 (height / width of the whole figure); M panels keep the page layout
-finalize_figure(fig, [ax, ax_bar], height="M")
+finalize_figure(fig, [ax, ax_bar])
 fig.savefig("../out/fig7a.pdf")

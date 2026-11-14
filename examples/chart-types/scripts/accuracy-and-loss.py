@@ -61,7 +61,7 @@ fig.supxlabel("Epoch")
 handles, labels = axes[0].get_legend_handles_labels()
 fig.legend(handles[::-1], labels[::-1], loc="outside upper center", ncol=2, borderaxespad=0)
 
-finalize_figure(fig, axes, height="M", min_width=0.9)
+finalize_figure(fig, axes, height="SQ", min_width=0.9)
 fig.savefig("../outputs/accuracy-and-loss.pdf")
 fig.savefig("../outputs/accuracy-and-loss.png")
 fig.savefig("../outputs/accuracy-and-loss.svg")

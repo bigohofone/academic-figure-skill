@@ -5,7 +5,7 @@ import sys
 
 import matplotlib.pyplot as plt
 from matplotlib.cm import ScalarMappable
-from matplotlib.colors import LinearSegmentedColormap, Normalize
+from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgb
 import numpy as np
 from matplotlib.lines import Line2D
 
@@ -14,6 +14,14 @@ import paper
 from paper import finalize_figure, make_shades, shift_lightness
 
 colors = paper.colors
+
+
+def grey(color):
+    """The grey of the same lightness (relative luminance): what the point shows in grayscale."""
+    linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in to_rgb(color)]
+    y = np.dot(linear, [0.2126, 0.7152, 0.0722])
+    return (12.92 * y if y <= 0.0031308 else 1.055 * y ** (1 / 2.4) - 0.055,) * 3
+
 
 data = json.load(open("../data/fig10.json"))
 gflops, runs = data["gflops"], data["runs"]
@@ -47,11 +55,13 @@ ax.grid(True)
 
 ax.legend([Line2D([], [], color=c, marker=m, markersize=paper.highlight_markersize, linestyle="none") for c, m in zip(series_colors, markers)],
           [f"VIter {v}" for v in viters])
-# the gauge reads lightness as compute: the same light-to-dark steps as the shades, in grey
-gauge = LinearSegmentedColormap.from_list("compute", make_shades(colors["neutral"], len(gflops)))
-fig.colorbar(ScalarMappable(Normalize(min(gflops), max(gflops)), gauge), ax=ax, label="GFLOPs",
+
+
+# the gauge reads lightness as compute: the points' own light-to-dark steps, in grey (VIter 3, 5 and 10 take the
+# same steps; VIter 1's darker color starts a little darker)
+gauge = LinearSegmentedColormap.from_list("compute", [grey(c) for c in make_shades(series_colors[1], len(gflops))])
+fig.colorbar(ScalarMappable(Normalize(min(gflops), max(gflops)), gauge), ax=ax, label="Compute (GFLOPs)",
              ticks=gflops, format=lambda v, _: f"{v / 1e9:g}B")
 
-# XS, as Figure 9 beside it
-finalize_figure(fig, ax, height="XS")
+finalize_figure(fig, ax)
 fig.savefig("../out/fig10.pdf")

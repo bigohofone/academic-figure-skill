@@ -5,7 +5,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import to_rgb
 from matplotlib import rcParams
 
 sys.path.insert(0, "../../../skills/paper-figure/assets")
@@ -38,23 +37,14 @@ assert top_two > 0.5, "the two largest sources are not a majority"
 
 part_colors = paper.make_part_colors(len(names))
 
-fig, ax = plt.subplots(figsize=(2.75, 2.75))
-wedges, _ = ax.pie(values, colors=part_colors, startangle=0, counterclock=False,
+fig, ax = plt.subplots(figsize=(3.25, 3.25), layout="constrained")
+# from 12 o'clock, clockwise, largest first: the order the legend lists them
+wedges, _ = ax.pie(values, colors=part_colors, startangle=90, counterclock=False,
                    wedgeprops=dict(width=0.4, edgecolor=colors["paper"], linewidth=rcParams["grid.linewidth"]))
 
-# Shares inside their wedges; those too small for their wedge join the name outside, with a leader line
-outside = ["Synthetic", "Other"]
-for w, name, v, color in zip(wedges, names, values, part_colors):
-    mid = np.deg2rad((w.theta1 + w.theta2) / 2)
-    x, y = np.cos(mid), np.sin(mid)
-    if name in outside:
-        ax.annotate(f"{name} {share_text(v)}", (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y),
-                    ha="left" if x > 0 else "right", va="center",
-                    arrowprops=dict(arrowstyle="-", color=colors["ink"], linewidth=rcParams["grid.linewidth"],
-                                    relpos=(0, 0.5) if x > 0 else (1, 0.5)))
-    else:
-        ax.annotate(name, (1.02 * x, 1.02 * y), xytext=(1.12 * x, 1.12 * y), ha="left" if x > 0 else "right", va="center")
-        ax.text(0.8 * x, 0.8 * y, share_text(v), ha="center", va="center", color=colors["paper"] if np.dot(to_rgb(color), [0.299, 0.587, 0.114]) < 0.5 else colors["ink"])
+# names and shares in the legend, one entry per part in wedge order; nothing written on the wedges
+# beside the donut, where a round panel leaves room
+fig.legend(wedges, [f"{name} {share_text(v)}" for name, v in zip(names, values)], loc="outside right center")
 
 ax.text(0, 0, f"{total / 1e6:.3g}M\nexamples", ha="center", va="center")
 

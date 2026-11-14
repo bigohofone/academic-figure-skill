@@ -45,23 +45,25 @@ def shift_lightness(color, stops):
 
 
 def make_shades(color, n):
-    """n shades of `color`, light to dark, evenly spread in grayscale lightness over the `shades` tokens' range:
-    a sweep inside one group (depths, sizes), or greys for n compared series. Greys skip the band around
-    ours' lightness, so ours stays apart in grayscale. One shade: `color` itself."""
+    """n shades of `color`, light to dark: a sweep inside one group (depths, sizes), or greys for n compared series.
+    Neighbours sit `step` L* apart, so they stay apart in grayscale. A color's darkest shade is the color itself;
+    when the shades would run past `lightest`, they slide darker. Greys start at `lightest` and skip the band
+    around ours' lightness, so ours stays apart in grayscale. When `lightest` to `darkest` cannot hold n shades
+    `step` apart, they spread evenly over it. One shade: `color` itself."""
     if n == 1:
         return [tuple(colors.to_rgb(color))]
     h, sat = _hue_and_saturation(color)
-    if sat:
-        sat = max(sat, 0.65)  # a muted palette color still gives a vivid dark end
-    lightest, darkest, stop = design.shades["lightest"], design.shades["darkest"], design.shades["stop"]
+    lightest, darkest, step, stop = (design.shades[k] for k in ("lightest", "darkest", "step", "stop"))
     segments = [(lightest, darkest)]
+    start = max(0, lightest - _lightness(color) - step * (n - 1))  # L* below `lightest` of the lightest shade
     if not sat:
         ours = _lightness(design.colors["ours"])
         segments = [(a, b) for a, b in [(lightest, min(lightest, ours + stop)), (max(darkest, ours - stop), darkest)] if a > b]
-    total = sum(a - b for a, b in segments)
+        start = 0
+    gap = min(step, sum(a - b for a, b in segments) / (n - 1))
     out = []
     for i in range(n):
-        t = total * i / (n - 1)
+        t = start + gap * i
         for a, b in segments:
             if t <= a - b + 1e-9:
                 out.append(_at_hls_lightness(h, sat, a - t))

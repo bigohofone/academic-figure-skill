@@ -46,7 +46,7 @@ Values along continuous x: learning curves, scaling curves, pass@k, metric over 
   ```python
   ax.set_xlim(0, 1)
   ax.set_ylim(0, 1)
-  ax.axline((0, 0), (1, 1), color=colors["neutral"], linewidth=rcParams["grid.linewidth"], zorder=1)
+  ax.axline((0, 0), (1, 1), color=colors["reference"], linestyle="--", linewidth=paper.dashed_linewidth, zorder=1)
   ```
 - Precision-recall curve: as ROC; x "Recall", y "Precision", `drawstyle="steps-post"`; positive rate as horizontal reference line.
 - ROC and PR curves: as computed (staircase through thresholds), never smoothed. No markers, except operating points the paper reports. Variants of ours: by line style, full method solid, others dashed, all ours color (DESIGN.md Colors). AUC in each legend entry; data gives none: compute it, say so in caption.

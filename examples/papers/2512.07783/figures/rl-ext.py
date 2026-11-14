@@ -43,8 +43,9 @@ for i, (ax, title) in enumerate(zip(axes, data["panels"])):
 
 axes[0].set_ylabel("performance (%)")
 fig.supxlabel("pass@k")
-axes[0].legend()
+# above the panels, in one row: inside it covers curves at this height
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="outside upper center", ncol=len(labels))
 
-# original height / width 172.8 / 604.8 = 0.29, 1.62 in printed; S gives the closest height
-finalize_figure(fig, axes, height="S")
+finalize_figure(fig, axes, height="XS")
 fig.savefig("../out/rl-ext.pdf")

@@ -21,12 +21,13 @@ shades = part_colors = {}  # L* settings of make_shades and make_part_colors
 dashed_linewidth = None  # compared series: pass it to dashed and dotted lines
 highlight_markersize = None  # the marker highlight-size, for a point of interest
 filled_markeredgewidth = None  # the edge of filled markers
+highlight_markeredgecolor = None  # the dark edge of highlight-size markers
 canvas_pad = None  # inches of free space at each edge of the canvas
 panel_gap = None  # free space between panels, as a share of the panel's size
 legend_gap = None  # inches between a legend outside the panels and their box
 value_label_small_fontsize = tick_label_text_fontsize = None  # points
 colorbar_width = colorbar_gap = None  # inches
-panel_ratios = {}  # height / width by step: panel_ratios["M"] == 1
+panel_heights = {}  # inches by step: panel_heights["S"] == 1.5
 tick_spacing = None  # inches between numeric ticks
 data_margin = None  # inches between the data and the panel edge
 
@@ -62,7 +63,7 @@ def _merge(base, extra):
 def apply_design(*paths):
     """Set matplotlib's style from paper.mplstyle and the tokens in the front matter of `paths`, DESIGN.md files:
     each later file changes only the tokens it names. Returns the colors by name, e.g. colors["ours"]."""
-    global colors, series_order, series_colors, shades, part_colors, dashed_linewidth, highlight_markersize, filled_markeredgewidth, canvas_pad, panel_gap, legend_gap, colorbar_width, colorbar_gap, value_label_small_fontsize, tick_label_text_fontsize, panel_ratios, tick_spacing, data_margin
+    global colors, series_order, series_colors, shades, part_colors, dashed_linewidth, highlight_markersize, filled_markeredgewidth, highlight_markeredgecolor, canvas_pad, panel_gap, legend_gap, colorbar_width, colorbar_gap, value_label_small_fontsize, tick_label_text_fontsize, panel_heights, tick_spacing, data_margin
     # one renderer everywhere: screen backends measure text differently, so finalize_figure's layout and
     # checks would differ from what Agg saves; the scripts write files and never open a window
     matplotlib.use("agg", force=True)
@@ -85,7 +86,7 @@ def apply_design(*paths):
     shades, part_colors = k["shades"], k["part-colors"]
     # palette reads this module's colors, so it is imported once they exist
     from .palette import make_diverging_colormap, make_sequential_colormap, shift_lightness
-    # the frame (panel box, tick marks) two stops lighter than the grey compared series: data > frame > grid
+    # the legend frame, lighter than the grey compared series: data > frame > grid
     frame = shift_lightness(c["neutral"], k["frame"]["lighter"])
     tick_pad, tick_width = _points(s["tick-pad"]), weight["context"]
     rcParams.update({
@@ -99,9 +100,10 @@ def apply_design(*paths):
         "ytick.major.width": tick_width, "ytick.minor.width": tick_width,
         "xtick.major.size": _points(k["tick"]["size"]), "ytick.major.size": _points(k["tick"]["size"]),
         "xtick.minor.size": _points(k["tick"]["minor-size"]), "ytick.minor.size": _points(k["tick"]["minor-size"]),
-        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": frame, "ytick.color": frame,
+        "text.color": c["ink"], "axes.labelcolor": c["ink"], "xtick.color": c["ink"], "ytick.color": c["ink"],
         "xtick.labelcolor": c["ink"], "ytick.labelcolor": c["ink"],
-        "axes.edgecolor": frame, "axes.linewidth": weight["context"],
+        # the panel box: all four sides, black, thin
+        "axes.edgecolor": c["ink"], "axes.linewidth": weight["context"],
         "grid.color": k["grid"]["color"], "grid.alpha": k["grid"]["opacity"], "grid.linewidth": weight["context"],
         "lines.linewidth": weight["data"],
         "lines.markersize": line * marker["size"], "lines.markeredgewidth": weight["context"], "lines.markeredgecolor": marker["edge"],
@@ -134,11 +136,12 @@ def apply_design(*paths):
                                                           cmap["lightest"], cmap["darkest"]), force=True)
     dashed_linewidth = weight["compared"]
     highlight_markersize = line * marker["highlight-size"]
+    highlight_markeredgecolor = marker["highlight-edge"]
     canvas_pad = _inches(s["canvas-pad"])
     panel_gap = float(s["panel-gap"].rstrip("%")) / 100
     legend_gap = _inches(s["legend-gap"])
     colorbar_width, colorbar_gap = _inches(k["colorbar"]["width"]), _inches(k["colorbar"]["gap"])
-    panel_ratios = {key.removeprefix("height-").upper(): float(v) for key, v in k["panel"].items()}
+    panel_heights = {key.removeprefix("height-").upper(): _inches(v) for key, v in k["panel"].items()}
     tick_spacing = _inches(k["tick"]["spacing"])
     data_margin = _inches(s["data-margin"])
     filled_markeredgewidth = weight["context"]

@@ -7,7 +7,7 @@ examples/*/outputs/*.pdf
 examples/*/outputs/*.svg
 
 # layout test set: regenerated on every edit
-examples/layouts/last-run.log
+examples/layouts/last-run*.log
 
 # paper examples: arXiv sources and build trees are fetched and made by examples/papers/build.py
 examples/papers/*/src/

@@ -32,23 +32,51 @@
   <p class="lead">Ask for a plot. Get a figure sized for your venue, readable in print and consistent across your paper. A Claude Code skill for matplotlib and seaborn.</p>
   <div class="cta"><a class="btn primary" href="#install">Install the skill</a><a class="btn" href="https://github.com/bigohofone/paper-figure-skill" target="_blank" rel="noopener">View on GitHub</a></div>
 
+<div class="demo" id="how" aria-label="An agent asked for Figure 7 of a paper draws it, checks it and places it on page 8">
+    <div class="cc" aria-hidden="true">
+      <div class="cc-bar"><i></i><i></i><i></i><span>~/my-paper — claude</span></div>
+      <div class="cc-body">
+        <div class="cc-welcome"><b>✻</b> Welcome to <strong>Claude Code</strong>!<div class="dim">cwd: ~/my-paper</div></div>
+        <div class="cc-log"></div>
+        <div class="cc-input">&gt; <span class="cc-typed"></span><span class="cc-caret"></span></div>
+        <div class="cc-hint">? for shortcuts</div>
+      </div>
+    </div>
+    <div class="demo-canvas">
+      <ol class="demo-stages"><li data-stage="prepare"><button type="button">Prepare</button></li><li data-stage="plan"><button type="button">Plan</button></li><li data-stage="write"><button type="button">Write</button></li><li data-stage="run"><button type="button">Run</button></li><li data-stage="check"><button type="button">Check</button></li></ol>
+      <div class="scene scene-width">
+        <div class="sw-page"><div class="sw-text"></div><div class="sw-dim sw-full"><span>text width 6.75 in</span></div>
+          <div class="sw-halves"><div class="sw-half"><span>(a) 3.31 in</span></div><div class="sw-half"><span>(b) 3.31 in</span></div></div></div>
+      </div>
+      <div class="scene scene-data"><pre class="sd-card"><span class="ln" style="--i:0">fig7.json</span><span class="ln" style="--i:1">├─ GP-VL</span><span class="ln" style="--i:2">│  ├─ training  init · sft · rl</span><span class="ln" style="--i:3">│  └─ final     SFT · Init · RL</span><span class="ln" style="--i:4">└─ V-IRL-VL</span><span class="ln" style="--i:5">   ├─ training  init · sft · rl</span><span class="ln" style="--i:6">   ├─ final     SFT · Init · RL</span><span class="ln" style="--i:7">   └─ previous_sota  44.44</span></pre></div>
+      <div class="scene scene-plan"><div class="sp-card">
+        <div class="ln" style="--i:0"><b>Takeaway</b>RL reaches 77.8%, past the previous SOTA (44.4%)</div>
+        <div class="ln" style="--i:1"><b>Chart</b>curves over compute, bars for the final value</div>
+        <svg class="sp-sketch ln" style="--i:2" viewBox="0 0 320 120" aria-hidden="true">
+          <g class="sp-axes"><path d="M20 10V100H150"/><path d="M180 10V100H310"/></g>
+          <path class="sp-sota" d="M20 52H150M180 52H310"/>
+          <path class="sp-grey" d="M24 70C50 66 70 78 95 72S130 84 146 90"/>
+          <path class="sp-ours" d="M40 92C60 70 80 66 100 62S130 50 146 20"/>
+          <rect class="sp-bar" x="200" y="88" width="24" height="12"/><rect class="sp-bar" x="235" y="83" width="24" height="17"/><rect class="sp-bar ours" x="270" y="22" width="24" height="78"/>
+        </svg>
+        <div class="ln" style="--i:3"><b>Emphasis</b><i class="sw ours"></i>RL &nbsp;<i class="sw"></i>SFT, Init in grey, dashed</div>
+      </div></div>
+      <div class="scene scene-code"><div class="sc-card"><div class="sc-tab">figures/fig7b.py</div><pre><span class="ln" style="--i:0">data = json.load(open(&quot;../data/fig7.json&quot;))[&quot;V-IRL-VL&quot;]</span><span class="ln" style="--i:1">final = data[&quot;final&quot;]</span><span class="ln" style="--i:2">sota = data[&quot;previous_sota&quot;]</span><span class="ln" style="--i:3">print(&quot;takeaway:&quot;, final, &quot;previous SOTA&quot;, sota)</span><span class="ln" style="--i:4">assert final[&quot;SFT&quot;] &lt; final[&quot;Init&quot;] &lt; sota &lt; final[&quot;RL&quot;]</span><span class="ln" style="--i:5"> </span><span class="ln" style="--i:6">fig, (ax, ax_bar) = plt.subplots(1, 2, figsize=(3.3075, 3.3075))</span><span class="ln" style="--i:7">for key, name, color, style, marker in series:</span><span class="ln" style="--i:8">    s = data[&quot;training&quot;][key]</span><span class="ln" style="--i:9">    ax.plot(s[&quot;gflops&quot;], s[&quot;smoothed&quot;], color=color, linestyle=style)</span><span class="ln" style="--i:10">ax.axhline(sota, color=colors[&quot;ink&quot;])</span><span class="ln" style="--i:11">for i, m in enumerate(methods):</span><span class="ln" style="--i:12">    ax_bar.bar(i, final[m], color=bar_colors[m])</span><span class="ln" style="--i:13">ax.legend(handles, names)</span><span class="ln" style="--i:14">finalize_figure(fig, [ax, ax_bar])</span></pre></div></div>
+      <div class="demo-page"><img src="papers/2501.17161/redrawn/p8.svg" alt="" loading="lazy"><div class="demo-hole"></div></div>
+      <div class="demo-fig"><img src="hero/with/fig7a.svg?v=0039a01a9b" alt="Figure 7a drawn with paper-figure"><img src="hero/with/fig7b.svg?v=9926b81c74" alt="Figure 7b drawn with paper-figure"><div class="demo-scan"></div></div>
+      <div class="demo-badges"><span data-b="size">✓ 3.31 in, fits its half</span><span data-b="overlap">✓ no overlaps, no cut-off text</span><span data-b="gray">✓ apart in grayscale</span></div>
+    </div>
+  </div>
+</div></div>
+
+<section id="compare"><div class="wrap">
+  <div class="sec-head"><h2>See how good it looks. <span class="dim">Same paper, same data, redrawn.</span></h2></div>
 <div class="hero-compare" aria-label="The figures of three pages of a paper, drawn by Claude Code alone and with paper-figure">
   <div class="hc-bar">
   <div class="hc-pages"><button type="button" data-p="0" aria-current="true">p. 7</button><button type="button" data-p="1" aria-current="false">p. 8</button><button type="button" data-p="2" aria-current="false">p. 9</button></div></div>
-  <div class="hc-stack"><div class="hc-sheet" data-p="0"><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig5a.svg" alt="fig5a drawn with paper-figure"></div><p class="hc-sub">(a) Language-only</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig5b.svg" alt="fig5b drawn with paper-figure"></div><p class="hc-sub">(b) With vision</p></div></div><p class="hc-cap">Figure 5: <b>Success rate (%) - GFLOPs trendlines for RL and SFT on <span class="tt">GeneralPoints</span> and <span class="tt">V-IRL</span>.</b> The top row shows in-distribution performance, while the bottom row shows out-of-distribution performance. Results are presented for both pure language (<span class="tt">-L</span>) and vision-language (<span class="tt">-VL</span>) variants of each task. For <span class="tt">GeneralPoints</span>, we report the episode success rate, while for <span class="tt">V-IRL</span>, we report per-step accuracy with overall success rate in Figures 1 and 18. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig5a.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig5a.svg" alt="fig5a drawn by Claude Code alone"></div><p class="hc-sub">(a) Language-only</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig5b.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig5b.svg" alt="fig5b drawn by Claude Code alone"></div><p class="hc-sub">(b) With vision</p></div></div><p class="hc-cap">Figure 5: <b>Success rate (%) - GFLOPs trendlines for RL and SFT on <span class="tt">GeneralPoints</span> and <span class="tt">V-IRL</span>.</b> The top row shows in-distribution performance, while the bottom row shows out-of-distribution performance. Results are presented for both pure language (<span class="tt">-L</span>) and vision-language (<span class="tt">-VL</span>) variants of each task. For <span class="tt">GeneralPoints</span>, we report the episode success rate, while for <span class="tt">V-IRL</span>, we report per-step accuracy with overall success rate in Figures 1 and 18. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div><div class="hc-sheet" data-p="1" hidden><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img src="hero/with/fig6.svg" alt="fig6 drawn with paper-figure"></div></div></div><p class="hc-cap">Figure 6: <b>Comparison of out-of-distribution performance under rule variants.</b> We report the success rate for <span class="tt">GeneralPoints</span> and <b>per-step-accuracy</b> for <span class="tt">V-IRL</span>. For each subplot, RL and SFT are trained with equal computation, and their shared initial checkpoint (marked as Init) is set as baseline. Detailed setups are provided in Appendix C.3.</p><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig7a.svg" alt="fig7a drawn with paper-figure"></div><p class="hc-sub">(a) GP-VL</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig7b.svg" alt="fig7b drawn with paper-figure"></div><p class="hc-sub">(b) V-IRL-VL</p></div></div><p class="hc-cap">Figure 7: <b>Comparison of out-of-distribution performance under visual variants.</b> Similar to Figures 5 and 6, we present both the performance dynamics (shown as lines) and final performance (shown as bars) for visual out-of-distribution evaluations. The previous state-of-the-art on <span class="tt">V-IRL</span> VLN mini benchmark (Yang et al., 2024a) is marked in <span style="color:#FF7E79">orange</span>. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig6.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig6.svg" alt="fig6 drawn by Claude Code alone"></div></div></div><p class="hc-cap">Figure 6: <b>Comparison of out-of-distribution performance under rule variants.</b> We report the success rate for <span class="tt">GeneralPoints</span> and <b>per-step-accuracy</b> for <span class="tt">V-IRL</span>. For each subplot, RL and SFT are trained with equal computation, and their shared initial checkpoint (marked as Init) is set as baseline. Detailed setups are provided in Appendix C.3.</p><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig7a.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig7a.svg" alt="fig7a drawn by Claude Code alone"></div><p class="hc-sub">(a) GP-VL</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig7b.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig7b.svg" alt="fig7b drawn by Claude Code alone"></div><p class="hc-sub">(b) V-IRL-VL</p></div></div><p class="hc-cap">Figure 7: <b>Comparison of out-of-distribution performance under visual variants.</b> Similar to Figures 5 and 6, we present both the performance dynamics (shown as lines) and final performance (shown as bars) for visual out-of-distribution evaluations. The previous state-of-the-art on <span class="tt">V-IRL</span> VLN mini benchmark (Yang et al., 2024a) is marked in <span style="color:#FF7E79">orange</span>. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div><div class="hc-sheet" data-p="2" hidden><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img src="hero/with/fig8.svg" alt="fig8 drawn with paper-figure"></div></div></div><p class="hc-cap">Figure 8: <b>Recognition vs. success rate for RL and SFT under different variants in <span class="tt">GP-VL</span>.</b> We report both in-distribution (<span style="color:#B85450">red</span>) and OOD (<span style="color:#6C8EBF">blue</span>) performance of recognition (y-axis) and episode success rate (x-axis). We denote the training compute of each data point via transparency (color bar) while connected (⋆-◦) pairs are evaluated using same checkpoints. As scaling up post-training compute, RL improves both recognition and overall accuracy, while SFT shows opposite effect.</p><div class="hc-row"><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img src="hero/with/fig9.svg" alt="fig9 drawn with paper-figure"></div><p class="hc-cap">Figure 9: <b>RL experiments on <span class="tt">GP-L</span> without SFT initialization.</b> All trials fail due to poor instruction following capability of the base model.</p></div><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img src="hero/with/fig10.svg" alt="fig10 drawn with paper-figure"></div><p class="hc-cap">Figure 10: <b>In-distribution vs. OOD performance growth on <span class="tt">GP-L</span>.</b> We record RL experiments with different number of verification iterations (VIter) as scaling up training compute (color transparency).</p></div></div></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig8.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig8.svg" alt="fig8 drawn by Claude Code alone"></div></div></div><p class="hc-cap">Figure 8: <b>Recognition vs. success rate for RL and SFT under different variants in <span class="tt">GP-VL</span>.</b> We report both in-distribution (<span style="color:#B85450">red</span>) and OOD (<span style="color:#6C8EBF">blue</span>) performance of recognition (y-axis) and episode success rate (x-axis). We denote the training compute of each data point via transparency (color bar) while connected (⋆-◦) pairs are evaluated using same checkpoints. As scaling up post-training compute, RL improves both recognition and overall accuracy, while SFT shows opposite effect.</p><div class="hc-row"><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig9.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig9.svg" alt="fig9 drawn by Claude Code alone"></div><p class="hc-cap">Figure 9: <b>RL experiments on <span class="tt">GP-L</span> without SFT initialization.</b> All trials fail due to poor instruction following capability of the base model.</p></div><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig10.svg" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig10.svg" alt="fig10 drawn by Claude Code alone"></div><p class="hc-cap">Figure 10: <b>In-distribution vs. OOD performance growth on <span class="tt">GP-L</span>.</b> We record RL experiments with different number of verification iterations (VIter) as scaling up training compute (color transparency).</p></div></div></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div></div>
+  <div class="hc-stack"><div class="hc-sheet" data-p="0"><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig5a.svg?v=fc9824d4a1" alt="fig5a drawn with paper-figure"></div><p class="hc-sub">(a) Language-only</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig5b.svg?v=41dd3d38cc" alt="fig5b drawn with paper-figure"></div><p class="hc-sub">(b) With vision</p></div></div><p class="hc-cap">Figure 5: <b>Success rate (%) - GFLOPs trendlines for RL and SFT on <span class="tt">GeneralPoints</span> and <span class="tt">V-IRL</span>.</b> The top row shows in-distribution performance, while the bottom row shows out-of-distribution performance. Results are presented for both pure language (<span class="tt">-L</span>) and vision-language (<span class="tt">-VL</span>) variants of each task. For <span class="tt">GeneralPoints</span>, we report the episode success rate, while for <span class="tt">V-IRL</span>, we report per-step accuracy with overall success rate in Figures 1 and 18. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig5a.svg?v=fc9824d4a1" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig5a.svg?v=5dd3646213" alt="fig5a drawn by Claude Code alone"></div><p class="hc-sub">(a) Language-only</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig5b.svg?v=41dd3d38cc" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig5b.svg?v=8cd8eae08c" alt="fig5b drawn by Claude Code alone"></div><p class="hc-sub">(b) With vision</p></div></div><p class="hc-cap">Figure 5: <b>Success rate (%) - GFLOPs trendlines for RL and SFT on <span class="tt">GeneralPoints</span> and <span class="tt">V-IRL</span>.</b> The top row shows in-distribution performance, while the bottom row shows out-of-distribution performance. Results are presented for both pure language (<span class="tt">-L</span>) and vision-language (<span class="tt">-VL</span>) variants of each task. For <span class="tt">GeneralPoints</span>, we report the episode success rate, while for <span class="tt">V-IRL</span>, we report per-step accuracy with overall success rate in Figures 1 and 18. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div><div class="hc-sheet" data-p="1" hidden><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img src="hero/with/fig6.svg?v=6eeff5dc52" alt="fig6 drawn with paper-figure"></div></div></div><p class="hc-cap">Figure 6: <b>Comparison of out-of-distribution performance under rule variants.</b> We report the success rate for <span class="tt">GeneralPoints</span> and <b>per-step-accuracy</b> for <span class="tt">V-IRL</span>. For each subplot, RL and SFT are trained with equal computation, and their shared initial checkpoint (marked as Init) is set as baseline. Detailed setups are provided in Appendix C.3.</p><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig7a.svg?v=0039a01a9b" alt="fig7a drawn with paper-figure"></div><p class="hc-sub">(a) GP-VL</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img src="hero/with/fig7b.svg?v=9926b81c74" alt="fig7b drawn with paper-figure"></div><p class="hc-sub">(b) V-IRL-VL</p></div></div><p class="hc-cap">Figure 7: <b>Comparison of out-of-distribution performance under visual variants.</b> Similar to Figures 5 and 6, we present both the performance dynamics (shown as lines) and final performance (shown as bars) for visual out-of-distribution evaluations. The previous state-of-the-art on <span class="tt">V-IRL</span> VLN mini benchmark (Yang et al., 2024a) is marked in <span style="color:#FF7E79">orange</span>. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig6.svg?v=6eeff5dc52" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig6.svg?v=26001050d7" alt="fig6 drawn by Claude Code alone"></div></div></div><p class="hc-cap">Figure 6: <b>Comparison of out-of-distribution performance under rule variants.</b> We report the success rate for <span class="tt">GeneralPoints</span> and <b>per-step-accuracy</b> for <span class="tt">V-IRL</span>. For each subplot, RL and SFT are trained with equal computation, and their shared initial checkpoint (marked as Init) is set as baseline. Detailed setups are provided in Appendix C.3.</p><div class="hc-row"><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig7a.svg?v=0039a01a9b" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig7a.svg?v=ded51bc7fe" alt="fig7a drawn by Claude Code alone"></div><p class="hc-sub">(a) GP-VL</p></div><div class="hc-slot" style="width:49.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig7b.svg?v=9926b81c74" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig7b.svg?v=008801672a" alt="fig7b drawn by Claude Code alone"></div><p class="hc-sub">(b) V-IRL-VL</p></div></div><p class="hc-cap">Figure 7: <b>Comparison of out-of-distribution performance under visual variants.</b> Similar to Figures 5 and 6, we present both the performance dynamics (shown as lines) and final performance (shown as bars) for visual out-of-distribution evaluations. The previous state-of-the-art on <span class="tt">V-IRL</span> VLN mini benchmark (Yang et al., 2024a) is marked in <span style="color:#FF7E79">orange</span>. Detailed evaluation setups (and curve smoothing) are provided in Appendix C.3.</p></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div><div class="hc-sheet" data-p="2" hidden><div class="hc-layer hc-with"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img src="hero/with/fig8.svg?v=9a289b4e25" alt="fig8 drawn with paper-figure"></div></div></div><p class="hc-cap">Figure 8: <b>Recognition vs. success rate for RL and SFT under different variants in <span class="tt">GP-VL</span>.</b> We report both in-distribution (<span style="color:#B85450">red</span>) and OOD (<span style="color:#6C8EBF">blue</span>) performance of recognition (y-axis) and episode success rate (x-axis). We denote the training compute of each data point via transparency (color bar) while connected (⋆-◦) pairs are evaluated using same checkpoints. As scaling up post-training compute, RL improves both recognition and overall accuracy, while SFT shows opposite effect.</p><div class="hc-row"><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img src="hero/with/fig9.svg?v=b5d7ec445b" alt="fig9 drawn with paper-figure"></div><p class="hc-cap">Figure 9: <b>RL experiments on <span class="tt">GP-L</span> without SFT initialization.</b> All trials fail due to poor instruction following capability of the base model.</p></div><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img src="hero/with/fig10.svg?v=752732cb36" alt="fig10 drawn with paper-figure"></div><p class="hc-cap">Figure 10: <b>In-distribution vs. OOD performance growth on <span class="tt">GP-L</span>.</b> We record RL experiments with different number of verification iterations (VIter) as scaling up training compute (color transparency).</p></div></div></div><div class="hc-layer hc-without"><div class="hc-row"><div class="hc-slot" style="width:100.00%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig8.svg?v=9a289b4e25" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig8.svg?v=f2609692a5" alt="fig8 drawn by Claude Code alone"></div></div></div><p class="hc-cap">Figure 8: <b>Recognition vs. success rate for RL and SFT under different variants in <span class="tt">GP-VL</span>.</b> We report both in-distribution (<span style="color:#B85450">red</span>) and OOD (<span style="color:#6C8EBF">blue</span>) performance of recognition (y-axis) and episode success rate (x-axis). We denote the training compute of each data point via transparency (color bar) while connected (⋆-◦) pairs are evaluated using same checkpoints. As scaling up post-training compute, RL improves both recognition and overall accuracy, while SFT shows opposite effect.</p><div class="hc-row"><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig9.svg?v=b5d7ec445b" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig9.svg?v=dad004b6a1" alt="fig9 drawn by Claude Code alone"></div><p class="hc-cap">Figure 9: <b>RL experiments on <span class="tt">GP-L</span> without SFT initialization.</b> All trials fail due to poor instruction following capability of the base model.</p></div><div class="hc-slot" style="width:48.15%"><div class="hc-fig"><img class="hc-size" src="hero/with/fig10.svg?v=752732cb36" alt="" aria-hidden="true"><img class="hc-img" src="hero/without/fig10.svg?v=e011e3a4ee" alt="fig10 drawn by Claude Code alone"></div><p class="hc-cap">Figure 10: <b>In-distribution vs. OOD performance growth on <span class="tt">GP-L</span>.</b> We record RL experiments with different number of verification iterations (VIter) as scaling up training compute (color transparency).</p></div></div></div><span class="hc-tag hc-tag-without">Claude Code alone</span><span class="hc-tag hc-tag-with">With paper-figure</span></div></div>
   <p class="hc-credit">Figures of Chu et al., <i>SFT Memorizes, RL Generalizes</i>, ICML 2025, <a href="https://arxiv.org/abs/2501.17161" target="_blank" rel="noopener">arXiv:2501.17161</a>, CC BY 4.0, laid out as on their pages with their original captions; body text left out. Left: Claude Code without the skill. <a href="papers/">All redrawn pages →</a></p>
 </div>
-</div></div>
-
-<section id="how"><div class="wrap">
-  <div class="sec-head"><h2>Just ask. <span class="dim">Nothing to learn, nothing to set up.</span></h2></div>
-  <div class="steps">
-    <div class="step"><h3>Ask</h3><p>Name your data and your venue. That’s it.</p><pre class="mini">› plot results.json for my ICLR paper</pre></div>
-    <div class="step"><h3>Check</h3><p>Sized, styled and checked for overlaps, cut-off text and grayscale.</p><pre class="mini">finalize_figure(fig, ax)
-<span class="ok">✓ no warnings</span></pre></div>
-    <div class="step"><h3>Use</h3><p>A print-ready PDF and PNG, with a caption built from your data.</p><pre class="mini">outputs/learning-curve.pdf
-<span class="ok">✓ fonts embedded</span></pre></div>
-  </div>
 </div></section>
 
 <section id="examples"><div class="wrap">
@@ -88,6 +116,108 @@
     s.addEventListener("pointerdown", e => { s.setPointerCapture(e.pointerId); move(e); });
     s.addEventListener("pointermove", e => { if (s.hasPointerCapture(e.pointerId)) move(e); });
   });
+})();
+</script>
+<script>
+// the "how" demo: Claude Code is asked for Figure 7 and goes through the skill's steps (Prepare, Plan, Write, Run,
+// Check), each with its own scene on the right; then the figure goes onto its page
+(() => {
+  const demo = document.querySelector(".demo");
+  const log = demo.querySelector(".cc-log"), typed = demo.querySelector(".cc-typed");
+  const canvas = demo.querySelector(".demo-canvas"), fig = demo.querySelector(".demo-fig"), page = demo.querySelector(".demo-page");
+  const ask = "plot fig7.json for my ICML paper";
+  // Figure 7 on page 8, as shares of the page: left, top, width (pdf points / 612 × 792)
+  const slot = { left: 0.09069, top: 0.30505, width: 0.78994 };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  // the current step dark, the ones before it ticked ("done": all ticked)
+  const stage = name => { const names = [...demo.querySelectorAll(".demo-stages li")].map(li => li.dataset.stage);
+    const at = name === "done" ? names.length : names.indexOf(name);
+    demo.querySelectorAll(".demo-stages li").forEach((li, i) => { li.classList.toggle("on", i === at); li.classList.toggle("done", i < at); }); };
+  const scene = name => { canvas.dataset.scene = name; };
+  const badge = name => demo.querySelector(`[data-b="${name}"]`).classList.add("on");
+  const el = (cls, text = "") => { const e = document.createElement("div"); e.className = cls; e.textContent = text; return e; };
+  // a new line scrolls the transcript up, as the terminal does once it is full
+  const add = e => { log.append(e); log.scrollTop = log.scrollHeight; };
+  const user = text => add(el("cc-user", `> ${text}`));
+  const say = text => add(el("cc-say", text));
+  const tool = (name, arg) => { const e = el("cc-tool"); e.append(Object.assign(document.createElement("b"), { textContent: name }), `(${arg})`); add(e); };
+  const out = text => add(el("cc-out", text));
+  const spin = async (word, ms) => {
+    const e = el("cc-spin"); add(e);
+    for (let t = 0, frames = "·✢✳✶✻✽✶✳✢"; t < ms; t += 120) { e.textContent = `${frames[(t / 120) % frames.length]} ${word}…`; await wait(120); }
+    e.remove();
+  };
+  // layout offsets, not the on-screen box: the page may still be scaling in (it is centered by translateX(-50%))
+  const toSlot = () => {
+    const w = page.offsetWidth, h = page.offsetHeight, left = page.offsetLeft - w / 2;
+    Object.assign(fig.style, { left: `${left + slot.left * w}px`, top: `${page.offsetTop + slot.top * h}px`,
+                               width: `${slot.width * w}px`, transform: "none" });
+  };
+  // back to the start at once, transitions off: no transition plays the scene in reverse
+  const reset = () => { log.textContent = ""; typed.textContent = ""; fig.removeAttribute("style"); scene(""); stage("");
+    demo.querySelectorAll(".demo-badges .on").forEach(b => b.classList.remove("on"));
+    demo.className = "demo instant"; };
+  const settle = () => { void demo.offsetWidth; demo.classList.remove("instant"); };
+  // each run of the session has a number; a click starts a new run, and the old one stops at its next move
+  let run = 0;
+  const typeAsk = async me => {
+    await wait(700);
+    for (const ch of ask) { if (me !== run) return; typed.textContent += ch; await wait(40); }
+    await wait(450);
+    typed.textContent = "";
+  };
+  const at = name => Object.assign(() => stage(name), { stage: name });  // a move that starts a step
+
+  // the session, as a list of moves: a line in the terminal, a scene on the right, or a pause
+  const session = [
+    [typeAsk], () => user(ask),
+    at("prepare"), () => scene("width"), [spin, "Thinking", 900],
+    () => say("ICML text is 6.75 in wide. Figure 7 is two halves side by side, 3.31 in each."), 1600,
+    () => tool("Bash", "cp -n …/paper-figure/assets/DESIGN.md figures/"), () => out("Copied the design and style/paper"), 700,
+    () => tool("Read", "figures/DESIGN.md"), () => out("Read 479 lines"), 700,
+    () => tool("Bash", "python -c \"…print the structure of fig7.json\""), () => scene("data"),
+    () => out("GP-VL: training, final"), () => out("V-IRL-VL: training, final, previous_sota"), 1800,
+    at("plan"), () => scene("plan"), [spin, "Planning", 700],
+    () => say("Takeaway: RL reaches 77.8%, past the previous SOTA (44.4%)."), 900,
+    () => say("Curves over compute, bars for the final value; RL red, SFT and Init grey."), 2000,
+    at("write"),
+    () => tool("Read", "references/line-chart.md"), () => out("Read 71 lines"), 450,
+    () => tool("Read", "references/bar-chart.md"), () => out("Read 59 lines"), 450,
+    () => tool("Read", "references/multi-panel.md"), () => out("Read 58 lines"), 450,
+    () => scene("code"), () => tool("Write", "figures/fig7a.py"), () => out("Wrote 65 lines"), 900,
+    () => tool("Write", "figures/fig7b.py"), () => out("Wrote 70 lines"), 1600,
+    at("run"), () => tool("Bash", "python fig7a.py fig7b.py"), () => scene("fig"), () => demo.classList.add("drawn"), 1200,
+    () => out("takeaway: SFT 13.7, Init 23.6, RL 41.2"), 400, () => out("takeaway: SFT 11.1, Init 16.7, RL 77.8, previous SOTA 44.4"), 900,
+    at("check"), () => demo.classList.add("scanning"), () => out("finalize_figure: no warnings"), 600,
+    () => badge("size"), 700, () => badge("overlap"), 700, () => demo.classList.add("gray"), 500, () => badge("gray"), 900,
+    () => demo.classList.remove("gray", "scanning"), 600,
+    () => stage("done"), [spin, "Placing", 700],
+    () => tool("Update", "paper/results.tex"), () => out("Added Figure 7 after Figure 6"),
+    () => { scene("page"); demo.classList.add("placed"); }, 400, toSlot, 1400,
+    () => demo.classList.add("landed"), () => say("Figure 7 is in, on page 8."), 3200,
+  ];
+  const play = (move, me) => typeof move === "number" ? wait(move) : Array.isArray(move) ? move[0](...move.slice(1), me) : move();
+
+  // play from a step (the start by default): the moves before it at once, without pauses, then the rest, looping
+  const playFrom = async (start = 0) => {
+    const me = ++run;
+    reset();
+    session.slice(0, start).forEach(m => { if (typeof m === "function") m(); });
+    settle();
+    for (const move of session.slice(start)) { if (me !== run) return; await play(move, me); }
+    if (me !== run) return;
+    demo.classList.add("fade");
+    await wait(600);
+    if (me === run) playFrom();
+  };
+  demo.querySelectorAll(".demo-stages li").forEach(li => li.querySelector("button").addEventListener("click", () =>
+    playFrom(session.findIndex(m => m.stage === li.dataset.stage))));
+
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    reset(); session.forEach(m => { if (typeof m === "function") m(); }); settle();
+    addEventListener("resize", toSlot); return;
+  }
+  playFrom();
 })();
 </script>
 </body>
