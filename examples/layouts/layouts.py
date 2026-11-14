@@ -324,7 +324,9 @@ if __name__ == "__main__":
     # half an inch), so figures of different heights sit right under each other; then the full-width figures
     # numbered as the page shows them: the single-column figures (placed in order), then the full-width ones
     ordered = [r for r in results if not r[2]] + [r for r in results if r[2]]
-    results = [(card.replace("Figure §", f"Figure {n}"), *rest) for n, (card, *rest) in enumerate(ordered, 1)]
+    # each figure carries its number as its order too: on a phone the columns melt into one list, in number order
+    results = [(card.replace("Figure §", f"Figure {n}").replace("<figure", f'<figure style="order:{n}"', 1), *rest)
+               for n, (card, *rest) in enumerate(ordered, 1)]
     cols, heights = [[], []], [0, 0]
     for card, _, wide, height in results:
         if not wide:
@@ -360,6 +362,12 @@ if __name__ == "__main__":
 /* captions as in the paper, at print size: 9 pt Times, the lead in bold */
 .layouts figcaption {{ margin-top:6pt; font:9pt/11pt "Times New Roman", Times, serif; color:#111; text-align:justify; hyphens:auto; }}
 .layouts figcaption b {{ font-weight:700; }}
+/* a phone: one column, the figures scaled to the screen (print size does not fit) */
+@media (max-width:860px) {{
+  .layouts {{ width:auto; margin:0 16px 40px; padding:20px 16px; }}
+  .layouts .pair {{ display:flex; flex-direction:column; gap:28px; }} .layouts .col {{ display:contents; }}
+  .layouts img {{ max-width:100%; height:auto; }}
+}}
 .layouts ul {{ margin:6px 0 0; padding-left:16px; color:#4d4d4d; font-size:12.5px; }}
 </style></head><body>
 <header class="top"><div class="wrap">

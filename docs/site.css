@@ -309,4 +309,12 @@ footer a:hover { color:var(--ink); }
   .pv[data-show="with"] .pv-pair .without, .pv[data-show="without"] .pv-pair .with { display:none; }
   .top .links .opt { display:none; }
 }
-@media (max-width:520px) { .wrap { padding:0 16px; } .top .links { gap:16px; } }
+@media (max-width:520px) {
+  .wrap { padding:0 16px; } .top .links { gap:16px; }
+  /* the comparison: less frame, smaller labels and handle, so the page gets the width */
+  .hero-compare { padding:16px 10px 14px; border-radius:16px; }
+  .hc-tag { top:8px; padding:3px 8px; font-size:10.5px; } .hc-tag-without { left:8px; } .hc-tag-with { right:8px; }
+  .hc-sheet::after { width:30px; height:30px; background-size:16px 16px; }
+  /* the install commands: the copy button gets its own row above them */
+  .install pre { padding-top:52px; font-size:13px; }
+}
